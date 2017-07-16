@@ -1,0 +1,36 @@
+build-nano-atmega328//mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/wheeledbase.o: \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/wheeledbase.ino \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/binary.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/WCharacter.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/WString.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/HardwareSerial.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Stream.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Print.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Printable.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/USBAPI.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/variants/eightanaloginputs/pins_arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/variants/eightanaloginputs/../standard/pins_arduino.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/PIN.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/constants.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/instructions.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/SerialTalks.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/serialutils.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/addresses.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/DCMotor.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/NonCopyable.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/DifferentialController.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/PeriodicProcess.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/Clock.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/PID.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/Codewheel.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/Odometry.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/Odometry.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/PID.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/VelocityController.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/PositionController.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/PurePursuit.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/PositionController.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/SmoothTrajectory.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/secondaryrobot/wheeledbase/../../common/mathutils.h

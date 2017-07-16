@@ -1,0 +1,24 @@
+build-nano-atmega328//mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/display.ino.o: \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/display.ino \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/binary.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/WCharacter.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/WString.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/HardwareSerial.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Stream.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Print.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Printable.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/USBAPI.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/variants/eightanaloginputs/pins_arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/variants/eightanaloginputs/../standard/pins_arduino.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/../common/SerialTalks.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/../common/serialutils.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/IPDisplay.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/../common/PeriodicProcess.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/../common/Clock.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/configuration.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/instructions.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/ledMatrix.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/display/eepromManagment.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/libraries/EEPROM/src/EEPROM.h

@@ -1,0 +1,30 @@
+build-nano-atmega328//mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/instructions.cpp.o: \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/instructions.cpp \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/instructions.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/SerialTalks.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/binary.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/WCharacter.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/WString.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/HardwareSerial.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Stream.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Print.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Printable.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/USBAPI.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/cores/arduino/Arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/variants/eightanaloginputs/pins_arduino.h \
+ /opt/arduino-1.6.12/hardware/arduino/avr/variants/eightanaloginputs/../standard/pins_arduino.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/serialutils.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/EndStop.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/DCMotor.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/NonCopyable.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/DifferentialController.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/PeriodicProcess.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/Clock.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/PID.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/VelocityServo.h \
+ /opt/arduino-1.6.12/libraries/Servo/src/Servo.h \
+ /opt/arduino-1.6.12/libraries/Servo/src/avr/ServoTimers.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/FullSpeedServo.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/../common/Clock.h \
+ /mnt/A64668F54668C79F/Documents/git/Club-Robot-2k17/team-2017/arduino/modulescollector/PIN.h
