@@ -1,0 +1,20 @@
+# Linux backup files
+*~
+
+# Visual Studio Code files
+.vscode
+
+# Python files
+__pycache__
+
+# Arduino build files
+build-*
+*.o
+*.d
+*.elf
+*.hex
+*.sizeok
+
+# OS X files
+.DS_Store
+._*
