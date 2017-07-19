@@ -53,9 +53,9 @@ sudo usermod -a -G dialout $USER
 PYTHONPATH=$(python3 -m site --user-site)
 
 UDEVRULES_DIRECTORY=/etc/udev/rules.d
-UDEVRULE='KERNEL=="ttyUSB*", PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c"'
+UDEVRULE='KERNEL=="ttyUSB*"	, PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c" \nKERNEL=="ttyACM*"	, PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c" '
 
-echo $UDEVRULE | sudo tee "$UDEVRULES_DIRECTORY/serialtalks.rules" > /dev/null
+echo -e $UDEVRULE | sudo tee "$UDEVRULES_DIRECTORY/serialtalks.rules" > /dev/null
 sudo udevadm control --reload-rules
 
 # Add the robot command to the user path if it is not already in it
