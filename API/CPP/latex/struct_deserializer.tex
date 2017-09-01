@@ -1,0 +1,127 @@
+\hypertarget{struct_deserializer}{}\section{Deserializer Struct Reference}
+\label{struct_deserializer}\index{Deserializer@{Deserializer}}
+
+
+Objet destiné à extraire des variables d\textquotesingle{}un flux en octet.  
+
+
+
+
+{\ttfamily \#include $<$serialutils.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{struct_deserializer_ae6463833d115113e2d7ed91c79d0c988}{Deserializer} (\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} \hyperlink{struct_deserializer_a37f4bae0d8a61c6c556ba3e90a10f0c4}{buffer}\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Constructeur de \hyperlink{struct_deserializer}{Deserializer}. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\\hyperlink{struct_deserializer}{Deserializer} \& \hyperlink{struct_deserializer_acda0fe1ee62c4f5de3d70104a20bc41a}{operator$>$$>$} (T \&object)
+\begin{DoxyCompactList}\small\item\em Operateur de décalage, a utilisé pour extraire les variables du buffer. \end{DoxyCompactList}\item 
+\hyperlink{struct_deserializer}{Deserializer} \& \hyperlink{struct_deserializer_aef72a346514298e1e71e69e9aef3b96f}{operator$>$$>$} (char $\ast$string)
+\begin{DoxyCompactList}\small\item\em Operateur de décalage, a utilisé pour remplir le buffer uniquement pour les variables de type char. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\T \hyperlink{struct_deserializer_af93dc898d561ad0b1d8b86ddf49053ca}{read} ()
+\begin{DoxyCompactList}\small\item\em Methode interne pour convertir les octets du buffer en données exploitables. \end{DoxyCompactList}\item 
+{\footnotesize template$<$$>$ }\\\hyperlink{serialutils_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String} \hyperlink{struct_deserializer_aefa095423e11239219f8a472547a6d22}{read} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} $\ast$ \hyperlink{struct_deserializer_a37f4bae0d8a61c6c556ba3e90a10f0c4}{buffer}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Objet destiné à extraire des variables d\textquotesingle{}un flux en octet. 
+
+\hyperlink{struct_deserializer}{Deserializer} permet d\textquotesingle{}extraire d\textquotesingle{}un buffer des variables. Cela permet une utilisation plus simple de \hyperlink{class_serial_talks}{Serial\+Talks}. Voir l\textquotesingle{}utilisation dans la doc python. Attention a bien extraire les variables dans le bonne ordre pour éviter les problèmes d\textquotesingle{}encodage et autres. 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{struct_deserializer_ae6463833d115113e2d7ed91c79d0c988}\label{struct_deserializer_ae6463833d115113e2d7ed91c79d0c988}} 
+\index{Deserializer@{Deserializer}!Deserializer@{Deserializer}}
+\index{Deserializer@{Deserializer}!Deserializer@{Deserializer}}
+\subsubsection{\texorpdfstring{Deserializer()}{Deserializer()}}
+{\footnotesize\ttfamily Deserializer\+::\+Deserializer (\begin{DoxyParamCaption}\item[{\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte}}]{buffer\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Constructeur de \hyperlink{struct_deserializer}{Deserializer}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointeur du buffer à utiliser. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{struct_deserializer_acda0fe1ee62c4f5de3d70104a20bc41a}\label{struct_deserializer_acda0fe1ee62c4f5de3d70104a20bc41a}} 
+\index{Deserializer@{Deserializer}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!Deserializer@{Deserializer}}
+\subsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+\hyperlink{struct_deserializer}{Deserializer}\& Deserializer\+::operator$>$$>$ (\begin{DoxyParamCaption}\item[{T \&}]{object }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Operateur de décalage, a utilisé pour extraire les variables du buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & Object à complêter avec le buffer. Attention le type de la variable est pris en compte dans la conversion octect -\/$>$ var\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Retourne le pointeur du deserializer pour une utilisation plus simple. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{struct_deserializer_aef72a346514298e1e71e69e9aef3b96f}\label{struct_deserializer_aef72a346514298e1e71e69e9aef3b96f}} 
+\index{Deserializer@{Deserializer}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!Deserializer@{Deserializer}}
+\subsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \hyperlink{struct_deserializer}{Deserializer}\& Deserializer\+::operator$>$$>$ (\begin{DoxyParamCaption}\item[{char $\ast$}]{string }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Operateur de décalage, a utilisé pour remplir le buffer uniquement pour les variables de type char. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & Object a renvoyer dans le buffer pour transmission.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Retourne le pointeur du serializer pour une utilisation plus simple 
+\end{DoxyReturn}
+\mbox{\Hypertarget{struct_deserializer_af93dc898d561ad0b1d8b86ddf49053ca}\label{struct_deserializer_af93dc898d561ad0b1d8b86ddf49053ca}} 
+\index{Deserializer@{Deserializer}!read@{read}}
+\index{read@{read}!Deserializer@{Deserializer}}
+\subsubsection{\texorpdfstring{read()}{read()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T Deserializer\+::read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Methode interne pour convertir les octets du buffer en données exploitables. 
+
+\begin{DoxyReturn}{Returns}
+Retourne la valeur extraite du buffer. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{struct_deserializer_aefa095423e11239219f8a472547a6d22}\label{struct_deserializer_aefa095423e11239219f8a472547a6d22}} 
+\index{Deserializer@{Deserializer}!read@{read}}
+\index{read@{read}!Deserializer@{Deserializer}}
+\subsubsection{\texorpdfstring{read()}{read()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$$>$ \\
+\hyperlink{serialutils_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String} Deserializer\+::read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{struct_deserializer_a37f4bae0d8a61c6c556ba3e90a10f0c4}\label{struct_deserializer_a37f4bae0d8a61c6c556ba3e90a10f0c4}} 
+\index{Deserializer@{Deserializer}!buffer@{buffer}}
+\index{buffer@{buffer}!Deserializer@{Deserializer}}
+\subsubsection{\texorpdfstring{buffer}{buffer}}
+{\footnotesize\ttfamily \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte}$\ast$ Deserializer\+::buffer}
+
+pointer vers le buffer à vider 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source\+\_\+code/\hyperlink{serialutils_8h}{serialutils.\+h}\end{DoxyCompactItemize}

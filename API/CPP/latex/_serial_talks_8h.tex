@@ -1,0 +1,143 @@
+\hypertarget{_serial_talks_8h}{}\section{source\+\_\+code/\+Serial\+Talks.h File Reference}
+\label{_serial_talks_8h}\index{source\+\_\+code/\+Serial\+Talks.\+h@{source\+\_\+code/\+Serial\+Talks.\+h}}
+{\ttfamily \#include $<$Arduino.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}serialutils.\+h\char`\"{}}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classostream}{ostream}
+\item 
+class \hyperlink{class_serial_talks}{Serial\+Talks}
+\begin{DoxyCompactList}\small\item\em Object de communication serial avec un ordinateur. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{_serial_talks_8h_a54ac2ddd5c85a3b5bb2469ad60a2d903}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE}~115200
+\item 
+\#define \hyperlink{_serial_talks_8h_a11d366b3979b2105dcd2a2c7c9329494}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}~64
+\item 
+\#define \hyperlink{_serial_talks_8h_aa9b06aaa07f7352b6039e4c16d24c4b2}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}~64
+\item 
+\#define \hyperlink{_serial_talks_8h_ad8d4edff1ced67e2bec1902168ce8884}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS}~0x0000000000
+\item 
+\#define \hyperlink{_serial_talks_8h_af4423a1f3526cac7c514d159b76e87d0}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}~32
+\item 
+\#define \hyperlink{_serial_talks_8h_a6c244e1c01fe09474f4c7665847e9deb}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE}~0x10
+\item 
+\#define \hyperlink{_serial_talks_8h_a1a21998925b3b6ce25bfb0b57f8a84cd}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE}~\textquotesingle{}R\textquotesingle{}
+\item 
+\#define \hyperlink{_serial_talks_8h_a863c7c8d86704679090a021c308fe9e4}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE}~\textquotesingle{}A\textquotesingle{}
+\item 
+\#define \hyperlink{_serial_talks_8h_aac69fae21d2a4ea7e5db5a2fa6dad23d}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}~9
+\item 
+\#define \hyperlink{_serial_talks_8h_ab336378d0cc6754ffaed1451ec5e6f68}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE}~0x0
+\item 
+\#define \hyperlink{_serial_talks_8h_ae6699bf7156ea8d801425762ecb2bd74}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}~0x1
+\item 
+\#define \hyperlink{_serial_talks_8h_ab705110647a7f21d0f73ea410b0d612f}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}~0x2
+\item 
+\#define \hyperlink{_serial_talks_8h_a37d105a48ca2d55c8e733fecc7dcdd60}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE}~0x\+F\+F\+F\+F\+F\+F\+FF
+\item 
+\#define \hyperlink{_serial_talks_8h_abdb2ac47a9307337b00854b423d3ffc9}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE}~0x\+F\+F\+F\+F\+F\+F\+FE
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_serial_talks}{Serial\+Talks} \hyperlink{_serial_talks_8h_ad2a5b3993cbc91fe3d61a87df5dc005a}{talks}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{_serial_talks_8h_a54ac2ddd5c85a3b5bb2469ad60a2d903}\label{_serial_talks_8h_a54ac2ddd5c85a3b5bb2469ad60a2d903}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE}{SERIALTALKS\_BAUDRATE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+B\+A\+U\+D\+R\+A\+TE~115200}
+
+Bauderate utiliser \mbox{\Hypertarget{_serial_talks_8h_aac69fae21d2a4ea7e5db5a2fa6dad23d}\label{_serial_talks_8h_aac69fae21d2a4ea7e5db5a2fa6dad23d}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}{SERIALTALKS\_DEFAULT\_UUID\_LENGTH}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+D\+E\+F\+A\+U\+L\+T\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH~9}
+
+\mbox{\Hypertarget{_serial_talks_8h_ae6699bf7156ea8d801425762ecb2bd74}\label{_serial_talks_8h_ae6699bf7156ea8d801425762ecb2bd74}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}{SERIALTALKS\_GETUUID\_OPCODE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+G\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE~0x1}
+
+\mbox{\Hypertarget{_serial_talks_8h_a11d366b3979b2105dcd2a2c7c9329494}\label{_serial_talks_8h_a11d366b3979b2105dcd2a2c7c9329494}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}{SERIALTALKS\_INPUT\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE~64}
+
+\mbox{\Hypertarget{_serial_talks_8h_a1a21998925b3b6ce25bfb0b57f8a84cd}\label{_serial_talks_8h_a1a21998925b3b6ce25bfb0b57f8a84cd}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE}{SERIALTALKS\_MASTER\_BYTE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+S\+T\+E\+R\+\_\+\+B\+Y\+TE~\textquotesingle{}R\textquotesingle{}}
+
+\mbox{\Hypertarget{_serial_talks_8h_a6c244e1c01fe09474f4c7665847e9deb}\label{_serial_talks_8h_a6c244e1c01fe09474f4c7665847e9deb}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE}{SERIALTALKS\_MAX\_OPCODE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE~0x10}
+
+\mbox{\Hypertarget{_serial_talks_8h_aa9b06aaa07f7352b6039e4c16d24c4b2}\label{_serial_talks_8h_aa9b06aaa07f7352b6039e4c16d24c4b2}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}{SERIALTALKS\_OUTPUT\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE~64}
+
+\mbox{\Hypertarget{_serial_talks_8h_ab336378d0cc6754ffaed1451ec5e6f68}\label{_serial_talks_8h_ab336378d0cc6754ffaed1451ec5e6f68}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE}{SERIALTALKS\_PING\_OPCODE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+P\+I\+N\+G\+\_\+\+O\+P\+C\+O\+DE~0x0}
+
+\mbox{\Hypertarget{_serial_talks_8h_ab705110647a7f21d0f73ea410b0d612f}\label{_serial_talks_8h_ab705110647a7f21d0f73ea410b0d612f}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE}{SERIALTALKS\_SETUUID\_OPCODE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+E\+T\+U\+U\+I\+D\+\_\+\+O\+P\+C\+O\+DE~0x2}
+
+\mbox{\Hypertarget{_serial_talks_8h_a863c7c8d86704679090a021c308fe9e4}\label{_serial_talks_8h_a863c7c8d86704679090a021c308fe9e4}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE}{SERIALTALKS\_SLAVE\_BYTE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+L\+A\+V\+E\+\_\+\+B\+Y\+TE~\textquotesingle{}A\textquotesingle{}}
+
+\mbox{\Hypertarget{_serial_talks_8h_abdb2ac47a9307337b00854b423d3ffc9}\label{_serial_talks_8h_abdb2ac47a9307337b00854b423d3ffc9}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE}{SERIALTALKS\_STDERR\_RETCODE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+E\+R\+R\+\_\+\+R\+E\+T\+C\+O\+DE~0x\+F\+F\+F\+F\+F\+F\+FE}
+
+\mbox{\Hypertarget{_serial_talks_8h_a37d105a48ca2d55c8e733fecc7dcdd60}\label{_serial_talks_8h_a37d105a48ca2d55c8e733fecc7dcdd60}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE}{SERIALTALKS\_STDOUT\_RETCODE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+S\+T\+D\+O\+U\+T\+\_\+\+R\+E\+T\+C\+O\+DE~0x\+F\+F\+F\+F\+F\+F\+FF}
+
+\mbox{\Hypertarget{_serial_talks_8h_ad8d4edff1ced67e2bec1902168ce8884}\label{_serial_talks_8h_ad8d4edff1ced67e2bec1902168ce8884}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS}{SERIALTALKS\_UUID\_ADDRESS}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+A\+D\+D\+R\+E\+SS~0x0000000000}
+
+\mbox{\Hypertarget{_serial_talks_8h_af4423a1f3526cac7c514d159b76e87d0}\label{_serial_talks_8h_af4423a1f3526cac7c514d159b76e87d0}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}}
+\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH}{SERIALTALKS\_UUID\_LENGTH}}
+{\footnotesize\ttfamily \#define S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+U\+U\+I\+D\+\_\+\+L\+E\+N\+G\+TH~32}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{_serial_talks_8h_ad2a5b3993cbc91fe3d61a87df5dc005a}\label{_serial_talks_8h_ad2a5b3993cbc91fe3d61a87df5dc005a}} 
+\index{Serial\+Talks.\+h@{Serial\+Talks.\+h}!talks@{talks}}
+\index{talks@{talks}!Serial\+Talks.\+h@{Serial\+Talks.\+h}}
+\subsubsection{\texorpdfstring{talks}{talks}}
+{\footnotesize\ttfamily \hyperlink{class_serial_talks}{Serial\+Talks} talks}
+

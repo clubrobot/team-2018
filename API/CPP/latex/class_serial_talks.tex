@@ -1,0 +1,253 @@
+\hypertarget{class_serial_talks}{}\section{Serial\+Talks Class Reference}
+\label{class_serial_talks}\index{Serial\+Talks@{Serial\+Talks}}
+
+
+Object de communication serial avec un ordinateur.  
+
+
+
+
+{\ttfamily \#include $<$Serial\+Talks.\+h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef void($\ast$ \hyperlink{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}{Instruction}) (\hyperlink{class_serial_talks}{Serial\+Talks} \&inst, \hyperlink{struct_deserializer}{Deserializer} \&input, \hyperlink{struct_serializer}{Serializer} \&output)
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_serial_talks_ad66e8c5cd4d3ae3e63f70884dba3ce12}{begin} (Stream \&stream)
+\item 
+void \hyperlink{class_serial_talks_a484c56fb8d8619a58435a001dca6f0ba}{bind} (\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} opcode, \hyperlink{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}{Instruction} instruction)
+\item 
+bool \hyperlink{class_serial_talks_a31aac8c9995468cf9b1308264bc077ae}{execinstruction} (\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} $\ast$input\+Buffer)
+\item 
+bool \hyperlink{class_serial_talks_a9bd8eaff71cfcf33f489e86d3326435c}{execute} ()
+\item 
+bool \hyperlink{class_serial_talks_a02d73ff9cbb4c44e2e9ba36f97714c9d}{is\+Connected} () const
+\item 
+bool \hyperlink{class_serial_talks_a1cf3e5668f7a1d1cd1296535ef011528}{wait\+Until\+Connected} (float timeout=-\/1)
+\item 
+bool \hyperlink{class_serial_talks_a61f0840f12d804ea107ebb98abdc5964}{get\+U\+U\+ID} (char $\ast$uuid)
+\item 
+void \hyperlink{class_serial_talks_a66e896e6d974c4e4eb9ed890b15c38c1}{set\+U\+U\+ID} (const char $\ast$uuid)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \hyperlink{class_serial_talks_a08807e3d40b70042f9b88504216245e0}{generate\+Random\+U\+U\+ID} (char $\ast$uuid, int length)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classostream}{ostream} \hyperlink{class_serial_talks_adcce1950be020551b2acfac6c912bbb8}{out}
+\item 
+\hyperlink{classostream}{ostream} \hyperlink{class_serial_talks_ad0f3d8029336f8f3e0522c18de8206fd}{err}
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a07d4b82adf8bfbd008a9f02bd9f92edc}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+W\+A\+I\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE}, 
+\hyperlink{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a3f57d939c8568b615523f51378deca27}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE}, 
+\hyperlink{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a3b63d11137aef55d7bc7636619609b8e}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+R\+E\+C\+E\+I\+V\+I\+N\+G\+\_\+\+S\+T\+A\+TE}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{class_serial_talks_a19f503e1040f6e8f157b4ff579343f62}{sendback} (long retcode, const \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} $\ast$buffer, int size)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Stream $\ast$ \hyperlink{class_serial_talks_a41747c976eb00f67b6bc97e9deafed18}{m\+\_\+stream}
+\item 
+bool \hyperlink{class_serial_talks_a456c0512ed2ff0f34e3f389c72d51707}{m\+\_\+connected}
+\item 
+\hyperlink{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}{Instruction} \hyperlink{class_serial_talks_a13d8ac072cbe0bd5c6c326f6edaa2d64}{m\+\_\+instructions} \mbox{[}\hyperlink{_serial_talks_8h_a6c244e1c01fe09474f4c7665847e9deb}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE}\mbox{]}
+\item 
+\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} \hyperlink{class_serial_talks_a8a462f95adc02e43325c57aceaa6f16f}{m\+\_\+input\+Buffer} \mbox{[}\hyperlink{_serial_talks_8h_a11d366b3979b2105dcd2a2c7c9329494}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}\mbox{]}
+\item 
+\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} \hyperlink{class_serial_talks_a03d177cdcaafce204cf6e39c078e72b8}{m\+\_\+output\+Buffer} \mbox{[}\hyperlink{_serial_talks_8h_aa9b06aaa07f7352b6039e4c16d24c4b2}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}\mbox{]}
+\item 
+enum Serial\+Talks\+:: \{ ... \}  \hyperlink{class_serial_talks_afcb349051c5b5557bebfc0751bd6c4d1}{m\+\_\+state}
+\item 
+\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} \hyperlink{class_serial_talks_a57d258fa613c6d0af8f8e4b1321f45fc}{m\+\_\+bytes\+Number}
+\item 
+\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} \hyperlink{class_serial_talks_ab47d58ef0dcabdde5c0d127c0265df6a}{m\+\_\+bytes\+Counter}
+\item 
+long \hyperlink{class_serial_talks_a8c1f54ff3158f520e09670d66a9ac0ac}{m\+\_\+last\+Time}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Object de communication serial avec un ordinateur. 
+
+class \hyperlink{class_serial_talks}{Serial\+Talks} est un outil permetant à l\textquotesingle{}arduino de pouvoir répondre au requette recu depuis le serial. Il utilise donc le port serial (usb) pour envoyer ou recevoir des données avec l\textquotesingle{}ordinateur ou la raspberry La classe est capable de lancer des methodes sur demande de l\textquotesingle{}ordinateur ou de la raspberry. 
+
+\subsection{Member Typedef Documentation}
+\mbox{\Hypertarget{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}\label{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}} 
+\index{Serial\+Talks@{Serial\+Talks}!Instruction@{Instruction}}
+\index{Instruction@{Instruction}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{Instruction}{Instruction}}
+{\footnotesize\ttfamily typedef void($\ast$ Serial\+Talks\+::\+Instruction) (\hyperlink{class_serial_talks}{Serial\+Talks} \&inst, \hyperlink{struct_deserializer}{Deserializer} \&input, \hyperlink{struct_serializer}{Serializer} \&output)}
+
+
+
+\subsection{Member Enumeration Documentation}
+\mbox{\Hypertarget{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2}\label{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2}} 
+\subsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily anonymous enum\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+W\+A\+I\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+W\+A\+I\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE}!Serial\+Talks@{Serial\+Talks}}\index{Serial\+Talks@{Serial\+Talks}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+W\+A\+I\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+W\+A\+I\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE}}}\mbox{\Hypertarget{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a07d4b82adf8bfbd008a9f02bd9f92edc}\label{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a07d4b82adf8bfbd008a9f02bd9f92edc}} 
+S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+W\+A\+I\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE}!Serial\+Talks@{Serial\+Talks}}\index{Serial\+Talks@{Serial\+Talks}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE}}}\mbox{\Hypertarget{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a3f57d939c8568b615523f51378deca27}\label{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a3f57d939c8568b615523f51378deca27}} 
+S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+S\+T\+A\+TE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+R\+E\+C\+E\+I\+V\+I\+N\+G\+\_\+\+S\+T\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+R\+E\+C\+E\+I\+V\+I\+N\+G\+\_\+\+S\+T\+A\+TE}!Serial\+Talks@{Serial\+Talks}}\index{Serial\+Talks@{Serial\+Talks}!S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+R\+E\+C\+E\+I\+V\+I\+N\+G\+\_\+\+S\+T\+A\+TE@{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+R\+E\+C\+E\+I\+V\+I\+N\+G\+\_\+\+S\+T\+A\+TE}}}\mbox{\Hypertarget{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a3b63d11137aef55d7bc7636619609b8e}\label{class_serial_talks_aa0ccaa2c5993aa8989e592eee55de2b2a3b63d11137aef55d7bc7636619609b8e}} 
+S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+S\+T\+R\+U\+C\+T\+I\+O\+N\+\_\+\+R\+E\+C\+E\+I\+V\+I\+N\+G\+\_\+\+S\+T\+A\+TE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_serial_talks_ad66e8c5cd4d3ae3e63f70884dba3ce12}\label{class_serial_talks_ad66e8c5cd4d3ae3e63f70884dba3ce12}} 
+\index{Serial\+Talks@{Serial\+Talks}!begin@{begin}}
+\index{begin@{begin}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily void Serial\+Talks\+::begin (\begin{DoxyParamCaption}\item[{Stream \&}]{stream }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_talks_a484c56fb8d8619a58435a001dca6f0ba}\label{class_serial_talks_a484c56fb8d8619a58435a001dca6f0ba}} 
+\index{Serial\+Talks@{Serial\+Talks}!bind@{bind}}
+\index{bind@{bind}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{bind()}{bind()}}
+{\footnotesize\ttfamily void Serial\+Talks\+::bind (\begin{DoxyParamCaption}\item[{\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte}}]{opcode,  }\item[{\hyperlink{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}{Instruction}}]{instruction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_talks_a31aac8c9995468cf9b1308264bc077ae}\label{class_serial_talks_a31aac8c9995468cf9b1308264bc077ae}} 
+\index{Serial\+Talks@{Serial\+Talks}!execinstruction@{execinstruction}}
+\index{execinstruction@{execinstruction}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{execinstruction()}{execinstruction()}}
+{\footnotesize\ttfamily bool Serial\+Talks\+::execinstruction (\begin{DoxyParamCaption}\item[{\hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} $\ast$}]{input\+Buffer }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_talks_a9bd8eaff71cfcf33f489e86d3326435c}\label{class_serial_talks_a9bd8eaff71cfcf33f489e86d3326435c}} 
+\index{Serial\+Talks@{Serial\+Talks}!execute@{execute}}
+\index{execute@{execute}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{execute()}{execute()}}
+{\footnotesize\ttfamily bool Serial\+Talks\+::execute (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_talks_a08807e3d40b70042f9b88504216245e0}\label{class_serial_talks_a08807e3d40b70042f9b88504216245e0}} 
+\index{Serial\+Talks@{Serial\+Talks}!generate\+Random\+U\+U\+ID@{generate\+Random\+U\+U\+ID}}
+\index{generate\+Random\+U\+U\+ID@{generate\+Random\+U\+U\+ID}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{generate\+Random\+U\+U\+I\+D()}{generateRandomUUID()}}
+{\footnotesize\ttfamily static void Serial\+Talks\+::generate\+Random\+U\+U\+ID (\begin{DoxyParamCaption}\item[{char $\ast$}]{uuid,  }\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_serial_talks_a61f0840f12d804ea107ebb98abdc5964}\label{class_serial_talks_a61f0840f12d804ea107ebb98abdc5964}} 
+\index{Serial\+Talks@{Serial\+Talks}!get\+U\+U\+ID@{get\+U\+U\+ID}}
+\index{get\+U\+U\+ID@{get\+U\+U\+ID}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{get\+U\+U\+I\+D()}{getUUID()}}
+{\footnotesize\ttfamily bool Serial\+Talks\+::get\+U\+U\+ID (\begin{DoxyParamCaption}\item[{char $\ast$}]{uuid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_talks_a02d73ff9cbb4c44e2e9ba36f97714c9d}\label{class_serial_talks_a02d73ff9cbb4c44e2e9ba36f97714c9d}} 
+\index{Serial\+Talks@{Serial\+Talks}!is\+Connected@{is\+Connected}}
+\index{is\+Connected@{is\+Connected}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{is\+Connected()}{isConnected()}}
+{\footnotesize\ttfamily bool Serial\+Talks\+::is\+Connected (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{class_serial_talks_a19f503e1040f6e8f157b4ff579343f62}\label{class_serial_talks_a19f503e1040f6e8f157b4ff579343f62}} 
+\index{Serial\+Talks@{Serial\+Talks}!sendback@{sendback}}
+\index{sendback@{sendback}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{sendback()}{sendback()}}
+{\footnotesize\ttfamily int Serial\+Talks\+::sendback (\begin{DoxyParamCaption}\item[{long}]{retcode,  }\item[{const \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} $\ast$}]{buffer,  }\item[{int}]{size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a66e896e6d974c4e4eb9ed890b15c38c1}\label{class_serial_talks_a66e896e6d974c4e4eb9ed890b15c38c1}} 
+\index{Serial\+Talks@{Serial\+Talks}!set\+U\+U\+ID@{set\+U\+U\+ID}}
+\index{set\+U\+U\+ID@{set\+U\+U\+ID}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{set\+U\+U\+I\+D()}{setUUID()}}
+{\footnotesize\ttfamily void Serial\+Talks\+::set\+U\+U\+ID (\begin{DoxyParamCaption}\item[{const char $\ast$}]{uuid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_serial_talks_a1cf3e5668f7a1d1cd1296535ef011528}\label{class_serial_talks_a1cf3e5668f7a1d1cd1296535ef011528}} 
+\index{Serial\+Talks@{Serial\+Talks}!wait\+Until\+Connected@{wait\+Until\+Connected}}
+\index{wait\+Until\+Connected@{wait\+Until\+Connected}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{wait\+Until\+Connected()}{waitUntilConnected()}}
+{\footnotesize\ttfamily bool Serial\+Talks\+::wait\+Until\+Connected (\begin{DoxyParamCaption}\item[{float}]{timeout = {\ttfamily -\/1} }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_serial_talks_ad0f3d8029336f8f3e0522c18de8206fd}\label{class_serial_talks_ad0f3d8029336f8f3e0522c18de8206fd}} 
+\index{Serial\+Talks@{Serial\+Talks}!err@{err}}
+\index{err@{err}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{err}{err}}
+{\footnotesize\ttfamily \hyperlink{classostream}{ostream} Serial\+Talks\+::err}
+
+\mbox{\Hypertarget{class_serial_talks_ab47d58ef0dcabdde5c0d127c0265df6a}\label{class_serial_talks_ab47d58ef0dcabdde5c0d127c0265df6a}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+bytes\+Counter@{m\+\_\+bytes\+Counter}}
+\index{m\+\_\+bytes\+Counter@{m\+\_\+bytes\+Counter}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+bytes\+Counter}{m\_bytesCounter}}
+{\footnotesize\ttfamily \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} Serial\+Talks\+::m\+\_\+bytes\+Counter\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a57d258fa613c6d0af8f8e4b1321f45fc}\label{class_serial_talks_a57d258fa613c6d0af8f8e4b1321f45fc}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+bytes\+Number@{m\+\_\+bytes\+Number}}
+\index{m\+\_\+bytes\+Number@{m\+\_\+bytes\+Number}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+bytes\+Number}{m\_bytesNumber}}
+{\footnotesize\ttfamily \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} Serial\+Talks\+::m\+\_\+bytes\+Number\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a456c0512ed2ff0f34e3f389c72d51707}\label{class_serial_talks_a456c0512ed2ff0f34e3f389c72d51707}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+connected@{m\+\_\+connected}}
+\index{m\+\_\+connected@{m\+\_\+connected}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+connected}{m\_connected}}
+{\footnotesize\ttfamily bool Serial\+Talks\+::m\+\_\+connected\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a8a462f95adc02e43325c57aceaa6f16f}\label{class_serial_talks_a8a462f95adc02e43325c57aceaa6f16f}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+input\+Buffer@{m\+\_\+input\+Buffer}}
+\index{m\+\_\+input\+Buffer@{m\+\_\+input\+Buffer}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+input\+Buffer}{m\_inputBuffer}}
+{\footnotesize\ttfamily \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} Serial\+Talks\+::m\+\_\+input\+Buffer\mbox{[}\hyperlink{_serial_talks_8h_a11d366b3979b2105dcd2a2c7c9329494}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+I\+N\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a13d8ac072cbe0bd5c6c326f6edaa2d64}\label{class_serial_talks_a13d8ac072cbe0bd5c6c326f6edaa2d64}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+instructions@{m\+\_\+instructions}}
+\index{m\+\_\+instructions@{m\+\_\+instructions}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+instructions}{m\_instructions}}
+{\footnotesize\ttfamily \hyperlink{class_serial_talks_a35ccf86c63ad45fb719e81b0c8db2f13}{Instruction} Serial\+Talks\+::m\+\_\+instructions\mbox{[}\hyperlink{_serial_talks_8h_a6c244e1c01fe09474f4c7665847e9deb}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+M\+A\+X\+\_\+\+O\+P\+C\+O\+DE}\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a8c1f54ff3158f520e09670d66a9ac0ac}\label{class_serial_talks_a8c1f54ff3158f520e09670d66a9ac0ac}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+last\+Time@{m\+\_\+last\+Time}}
+\index{m\+\_\+last\+Time@{m\+\_\+last\+Time}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+last\+Time}{m\_lastTime}}
+{\footnotesize\ttfamily long Serial\+Talks\+::m\+\_\+last\+Time\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a03d177cdcaafce204cf6e39c078e72b8}\label{class_serial_talks_a03d177cdcaafce204cf6e39c078e72b8}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+output\+Buffer@{m\+\_\+output\+Buffer}}
+\index{m\+\_\+output\+Buffer@{m\+\_\+output\+Buffer}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+output\+Buffer}{m\_outputBuffer}}
+{\footnotesize\ttfamily \hyperlink{serialutils_8h_a0c8186d9b9b7880309c27230bbb5e69d}{byte} Serial\+Talks\+::m\+\_\+output\+Buffer\mbox{[}\hyperlink{_serial_talks_8h_aa9b06aaa07f7352b6039e4c16d24c4b2}{S\+E\+R\+I\+A\+L\+T\+A\+L\+K\+S\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_afcb349051c5b5557bebfc0751bd6c4d1}\label{class_serial_talks_afcb349051c5b5557bebfc0751bd6c4d1}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+state@{m\+\_\+state}}
+\index{m\+\_\+state@{m\+\_\+state}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+state}{m\_state}}
+{\footnotesize\ttfamily enum \{ ... \}             Serial\+Talks\+::m\+\_\+state\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_a41747c976eb00f67b6bc97e9deafed18}\label{class_serial_talks_a41747c976eb00f67b6bc97e9deafed18}} 
+\index{Serial\+Talks@{Serial\+Talks}!m\+\_\+stream@{m\+\_\+stream}}
+\index{m\+\_\+stream@{m\+\_\+stream}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{m\+\_\+stream}{m\_stream}}
+{\footnotesize\ttfamily Stream$\ast$ Serial\+Talks\+::m\+\_\+stream\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{class_serial_talks_adcce1950be020551b2acfac6c912bbb8}\label{class_serial_talks_adcce1950be020551b2acfac6c912bbb8}} 
+\index{Serial\+Talks@{Serial\+Talks}!out@{out}}
+\index{out@{out}!Serial\+Talks@{Serial\+Talks}}
+\subsubsection{\texorpdfstring{out}{out}}
+{\footnotesize\ttfamily \hyperlink{classostream}{ostream} Serial\+Talks\+::out}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source\+\_\+code/\hyperlink{_serial_talks_8h}{Serial\+Talks.\+h}\end{DoxyCompactItemize}
