@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Recherche" href="search.html" />
     <link rel="next" title="TCP Talks" href="TCPTalks.html" />
-    <link rel="prev" title="Header &lt;cpr/SerialTalks.h&gt;" href="cpp/SerialTalks.html" /> 
+    <link rel="prev" title="SerialTalks" href="SerialTalks.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,13 +36,10 @@
           <a href="genindex.html" title="Index général"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Index des modules Python"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="TCPTalks.html" title="TCP Talks"
              accesskey="N">suivant</a> |</li>
         <li class="right" >
-          <a href="cpp/SerialTalks.html" title="Header &lt;cpr/SerialTalks.h&gt;"
+          <a href="SerialTalks.html" title="SerialTalks"
              accesskey="P">précédent</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">documentation Club Robot 1.0</a> &#187;</li> 
       </ul>
@@ -55,14 +52,329 @@
             
   <div class="section" id="serial-utils">
 <h1>Serial Utils<a class="headerlink" href="#serial-utils" title="Lien permanent vers ce titre">¶</a></h1>
+<p>Serial Utils est une librairie de serialisation pour la communication entre l’ordinateur sous python et l’arduino sous CPP et ino.</p>
 <div class="section" id="preambule">
 <h2>Préambule<a class="headerlink" href="#preambule" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Cette librairie existe en deux versions (python , cpp). Ces deux versions different un peu dans le fonctionnement mais l’idée reste la même. Le but est de serialiser et de deserialiser. Ces opérations consistent à passer d’un object utilisable par un language (exemple int float double string) à une chaine d’octet ou l’inverse.
+Pour une utilisation plus simple cette librairie est composé d’object avec une tache bien spécifique.</p>
 </div>
-<div class="section" id="python-object">
-<h2>Python Object<a class="headerlink" href="#python-object" title="Lien permanent vers ce titre">¶</a></h2>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Voici la version en python de cette librairie</p>
+<div class="section" id="id1">
+<h3>Préambule<a class="headerlink" href="#id1" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Pour le côté python, il existe des objects qui sont capables de faire la serialisation et la déserialisation en même temps mais pour un seul type de donnée. Malgrès le fais que ces objects existent, on prefèrera utiliser un object de déserialisation pur qui peux gérer des données avec plusieurs variables encodé en octet à l’interieur (ce qui n’est pas possible avec les objects de serialisation).
+Pour commencer l’API nous allons traiter les objects de serialisation hybride puis l’object de déserialisation.</p>
+<p>Toutes les classes de serialisation hybride hérite de AbstractType qui permet de les utiliser beaucoup plus facilement.</p>
 </div>
-<div class="section" id="arduino-object">
-<h2>Arduino Object<a class="headerlink" href="#arduino-object" title="Lien permanent vers ce titre">¶</a></h2>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Lien permanent vers ce titre">¶</a></h3>
+<dl class="class">
+<dt id="AbstractType">
+<em class="property">class </em><code class="descname">AbstractType</code><a class="headerlink" href="#AbstractType" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><dl class="method">
+<dt id="AbstractType.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#AbstractType.__call__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Cette methode permet à l’object d’être utilisé comme une methode et de retourner l’arguement (octets) en variable exploitable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>value</strong> (<em>octet</em>) – Les octets à convertir en variable exploitables</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">Retourne la variable transcrit de l’octet à partir de value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="IntegerType">
+<em class="property">class </em><code class="descname">IntegerType</code><span class="sig-paren">(</span><em>AbstractType</em><span class="sig-paren">)</span><a class="headerlink" href="#IntegerType" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode pour les variables sans virgules et les caractères simple (int , char , long).</p>
+<dl class="method">
+<dt id="IntegerType.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>length</em>, <em>byteorder</em>, <em>signed</em><span class="sig-paren">)</span><a class="headerlink" href="#IntegerType.__init__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Constructeur de l’object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first last simple">
+<li><strong>length</strong> – nombre d’octet du type à convertir, exemple 2 pour int.</li>
+<li><strong>byteorder</strong> – Cette argument defini l’octet principal. Seul deux options possible <code class="docutils literal"><span class="pre">big</span></code> pour l’octet principal au debut et <code class="docutils literal"><span class="pre">little</span></code> pour l’octet principal à la fin.</li>
+<li><strong>signed</strong> – Boolean pour savoir si la variable peut être négatif ou non.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="IntegerType.to_bytes">
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>integer</em><span class="sig-paren">)</span><a class="headerlink" href="#IntegerType.to_bytes" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode pour convertir l’argument en octet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>integer</strong> – argument à convertir en octet.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">Retourne l’argument en octet.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="IntegerType.from_bytes">
+<code class="descname">from_bytes</code><span class="sig-paren">(</span><em>rawbytes</em><span class="sig-paren">)</span><a class="headerlink" href="#IntegerType.from_bytes" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode pour transformer des octets en variable exploitable dans le type prealablement paramétré.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>rawbytes</strong> – octets à convertir en variable utilisable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">Retourne la variable convertie de l’octet renseigné.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Pour l’arduino il faut prendre comme byteorder <code class="docutils literal"><span class="pre">little</span></code></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="FloatType">
+<em class="property">class </em><code class="descname">FloatType</code><span class="sig-paren">(</span><em>AbstractType</em><span class="sig-paren">)</span><a class="headerlink" href="#FloatType" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Object de serialisation pour les variables float et double</p>
+<dl class="method">
+<dt id="FloatType.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>standard</em><span class="sig-paren">)</span><a class="headerlink" href="#FloatType.__init__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Constucteur du serialiser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>standard</strong> – Egal à <code class="docutils literal"><span class="pre">f</span></code> pour float et <code class="docutils literal"><span class="pre">d</span></code> pour double.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="FloatType.to_bytes">
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>real</em><span class="sig-paren">)</span><a class="headerlink" href="#FloatType.to_bytes" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode pour convertir l’argument en octet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>integer</strong> – argument à convertir en octet.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">Retourne l’argument en octet.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="FloatType.from_bytes">
+<code class="descname">from_bytes</code><span class="sig-paren">(</span><em>rawbytes</em><span class="sig-paren">)</span><a class="headerlink" href="#FloatType.from_bytes" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode pour transformer des octets en variable exploitable dans le type prealablement paramétré.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>rawbytes</strong> – octets à convertir en variable utilisable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">Retourne la variable convertie de l’octet renseigné.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="StringType">
+<em class="property">class </em><code class="descname">StringType</code><span class="sig-paren">(</span><em>AbstractType</em><span class="sig-paren">)</span><a class="headerlink" href="#StringType" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Serialiser pour les chaines de caractère</p>
+<dl class="method">
+<dt id="StringType.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>encoding</em><span class="sig-paren">)</span><a class="headerlink" href="#StringType.__init__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Constructeur de l’oject.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>encoding</strong> – Encodage à utiliser pour transcrire les chaines de caractères en octets.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Pour une utilisation avec un arduino, il faut utiliser l’utf-8.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="StringType.to_bytes">
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="headerlink" href="#StringType.to_bytes" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode de conversion des strings en octets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>string</strong> – Chaine de caractères à convertir en octets.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">Les octets defini à partir de la chaine de caractères en argument.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StringType.from_bytes">
+<code class="descname">from_bytes</code><span class="sig-paren">(</span><em>rawbytes</em><span class="sig-paren">)</span><a class="headerlink" href="#StringType.from_bytes" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode de conversion d’octets en une chaine de caractères.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>rawbytes</strong> – Octets à convertir.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">La chaine de caractères transcrit des octets en argument.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Deserializer">
+<em class="property">class </em><code class="descname">Deserializer</code><a class="headerlink" href="#Deserializer" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Object de déserialisation d’octets avec plusieurs variables dedans.</p>
+<dl class="method">
+<dt id="Deserializer.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>rawbytes</em><span class="sig-paren">)</span><a class="headerlink" href="#Deserializer.__init__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Constructeur de l’object de deserialisation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>rawbytes</strong> – Octets à convertir en variables.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="Deserializer.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>*types</em><span class="sig-paren">)</span><a class="headerlink" href="#Deserializer.read" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode pour extraire les variables des octets fourni dans le constructeur.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>types</strong> – Arguments pour deserialiser les octets.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">La liste des variables extraite en tuple.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Avertissement</p>
+<p class="last">Il faut obligatoirement utiliser des objets d’AbstractType, pour bien convertir.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="utilisation">
+<h3>Utilisation<a class="headerlink" href="#utilisation" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Voici quelques exemples d’utilisation de la libraire.</p>
+<p>Pour la conversion en octet :</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">char_t</span>   <span class="o">=</span> <span class="n">IntegerType</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">byte_t</span>   <span class="o">=</span> <span class="n">IntegerType</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">int_t</span>    <span class="o">=</span> <span class="n">IntegerType</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">uint_t</span>   <span class="o">=</span> <span class="n">IntegerType</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">string_t</span> <span class="o">=</span> <span class="n">StringType</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="n">float_t</span>  <span class="o">=</span> <span class="n">FloatType</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
+
+<span class="n">rawbyte</span> <span class="o">=</span> <span class="n">byte_t</span>  <span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="n">char_t</span>  <span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="n">uint_t</span>  <span class="p">(</span><span class="mi">123456</span><span class="p">)</span> <span class="o">+</span> <span class="n">int_t</span>   <span class="p">(</span><span class="o">-</span><span class="mi">789</span><span class="p">)</span> <span class="o">+</span>  <span class="n">string_t</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">float_t</span> <span class="p">(</span><span class="mf">987.654</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Rawbyte est donc une liste d’octets contenants toutes ces variables.
+Pour la reconversion :</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">Deserializer</span><span class="p">(</span><span class="n">rawbyte</span><span class="p">)</span>
+<span class="n">variables</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">byte_t</span><span class="p">,</span><span class="n">char_t</span><span class="p">,</span><span class="n">uint_t</span><span class="p">,</span><span class="n">int_t</span><span class="p">,</span><span class="n">string_t</span><span class="p">,</span><span class="n">float_t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Voici un tableau récapitulant les objects de déserialisation utile pour l’arduino :</p>
+<table border="1" class="colwidths-given docutils" id="id3">
+<caption><span class="caption-text">Tableau des serialisation pour utiliser Serialtalks</span><a class="headerlink" href="#id3" title="Lien permanent vers ce tableau">¶</a></caption>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Object</th>
+<th class="head">Paramètres</th>
+<th class="head">&#160;</th>
+<th class="head">&#160;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>BYTE</td>
+<td>IntegerType</td>
+<td>1</td>
+<td>“little”</td>
+<td>False</td>
+</tr>
+<tr class="row-odd"><td>INT</td>
+<td>IntegerType</td>
+<td>2</td>
+<td>“little”</td>
+<td>True</td>
+</tr>
+<tr class="row-even"><td>LONG</td>
+<td>IntegerType</td>
+<td>4</td>
+<td>“little”</td>
+<td>True</td>
+</tr>
+<tr class="row-odd"><td>FLOAT</td>
+<td>FloatType</td>
+<td>“f”</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>STRING</td>
+<td>StringType</td>
+<td>“utf-8”</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="c-api">
+<h2>C++ API<a class="headerlink" href="#c-api" title="Lien permanent vers ce titre">¶</a></h2>
 <dl class="class">
 <dt id="Serializer">
 <em class="property">class </em><code class="descname">Serializer</code><a class="headerlink" href="#Serializer" title="Lien permanent vers cette définition">¶</a></dt>
@@ -85,15 +397,20 @@
   <ul>
 <li><a class="reference internal" href="#">Serial Utils</a><ul>
 <li><a class="reference internal" href="#preambule">Préambule</a></li>
-<li><a class="reference internal" href="#python-object">Python Object</a></li>
-<li><a class="reference internal" href="#arduino-object">Arduino Object</a></li>
+<li><a class="reference internal" href="#python">Python</a><ul>
+<li><a class="reference internal" href="#id1">Préambule</a></li>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#utilisation">Utilisation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#c-api">C++ API</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Sujet précédent</h4>
-  <p class="topless"><a href="cpp/SerialTalks.html"
-                        title="Chapitre précédent">Header <code class="docutils literal"><span class="pre">&lt;cpr/SerialTalks.h&gt;</span></code></a></p>
+  <p class="topless"><a href="SerialTalks.html"
+                        title="Chapitre précédent">SerialTalks</a></p>
   <h4>Sujet suivant</h4>
   <p class="topless"><a href="TCPTalks.html"
                         title="Chapitre suivant">TCP Talks</a></p>
@@ -125,13 +442,10 @@
           <a href="genindex.html" title="Index général"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Index des modules Python"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="TCPTalks.html" title="TCP Talks"
              >suivant</a> |</li>
         <li class="right" >
-          <a href="cpp/SerialTalks.html" title="Header &lt;cpr/SerialTalks.h&gt;"
+          <a href="SerialTalks.html" title="SerialTalks"
              >précédent</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">documentation Club Robot 1.0</a> &#187;</li> 
       </ul>

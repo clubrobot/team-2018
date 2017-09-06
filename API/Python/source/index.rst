@@ -16,7 +16,7 @@ Bienvenue dans la documentation du club robot de l'Insa de Rennes!
     SerialTalks <SerialTalks.rst>
     SerialUtils <SerialUtils.rst>
     TCPTalks <TCPTalks.rst>
-    Server <Server.rst>
+    Components <Components.rst>
     Outils <Outils.rst>
 
 

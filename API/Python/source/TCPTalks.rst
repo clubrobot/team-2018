@@ -303,7 +303,7 @@ La prochaine étape est d'affecter des methodes ou fonctions à un opcode pour p
 
     tcplink.bind(0xFF,``fonction``)
 
-Pour la realisation de fonction utilisable par la librairie, il n'y a pas beaucoup de contraite, puisque le TCPtalks va remplir tous les champs de la fonction avec les données reçu.
+Pour la realisation de fonction utilisable par la librairie, il n'y a pas beaucoup de contrainte, puisque le TCPtalks va remplir tous les champs de la fonction avec les données reçu.
 Si il manque des arguments dans la requettes la librairie lèvera une erreur chez l'emetteur de cette requette.
 
 Pour retourner des arguments il suffit de les mettres dans le return de la methode. Il est possible d'avoir plusieurs return différents avec un nombre d'arguments differents.
@@ -318,6 +318,31 @@ Exemple :
         return ("Bien reçu",10)
 
 
+Dans cette  exemple, la fonction va quand elle sera apellé par TCPTalks afficher le paramètre recu dans la requette avec l'OPCode qui était associé à cette fonction. Elle va ensuite renvoyer deux variables, un texte et un entier.
+Cette exemple reste très basique mais ilustre bien le peut de contraite qu'impose TCPTalks.
+
+
+Il ne reste plus qu'à lancer l'instruction que nous venons de creer. Pour finir ce petit tutoriel, je vais montrer les deux methodes pour une parfaite execution de la commande.
+La première methode qui est la plus simple quand il faut apeller une requette qui attend un retour comme avec la fonctionb que nous avons creer juste au dessus.
+
+.. code:: 
+
+    tcplink.execute(0xFF,"tu me reçois ?")
+    #Cette ligne va naturelement renvoyer le tuple ("Bien reçu",10)
+
+La deuxième methode moins recommandée (pour des raisons de gestion d'erreur à distance) consiste à utiliser les deux methodes send et poll.
+
+.. code::
+
+    #envoie de la requette
+    retcode = tcplink.send(0xFF,("tu me reçois?")
+
+    #reception du rendu de la requette
+    tcplink.poll(retcode)
+    #Cette ligne affiche naturelement le tuple  ("Bien reçu",10).
+
+
+    
 
 
 

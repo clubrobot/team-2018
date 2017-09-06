@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Outils &#8212; documentation Club Robot 1.0</title>
+    <title>Components &#8212; documentation Club Robot 1.0</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -25,7 +25,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Recherche" href="search.html" />
-    <link rel="prev" title="Components" href="Components.html" /> 
+    <link rel="next" title="Outils" href="Outils.html" />
+    <link rel="prev" title="TCP Talks" href="TCPTalks.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -35,7 +36,10 @@
           <a href="genindex.html" title="Index général"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="Components.html" title="Components"
+          <a href="Outils.html" title="Outils"
+             accesskey="N">suivant</a> |</li>
+        <li class="right" >
+          <a href="TCPTalks.html" title="TCP Talks"
              accesskey="P">précédent</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">documentation Club Robot 1.0</a> &#187;</li> 
       </ul>
@@ -46,8 +50,23 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="outils">
-<h1>Outils<a class="headerlink" href="#outils" title="Lien permanent vers ce titre">¶</a></h1>
+  <div class="section" id="components">
+<h1>Components<a class="headerlink" href="#components" title="Lien permanent vers ce titre">¶</a></h1>
+<p>Components est une libraire qui permet une utilisation de SerialTalks à travers TCPTalks. Cette librairie est très pratique pour la réalisation d’intéligence puisqu’elle permet de pouvoir executer l’inteligence depuis l’ordinateur sans à avoir à rentrer dans la raspberry.</p>
+<div class="section" id="preambule">
+<h2>Préambule<a class="headerlink" href="#preambule" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Cette librairie est purement python, puisqu’elle est executer par la raspberry et un ordinateur. Son principal rôle comme indiqué précedement est d’externalisé l’utilisation de SerialTalks et des objects dérivés de celui-ci (ce reporté au chapitre utilisation de SerialTalks).</p>
+<p>Pour cette librairie il existe plusieurs type d’elements, tout d’abord les classes principals qui permettent la communication c’est à dire Manager (client) et Serveur.
+Chacune de ces entités à besoins d’objects pour matérialisé un arduino ou d’autre object accessible à distance.</p>
+<p>Du côté de la raspberry et de l’object Serveur,ils existents des objects apellés «&nbsp;component&nbsp;». Chaque component représente un element  utilisable a distance (arduino , gpio devices). Ces elements se creent sur demande du client.
+De l’autre côté le client utilise des objects Proxy qui vont utiliser l’object Managers pour creer leurs homologues (component) et communiquer avec eux.</p>
+</div>
+<div class="section" id="server-rasp">
+<h2>Server Rasp<a class="headerlink" href="#server-rasp" title="Lien permanent vers ce titre">¶</a></h2>
+</div>
+<div class="section" id="manager">
+<h2>Manager<a class="headerlink" href="#manager" title="Lien permanent vers ce titre">¶</a></h2>
+</div>
 </div>
 
 
@@ -59,13 +78,26 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/logo.png" alt="Logo"/>
             </a></p>
+  <h3><a href="index.html">Table des Matières</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Components</a><ul>
+<li><a class="reference internal" href="#preambule">Préambule</a></li>
+<li><a class="reference internal" href="#server-rasp">Server Rasp</a></li>
+<li><a class="reference internal" href="#manager">Manager</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Sujet précédent</h4>
-  <p class="topless"><a href="Components.html"
-                        title="Chapitre précédent">Components</a></p>
+  <p class="topless"><a href="TCPTalks.html"
+                        title="Chapitre précédent">TCP Talks</a></p>
+  <h4>Sujet suivant</h4>
+  <p class="topless"><a href="Outils.html"
+                        title="Chapitre suivant">Outils</a></p>
   <div role="note" aria-label="source link">
     <h3>Cette page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/Outils.rst.txt"
+      <li><a href="_sources/Components.rst.txt"
             rel="nofollow">Montrer le code source</a></li>
     </ul>
    </div>
@@ -90,7 +122,10 @@
           <a href="genindex.html" title="Index général"
              >index</a></li>
         <li class="right" >
-          <a href="Components.html" title="Components"
+          <a href="Outils.html" title="Outils"
+             >suivant</a> |</li>
+        <li class="right" >
+          <a href="TCPTalks.html" title="TCP Talks"
              >précédent</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">documentation Club Robot 1.0</a> &#187;</li> 
       </ul>

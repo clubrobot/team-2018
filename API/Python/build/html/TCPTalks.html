@@ -351,12 +351,153 @@ Il existe des packets maitre et esclave. Les packets maitres sont destiné à la
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="TCPTalks._serversocket">
+<code class="descname">_serversocket</code><span class="sig-paren">(</span><em>port</em>, <em>timeout</em><span class="sig-paren">)</span><a class="headerlink" href="#TCPTalks._serversocket" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode privée pour la connexion du socket en tant que serveur.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first simple">
+<li><strong>port</strong> – Port à utiliser pour le lancement du serveur.</li>
+<li><strong>timeout</strong> – Timeout à utiliser pour la connexion.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body"><p class="first last">Retourne un object socket utilisable pour la connexion.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TCPTalks._clientsocket">
+<code class="descname">_clientsocket</code><span class="sig-paren">(</span><em>ip</em>, <em>port</em>, <em>timeout</em><span class="sig-paren">)</span><a class="headerlink" href="#TCPTalks._clientsocket" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode privée pour la connexion à un serveur avec l’ip et le port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ip</strong> – Ip du serveur à connecter.</li>
+<li><strong>port</strong> – Port à utiliser pour la connexion.</li>
+<li><strong>timeout</strong> – Timeout utilisé pour la connexion au serveur.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TCPTalks._loads">
+<code class="descname">_loads</code><span class="sig-paren">(</span><em>rawbytes</em><span class="sig-paren">)</span><a class="headerlink" href="#TCPTalks._loads" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode qui permet d’isolé le premier message du rawbytes, ou renvoie une erreure si le rawbytes n’est constitué que d’un message incomplet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Lève:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pickle.UnpicklingError</strong> – Levée si le rawbytes n’est constitué que d’un message incomplet.</li>
+<li><strong>AttributeError</strong> – Levée si le rawbytes n’est constitué que d’un message incomplet.</li>
+<li><strong>EOFError</strong> – Levée si le rawbytes n’est constitué que d’un message incomplet.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <p>..class:: TCPListener(Thread)</p>
+<blockquote>
+<div><dl class="method">
+<dt id="__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="headerlink" href="#__init__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Constructeur du TCPListener.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>parent</strong> – Object TCPTalks auquel le TCPListener sera rataché</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#run" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Methode principal du Thread, elle permet la reception des messages et l’envoie pour traitement à TCPTalks.</p>
+</dd></dl>
+
+</div></blockquote>
 </div>
 <div class="section" id="utilisation">
 <h2>Utilisation<a class="headerlink" href="#utilisation" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Il faut bien comprendre que dans cette librairie la connexion n’est pas exactement symetrique. Puisque qu’il faut choisir qui sera le serveur et qui sera le client.
+Il est donc important de bien choisir les rôles pour une bonne utilisation.</p>
+<p>Dans ce petit guide je vous montrerai une utilisation basique de la librairie avec quelques astuces.</p>
+<p>Pour etablir une connexion il suffit d’écrire les lignes suivantes.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Il est possible d’utiliser cette librairie en interne avec l’IP <code class="docutils literal"><span class="pre">127.0.0.1</span></code>.</p>
+</div>
+<p>Côté client :</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">TCPTalks</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="c1">#creation du TCPTalks</span>
+<span class="n">tcplink</span> <span class="o">=</span> <span class="n">TCPTalks</span><span class="p">(</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1">#Connexion au client</span>
+<span class="n">tcplink</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Côté serveur:</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">TCPTalks</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="c1">#creation du TCPTalks</span>
+<span class="n">tcplink</span> <span class="o">=</span> <span class="n">TCPTalks</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1">#Connexion au serveur</span>
+<span class="n">tcplink</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Une fois la connexion faite, il n’y a plus de difference dans le fonctionnement de la lib entre serveur et client.</p>
+<p>La prochaine étape est d’affecter des methodes ou fonctions à un opcode pour pouvoir repondre à des requettes.</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span>tcplink.bind(0xFF,``fonction``)
+</pre></div>
+</div>
+<p>Pour la realisation de fonction utilisable par la librairie, il n’y a pas beaucoup de contrainte, puisque le TCPtalks va remplir tous les champs de la fonction avec les données reçu.
+Si il manque des arguments dans la requettes la librairie lèvera une erreur chez l’emetteur de cette requette.</p>
+<p>Pour retourner des arguments il suffit de les mettres dans le return de la methode. Il est possible d’avoir plusieurs return différents avec un nombre d’arguments differents.</p>
+<p>Exemple :</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fonction</span><span class="p">(</span><span class="n">texte</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">texte</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Bien reçu&quot;</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Dans cette  exemple, la fonction va quand elle sera apellé par TCPTalks afficher le paramètre recu dans la requette avec l’OPCode qui était associé à cette fonction. Elle va ensuite renvoyer deux variables, un texte et un entier.
+Cette exemple reste très basique mais ilustre bien le peut de contraite qu’impose TCPTalks.</p>
+<p>Il ne reste plus qu’à lancer l’instruction que nous venons de creer. Pour finir ce petit tutoriel, je vais montrer les deux methodes pour une parfaite execution de la commande.
+La première methode qui est la plus simple quand il faut apeller une requette qui attend un retour comme avec la fonctionb que nous avons creer juste au dessus.</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">tcplink</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="mh">0xFF</span><span class="p">,</span><span class="s2">&quot;tu me reçois ?&quot;</span><span class="p">)</span>
+<span class="c1">#Cette ligne va naturelement renvoyer le tuple (&quot;Bien reçu&quot;,10)</span>
+</pre></div>
+</div>
+<p>La deuxième methode moins recommandée (pour des raisons de gestion d’erreur à distance) consiste à utiliser les deux methodes send et poll.</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="c1">#envoie de la requette</span>
+<span class="n">retcode</span> <span class="o">=</span> <span class="n">tcplink</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mh">0xFF</span><span class="p">,(</span><span class="s2">&quot;tu me reçois?&quot;</span><span class="p">)</span>
+
+<span class="c1">#reception du rendu de la requette</span>
+<span class="n">tcplink</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">retcode</span><span class="p">)</span>
+<span class="c1">#Cette ligne affiche naturelement le tuple  (&quot;Bien reçu&quot;,10).</span>
+</pre></div>
+</div>
 </div>
 </div>
 
