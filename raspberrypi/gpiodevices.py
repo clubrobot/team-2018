@@ -25,7 +25,7 @@ class Switch(Device):
 			raise RuntimeError('pin already in use')
 
 
-	def LaunchFunction(self,a):
+	def LaunchFunction(self,*args):
 		time.sleep(0.001)
 
 		if(GPIO.input(self.PinInput)==0):
