@@ -23,8 +23,10 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/translations.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="GPIO" href="GPIO.html" />
     <link rel="prev" title="Components" href="Components.html" /> 
   </head>
   <body>
@@ -34,6 +36,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="Index général"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="GPIO.html" title="GPIO"
+             accesskey="N">suivant</a> |</li>
         <li class="right" >
           <a href="Components.html" title="Components"
              accesskey="P">précédent</a> |</li>
@@ -48,6 +53,286 @@
             
   <div class="section" id="outils">
 <h1>Outils<a class="headerlink" href="#outils" title="Lien permanent vers ce titre">¶</a></h1>
+<p>Cette rubrique regroupe tous les outils annexes qui peuvent avoir une utilisation dans l’élaboration d’une IA, ou d’automate.</p>
+<div class="section" id="geogebra">
+<h2>GeoGebra<a class="headerlink" href="#geogebra" title="Lien permanent vers ce titre">¶</a></h2>
+<div class="section" id="preambule">
+<h3>Preambule<a class="headerlink" href="#preambule" title="Lien permanent vers ce titre">¶</a></h3>
+<p>La librairie GeoGebra permet de pouvoir extraire des points, angles, et lignes brisés. Cette librairie extrait les données des fichiers GGB qui ne sont que des fichiers XML compressés.
+Voici un exemple de XML de geogebra avec comme exemple un point apellé <code class="docutils literal"><span class="pre">bornibus</span></code>.</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">element</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;point&quot;</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bornibus&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">show</span> <span class="nb">object</span><span class="o">=</span><span class="s2">&quot;true&quot;</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;true&quot;</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">objColor</span> <span class="n">r</span><span class="o">=</span><span class="s2">&quot;0&quot;</span> <span class="n">g</span><span class="o">=</span><span class="s2">&quot;0&quot;</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;255&quot;</span> <span class="n">alpha</span><span class="o">=</span><span class="s2">&quot;0.0&quot;</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">layer</span> <span class="n">val</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;</span><span class="n">labelMode</span> <span class="n">val</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;</span><span class="n">animation</span> <span class="n">step</span><span class="o">=</span><span class="s2">&quot;1&quot;</span> <span class="n">speed</span><span class="o">=</span><span class="s2">&quot;1&quot;</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;1&quot;</span> <span class="n">playing</span><span class="o">=</span><span class="s2">&quot;false&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;</span><span class="n">isShape</span> <span class="n">val</span><span class="o">=</span><span class="s2">&quot;false&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;</span><span class="n">coords</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;-0.72&quot;</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;4.14&quot;</span> <span class="n">z</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;</span><span class="n">pointSize</span> <span class="n">val</span><span class="o">=</span><span class="s2">&quot;4&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;</span><span class="n">pointStyle</span> <span class="n">val</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="o">/&gt;</span>
+</pre></div>
+</div>
+<p>Cette petites fonctiobs utilisent les librairies <code class="docutils literal"><span class="pre">zipfile</span></code> et <code class="docutils literal"><span class="pre">xml.etree.ElementTree</span></code>.</p>
+</div>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Lien permanent vers ce titre">¶</a></h3>
+<dl class="function">
+<dt id="loadggb">
+<code class="descname">loadggb</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#loadggb" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Fonction pour convertir le fichier .ggb en object ELEMENT de la librairie <code class="docutils literal"><span class="pre">xml.etree.ElementTree</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>filename</strong> – Chemin du fichier ou nom du fichier.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="getpos">
+<code class="descname">getpos</code><span class="sig-paren">(</span><em>root</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#getpos" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Retourn la position du point de nom label (en tuple).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> (<em>Element</em>) – object XML obtenu avec le loadggb.</li>
+<li><strong>label</strong> – Nom du point à retourner.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="getangle">
+<code class="descname">getangle</code><span class="sig-paren">(</span><em>root</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#getangle" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Retourne la valeur de l’angle avec le nom Label.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> (<em>Element</em>) – object XML obtenu avec le loadggb.</li>
+<li><strong>label</strong> – Nom de l’angle à retourner.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="getpath">
+<code class="descname">getpath</code><span class="sig-paren">(</span><em>root</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#getpath" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Retourne une liste des points de la ligne brisé se nommant label.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> (<em>Element</em>) – object XML obtenu avec le loadggb.</li>
+<li><strong>label</strong> – Nom de la ligne brisé à retourner.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="utilisation">
+<h3>Utilisation<a class="headerlink" href="#utilisation" title="Lien permanent vers ce titre">¶</a></h3>
+<p>La librairie étant très simple ce chapitre ce limitera à un exemple d’utilisation avec une ligne brisé généralement utilisé pour les paths.</p>
+<p>Voici un exmple de géogebra contenant une ligne brisé. Celle-ci prend le nom de <code class="docutils literal"><span class="pre">main</span></code>.</p>
+<img alt="_images/example1_geogebra.png" src="_images/example1_geogebra.png" />
+<p>Une fois le fichier sauvegardé (<code class="docutils literal"><span class="pre">example.ggb</span></code>), vous pouvez lancer votre python pour exploiter le fichier. Il faut d’abord ouvrir le fichier pour l’exploiter.</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">file</span> <span class="o">=</span> <span class="n">loadggb</span><span class="p">(</span><span class="s1">&#39;example.ggb&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A partir d’içi il est tres facile extraire les données comme ci-dessous :</p>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">getpath</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="s1">&#39;main&#39;</span><span class="p">))</span>
+<span class="c1">#[(-2.0, 3.0), (1.56, 5.161818181818181), (3.4509090909090903, 2.9254545454545458), (0.8145454545454542, -0.9836363636363615), (-2.0, -1.0)]</span>
+</pre></div>
+</div>
+<p>Il faut noté que pour les indices il faut l’ecrire dans les methodes comme cela : <code class="docutils literal"><span class="pre">nom_{indice}</span></code></p>
+</div>
+</div>
+<div class="section" id="roadmap">
+<h2>RoadMap<a class="headerlink" href="#roadmap" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Cette librairie permet une utilisation simplifié d’Igraph qui est une librairie de python permetant de creer des graphs. Grace aux outils de cette librairie vous pourez faire du path finding dans un graph creer avec geogebra.</p>
+<div class="section" id="id1">
+<h3>Préambule<a class="headerlink" href="#id1" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Cette librairie utilise les methodes de <code class="docutils literal"><span class="pre">geogebra</span></code>, voir au dessus. Cette resource est composée d’une fonction d’intersectinon est  d’un object roadmap.</p>
+</div>
+<div class="section" id="id2">
+<h3>API<a class="headerlink" href="#id2" title="Lien permanent vers ce titre">¶</a></h3>
+<dl class="function">
+<dt id="intersect">
+<code class="descname">intersect</code><span class="sig-paren">(</span><em>A</em>, <em>B</em><span class="sig-paren">)</span><a class="headerlink" href="#intersect" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Retourne un boolean si les deux segments donnés en argument se coupent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first simple">
+<li><strong>A</strong> (<em>tuple</em>) – Coordonnées du premier segment avec la forme suivante : (xA1, yA1), (xA2, yA2)</li>
+<li><strong>B</strong> (<em>tuple</em>) – Coordonnées du deuxième segment avec la forme suivante : (xB1, yB1), (xB2, yB2)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body"><p class="first last">Un boolean si il y a croisement ou pas.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="RoadMap">
+<em class="property">class </em><code class="descname">RoadMap</code><a class="headerlink" href="#RoadMap" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><dl class="method">
+<dt id="RoadMap.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>vertices=list()</em>, <em>edges=set()</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.__init__" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Constructeur de l’object RoadMap, elle a pour but de charger le graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertices</strong> (<em>list</em>) – Liste des sommets du graph.</li>
+<li><strong>edges</strong> (<em>set</em>) – Set des segments du graph.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="RoadMap.reset_edges">
+<code class="descname">reset_edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.reset_edges" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Calcule le poid des segments, c’est à dire leur longueur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="RoadMap.cut_edges">
+<code class="descname">cut_edges</code><span class="sig-paren">(</span><em>cutline</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.cut_edges" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Retire les segments du graph qui coupe la cutline.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>cutline</strong> – Ligne permetant là découpe des segments du graph. Elle dois être de cette forme : <code class="docutils literal"><span class="pre">(xCutLine,</span> <span class="pre">yCutLine),</span> <span class="pre">(xCutLine2,</span> <span class="pre">yCutLine2)</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="RoadMap.get_vertex_distance">
+<code class="descname">get_vertex_distance</code><span class="sig-paren">(</span><em>vid</em>, <em>vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.get_vertex_distance" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Calcule la distance entre deux sommets du graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first simple">
+<li><strong>vid</strong> – Numéro du sommet , c’est à dire le rang de celle-ci dans la liste donné au constructeur.</li>
+<li><strong>vertex</strong> – Coordonnées du deuxième sommet. Dois être de cette forme <code class="docutils literal"><span class="pre">x1,</span> <span class="pre">y1</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body"><p class="first last">la distance entre les deux sommets.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="RoadMap.get_closest_vertex">
+<code class="descname">get_closest_vertex</code><span class="sig-paren">(</span><em>vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.get_closest_vertex" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Trouve le sommet le plus près du point vertex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>vertex</strong> – point à partir du quel, on cherche le plus près sommet.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">L’index du sommet du graph trouvé comme le plus proche de vertex.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="RoadMap.add_vertex">
+<code class="descname">add_vertex</code><span class="sig-paren">(</span><em>vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.add_vertex" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Ajoute un sommet au graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><strong>vertex</strong> – Point à ajouter comme sommet au graph.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body">L’index du sommet créé.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="RoadMap.get_shortest_path">
+<code class="descname">get_shortest_path</code><span class="sig-paren">(</span><em>source</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.get_shortest_path" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Effectue un path finding à l’aide du graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first simple">
+<li><strong>source</strong> – Point d’origine du path finding.</li>
+<li><strong>target</strong> – Point d’arrivé du path finding.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body"><p class="first last">Le tableau avec chaque point du pathfinding.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>&#64;staticmethod</p>
+<dl class="function">
+<dt id="RoadMap.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>geogebra</em>, <em>pattern='roadmap_{s*d+s*</em>, <em>s*d+s*}'</em><span class="sig-paren">)</span><a class="headerlink" href="#RoadMap.load" title="Lien permanent vers cette définition">¶</a></dt>
+<dd><p>Cree un object Roadmap à partir d’un fichier geogebra.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Paramètres:</th><td class="field-body"><ul class="first simple">
+<li><strong>geogebra</strong> – Nom du fichier ou object GeoGebra.</li>
+<li><strong>pattern</strong> – structure du nom du graph sous GeoGebra.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Retourne:</th><td class="field-body"><p class="first last">L’object Roadmap généré.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 
@@ -59,9 +344,30 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/logo.png" alt="Logo"/>
             </a></p>
+  <h3><a href="index.html">Table des Matières</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Outils</a><ul>
+<li><a class="reference internal" href="#geogebra">GeoGebra</a><ul>
+<li><a class="reference internal" href="#preambule">Preambule</a></li>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#utilisation">Utilisation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#roadmap">RoadMap</a><ul>
+<li><a class="reference internal" href="#id1">Préambule</a></li>
+<li><a class="reference internal" href="#id2">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Sujet précédent</h4>
   <p class="topless"><a href="Components.html"
                         title="Chapitre précédent">Components</a></p>
+  <h4>Sujet suivant</h4>
+  <p class="topless"><a href="GPIO.html"
+                        title="Chapitre suivant">GPIO</a></p>
   <div role="note" aria-label="source link">
     <h3>Cette page</h3>
     <ul class="this-page-menu">
@@ -89,6 +395,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="Index général"
              >index</a></li>
+        <li class="right" >
+          <a href="GPIO.html" title="GPIO"
+             >suivant</a> |</li>
         <li class="right" >
           <a href="Components.html" title="Components"
              >précédent</a> |</li>
