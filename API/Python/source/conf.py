@@ -96,6 +96,9 @@ html_theme = 'classic'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+
+
+
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
 #
@@ -116,7 +119,7 @@ html_static_path = ['_static']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'ClubRobotdoc'
-
+html_favicon= 'favicon.ico'
 html_logo = "logo.png"
 # -- Options for LaTeX output ---------------------------------------------
 
