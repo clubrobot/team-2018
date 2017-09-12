@@ -119,6 +119,25 @@ def getuuid(args):
 		talks.disconnect()
 
 
+def showip(args):
+
+	try: 
+		ssg = SerialTalks(os.path.join('/dev/arduino', 'display'))
+		ssg.connect()
+		import subprocess
+		from serialtalks import STRING
+		ip = ''
+		while not ip:
+			proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
+			ip = proc.stdout.strip().decode('utf8')
+		ssg.send(0x0E, STRING(ip))
+
+		ssg.disconnect()
+	except:
+		pass
+		
+
+
 def getlogs(args):
 	talks = SerialTalks(args.port)
 	try:
@@ -202,6 +221,10 @@ getlogs_parser.set_defaults(func=getlogs)
 server_parser = subparsers.add_parser('server')
 server_parser.add_argument('-p', '--password', type=str, default=None)
 server_parser.set_defaults(func=server)
+
+showip_parser = subparsers.add_parser('showip')
+showip_parser.set_defaults(func=showip)
+
 
 start_parser = subparsers.add_parser('start')
 start_parser.add_argument('name', type=str, choices=('bornibus', 'murray'))
