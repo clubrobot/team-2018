@@ -2,7 +2,7 @@
     GPIO
 ##################
 
-Cette partie va traiter tous les objects evoluant sur le GPIO de la raspberry
+Cette partie va traiter tous les objets évoluant sur le GPIO de la Raspberry.
 
 
 Préambule
@@ -10,7 +10,7 @@ Préambule
 
 
 
-Cette libraire utilise la libraire RPi et la configuration des GPIOs en mode BOARD
+Cette libraire utilise la libraire RPi et la configuration des GPIOs en mode BOARD.
 
 Numero des pins en mode BOARD.
 
@@ -19,13 +19,13 @@ Numero des pins en mode BOARD.
 
 
 
-Tous les objets utilisants du GPIO doivent hériter de l'object ``Device`` Qui permet la gestion des pins pour éviter à deux objects d'utiliser les mêmes pins.
+Tous les objets utilisant  du GPIO doivent hériter de l'objet ``Device``. Cet objet permet la bien gérer l'allocation des pins afin d'éviter à deux objets d'utiliser les mêmes pins.
 
 
 API
 ---------------------------------------- 
 
-Pour commencer voici la classe Device permettant la gestion des pins
+Pour commencer voici la classe Device permettant la gestion des pins.
 
 .. class:: Device
 
@@ -35,17 +35,17 @@ Pour commencer voici la classe Device permettant la gestion des pins
     1 = Occupé
 
 
-Viens ensuite les objects fonctionnant sur le GPIO.
-Le premier conserne l'interrupteur, celui-ci dois être brancher sur la masse et sur un pin du GPIO à renseigner.
+Viens ensuite les objets fonctionnant sur le GPIO.
+Le premier concerne l'interrupteur, celui-ci dois être branché sur la masse et sur un pin du GPIO à renseigner dans le constructeur.
 
 .. class:: Switch(Device)
 
     .. method:: __init__(self,pininput,function=None,*args)
 
-        Constructeur de l'object interrupteur. Elle peut également avec les deux derniers paramètre parametrer une methode à apeller à chaque changement d'etat.
+        Constructeur de l'objet interrupteur. Elle peut également avec les deux derniers paramètres, paramétrer une méthode à appeler à chaque changement d'état.
 
         :param pininput: Pin à utiliser pour l'interrupteur. 
-        :param function: Fonction à apeller à chaque changement d'etat.
+        :param function: Fonction à appeler  à chaque changement d'état.
         :param args: Arguments à transmettre à la fonction.
         :exception RuntimeError: Dans le cas de l'utilisation d'un pin déjà utilisé.
 
@@ -54,19 +54,19 @@ Le premier conserne l'interrupteur, celui-ci dois être brancher sur la masse et
 
     .. method:: SetFunction(function,*args)
 
-        Methode pour bind une fonction à chaque changement d'état de l'interrupteur. Pour ne plus avoir de methode d'enregistrée utilisé ``None``.
+        Méthode pour bind une fonction à chaque changement d'état de l'interrupteur. Pour ne plus avoir de méthode d'enregistrée utilisé ``None``.
 
         :param function: Fonction à associer.
-        :param args: Arguments à transmettre à la fonction lors de son apelle.
+        :param args: Arguments à transmettre à la fonction lors de son appelle.
 
 
     .. method:: LaunchFunction(args)
 
-        Methode interne d'apelle de la fonction enregistrée.
+        Méthode interne d'appel de la fonction enregistrée.
 
         :param args: Arguments annexes.
 
-Le deuxieme object est un bouton poussoir luminessante. Pour les connectiques du bouton, il faut brancher une pin à la masse du GPIO et un pin à une entrée du GPIO.
+Le deuxième objet est un bouton poussoir luminescent. Pour les connectiques du bouton, il faut brancher un pin à la masse du GPIO et un pin à une entrée du GPIO.
 
 
 .. class:: LightButton(Device)
@@ -81,35 +81,36 @@ Le deuxieme object est un bouton poussoir luminessante. Pour les connectiques du
 
     .. method:: SetAutoSwitch(value)
 
-        Activation de l'autoswitch de la lumière du bouton. C'est a dire qu'à chaque changement d'état du bouton, la lumière change également d'état.
+        Activation de l'AutoSwitch de la lumière du bouton. C'est à dire qu'à chaque pression sur le bouton, la lumière change d'état.
+
         :param boolean value: Vrai ou Faux pour l'activation de l'AutoSwitch.
 
     .. method:: On()
 
-        Allumer le bouton.
+        Allume le bouton.
 
     .. method:: Off()
 
-        Etteindre le bouton.
+        Eteins le bouton.
 
 
     .. method:: Switch()
 
-        Changer l'état de la lumière du bouton.
+        Change l'état de la lumière du bouton.
 
     .. method:: SetFunction(function,*args)
 
-        Methode d'affectation de la fonction pour le bouton. 
+        Méthode d'affectation de la fonction pour le bouton. 
 
-        :param function: Fonction à apeller à chaque changement d'état du bouton.
-        :param args: Arguments à passer à la fonction lors de l'apelle.
+        :param function: Fonction à appeler à chaque changement d'état du bouton.
+        :param args: Arguments à passer à la fonction lors de l'appel.
 
     .. method:: Close()
 
-        Couper le bouton et libéré les pins pour une autre utilisation.
+        Coupe le bouton et libére les pins pour une autre utilisation.
 
         
 
     .. method:: LaunchFunction(args)
 
-        Methode interne d'apelle de la fonction parametrée.
+        Méthode interne d'appel de la fonction paramétrée.
