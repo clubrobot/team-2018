@@ -21,8 +21,7 @@ Sommaire des librairies de communication :
     SerialUtils <SerialUtils.rst>
     TCPTalks <TCPTalks.rst>
     Components <Components.rst>
-    Outils <Outils.rst>
-    GPIO <GPIO.rst>
+
 
 
 
