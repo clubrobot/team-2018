@@ -10,7 +10,7 @@ Bienvenue dans cette documentation. Vous pourez trouver toutes les API utiles po
 
 Cette documentation conserne tous les programmes sous python et sous C++ pour l'arduino.
 
-Sommaire des librairies :
+Sommaire des librairies de communication :
 
 .. toctree::
    :maxdepth: 2
@@ -25,7 +25,7 @@ Sommaire des librairies :
 
 
 
-Sommaire des arduinos :
+Sommaire des librairies dédiés aux Arduinos :
 
 .. toctree::
     :maxdepth: 2
@@ -33,6 +33,13 @@ Sommaire des arduinos :
     Wheeledbase <arduino//wheeledbase.rst>
 
 
+Sommaire des librairies annexes :
+
+.. toctree::
+    :maxdepth: 2
+    
+    Outils <Outils.rst>
+    GPIO <GPIO.rst>
 
 Indices and tables
 ==================
