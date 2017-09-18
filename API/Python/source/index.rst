@@ -6,9 +6,10 @@
 Bienvenue dans la documentation du club robot de l'Insa de Rennes!
 ===================================================================
 
-Bienvenue dans cette documentation. Vous pourez trouver toutes les API utiles pour utiliser les librairies disponibles pour utiliser pleinement le robot. Cette librairie est également constituer de quelques exemple pour bien illustrer ce qui est présent dans les API(s).
+Bienvenue dans cette documentation. Vous pourrez trouver toutes les APIs utiles pour utiliser pleinement les robots et  les librairies associées. Certaine librairies disposent en plus d’un API classique de quelques exemples pour bien illustrer ce qui est présent dans la documentation.
 
-Cette documentation conserne tous les programmes sous python et sous C++ pour l'arduino.
+Cette documentation concerne tous les programmes sous python et sous C++.
+
 
 Sommaire des librairies de communication :
 
