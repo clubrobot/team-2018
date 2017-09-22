@@ -2,14 +2,14 @@
 Serial Utils
 ############
 
-Serial Utils est une librairie de serialisation pour la communication entre l'ordinateur sous python et l'arduino sous CPP et ino.
+Serial Utils est une librairie de sérialisation pour la communication entre l'ordinateur sous python et l'Arduino sous CPP.
 
 
 *************
 Préambule
 *************
 
-Cette librairie existe en deux versions (python , cpp). Ces deux versions different un peu dans le fonctionnement mais l'idée reste la même. Le but est de serialiser et de deserialiser. Ces opérations consistent à passer d'un object utilisable par un language (exemple int float double string) à une chaine d'octet ou l'inverse.
+Cette librairie existe en deux versions (python , cpp). Ces deux versions diffèrent un peu dans le fonctionnement mais l'idée reste la même. Le but est de serialiser et de deserialiser. Ces opérations consistent à passer d'un object utilisable par un language (exemple int float double string) à une chaine d'octet ou l'inverse.
 Pour une utilisation plus simple cette librairie est composé d'object avec une tache bien spécifique. 
 
 
