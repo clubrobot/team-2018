@@ -9,25 +9,25 @@ Serial Utils est une librairie de sérialisation pour la communication entre l'o
 Préambule
 *************
 
-Cette librairie existe en deux versions (python , cpp). Ces deux versions diffèrent un peu dans le fonctionnement mais l'idée reste la même. Le but est de serialiser et de deserialiser. Ces opérations consistent à passer d'un object utilisable par un language (exemple int float double string) à une chaine d'octet ou l'inverse.
-Pour une utilisation plus simple cette librairie est composé d'object avec une tache bien spécifique. 
+Cette librairie existe en deux versions (python , cpp). Ces deux versions diffèrent un peu dans le fonctionnement mais l'idée reste la même. Le but est de sérialiser et de desérialiser. Ces opérations consistent à passer d'un objet utilisable par un langage (exemple int float double string) à une chaine d'octet ou l'inverse.
+Pour une utilisation plus simple cette librairie est composée d'objet avec une tache bien spécifique. 
 
 
 **************
 Python 
 **************
 
-Voici la version en python de cette librairie
+Voici la version en python de cette librairie.
 
 
 Préambule
 ----------------
 
 
-Pour le côté python, il existe des objects qui sont capables de faire la serialisation et la déserialisation en même temps mais pour un seul type de donnée. Malgrès le fais que ces objects existent, on prefèrera utiliser un object de déserialisation pur qui peux gérer des données avec plusieurs variables encodé en octet à l'interieur (ce qui n'est pas possible avec les objects de serialisation).
-Pour commencer l'API nous allons traiter les objects de serialisation hybride puis l'object de déserialisation.
+Pour le côté python, il existe des objets qui sont capables de faire la sérialisation et la desérialisation en même temps mais pour un seul type de donnée. Malgré le fais que ces objets existent, on préfèrera utiliser un objet de déserialisation pur qui peux gérer des données avec plusieurs variables encodées en octets à l'intérieur (ce qui n'est pas possible avec les objets de sérialisation).
+Pour commencer l'API nous allons traiter les objets de sérialisation hybride puis l'objet de desérialisation.
 
-Toutes les classes de serialisation hybride hérite de AbstractType qui permet de les utiliser beaucoup plus facilement.
+Toutes les classes de sérialisation hybride héritent de AbstractType qui permet de les utiliser beaucoup plus facilement.
 
 
 API
@@ -37,69 +37,67 @@ API
 
     .. method:: __call__(value)
 
-        Cette methode permet à l'object d'être utilisé comme une methode et de retourner l'arguement (octets) en variable exploitable.
+        Cette méthode permet à l'objet d'être utilisé comme une méthode et de retourner l'argument (octets) en variable exploitable.
 
-        :param octet value: Les octets à convertir en variable exploitables
-        :return: Retourne la variable transcrit de l'octet à partir de value.
+        :param octet value: Octets à convertir en variable.
+        :return: Variable transcrit de l'octet à partir de value.
 
 
 .. class:: IntegerType(AbstractType)
 
-    Methode pour les variables sans virgules et les caractères simple (int , char , long).
+    Classe pour les variables sans virgules et les caractères simple (int , char , long).
 
     .. method:: __init__(length, byteorder, signed)
 
-        Constructeur de l'object
+        Constructeur de l'objet.
 
-        :param length: nombre d'octet du type à convertir, exemple 2 pour int.
-        :param byteorder: Cette argument defini l'octet principal. Seul deux options possible ``big`` pour l'octet principal au debut et ``little`` pour l'octet principal à la fin.
+        :param length: Nombre d'octet du type à convertir, exemple 2 pour int.
+        :param byteorder: Défini l'octet principal. Seul deux options possible ``big`` pour l'octet principal au début et ``little`` pour l'octet principal à la fin.
         :param signed: Boolean pour savoir si la variable peut être négatif ou non.
         
 
     .. method:: to_bytes(integer)
 
-        Methode pour convertir l'argument en octet.
+        Converti l'argument en octet.
 
-        :param integer: argument à convertir en octet.
-        :return: Retourne l'argument en octet.
+        :param integer: Argument à convertir en octet.
+        :return: Argument en octet.
 
 
     .. method:: from_bytes(rawbytes)
 
-        Methode pour transformer des octets en variable exploitable dans le type prealablement paramétré.
+        Transforme des octets en  une variable exploitable dans le type prealablement paramétré.
 
-        :param rawbytes: octets à convertir en variable utilisable.
-        :return: Retourne la variable convertie de l'octet renseigné.
-
-
+        :param rawbytes: Octets à convertir.
+        :return: Variable convertie.
 
 
 
-        .. note:: Pour l'arduino il faut prendre comme byteorder ``little``
+        .. note:: Pour l'Arduino il faut prendre comme byteorder ``little``.
 
 .. class:: FloatType(AbstractType)
 
-    Object de serialisation pour les variables float et double
+    Objet de sérialisation pour les variables float et double.
 
     .. method:: __init__(standard)
 
-        Constucteur du serialiser
+        Constucteur du sérialiser.
 
         :param standard: Egal à ``f`` pour float et ``d`` pour double.
 
 
     .. method:: to_bytes(real)
 
-        Methode pour convertir l'argument en octet.
+        Convertis l'argument en octet.
 
-        :param integer: argument à convertir en octet.
-        :return: Retourne l'argument en octet.
+        :param integer: Argument à convertir.
+        :return: Argument en octet.
 
 
     .. method:: from_bytes(rawbytes)
 
 
-        Methode pour transformer des octets en variable exploitable dans le type prealablement paramétré.
+        Transforme des octets en variable exploitable dans le type prealablement paramétré.
 
         :param rawbytes: octets à convertir en variable utilisable.
         :return: Retourne la variable convertie de l'octet renseigné.
