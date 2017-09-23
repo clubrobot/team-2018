@@ -105,62 +105,62 @@ API
 
 .. class:: StringType(AbstractType)
 
-    Serialiser pour les chaines de caractère
+    Sérialiser pour les chaines de caractères.
 
     .. method:: __init__(encoding)
 
-        Constructeur de l'oject.
+        Constructeur de l'objet.
 
         :param encoding: Encodage à utiliser pour transcrire les chaines de caractères en octets.
 
-        .. note:: Pour une utilisation avec un arduino, il faut utiliser l'utf-8.
+        .. note:: Pour une utilisation avec un Arduino, il faut utiliser l'utf-8.
 
 
     .. method:: to_bytes(string)
 
-        Methode de conversion des strings en octets.
+        Converti des chaines de caractères en octets.
 
-        :param string: Chaine de caractères à convertir en octets.
-        :return: Les octets defini à partir de la chaine de caractères en argument.
+        :param string: Chaine de caractères à convertir.
+        :return: Les octets générés.
 
 
 
     .. method:: from_bytes(rawbytes)
 
-        Methode de conversion d'octets en une chaine de caractères.
+        Converti les octets en une chaine de caractères.
 
         :param rawbytes: Octets à convertir.
-        :return: La chaine de caractères transcrit des octets en argument.
+        :return: La chaine de caractères transcrit.
 
 
 
 .. class:: Deserializer
 
-    Object de déserialisation d'octets avec plusieurs variables dedans.
+    Objet de désérialisation d'octets pour générer plusieurs variables.
 
     .. method:: __init__(rawbytes)
 
-        Constructeur de l'object de deserialisation.
+        Constructeur de l'objet de désérialisation.
 
-        :param rawbytes: Octets à convertir en variables.
+        :param rawbytes: Octets à convertir.
 
     
     .. method:: read(*types)
 
-        Methode pour extraire les variables des octets fourni dans le constructeur.
+        Extrait les variables des octets fourni dans le constructeur.
 
 
-        :param types: Arguments pour deserialiser les octets. 
-        :return: La liste des variables extraite en tuple.
+        :param types: Objets AbstractType pour décoder les variables dans les types souhaités. 
+        :return: La liste des variables extraites en tuple.
 
-        .. warning:: Il faut obligatoirement utiliser des objets d'AbstractType, pour bien convertir.
+        .. warning:: Il faut obligatoirement utiliser des objets d'AbstractType, pour bien convertir dans les bons formats.
 
 
 Utilisation
 ------------
-Voici quelques exemples d'utilisation de la libraire.
+Voici quelques exemples d'utilisation de la librairie.
 
-Pour la conversion en octet :
+Pour la conversion en octet:
 
 .. code::
 
@@ -182,9 +182,9 @@ Pour la reconversion :
     variables = out.read(byte_t,char_t,uint_t,int_t,string_t,float_t)
 
 
-Voici un tableau récapitulant les objects de déserialisation utile pour l'arduino :
+Voici un tableau récapitulant les objets de désérialisation utiles pour l'Arduino :
 
-.. csv-table:: Tableau des serialisation pour utiliser Serialtalks
+.. csv-table:: Tableau des sérialisations pour utiliser Serialtalks
    :header: Variable, Object , Paramètres
    :widths: 50,50,50,50,50
 
