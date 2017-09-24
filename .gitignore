@@ -18,3 +18,7 @@ build-*
 # OS X files
 .DS_Store
 ._*
+
+
+# Windows link
+*.lnk
