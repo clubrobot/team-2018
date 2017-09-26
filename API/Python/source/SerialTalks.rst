@@ -32,20 +32,19 @@ Quand une requêtes depuis l'ordinateur est envoyé à l’Arduino, il y a deux 
  * Si notre requête requière un retour, l’Arduino après avoir exécuté la fonction associé à l'OP code reçu va renvoyer ça réponse grâce au code esclave et le Retcode qui a été envoyé dans le packet reçu.
 
 
-**************
-Python Object
-**************
+
+
+Introduction
+-------------------------
 
 Cette partie correspond à la bibliothèque python destinée à la Raspberry ou à l'ordinateur.
-
-Préambule
--------------------------
 
 Pour ouvrir les communications avec un Arduino, il faut créer un objet SerialTalks et lancer la connexion avec la méthode de connexion.
 Une fois les étapes préliminaires exécutés, il est possible de lancer n’importe quelle requête.    
 
+***********
 API
---------------------------
+***********
 
 
 .. class:: SerialTalks
@@ -168,9 +167,9 @@ API
 
 
 
-
+************
 Utilisation
---------------------------
+************
 
 Ils existent deux possibilités pour utiliser cette librairie. Utiliser directement l'objet SeriaTalks, ce qui peut être vite fastidieux pour réaliser des actions autre que la manipulation d'UUID. L'autre option est de créer une classe qui dérive de SerialTalks qui va permettre une utilisation de l'Arduino très haut niveau.
 
@@ -231,22 +230,6 @@ Pour indiquer l'Op code, il est vivement conseillé d'utiliser des constantes à
     OPCODE = 0xF4
 
 .. warning:: Les opcodes suivants sont réservés par la lib et ne doivent pas être utilisés par vos objects : ``0x00`` , ``0x01`` , ``0x02``
-
-**************
-Arduino Object
-**************
-
-
-``<cpr/SerialTalks.h>``
-
-.. class:: serialTalks
-
-    .. method:: void rawsend()
-    
-        :param ef: 
-            test
-
-
 
 
 
