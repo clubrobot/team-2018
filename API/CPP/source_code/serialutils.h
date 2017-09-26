@@ -62,7 +62,7 @@ struct Serializer
 
 	//! Methode pour une utilisation interne qui permet d'écrire sur le buffer après conversion en octets. 
 	/*!
-		\param object Object (sous la forme d'un char) a renvoyer dans le buffer pour ecriture.
+		\param string Object (sous la forme d'un char) a renvoyer dans le buffer pour ecriture.
 
 	*/
 
@@ -120,7 +120,7 @@ struct Deserializer
 
 	//! Operateur de décalage, a utilisé pour remplir le buffer uniquement pour les variables de type char. 
 	/*!
-		\param object Object a renvoyer dans le buffer pour transmission.
+		\param string Object a renvoyer dans le buffer pour transmission.
 
 		\return Retourne le pointeur du serializer pour une utilisation plus simple
 	*/
