@@ -66,5 +66,41 @@ Voici l'API de SerialTalks :
 API SERIALTALKS
 
 *******************************
-Note et utilisation
+Utilisation
 *******************************
+
+L'utilisation de cette librairie est centrale dans la programmation des Arduinos. En effet, c'est le seul moyen en place pour communiquer avec les Arduinos depuis un ordinateur.
+Il est donc important de bien savoir utiliser cette librairie avant une quelconque programmation d'Arduino.
+
+La premier étape est l'importation de cette lib dans votre code.
+
+.. code:: 
+
+    #include "../common/SerialTalks.h"
+
+L'importation de ce header vous donne accès à l'objet ``talks`` instance de SerialTalks. Il faut ensuite creer un stream pour commencer à comuniquer avec SerialTalks. Il est important de bien faire correspondre le baudrate et d'utiliser la constante SERIALTALKS_BAUDRATE. 
+
+.. note:: La constante se situe dans le fichier  ``SerialTalks.h``.
+
+Voici les lignes correspondantes à la creation du stream et de l'association à SerialTalks.
+
+.. code:: 
+
+    void setup()
+    {
+    Serial.begin(SERIALTALKS_BAUDRATE);
+	talks.begin(Serial);
+
+La dernière étape pour bien executer les communication est d'ajouter l'appel de talks à chaque boucle avec la ligne : 
+
+
+.. code:: 
+
+    void loop()
+    {	
+    	talks.execute();
+
+Le SerialTalks est bien paramétré et peux recevoir et envoyer des informations. Il manque plus qu'à ajouter des fonctions pour répondre à des requêtes.
+
+Pour commencer, il faut choisir un OPCode associé à la fonction à ajouter. Cet OPCode devra être renseigné dans le code Python pour pouvoir appeler correctement la méthode Arduino.
+Il existe plusieurs façon de stoquer cette valeur mais on préfèrera utilés
