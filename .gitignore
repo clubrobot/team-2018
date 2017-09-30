@@ -22,3 +22,8 @@ build-*
 
 # Windows link
 *.lnk
+
+#API build
+API/CPP/html/**
+API/CPP/latex/**
+API/Python/build/**
