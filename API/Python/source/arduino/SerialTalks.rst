@@ -2,7 +2,7 @@
 SerialTalks
 ############
 
-a librairie SerialTalks assure la communication entre ordinateur et arduino.
+La librairie SerialTalks assure la communication entre ordinateur et arduino.
 On trouve dans cette librairie deux versions differentes pour chaque terminal.
 
 *************
