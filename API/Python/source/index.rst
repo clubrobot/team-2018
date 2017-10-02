@@ -42,7 +42,9 @@ Sommaire des librairies des librairies généralistes :
 .. toctree::
     :maxdepth: 2
 
-    SerialTalks <arduino//SerialTalks.rst>
+    SerialTalks     <arduino//SerialTalks.rst>
+    PeriodicProcess <arduino//PeriodicProcess.rst>
+    Clock           <arduino//Clock.rst>
     
 
 
