@@ -53,7 +53,6 @@ class UltrasonicSensor {
     TrigHandler* trighandler;
     bool m_dejaTest;
     void filtrage();
-    int m_a;
     bool m_inf2;
 
   public :

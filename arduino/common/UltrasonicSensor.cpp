@@ -195,7 +195,6 @@ void UltrasonicSensor::attach(int trig, int echo)
   if (trig == 9) {
     trighandler = &trighandler9;
   }
-  m_a = 0;
   echohandler->enabler();
   trighandler->enabler();
 }
