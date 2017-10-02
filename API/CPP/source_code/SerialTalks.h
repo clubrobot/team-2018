@@ -50,7 +50,7 @@
 /** class SerialTalks
  *  \brief Object de communication serial avec un ordinateur.
  *
- *  est un outil permetant à l'arduino de pouvoir répondre au requette recu depuis le serial.
+ *  est un outil permettant à l'arduino de pouvoir répondre au requette recu depuis le serial.
  *  Il utilise donc le port serial (usb) pour envoyer ou recevoir des données avec l'ordinateur ou la raspberry
  *  La classe est capable de lancer des methodes sur demande de l'ordinateur ou de la raspberry.
  */
