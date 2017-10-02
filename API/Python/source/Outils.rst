@@ -14,7 +14,8 @@ GeoGebra
 Preambule
 --------------
 
-La librairie GeoGebra permet de pouvoir extraire des points, angles, et lignes brisées. Cette librairie extrait les données des fichiers *.GGB qui ne sont que de simple fichiers XML compressés.
+La librairie GeoGebra permet de pouvoir extraire des points, angles, et lignes brisées. Cette librairie extrait les données des fichiers *.GGB qui ne sont que de simple fichiers XML compressés. 
+
 Voici un exemple de XML de Geogebra avec comme exemple un point appelé ``bornibus``.
 
 .. code:: 
@@ -126,7 +127,9 @@ API
 
     :param tuple A: Coordonnées du premier segment avec la forme suivante : (xA1, yA1), (xA2, yA2).
     :param tuple B: Coordonnées du deuxième segment avec la forme suivante : (xB1, yB1), (xB2, yB2).
+
     :return boolean : Vrai si il y a intersection.
+
 
 .. class:: RoadMap
 
