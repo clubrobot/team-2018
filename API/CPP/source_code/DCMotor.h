@@ -27,25 +27,25 @@ public:
 	void attach(int EN, int PWM, int DIR);
 
 	//!Envoie une commande de vitesse au moteur
-	/*
+	/*!
 		\param velocity vitesse de commande en mm/s
 	*/
 	void setVelocity(float velocity){m_velocity = velocity; update();}
 
 	//!Paramètre la constante du moteur 
-	/*
+	/*!
 		\param constant constante en rad/s/Volt
 	*/
 	void setConstant   (float constant)   {m_constant    = constant;    update();}
 	
 	//!Paramètre le rayon de la roue liée au moteur
-	/*
+	/*!
 		\param wheelRadius rayon en mm
 	*/
 	void setWheelRadius(float wheelRadius){m_wheelRadius = wheelRadius; update();}
 
 	//!Paramètre une valeur limite de PWN à ne pas dépasser
-	/*
+	/*!
 		\param maxPWM valeur limite entre 0 et 1
 	*/
 	void setMaxPWM     (float maxPWM)     {m_maxPWM      = maxPWM;      update();}
@@ -54,13 +54,13 @@ public:
 	void disable(){m_enabled = false; update();}
 
 	//!Renvoie la vitesse de commande actuelle du moteur
-	/*
+	/*!
 		\return vitesse en mm/s
 	*/
 	float getVelocity   () const {return m_velocity;}
 	
 	//!Renvoie la constante du moteur paramétrée
-	/*
+	/*!
 		\return constante : (60 * reduction_ratio / velocity_constant_in_RPM) / supplied_voltage_in_V
 	*/
 	float getConstant   () const {return m_constant;}
@@ -71,14 +71,14 @@ public:
 	*/
 	float getWheelRadius() const {return m_wheelRadius;}
 	//!Renvoie la valeur max de PWM
-	/*
+	/*!
 		\return valeur entre 0 et 1
 	*/
 	float getMaxPWM     () const {return m_maxPWM;}
 	bool  isEnabled     () const {return m_enabled;}
 
 	//!Renvoie la vitesse maximale avec les constantes actuelles
-	/*
+	/*!
 		\return vitesse max en mm/s
 	*/
 	float getMaxVelocity() const;
@@ -113,7 +113,7 @@ class DCMotorsDriver
 {
 public:
 	//!Définit les pins utiles au driver
-	/*
+	/*!
 		\param RESET pin de reset
 		\param FAULT pin de Fault
 	*/
