@@ -50,7 +50,7 @@
 /** class SerialTalks
  *  \brief Object de communication serial avec un ordinateur.
  *
- *  est un outil permettant à l'arduino de pouvoir répondre au requette recu depuis le serial.
+ *  est un outil permettant à l'arduino de pouvoir répondre aux requettes recu depuis le serial.
  *  Il utilise donc le port serial (usb) pour envoyer ou recevoir des données avec l'ordinateur ou la raspberry
  *  La classe est capable de lancer des methodes sur demande de l'ordinateur ou de la raspberry.
  */
@@ -102,7 +102,7 @@ public:
 
 	protected:
 
-		//! Initialise le ostream. C'est à dire explicité le pointeur du SerialTalks et le retcode à associer.
+		//! Initialise le ostream. C'est à dire expliciter le pointeur du SerialTalks et le retcode à associer.
 		/*!
 			\param parent SerialTalks à associer.
 			\param retcode Code d'identification à utiliser pour l'utilisation du serial.

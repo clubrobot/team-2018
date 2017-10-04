@@ -105,7 +105,7 @@ struct Deserializer
 
 
 
-	//! Operateur de décalage, a utilisé pour extraire les variables du buffer. 
+	//! Operateur de décalage, à utiliser pour extraire les variables du buffer. 
 	/*!
 		\param object Object à complêter avec le buffer. Attention le type de la variable est pris en compte dans la conversion octect -> var
 

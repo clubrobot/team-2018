@@ -8,11 +8,13 @@
 
 
 /** class PeriodicProcess
- *  \brief Classe à implémenter pour gérer les appel dans la loop.
+ *  \brief Classe à implémenter pour gérer les appels dans la loop.
  *
  *  est un outil permettant à l'Arduino de pouvoir appeler l'objet PeriodicProcess tout les X s. 
  *  Cela permet de ne pas saturer le microcontroleur pour des tâches qui ne nécessitent pas un très gros rafraichissement.
  *  En général, on l'utilise pour toutes les tâches dans la loop.
+ *
+ * 	Par exemple : faire tourner un moteur pendant un certain temps puis l'arreter en autonomie sans delay()
  * 
  */
 
@@ -74,23 +76,23 @@ protected:
 
 	//! Méthode à implémenter pour hériter de PeriodicProcess. 
 	/*!
-	* Process est la méthode qui s'exécutera toutes les m_timestep. Il dois donc être implémenté avec le code qui doit ce rafraichire dans la loop de l'Arduino. 
+	* Process est la méthode qui s'exécutera toutes les m_timestep. Il doit donc définir l'action répétitive voulue dans la loop de l'Arduino. 
 		\param timestep Temps écoulé depuis le dernier appel en seconde.
 	*/
 
 	virtual void process(float timestep) = 0;
 
-	//! Méthode exécuté à l'activation du PeriodicProcess. 
+	//! Méthode exécutée à l'activation du PeriodicProcess. 
 	/*!
-	* Méthode à implémenter si votre class require des actions à son activation. 
+	* Méthode à implémenter si votre class nécessite des actions à son activation. 
 	*/
 
 	virtual void onProcessEnabling(){}
 
 
-	//! Méthode exécuté à l'activation du PeriodicProcess. 
+	//! Méthode exécutée à la désactivation du PeriodicProcess. 
 	/*!
-	* Méthode à implémenter si votre class require des actions à sa déactivation. 
+	* Méthode à implémenter si votre class nécessite des actions à sa déactivation. 
 	*/
 
 	virtual void onProcessDisabling(){}
