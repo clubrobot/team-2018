@@ -5,14 +5,38 @@
 #include "PID.h"
 
 
-
+/**
+ * @brief Instance de moteur.
+ * 
+ * Instance de Moteur permettant une parfaite compatibilitée entre les classes Motor et le DifferentialController.
+ * 
+ */
 class AbstractMotor
 {
 public:
-
+	/**
+	 * @brief Constructeur d'AbstractMotor.
+	 * 
+	 * Méthode à implémenter.
+	 */
 	virtual ~AbstractMotor(){}
 
+	/**
+	 * @brief Charge une nouvelle vitesse.
+	 * 
+	 * Change la vitesse du moteur par celle passée en parametre. Méthode à implémenter.
+	 * 
+	 * @param velocity Nouvelle vitesse.
+	 */
 	virtual void setVelocity(float velocity) = 0;
+
+	/**
+	 * @brief Retourne vitesse max
+	 * 
+	 * Retourne la vitesse max du moteur pour son intégration dans les calculs de DifferentialController.
+	 * 
+	 * @return virtual float
+	 */
 	virtual float getMaxVelocity() const = 0;
 };
 
