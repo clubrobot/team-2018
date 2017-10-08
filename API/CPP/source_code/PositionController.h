@@ -50,7 +50,7 @@ public:
 	 * Change l'angle objectif de l'objet Position. 
 	 * Remarque : les coordonnées objectif reste les mêmes. 
 	 * 
-	 * @param posSetpoint Nouvelle angle objectif.
+	 * @param theta Nouvelle angle objectif.
 	 */	
 	void setThetaSetpoint(float theta){m_posSetpoint.theta = theta;}
 
@@ -166,14 +166,14 @@ public:
 	 * 
 	 * Charge les configurations de la mémoire de l'Arduino avec l'adresse indiqué en paramètre.
 	 * 
-	 * @param Adresse à utiliser.
+	 * @param address Adresse à utiliser.
 	 */
 	void load(int address);
 	/**
 	 * @brief Sauvegarde la configuration actuel.
 	 * 
 	 * 
-	 * @param Adresse à utiliser.
+	 * @param address Adresse à utiliser.
 	 */
 	void save(int address) const;
 
