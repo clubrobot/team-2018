@@ -11,8 +11,8 @@
 /**
  * @brief Objet de controle de la vitesse.
  * 
- * VelocityController contrôle la vitesse à atteindre à partir de la vitesse que l'utilisateur veux atteindre.
- * VelocityController va appliquer une ramp d'accélération pour respecter une ramp d'accélération.
+ * VelocityController est une version améliorée de DifferentialController car il rajoute la gestion de Spin et les accélérations capées.
+ * 
  * 
  */
 class VelocityController : public DifferentialController
@@ -38,15 +38,16 @@ public:
 	/**
 	 * @brief Paramètre les décéleration max.
 	 * 
-	 * @param maxLinAcc Décélération linéaire en mm/s².
-	 * @param maxAngAcc Décélération angulaire en rad/s².
+	 * @param maxLinDec Décélération linéaire en mm/s².
+	 * @param maxAngDec Décélération angulaire en rad/s².
 	 */
 	void setMaxDec(float maxLinDec, float maxAngDec){m_maxLinDec = maxLinDec; m_maxAngDec = maxAngDec;}
+
 	/**
 	 * @brief Change l'état de l'arret d'urgence.
 	 *
 	 * 
-	 * @param Etat à appliquer à la variable spinShutdown.
+	 * @param spinShutdown Etat à appliquer à la variable spinShutdown.
 	 */
 	void setSpinShutdown(bool spinShutdown){m_spinShutdown = spinShutdown;}
 
@@ -88,7 +89,7 @@ public:
 	 * 
 	 * Charge les derniers paramètres sauvegarder (les acc et dec) dans l'Arduino.
 	 * 
-	 * @param Adresse à utiliser.
+	 * @param address Adresse à utiliser.
 	 */
 	void load(int address);
 	/**
@@ -96,7 +97,7 @@ public:
 	 * 
 	 * Sauvegarde les paramètres actuellement chargés.
 	 * 
-	 * @param Adresse à utiliser.
+	 * @param address Adresse à utiliser.
 	 */
 	void save(int address) const;
 
@@ -106,27 +107,39 @@ protected:
 	 * 
 	 * Calcul les nouvelles vitesse à atteindre pour respecter les contraites d'accélérations.
 	 * 
-	 * @param stepSetpoint Vitesse à atteindre.
+	 * @param stepSetpoint Vitesse demandé.
 	 * @param input Vitesse actuel
-	 * @param rampSetpoint 
-	 * @param maxAcc
-	 * @param maxDec
-	 * @param timestep
+	 * @param rampSetpoint Ancienne vitesse intermédiaire calculée.
+	 * @param maxAcc Accélération max.
+	 * @param maxDec Accélération min.
+	 * @param timestep Temps depuis le dernier appel.
 	 * 
-	 * @return float
+	 * @return float Nouvelle vitesse intermédiaire.
 	 */
 	float genRampSetpoint(float stepSetpoint, float input, float rampSetpoint, float maxAcc, float maxDec, float timestep);
 
+	/**
+	 * @brief Calcul l'asservissement.
+
+	 * 
+	 * @param timestep temps depuis le dernier appel.
+	 * 
+	 */
 	virtual void process(float timestep);
+	/**
+	 * @brief Initialisation de l'asservissement.
+	 *
+	 * 
+	 */
 	virtual void onProcessEnabling();
 
-	float m_rampLinVelSetpoint; // in mm/s (no longer w/e unit)
-	float m_rampAngVelSetpoint; // in rad/s (no longer w/e unit)
-	float m_maxLinAcc; // always positive, in mm/s^2
-	float m_maxLinDec; // always positive, in mm/s^2
-	float m_maxAngAcc; // always positive, in rad/s^2
-	float m_maxAngDec; // always positive, in rad/s^2
-	bool m_spinShutdown;
+	float m_rampLinVelSetpoint;/*!< Vitesse linéaire intermédiaire en mm/s.  */  // in mm/s (no longer w/e unit)
+	float m_rampAngVelSetpoint; /*!< Vitesse angulaire intermédiaire en rad/s.  */// in rad/s (no longer w/e unit)
+	float m_maxLinAcc; /*!< Accélération max linéaire en mm/s². Toujours positif. */   // always positive, in mm/s^2
+	float m_maxLinDec; /*!< Accélération max angulaire en rad/s². Toujours positif.*/ // always positive, in mm/s^2
+	float m_maxAngAcc; /*!< Décélération max linéaire en mm/s². Toujours positif. */   // always positive, in mm/s^2
+	float m_maxAngDec; /*!< Décélération max angulaire en rad/s². Toujours positif.*/ // always positive, in mm/s^2
+	bool m_spinShutdown; /*!< Etat de la sécurité de patinage.*/
 
 #if ENABLE_VELOCITYCONTROLLER_LOGS
 	friend class VelocityControllerLogs;
@@ -134,6 +147,12 @@ protected:
 };
 
 #if ENABLE_VELOCITYCONTROLLER_LOGS
+/**
+ * @brief Classe d'enregistrement de vitesse.
+ * 
+ * 
+
+ */
 class VelocityControllerLogs : public PeriodicProcess
 {
 public:
