@@ -176,7 +176,7 @@ public:
 	 * 
 	 * Charge les paramètres depuis la mémoire de l'arduino.
 	 * 
-	 * @param Adresse à utilisé pour charger les données.
+	 * @param address Adresse à utilisé pour charger les données.
 	 */
 	void load(int address);
 	/**
@@ -184,7 +184,7 @@ public:
 	 * 
 	 * Sauvegarde les paramètres actuelement utilisés.
 	 * 
-	 * @param Adresse à utilisé pour la sauvegarde.
+	 * @param address Adresse à utilisé pour la sauvegarde.
 	 */
 	void save(int address) const;
 
