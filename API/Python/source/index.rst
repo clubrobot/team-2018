@@ -6,7 +6,7 @@
 Bienvenue dans la documentation du club robot de l'Insa de Rennes!
 ===================================================================
 
-Bienvenue dans cette documentation. Vous pourrez trouver toutes les APIs utiles pour utiliser pleinement les robots et  les librairies associées. Certaine librairies disposent en plus d’un API classique de quelques exemples pour bien illustrer ce qui est présent dans la documentation.
+Bienvenue dans cette documentation. Vous pourrez trouver toutes les APIs utiles pour utiliser pleinement les robots et  les librairies associées. Certaines librairies disposent en plus d’un API classique de quelques exemples pour bien illustrer ce qui est présent dans la documentation.
 
 Cette documentation concerne tous les programmes sous python et sous C++.
 
