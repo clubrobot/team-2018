@@ -40,7 +40,7 @@ Librairie Arduino / CPP
 Sommaire des librairies des librairies généralistes :
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     SerialTalks     <arduino//SerialTalks.rst>
     PeriodicProcess <arduino//PeriodicProcess.rst>
@@ -54,6 +54,7 @@ Sommaire des librairies dédiés aux Arduinos :
     :maxdepth: 2
 
     Wheeledbase <arduino//wheeledbase.rst>
+
 
 
 
