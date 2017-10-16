@@ -20,16 +20,16 @@ Cette librairie de communication se base sur des requêtes et des retours. Chaqu
 3. **OP Code**
     L'OP code est très important puisqu'il permet d'expliciter la requête. On associe au préalable pour chaque fonction de l’Arduino un OP code. Une fois qu'il reçoit un OP code et ces arguments, il exécute la fonction paramétrée. Attention l'OP Code n'est pas présent dans les packets de retour.
 4. **RET Code**
-    Le RET code est utile pour les réponses d'instructions. En effet si l'arduino a besoin de renvoyer des informations au programme python. il va utiliser ce code dans le packet retour pour permettre au programme python de bien associer avec quel requête ces informations sont reliés.
+    C'est un code unique identifiant la requête. Il est utile pour les réponses d'instructions. En effet si l'arduino a besoin de renvoyer des informations au programme python. il va utiliser ce code dans le packet retour pour permettre au programme python de bien associer avec quel requête ces informations sont reliés.
 5. **args et kwargs**:
     Une requête peux avoir une infinité d'arguments supplémentaire du moment que la taille du packet est réglementaire. Il faut savoir que l'arduino tout comme les méthodes en python ne peuvent pas d'eux même reconnaître la nature des arguments et leurs nombres. Ces information devront être renseignées au préalable.
 
 
-Les requêtes sont toujours à l'initiative de la parti python. L’Arduino ne peut pas déclencher la moindre fonction python contrairement à son homologue.
-Quand une requêtes depuis l'ordinateur est envoyé à l’Arduino, il y a deux cas de figure : 
+Les requêtes sont toujours à l'initiative de la partie python. L’Arduino ne peut pas déclencher la moindre fonction python contrairement à son homologue.
+Quand une requête depuis l'ordinateur est envoyée à l’Arduino, il y a deux cas de figure : 
 
- * Si notre requête ne requière aucun retour, dans ce cas le packet va déclenché une fonction dans l’Arduino.
- * Si notre requête requière un retour, l’Arduino après avoir exécuté la fonction associé à l'OP code reçu va renvoyer ça réponse grâce au code esclave et le Retcode qui a été envoyé dans le packet reçu.
+ * Si notre requête ne requiert aucun retour, dans ce cas le packet va déclencher une fonction dans l’Arduino.
+ * Si notre requête requiert un retour l’Arduino, après avoir exécuté la fonction associée à l'OP code reçu va renvoyer sa réponse grâce au code esclave et le Retcode qui a été envoyé dans le packet reçu.
 
 
 
@@ -37,10 +37,10 @@ Quand une requêtes depuis l'ordinateur est envoyé à l’Arduino, il y a deux 
 Introduction
 -------------------------
 
-Cette partie correspond à la bibliothèque python destinée à la Raspberry ou à l'ordinateur.
+Cette partie correspond à la bibliothèque Python destinée à la Raspberry ou à l'ordinateur.
 
 Pour ouvrir les communications avec un Arduino, il faut créer un objet SerialTalks et lancer la connexion avec la méthode de connexion.
-Une fois les étapes préliminaires exécutés, il est possible de lancer n’importe quelle requête.    
+Une fois les étapes préliminaires exécutées, il est possible de lancer n’importe quelle requête.    
 
 ***********
 API
@@ -65,7 +65,7 @@ API
 
         :exception ConnectionFailedError:
 
-             Dans le cas où l'Arduino n'est pas trouvé ou ne peut pas être configuré.
+             Dans le cas où l'Arduino n'est pas trouvée ou ne peut pas être configuré.
 
         :exception AlreadyConnectedError:
 
@@ -171,9 +171,9 @@ API
 Utilisation
 ************
 
-Ils existent deux possibilités pour utiliser cette librairie. Utiliser directement l'objet SeriaTalks, ce qui peut être vite fastidieux pour réaliser des actions autre que la manipulation d'UUID. L'autre option est de créer une classe qui dérive de SerialTalks qui va permettre une utilisation de l'Arduino très haut niveau.
+Il existe deux possibilités pour utiliser cette librairie. Utiliser directement l'objet SeriaTalks, ce qui peut être vite fastidieux pour réaliser des actions autre que la manipulation d'UUID. L'autre option est de créer une classe qui dérive de SerialTalks qui va permettre une utilisation de l'Arduino très haut niveau.
 
-Pour utilisé directement il faut d'abord importer la librairie :
+Pour utiliser directement il faut d'abord importer la librairie :
 
 .. code::
 
@@ -181,7 +181,7 @@ Pour utilisé directement il faut d'abord importer la librairie :
 
 .. warning::
 
-    Pour pouvoir faire l'importation depuis n'importe quel endroit utiliser le code suivant : 
+    Pour pouvoir faire l'importation depuis n'importe quel endroit, utiliser le code suivant : 
 
 .. code::
 
@@ -191,14 +191,14 @@ Pour utilisé directement il faut d'abord importer la librairie :
     	sys.path.append(directory)
 
 
-Il suffit ensuite de creer l'objet de le connecter comme ceci : 
+Il suffit ensuite de créer l'objet de le connecter comme ceci : 
 
 .. code::
     
     arduino = SerialTalks('ardresse')
     arduino.connect()
 
-La création d'objet est un peu plus compliquée. Pour commencer il faut faire hériter notre nouvelle objet de SerialTalks comme ceci:
+La création de classe fille est un peu plus compliquée. Pour commencer il faut faire hériter notre nouvelle classe de SerialTalks comme ceci:
 
 .. code::
 
@@ -212,7 +212,7 @@ La création d'objet est un peu plus compliquée. Pour commencer il faut faire h
 
 .. note:: Il est possible de ne pas écrire l'init si votre nouvelle object n'a pas besoin de variable pour son initialisation.
 
-Ensuite il faut ajouter à cette object des méthodes qui correspondrons à des OP code. 
+Ensuite il faut ajouter à cette classe des méthodes qui correspondront à des OP code. 
 Voici un exemple simple d'envoi d'une variable float à l'Arduino.
 
 .. code::
@@ -221,9 +221,9 @@ Voici un exemple simple d'envoi d'une variable float à l'Arduino.
 
         self.send(OPCODE,FLOAT(variable))
 
-On peut voir dans cette méthode l'utilisation de l'objet FLOAT, cette object venu tout droit de la librairie SerialUtils permet la conversion en bytes. Les objets de conversions sont expliquer dans le chapitre SerialUtils.
+On peut voir dans cette méthode l'utilisation de l'objet FLOAT, cette object venu tout droit de la librairie SerialUtils permet la conversion en bytes. Les objets de conversions sont expliqués dans le chapitre SerialUtils.
 
-Pour indiquer l'Op code, il est vivement conseillé d'utiliser des constantes à definir en haut de votre fichier python de préférence en hexadécimal. Comme dans l'exemple ci contre.
+Pour indiquer l'OP code, il est vivement conseillé d'utiliser des constantes à definir en haut de votre fichier python de préférence en hexadécimal. Comme dans l'exemple ci contre.
 
 .. code:: 
 
