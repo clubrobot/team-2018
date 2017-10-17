@@ -7,11 +7,13 @@ from argparse import ArgumentParser
 
 from serialtalks import SerialTalks
 from components  import Server
-from bornibus    import Bornibus
-from murray      import Murray
+#from bornibus    import Bornibus
+#from murray      import Murray
 
 from threading import Thread
 
+
+arduinos=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector')
 
 class Starter(Thread):
 	def __init__(self,ggb,wheeledbase,greenbutton,redbutton,bluebutton,yellowbutton,switch):
@@ -205,6 +207,18 @@ def start(args):
 		robot.side = 1
 	robot.start()
 
+def update(args):
+	import subprocess
+	if args.arduino == 'all':
+		for arduino in arduinos:
+			print(arduino)
+			subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + arduino], stdout=subprocess.PIPE)
+	
+	else:
+		subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + args.arduino], stdout=subprocess.PIPE)
+
+	
+
 parser = ArgumentParser()
 subparsers = parser.add_subparsers()
 
@@ -234,6 +248,10 @@ start_parser.add_argument('-t', '--timeout', type=int, default=5)
 start_parser.add_argument('-T', '--timelimit', type=int, default=None)
 start_parser.add_argument('-b', '--bluetooth', type=str, default=None)
 start_parser.set_defaults(func=start)
+
+update_parser = subparsers.add_parser('update')
+update_parser.add_argument('arduino', type=str, default='all', choices=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'all'))
+update_parser.set_defaults(func=update)
 
 args = parser.parse_args()
 args.func(args)
