@@ -103,4 +103,87 @@ La dernière étape pour bien executer les communication est d'ajouter l'appel d
 Le SerialTalks est bien paramétré et peux recevoir et envoyer des informations. Il manque plus qu'à ajouter des fonctions pour répondre à des requêtes.
 
 Pour commencer, il faut choisir un OPCode associé à la fonction à ajouter. Cet OPCode devra être renseigné dans le code Python pour pouvoir appeler correctement la méthode Arduino.
-Il existe plusieurs façon de stoquer cette valeur mais on préfèrera utilés
+Il existe plusieurs façon de stoquer cette valeur mais on préfèrera utilés un header et les ``#define``.
+Voici un exemple de instruction.h de l'Arduino WheeledBase.
+
+.. code::
+
+    #ifndef __INSTRUCTIONS_H__
+    #define __INSTRUCTIONS_H__
+
+    #include "../common/SerialTalks.h"
+
+    // Opcodes declaration
+
+    #define SET_OPENLOOP_VELOCITIES_OPCODE  0x04
+
+    #define GET_CODEWHEELS_COUNTERS_OPCODE  0x0D
+
+    #define SET_VELOCITIES_OPCODE           0x06
+
+    #define START_PUREPURSUIT_OPCODE        0x07
+    #define START_TURNONTHESPOT_OPCODE      0x09
+
+    #define POSITION_REACHED_OPCODE         0x08
+
+    #define SET_POSITION_OPCODE             0x0A
+    #define GET_POSITION_OPCODE             0x0B
+    #define GET_VELOCITIES_OPCODE           0x0C
+
+    #define SET_PARAMETER_VALUE_OPCODE      0x0E
+    #define GET_PARAMETER_VALUE_OPCODE      0x0F
+
+    #define RESET_PUREPURSUIT_OPCODE        0x10
+    #define ADD_PUREPURSUIT_WAYPOINT_OPCODE 0x11
+    .
+    .
+    .
+
+Il est également  conseillé de faire les fonctions pour gérer les instructions dans un instruction.cpp. Pour cela faire les imports nécessaire et utilisé les ``externs var`` dans votre code pour pouvoir compiler.
+Voici un autre exemple de instruction.cpp
+
+.. code:: 
+
+
+    // Global variables
+
+    extern DCMotorsDriver driver;
+    extern DCMotor leftWheel;
+    extern DCMotor rightWheel;
+
+    extern Codewheel leftCodewheel;
+    extern Codewheel rightCodewheel;
+
+    extern Odometry odometry;
+
+    extern VelocityController velocityControl;
+
+    extern PID linVelPID;
+    extern PID angVelPID;
+
+    extern PositionController positionControl;
+
+    extern PurePursuit   purePursuit;
+    extern TurnOnTheSpot turnOnTheSpot;
+
+    // Instructions
+
+    void SET_OPENLOOP_VELOCITIES(SerialTalks& talks, Deserializer& input, Serializer& output)
+    {
+        float leftWheelVel  = input.read<float>();
+        float rightWheelVel = input.read<float>();
+
+        velocityControl.disable();
+        positionControl.disable();
+        leftWheel .setVelocity(leftWheelVel);
+        rightWheel.setVelocity(rightWheelVel);
+    }
+
+Une fois que les fonctions sont créer avec les OPcode définis. Il ne reste plus qu'a associer le tout dans le SerialTalks. Cette opération dois être faite dans le setup du fichier .ino .
+Il est toutefois préférable d'executer cette opération après la création du socket. Voici un exemple d'association : 
+
+.. code:: 
+
+    talks.bind(SET_OPENLOOP_VELOCITIES_OPCODE, SET_OPENLOOP_VELOCITIES);
+	talks.bind(GET_CODEWHEELS_COUNTERS_OPCODE, GET_CODEWHEELS_COUNTERS);
+	talks.bind(SET_VELOCITIES_OPCODE, SET_VELOCITIES);
