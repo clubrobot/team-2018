@@ -215,14 +215,15 @@ def update(args):
 	else:
 		arduinos=list(arduino_list)
 
-	for arduino in arduinos:
-		gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '../arduino/' + arduino])
-		if gitdiff.returncode == 0:
-			arduinos.remove(arduino)
-			print(arduino + " up to date")
+	if not args.force:
+		for arduino in arduinos:
+			gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '../arduino/' + arduino])
+			if gitdiff.returncode == 0:
+				arduinos.remove(arduino)
+				print(arduino + " up to date")
 
 	subprocess.run(['/usr/bin/git', 'pull'])
-	
+
 	for arduino in arduinos:
 		print(arduino)
 		subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + arduino], stdout=subprocess.PIPE)
@@ -259,6 +260,7 @@ start_parser.set_defaults(func=start)
 
 update_parser = subparsers.add_parser('update')
 update_parser.add_argument('arduino', type=str, default='all', choices=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'all'))
+update_parser.add_argument('-f', '--force', type=str, default=None)
 update_parser.set_defaults(func=update)
 
 args = parser.parse_args()
