@@ -19,3 +19,9 @@ void ACTIVATE_SENSORS(SerialTalks& inst, Deserializer& input, Serializer& output
 void DESACTIVATE_SENSORS(SerialTalks& inst, Deserializer& input, Serializer& output);
 
 #endif
+
+
+
+
+
+
