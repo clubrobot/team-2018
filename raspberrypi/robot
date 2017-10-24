@@ -13,7 +13,7 @@ from components  import Server
 from threading import Thread
 
 
-arduinos=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector')
+arduino_list=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector')
 
 class Starter(Thread):
 	def __init__(self,ggb,wheeledbase,greenbutton,redbutton,bluebutton,yellowbutton,switch):
@@ -209,15 +209,23 @@ def start(args):
 
 def update(args):
 	import subprocess
-	if args.arduino == 'all':
-		for arduino in arduinos:
-			print(arduino)
-			subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + arduino], stdout=subprocess.PIPE)
-	
-	else:
-		subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + args.arduino], stdout=subprocess.PIPE)
 
+	if args.arduino != 'all':
+		arduinos=[args.arduino]
+	else:
+		arduinos=list(arduino_list)
+
+	for arduino in arduinos:
+		gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '../arduino/' + arduino])
+		if gitdiff.returncode == 0:
+			arduinos.remove(arduino)
+			print(arduino + " up to date")
+
+	subprocess.run(['/usr/bin/git', 'pull'])
 	
+	for arduino in arduinos:
+		print(arduino)
+		subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + arduino], stdout=subprocess.PIPE)
 
 parser = ArgumentParser()
 subparsers = parser.add_subparsers()
