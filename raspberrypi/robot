@@ -13,7 +13,7 @@ from components  import Server
 from threading import Thread
 
 
-arduino_list=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector')
+arduino_list=['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector']
 
 class Starter(Thread):
 	def __init__(self,ggb,wheeledbase,greenbutton,redbutton,bluebutton,yellowbutton,switch):
@@ -207,25 +207,36 @@ def start(args):
 		robot.side = 1
 	robot.start()
 
+# Update arduino programs
 def update(args):
 	import subprocess
 
+	# List all the arduino which should be updated
 	if args.arduino != 'all':
-		arduinos=[args.arduino]
+		arduinos_to_verify=[args.arduino]
 	else:
-		arduinos=list(arduino_list)
-
+		arduinos_to_verify=arduino_list
+	
+	arduinos_to_update = []
+	
+	# Verify if the code of the arduino changed since last update (can be forced)
 	if not args.force:
-		for arduino in arduinos:
-			gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '../arduino/' + arduino])
+		for arduino in arduinos_to_verify:
+			gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '--exit-code', '../arduino/' + arduino])
 			if gitdiff.returncode == 0:
-				arduinos.remove(arduino)
 				print(arduino + " up to date")
+			else:
+				arduinos_to_update.add(arduino)
 
-	subprocess.run(['/usr/bin/git', 'pull'])
+	else:
+		arduinos_to_update = list(arduino_list)
 
-	for arduino in arduinos:
-		print(arduino)
+	# Git pull
+	subprocess.run(['/usr/bin/git', 'pull'], stdout=subprocess.PIPE)
+
+	# Execute make upload for the selected arduinos 
+	for arduino in arduinos_to_update:
+		print("updating " + arduino)
 		subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + arduino], stdout=subprocess.PIPE)
 
 parser = ArgumentParser()
@@ -259,8 +270,8 @@ start_parser.add_argument('-b', '--bluetooth', type=str, default=None)
 start_parser.set_defaults(func=start)
 
 update_parser = subparsers.add_parser('update')
-update_parser.add_argument('arduino', type=str, default='all', choices=('sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'all'))
-update_parser.add_argument('-f', '--force', type=str, default=None)
+update_parser.add_argument('arduino', type=str, default='all', choices=arduino_list + ['all'])
+update_parser.add_argument('-f', '--force', action="store_true", required=False, default=False)
 update_parser.set_defaults(func=update)
 
 args = parser.parse_args()
