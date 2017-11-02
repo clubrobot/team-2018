@@ -31,6 +31,7 @@ Utilisation
 Pour pouvoir utiliser la librairie, il faut comprendre que l'intégration ce fera par l'héritage. C'est à dire que c'est a vos nouveau objet CPP d'incorporer la classe PeriodicProcess.
 Pour pourvoir faire l'héritage, il suffit d'importer la lib et de la faire hériter.
 .. code::
+
     #include "PeriodicProcess.h"
     class YourObject : public PeriodicProcess
     {   
@@ -38,6 +39,7 @@ Pour pourvoir faire l'héritage, il suffit d'importer la lib et de la faire hér
 Une fois l'héritage fait, il ne vous reste plus qu'à implémenter les 3 méthodes vu précédement.
 Pour finir, il faut penser à appeller le execute de la classe PeriodicProcess dans la loop de l'Arduino, comme ceci :
 .. code::
+
     void loop()
     {
 
