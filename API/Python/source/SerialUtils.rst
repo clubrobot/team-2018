@@ -10,18 +10,7 @@ Préambule
 *************
 
 Cette librairie existe en deux versions (python , cpp). Ces deux versions diffèrent un peu dans le fonctionnement mais l'idée reste la même. Le but est de sérialiser et de desérialiser. Ces opérations consistent à passer d'un objet utilisable par un langage (exemple int float double string) à une chaine d'octet ou l'inverse.
-Pour une utilisation plus simple cette librairie est composée d'objet avec une tache bien spécifique. 
-
-
-**************
-Python 
-**************
-
-Voici la version en python de cette librairie.
-
-
-Préambule
-----------------
+Pour une utilisation plus simple cette librairie est composée d'objet avec des taches bien spécifiques. 
 
 
 Pour le côté python, il existe des objets qui sont capables de faire la sérialisation et la desérialisation en même temps mais pour un seul type de donnée. Malgré le fais que ces objets existent, on préfèrera utiliser un objet de déserialisation pur qui peux gérer des données avec plusieurs variables encodées en octets à l'intérieur (ce qui n'est pas possible avec les objets de sérialisation).
@@ -29,9 +18,9 @@ Pour commencer l'API nous allons traiter les objets de sérialisation hybride pu
 
 Toutes les classes de sérialisation hybride héritent de AbstractType qui permet de les utiliser beaucoup plus facilement.
 
-
+*************
 API
------------------
+*************
 
 .. class:: AbstractType
 
@@ -155,9 +144,9 @@ API
 
         .. warning:: Il faut obligatoirement utiliser des objets d'AbstractType, pour bien convertir dans les bons formats.
 
-
+*************
 Utilisation
-------------
+*************
 Voici quelques exemples d'utilisation de la librairie.
 
 Pour la conversion en octet:
@@ -197,13 +186,3 @@ Voici un tableau récapitulant les objets de désérialisation utiles pour l'Ard
 
 
 
-
-**************
-C++ API
-**************
-
-
-
-.. class:: Serializer
-
-    `API <file:///W:/Francois/Mes%20documents/projet-robot/team-2018/API/CPP/html/struct_serializer.html#details>`_
