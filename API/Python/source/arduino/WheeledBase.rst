@@ -39,7 +39,9 @@ Cette erreur est nécessaire pour générer une nouvelle consigne au moteur (obj
 Position
 *************************
 
-TODO
+La parti position est le dernier étage d'abstraction de Wheeledbase. Cette étage va requérir l'activation de la partie vitesse. Car le rôle premier de cette partie est de générer des consignes de vitesse au moteur jusqu'à atteindre la position demandée. Cette étape de calcul est composée de deux objets principaux.
+Le premier est le ``PositionController`` , cette classe permet de charger et d'executer des stratégies de déplacements. Ces stratégies sont sous la forme de classe posédant des méthodes clées. Ces méthodes permettent de générer de nouvelle consignes de vitesses à partir de la position du robot.
+Il existe actuellement deux types de stratégies, le ``turnonthespot`` et le ``purepursuit`` . La première est dédié aux rotations du robot asservi en une position (x,y) et la deuxième permet de faire suivre au robot une trajectoire courbe le long d'une droite brisée donnée en paramètre. 
 
 
 *************************
