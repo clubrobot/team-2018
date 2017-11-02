@@ -43,6 +43,7 @@ Sommaire des librairies des librairies généralistes :
     :maxdepth: 1
 
     SerialTalks     <arduino//SerialTalks.rst>
+    SerialUtils     <arduino//SerialUtils.rst>
     PeriodicProcess <arduino//PeriodicProcess.rst>
     Clock           <arduino//Clock.rst>
     
@@ -53,7 +54,8 @@ Sommaire des librairies dédiés aux Arduinos :
 .. toctree::
     :maxdepth: 2
 
-    Wheeledbase <arduino//wheeledbase.rst>
+    Wheeledbase <arduino//WheeledBase.rst>
+    AbstractMoveStrategy <arduino//AbstractMoveStrategy.rst>
 
 
 
