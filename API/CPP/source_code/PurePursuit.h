@@ -67,12 +67,12 @@ public:
 	 * 
 	 * @param waypoint Nouveau point à ajouter.
 	 * @return true Ajout réussi. 
-	 * @return false L'ajout à rencontré un problème.
+	 * @return false L'ajout a rencontré un problème.
 	 */
 	bool addWaypoint(const Waypoint& waypoint);
 	
 	/**
-	 * @brief Initialise le Purpuisuit
+	 * @brief Initialise le Purpuisuit.
 	 * 
 	 * Supprime les points de la ligne brisée et les paramètres temporaires.
 	 * 
@@ -80,18 +80,18 @@ public:
 	void reset();
 
 	/**
-	 * @brief  Setter du lookAhead
+	 * @brief  Setter du lookAhead.
 	 * 
-	 * Met à jour la distance entre le point intermédiare et le robot.
+	 * Met à jour la distance entre le point intermediaire et le robot.
 	 * 
 	 * @param lookAhead Distance en mm.
 	 */
 	void setLookAhead   (float lookAhead)   {m_lookAhead    = lookAhead;}
 
 	/**
-	 * @brief Setter du lookAheadBis
+	 * @brief Setter du lookAheadBis.
 	 * 
-	 * Met à jour la distance entre le point intermédiare et le robot en fin de trajectoire.
+	 * Met à jour la distance entre le point intermediaire et le robot en fin de trajectoire.
 	 * 
 	 * @param lookAheadBis Distance en mm.
 	 */
@@ -106,7 +106,7 @@ public:
 	Direction getDirection() const {return m_direction;}
 
 	/**
-	 * @brief Getter de l'angle final
+	 * @brief Getter de l'angle final.
 	 * 
 	 * Retourne l'angle final que le robot va atteindre en fin de trajectoire.
 	 * 
@@ -129,12 +129,12 @@ public:
 	/**
 	 * @brief Getter du nombre de point de passage.
 	 * 
-	 * @return int Nombre de point de la ligne brisée.
+	 * @return int Nombre de points de la ligne brisée.
 	 */
 	int getNumWaypoints() const {return m_numWaypoints;}
 
 	/**
-	 * @brief Getter du lookahead
+	 * @brief Getter du lookahead.
 	 * 
 	 * @return float LookaHead en mm.
 	 */
@@ -147,13 +147,13 @@ public:
 	float getLookAheadBis() const {return m_lookAheadBis;}
 	
 	/**
-	 * @brief Charge les paramètres sauvegardés
+	 * @brief Charge les paramètres sauvegardés.
 	 * 
 	 * @param address Adresse à utiliser.
 	 */
 	void load(int address);
 	/**
-	 * @brief Sauvegarde les paramètres actuels
+	 * @brief Sauvegarde les paramètres actuels.
 	 * 
 	 * @param address Adresse à utiliser.
 	 */
@@ -165,21 +165,21 @@ protected:
 	virtual bool getPositionReached();
 
 	/**
-	 * @brief Calcul le point intermédiaire sur la ligne brisée.
+	 * @brief Calcul le point intermediaire sur la ligne brisée.
 	 * 
-	 * Calcul le point intermédiaire sur la courbe et met à jour le segment courant.
+	 * Calcul le point intermediaire sur la courbe et met à jour le segment courant.
 	 * 
 	 * @param x Coordonnées x du robot (mm).
 	 * @param y Coordonnées y du robot (mm).
 	 * @return true Un point a été trouvé.
-	 * @return false Aucun point a été trouvé.
+	 * @return false Aucun point n'a été trouvé.
 	 */
 	bool checkLookAheadGoal(const float x, const float y);
 
 	/**
-	 * @brief Calcule le point intermédiaire sur la ligne brisée.
+	 * @brief Calcule le point intermediaire sur la ligne brisée.
 	 * 
-	 * Calcul le point le plus près du robot sur la ligne brisée non parcourut.
+	 * Calcule le point le plus près du robot sur la ligne brisée non parcouru.
 	 * 
 	 * @param x Coordonnées x du robot (mm).
 	 * @param y Coordonnées y du robot (mm).
@@ -193,7 +193,7 @@ protected:
 	 */
 	float getDistAfterGoal();
 
-	Waypoint m_waypoints[PUREPURSUIT_MAX_WAYPOINTS];/*!< Liste des points de la ligne brisée à suivre*/
+	Waypoint m_waypoints[PUREPURSUIT_MAX_WAYPOINTS];/*!< Liste des points de la ligne brisée à suivre.*/
 	int m_numWaypoints; /*!< Nombre de points constituant la ligne brisée.*/
 	Direction m_direction;/*!< Sens du robot pendant la trajectoire.*/
 	float m_finalAngle;/*!< Angle à atteindre en fin de trajectoire.*/
@@ -204,8 +204,8 @@ protected:
 	bool m_goalReached;/*!< Arrivé ou non.*/
 
 	// Path following tunings
-	float m_lookAhead;/*!< Distance entre le point intermédiaire et le robot.*/
-	float m_lookAheadBis;/*!< Distance entre le point intermédiaire et le robot en fin de trajectoire.*/
+	float m_lookAhead;/*!< Distance entre le point intermediaire et le robot.*/
+	float m_lookAheadBis;/*!< Distance entre le point intermediaire et le robot en fin de trajectoire.*/
 };
 
 #endif // __PUREPURSUIT_H__
