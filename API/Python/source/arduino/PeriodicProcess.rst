@@ -48,3 +48,8 @@ Pour finir, il faut penser à appeller le execute de la classe PeriodicProcess d
     }
 
 .. note:: Il est possible de savoir si votre PeriodicProcess process c'est bien executé avec un : ``if(YourObject.update())``.
+
+API
+-------------
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_periodic_process.html

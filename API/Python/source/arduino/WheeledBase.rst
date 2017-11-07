@@ -27,6 +27,10 @@ Une fois que la classe mère Odometry a les distances parcouru elle peut à part
 Avec cette nouvelle position, l'odometrie peut en déduire une vitesse casi instantané. Une fois la position et la vitesse calculés, elle le transmet respectivement à PositionController et VelocityController.
 
 
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_odometry.html
+
+
 *************************
 Vitesse
 *************************
@@ -34,6 +38,10 @@ La parti vitesse est une phase importante pour correctement ce déplacer sur le 
 La première est de récupéré la vitesse actuel de robot donnée par l'odométrie. Ensuite, l'objet VelocityController détermine à partir de la consigne, de la vitesse demandé et de la consigne donnée à l'asservissement pour déterminé une nouvelle vitesse à suivre.
 Cette consigne répondra le plus rapidement à la consigne en respectant la limite de d'accélération. Une fois la consigne d'asservissement généré, on passe à l'asservissement à proprement parlé (avec un objet ``PID``). Cette étape va utilisé la vitesse actuel et la vitesse demandé pour en déduire une erreur.
 Cette erreur est nécessaire pour générer une nouvelle consigne au moteur (objet ``DCMotor``).
+
+
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_velocity_controller.html
 
 *************************
 Position
@@ -44,6 +52,9 @@ Le premier est le ``PositionController`` , cette classe permet de charger et d'e
 Il existe actuellement deux types de stratégies, le ``turnonthespot`` et le ``purepursuit`` . La première est dédié aux rotations du robot asservi en une position (x,y) et la deuxième permet de faire suivre au robot une trajectoire courbe le long d'une droite brisée donnée en paramètre. 
 
 
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_position_controller.html
+    
 *************************
 API Python
 *************************

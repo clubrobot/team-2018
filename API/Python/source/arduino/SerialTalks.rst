@@ -57,13 +57,11 @@ Le dernier type utilisé est le ostream. C'est une classe de SeriaTalks qui a po
 API
 *******************
 
-Nous commencerons cette API par la classe d'Ostream avant de passer à SeriaTalks.
 
-`API OSTREAM <file:///W:/Francois/Mes%20documents/projet-robot/team-2018/API/CPP/html/classostream.html>`_
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_serial_talks.html
 
-Voici l'API de SerialTalks :
 
-API SERIALTALKS
 
 *******************************
 Utilisation

@@ -21,6 +21,9 @@ Ce renseignement sera toujours passé au struct par des templates (chevrons deva
 **************
 API
 **************
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/struct_serializer.html
+
 
 ***************
 Utilisation

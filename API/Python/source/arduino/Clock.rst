@@ -7,6 +7,8 @@ Cette librairie facilite la prise de temps entre deux appel de celle-ci.
 
 La librairie va vous permettre de récupérer en secondes le temps depuis la construction de l'objet ou de l'appel de la méthode ``reset()`` sur l'objet.
 
+API
 ---------------------------------------
-`API <http://www.u-bordeaux1.fr/>`_
----------------------------------------
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_clock.html
+

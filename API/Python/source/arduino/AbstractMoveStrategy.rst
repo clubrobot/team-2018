@@ -6,6 +6,12 @@ Cette page a pour vocation de presenter le fonctionnement des AbstractMoveStrate
 Avant de commencer, il faut bien comprendre que le rôle d'une  AbstractMoveStrategy est de générer en temps reel des consignes de vitesses pour les moteurs, afin de pouvoir diriger le robot vers la position souhaitée.
 Pour atteindre cette mission, l'AbstractMoveStrategy dispose en temps reel de la position du robot. Le but pour creer une AbstractMoveStrategy est définir des algorithmes les plus simple possible pour définir des vitesses associées.
 
+
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_abstract_move_strategy.html
+
+
+
 ****************
 TurnOnTheSpot
 ****************
@@ -34,6 +40,14 @@ On multiplie cette distance avec un coefficient proportionnel pour obtenir notre
 Voici un exemple de fonctionnement: 
 
 .. image:: gif_turonthespot.gif
+
+
+API
+-------------
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_turn_on_the_spot.html
+
+
 
 
 
@@ -68,3 +82,7 @@ Le calcul du point intermédiaire se passe en deux étapes. On commence par fair
 
 .. note:: Il faut savoir que dans l'algorythme ces points sont stoqués sous la forme d'un rapport entre la distance de ce point avec le début de segment et la taille du segment.
 
+API
+-------------
+.. image:: logo_doxygen.jpg 
+    :target: ../../CPP/class_pure_pursuit.html
