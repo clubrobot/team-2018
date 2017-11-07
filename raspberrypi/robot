@@ -210,34 +210,36 @@ def start(args):
 # Update arduino programs
 def update(args):
 	import subprocess
-	
+
 	# List all the arduino which should be updated
 	if args.arduino != "all":
 		arduinos_to_verify=[args.arduino]
 	else:
 		arduinos_to_verify=arduino_list
-		
+
 	arduinos_to_update = []
 	
 	# Verify if the code of the arduino changed since last update (can be forced)
 	if not args.force:
 		for arduino in arduinos_to_verify:
-			gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '--exit-code', '../arduino/' + arduino])
+			arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
+			gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '--exit-code', arduino_path])
 			if gitdiff.returncode == 0:
 				print(arduino + " up to date")
 			else:
-				arduinos_to_update.add(arduino)
+				arduinos_to_update += [arduino]
 
 	else:
 		arduinos_to_update = arduinos_to_verify
 
 	# Git pull
-	subprocess.run(['/usr/bin/git', 'pull'], stdout=subprocess.PIPE)
+	subprocess.run(['/usr/bin/git', 'pull', '-f'], stdout=subprocess.PIPE)
 
 	# Execute make upload for the selected arduinos 
 	for arduino in arduinos_to_update:
+		arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
 		print("updating " + arduino)
-		subprocess.run(['/usr/bin/make', 'upload', '-C', '../arduino/' + arduino], stdout=subprocess.PIPE)
+		subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
 
 parser = ArgumentParser()
 subparsers = parser.add_subparsers()
@@ -273,6 +275,8 @@ update_parser = subparsers.add_parser('update')
 update_parser.add_argument('arduino', type=str, default='all', choices=arduino_list + ['all'])
 update_parser.add_argument('-f', '--force', action="store_true", required=False, default=False)
 update_parser.set_defaults(func=update)
+
+
 
 args = parser.parse_args()
 args.func(args)

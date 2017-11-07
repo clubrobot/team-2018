@@ -31,6 +31,18 @@ ifndef MONITOR_PORT
     endif
 endif
 
+# Create alternative upload. Abort if the arduino with the right uuid is not finded
+ifdef MONITOR_PORT
+upload_safe:
+	$(MAKE) upload
+endif
+
+ifndef MONITOR_PORT
+upload_safe:
+	@echo $(BOARD_UUID) not connected
+endif
+
+
 # Here is where the REAL grown-ups come into play ;)
 # Seriously they did an awesome work. Thank you guys!
 include $(ARDMK_DIR)/Arduino.mk
