@@ -37,6 +37,18 @@ if [ -z "$ARDUINO_DIR" ]; then # ifndef ARDUINO_DIR
 
 fi # ifndef ARDUINO_DIR
 
+# Install ESP-32 driver for Arduino IDE
+mkdir "/opt/$ARDUINO_SRC/hardware/espressif"
+cd  "/opt/$ARDUINO_SRC/hardware/espressif"
+git clone https://github.com/espressif/arduino-esp32.git esp32 
+cd esp32
+git submodule update --init --recursive && \
+cd tools
+python get.py
+
+echo export ESP_ROOT="/opt/$ARDUINO_SRC/hardware/espressif/esp32" >> "$PROFILE"
+
+
 # Install Arduino-Makefile if it is not already installed
 
 if [ -z "$ARDMK_DIR" ]; then # ifndef ARDMK_DIR
