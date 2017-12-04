@@ -5,7 +5,7 @@
 #include "serialutils.h"
 
 #ifndef EEPROM_SIZE
-#define EEPROM_SIZE 512
+#define EEPROM_SIZE 1024
 #endif
 
 
