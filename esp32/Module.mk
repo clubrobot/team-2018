@@ -19,7 +19,7 @@
 
 
 # Add preprocesseur rules for SerialTalks. 
-BUILD_EXTRA_FLAGS = -D BOARD_UUID=\"$(BOARD_UUID)\"
+BUILD_EXTRA_FLAGS = -D BOARD_UUID=\"$(BOARD_UUID)\" $(CPPFLAGS)
 
 # Include possible project makefile. This can be used to override the defaults below
 -include $(firstword $(PROJ_CONF) $(dir $(SKETCH))config.mk)
