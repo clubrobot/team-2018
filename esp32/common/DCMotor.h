@@ -13,7 +13,7 @@ public:
 
 	DCMotor() : m_enabled(false), m_velocity(0), m_wheelRadius(1 / (2 * M_PI)), m_constant(1), m_maxPWM(1){}
 
-	void attach(int EN, int PWM, int PWMChanel, int DIR);
+	void attach(int EN, int PWM, int PWMChanel, int freq ,int DIR);
 
 	void setVelocity(float velocity){m_velocity = velocity; update();}
 

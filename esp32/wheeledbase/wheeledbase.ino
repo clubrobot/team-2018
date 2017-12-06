@@ -18,10 +18,10 @@
 
 // Load the different modules
 
-//DCMotorsDriver driver;
+DCMotorsDriver driver;
 DCMotor leftWheel;
 DCMotor rightWheel;
-/*
+
 Codewheel leftCodewheel;
 Codewheel rightCodewheel;
 
@@ -39,7 +39,7 @@ PositionController positionControl;
 
 PurePursuit   purePursuit;
 TurnOnTheSpot turnOnTheSpot;
-*/
+
 // Setup
 
 void setup()
@@ -47,7 +47,7 @@ void setup()
 	// Communication
 	Serial.begin(SERIALTALKS_BAUDRATE);
 	talks.begin(Serial);
-	/*
+	
 	talks.bind(SET_OPENLOOP_VELOCITIES_OPCODE, SET_OPENLOOP_VELOCITIES);
 	talks.bind(GET_CODEWHEELS_COUNTERS_OPCODE, GET_CODEWHEELS_COUNTERS);
 	talks.bind(SET_VELOCITIES_OPCODE, SET_VELOCITIES);
@@ -61,26 +61,26 @@ void setup()
 	talks.bind(GET_VELOCITIES_OPCODE, GET_VELOCITIES);
 	talks.bind(SET_PARAMETER_VALUE_OPCODE, SET_PARAMETER_VALUE);
 	talks.bind(GET_PARAMETER_VALUE_OPCODE, GET_PARAMETER_VALUE);
-	*/
-	// DC motors wheels
-	/*
-	driver.attach(DRIVER_RESET, DRIVER_FAULT);
-	driver.reset();
-	*/
 	
-	leftWheel .attach(LEFT_MOTOR_EN,  LEFT_MOTOR_PWM,LEFT_PWM_CHANEL,  LEFT_MOTOR_DIR);
-	/*
-	rightWheel.attach(RIGHT_MOTOR_EN, RIGHT_MOTOR_PWM,RIGHT_PWM_CHANEL, RIGHT_MOTOR_DIR);
+	// DC motors wheels
+	
+	//driver.attach(DRIVER_RESET, DRIVER_FAULT);
+	driver.reset();
+	
+	
+	//leftWheel .attach(LEFT_MOTOR_EN,  LEFT_MOTOR_PWM,LEFT_MOTOR_CHANEL, PWM_FREQUENCY, LEFT_MOTOR_DIR);
+	
+	//rightWheel.attach(RIGHT_MOTOR_EN, RIGHT_MOTOR_PWM,RIGHT_MOTOR_CHANEL, PWM_FREQUENCY,RIGHT_MOTOR_DIR);
 	
 	leftWheel .load(LEFTWHEEL_ADDRESS);
 	
 	rightWheel.load(RIGHTWHEEL_ADDRESS);
 	
 	// Codewheels
-	leftCodewheel .attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_Y_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_Y);
-	rightCodewheel.attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_X_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_X);
-	leftCodewheel .attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
-	rightCodewheel.attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
+	//leftCodewheel .attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_Y_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_Y);
+	//rightCodewheel.attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_X_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_X);
+	//leftCodewheel .attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
+	//rightCodewheel.attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
 	leftCodewheel .load(LEFTCODEWHEEL_ADDRESS);
 	rightCodewheel.load(RIGHTCODEWHEEL_ADDRESS);
 	leftCodewheel .reset();
@@ -91,7 +91,7 @@ void setup()
 	odometry.setCodewheels(leftCodewheel, rightCodewheel);
 	odometry.setTimestep(ODOMETRY_TIMESTEP);
 	odometry.enable();
-
+	
 	// Engineering control
 	velocityControl.load(VELOCITYCONTROL_ADDRESS);
 	velocityControl.setWheels(leftWheel, rightWheel);
@@ -117,9 +117,10 @@ void setup()
 	positionControl.disable();
 
 	purePursuit.load(PUREPURSUIT_ADDRESS);
-	*/
+	
 	// Miscellanous
 	//TCCR2B = (TCCR2B & 0b11111000) | 1; // Set Timer2 frequency to 16MHz instead of 250kHz
+	
 }
 
 // Loop

@@ -3,21 +3,22 @@
 
 #include "DCMotor.h"
 
+#define PWM_BIT 8      
 #define FORWARD  0
 #define BACKWARD 1
 
 
-void DCMotor::attach(int EN, int PWM, int PWMChanel, int DIR)
+void DCMotor::attach(int EN, int PWM, int PWMChanel,int freq, int DIR)
 {
 	m_EN  = EN;
 	m_PWM = PWM;
 	m_PWMChanel = PWMChanel;
 	m_DIR = DIR;
-	//pinMode(m_EN, OUTPUT);
+	pinMode(m_EN, OUTPUT);
 
-	ledcSetup(m_PWMChanel, PWM_FREQUENCY, PWM_BIT);
+	ledcSetup(m_PWMChanel, freq, PWM_BIT);
 	ledcAttachPin(m_PWM, m_PWMChanel);
-	//pinMode(m_DIR, OUTPUT);
+	pinMode(m_DIR, OUTPUT);
 }
 
 void DCMotor::update()

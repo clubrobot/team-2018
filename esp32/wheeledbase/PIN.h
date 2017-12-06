@@ -14,9 +14,9 @@
 #define RIGHT_MOTOR_CHANEL 1
 #define RIGHT_MOTOR_DIR 10
 #define DRIVER_RESET    12
-#define DRIVER_FAULT    A7
+#define DRIVER_FAULT    15
 #define PWM_FREQUENCY 12000
-#define PWM_BIT 8        
+  
 
 // Codewheels
 
