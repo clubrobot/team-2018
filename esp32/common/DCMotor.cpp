@@ -15,7 +15,7 @@ void DCMotor::attach(int EN, int PWM, int PWMChanel, int DIR)
 	m_DIR = DIR;
 	//pinMode(m_EN, OUTPUT);
 
-	ledcSetup(m_PWMChanel, 16000000, 8);
+	ledcSetup(m_PWMChanel, PWM_FREQUENCY, PWM_BIT);
 	ledcAttachPin(m_PWM, m_PWMChanel);
 	//pinMode(m_DIR, OUTPUT);
 }
