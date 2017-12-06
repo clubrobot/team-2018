@@ -6,15 +6,17 @@
 // DC motors driver
 
 #define LEFT_MOTOR_EN    6
-#define LEFT_MOTOR_PWM   217
-#define LEFT_PWM_CHANEL  2
+#define LEFT_MOTOR_PWM   1
+#define LEFT_MOTOR_CHANEL  0
 #define LEFT_MOTOR_DIR   5
 #define RIGHT_MOTOR_EN   9
 #define RIGHT_MOTOR_PWM 11
-#define RIGHT_PWM_CHANEL 1
+#define RIGHT_MOTOR_CHANEL 1
 #define RIGHT_MOTOR_DIR 10
 #define DRIVER_RESET    12
 #define DRIVER_FAULT    A7
+#define PWM_FREQUENCY 12000
+#define PWM_BIT 8        
 
 // Codewheels
 
