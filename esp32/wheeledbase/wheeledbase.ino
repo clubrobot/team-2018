@@ -64,23 +64,23 @@ void setup()
 	
 	// DC motors wheels
 	
-	//driver.attach(DRIVER_RESET, DRIVER_FAULT);
+	driver.attach(DRIVER_RESET, DRIVER_FAULT);
 	driver.reset();
 	
 	
-	//leftWheel .attach(LEFT_MOTOR_EN,  LEFT_MOTOR_PWM,LEFT_MOTOR_CHANEL, PWM_FREQUENCY, LEFT_MOTOR_DIR);
+	leftWheel .attach(LEFT_MOTOR_EN,  LEFT_MOTOR_PWM,LEFT_MOTOR_CHANNEL, PWM_FREQUENCY, LEFT_MOTOR_DIR);
 	
-	//rightWheel.attach(RIGHT_MOTOR_EN, RIGHT_MOTOR_PWM,RIGHT_MOTOR_CHANEL, PWM_FREQUENCY,RIGHT_MOTOR_DIR);
+	rightWheel.attach(RIGHT_MOTOR_EN, RIGHT_MOTOR_PWM,RIGHT_MOTOR_CHANNEL, PWM_FREQUENCY,RIGHT_MOTOR_DIR);
 	
 	leftWheel .load(LEFTWHEEL_ADDRESS);
 	
 	rightWheel.load(RIGHTWHEEL_ADDRESS);
 	
 	// Codewheels
-	//leftCodewheel .attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_Y_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_Y);
-	//rightCodewheel.attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_X_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_X);
-	//leftCodewheel .attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
-	//rightCodewheel.attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
+	leftCodewheel .attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_Y_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_Y);
+	rightCodewheel.attachCounter(QUAD_COUNTER_XY, QUAD_COUNTER_X_AXIS, QUAD_COUNTER_SEL1, QUAD_COUNTER_SEL2, QUAD_COUNTER_OE, QUAD_COUNTER_RST_X);
+	leftCodewheel .attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
+	rightCodewheel.attachRegister(SHIFT_REG_DATA, SHIFT_REG_LATCH, SHIFT_REG_CLOCK);
 	leftCodewheel .load(LEFTCODEWHEEL_ADDRESS);
 	rightCodewheel.load(RIGHTCODEWHEEL_ADDRESS);
 	leftCodewheel .reset();
@@ -128,7 +128,7 @@ void setup()
 void loop()
 {	
 	talks.execute();
-	/*
+	
 	// Update odometry
 	if (odometry.update())
 	{
@@ -150,5 +150,7 @@ void loop()
 		controllerLogs.update();
 #else
 	velocityControl.update();
-#endif // ENABLE_VELOCITYCONTROLLER_LOGS*/
+#endif // ENABLE_VELOCITYCONTROLLER_LOGS //
+
+
 }
