@@ -5,30 +5,32 @@
 
 // DC motors driver
 
-#define LEFT_MOTOR_EN    6
-#define LEFT_MOTOR_PWM   1
-#define LEFT_MOTOR_CHANEL  0
-#define LEFT_MOTOR_DIR   5
-#define RIGHT_MOTOR_EN   9
-#define RIGHT_MOTOR_PWM 11
-#define RIGHT_MOTOR_CHANEL 1
-#define RIGHT_MOTOR_DIR 10
-#define DRIVER_RESET    12
-#define DRIVER_FAULT    15
-#define PWM_FREQUENCY 12000
+#define LEFT_MOTOR_EN    25
+#define LEFT_MOTOR_PWM   32
+#define LEFT_MOTOR_DIR   33
+#define RIGHT_MOTOR_EN   14
+#define RIGHT_MOTOR_PWM 26
+#define RIGHT_MOTOR_DIR 27
+#define DRIVER_RESET    13
+#define DRIVER_FAULT    35
+#define PWM_FREQUENCY 30000
   
+//PWM Chanel
+
+#define LEFT_MOTOR_CHANNEL  0
+#define RIGHT_MOTOR_CHANNEL 1
 
 // Codewheels
 
-#define QUAD_COUNTER_XY     A0
-#define QUAD_COUNTER_SEL1    7
-#define QUAD_COUNTER_SEL2    8
-#define QUAD_COUNTER_OE     A5
-#define QUAD_COUNTER_RST_X  A4
-#define QUAD_COUNTER_RST_Y  A3
-#define SHIFT_REG_DATA      13
+#define QUAD_COUNTER_XY     17
+#define QUAD_COUNTER_SEL1    23
+#define QUAD_COUNTER_SEL2    22
+#define QUAD_COUNTER_OE     21
+#define QUAD_COUNTER_RST_X  19
+#define QUAD_COUNTER_RST_Y  18
+#define SHIFT_REG_DATA      34
 #define SHIFT_REG_LATCH      4
-#define SHIFT_REG_CLOCK      2
+#define SHIFT_REG_CLOCK      16
 
 #define QUAD_COUNTER_X_AXIS  0 // Not pin
 #define QUAD_COUNTER_Y_AXIS  1 // Not pin
