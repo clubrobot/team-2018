@@ -2,6 +2,7 @@
 #define __SERIALTALKS_H__
 
 #include <Arduino.h>
+#include "SoftwareSerial.h"
 #include "serialutils.h"
 
 #ifndef EEPROM_SIZE
@@ -118,7 +119,7 @@ protected: // Protected methods
 	
 	byte        m_bytesNumber;
 	byte        m_bytesCounter;
-	long        m_lastTime;
+	unsigned long  m_lastTime;
 
 private:
 

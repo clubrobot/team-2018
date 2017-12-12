@@ -12,7 +12,10 @@ SerialTalks talks;
 
 void SerialTalks::PING(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
+	digitalWrite(2,HIGH);
+	delay(100);
 	output << true;
+	digitalWrite(2,LOW);
 }
 
 void SerialTalks::GETUUID(SerialTalks& inst, Deserializer& input, Serializer& output)
@@ -125,17 +128,30 @@ bool SerialTalks::execute()
 	bool ret = false;
 	int length = m_stream->available();
 
-	long currentTime = millis();
-	if (m_state != SERIALTALKS_WAITING_STATE && currentTime - m_lastTime > 100) // 0.1s timeout
+	unsigned long currentTime = millis();
+	if (m_state != SERIALTALKS_WAITING_STATE && (currentTime - m_lastTime > 200) ) // 0.1s timeout
 	{
 		// Abort previous communication
 		m_state = SERIALTALKS_WAITING_STATE;
+		digitalWrite(4,LOW);
 	}
 
+	
 	for (int i = 0; i < length; i++)
 	{
 		// Read the incoming byte
-		byte inc = byte(m_stream->read());
+		byte inc;
+		int aa = m_stream->read();
+		if (aa==-1){
+			digitalWrite(23,HIGH);
+		}else{
+			digitalWrite(23,LOW);
+		}
+		if (aa<0){
+			break;
+		}else{
+			inc = byte(aa);
+		}
 		m_lastTime = currentTime;
 		
 		// Use a state machine to process the above byte
@@ -143,8 +159,11 @@ bool SerialTalks::execute()
 		{
 		// An instruction always begin with the Master byte
 		case SERIALTALKS_WAITING_STATE:
+			digitalWrite(5,LOW);
+			digitalWrite(4,LOW);
 			if (inc == SERIALTALKS_MASTER_BYTE)
 				m_state = SERIALTALKS_INSTRUCTION_STARTING_STATE;
+				digitalWrite(4,HIGH);
 			continue;
 
 		// The second byte is the instruction size (for example: 'R', '\x02', '\x03', '\x31')
@@ -158,15 +177,21 @@ bool SerialTalks::execute()
 
 		// The first instruction byte is the opcode and the others the parameters
 		case SERIALTALKS_INSTRUCTION_RECEIVING_STATE:
+			digitalWrite(4,LOW);
+			digitalWrite(5,HIGH);
 			m_inputBuffer[m_bytesCounter++] = inc;
 			if (m_bytesCounter >= m_bytesNumber)
 			{
 				m_connected = true;
+				digitalWrite(2,HIGH);
 				ret |= execinstruction(m_inputBuffer);
+				digitalWrite(2,LOW);
+				digitalWrite(5,LOW);
 				m_state = SERIALTALKS_WAITING_STATE;
 			}
 		}
 	}
+
 	return ret;
 }
 
