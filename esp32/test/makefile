@@ -8,9 +8,9 @@ BOARD_UUID = esp32
 COMMON = ../common
 #Setup all libs used !
 LIBS = $(ESP_LIBS)/EEPROM \
-	   $(COMMON)/SerialTalks.cpp
+	   $(COMMON)/SerialTalks.cpp 
 
-
+CPPFLAGS = -fexceptions
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
 MODULEMK_DIR = ..
