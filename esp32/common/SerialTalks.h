@@ -12,7 +12,7 @@
 
 
 #ifndef SERIALTALKS_BAUDRATE
-#define SERIALTALKS_BAUDRATE 9600
+#define SERIALTALKS_BAUDRATE 115200
 #endif
 
 #ifndef SERIALTALKS_INPUT_BUFFER_SIZE
@@ -43,7 +43,7 @@
 #define SERIALTALKS_PING_OPCODE    0x0
 #define SERIALTALKS_GETUUID_OPCODE 0x1
 #define SERIALTALKS_SETUUID_OPCODE 0x2
-#define SERIALTALKS_DISCONNECT_OPCODE 0x3
+
 #define SERIALTALKS_STDOUT_RETCODE 0xFFFFFFFF
 #define SERIALTALKS_STDERR_RETCODE 0xFFFFFFFE
 
@@ -77,7 +77,7 @@ public: // Public API
 
 	typedef void (*Instruction)(SerialTalks& inst, Deserializer& input, Serializer& output);
 
-	void begin(HardwareSerial& stream);
+	void begin(Stream& stream);
 
 	void bind(byte opcode, Instruction instruction);
 
@@ -90,7 +90,6 @@ public: // Public API
 
 	bool getUUID(char* uuid);
 	void setUUID(const char* uuid);
-	void disconnect();
 
 	static void generateRandomUUID(char* uuid, int length);
 
@@ -105,7 +104,7 @@ protected: // Protected methods
 
 	// Attributes
 
-	HardwareSerial*     m_stream;
+	Stream*     m_stream;
 	bool		m_connected;
 
 	Instruction	m_instructions[SERIALTALKS_MAX_OPCODE];
@@ -129,7 +128,6 @@ private:
 	static void PING   (SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void GETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void SETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
-	static void DISCONNECT(SerialTalks& talks, Deserializer& input, Serializer& output);
 };
 
 extern SerialTalks talks;

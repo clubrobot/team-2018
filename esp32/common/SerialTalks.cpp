@@ -28,12 +28,7 @@ void SerialTalks::SETUUID(SerialTalks& inst, Deserializer& input, Serializer& ou
 	talks.setUUID(uuid);
 }
 
-void SerialTalks::DISCONNECT(SerialTalks& inst, Deserializer& input, Serializer& output)
-{
 
-	talks.disconnect();
-
-}
 
 // SerialTalks::ostream
 
@@ -57,7 +52,7 @@ size_t SerialTalks::ostream::write(const uint8_t *buffer, size_t size)
 
 // SerialTalks
 
-void SerialTalks::begin(HardwareSerial& stream)
+void SerialTalks::begin(Stream& stream)
 {
 
 	//Initialize EEPROM
@@ -86,7 +81,6 @@ void SerialTalks::begin(HardwareSerial& stream)
 	bind(SERIALTALKS_PING_OPCODE,    SerialTalks::PING);
 	bind(SERIALTALKS_GETUUID_OPCODE, SerialTalks::GETUUID);
 	bind(SERIALTALKS_SETUUID_OPCODE, SerialTalks::SETUUID);
-	bind(SERIALTALKS_DISCONNECT_OPCODE, SerialTalks::DISCONNECT);
 }
 
 int SerialTalks::sendback(long retcode, const byte* buffer, int size)
@@ -127,18 +121,6 @@ bool SerialTalks::execinstruction(byte* inputBuffer)
 
 bool SerialTalks::execute()
 {
-
-	if (!m_connected){
-		if ( millis() - m_lastTime<3000 ) return false;
-
-		m_stream->flush();
-		m_stream->begin(SERIALTALKS_BAUDRATE);
-		m_connected =true;
-		digitalWrite(2,LOW);
-		return false;
-	}
-
-
 	bool ret = false;
 	int length = m_stream->available();
 
@@ -221,15 +203,7 @@ void SerialTalks::setUUID(const char* uuid)
 	EEPROM.commit();
 }
 
-void SerialTalks::disconnect()
-{
 
-	m_stream->end();
-	m_connected = false;
-	m_lastTime = millis();
-	digitalWrite(2,HIGH);
-	//
-}
 
 
 void SerialTalks::generateRandomUUID(char* uuid, int length)
