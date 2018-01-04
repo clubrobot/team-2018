@@ -18,7 +18,7 @@ void setup() {
   // DEBUG monitoring
   Serial.begin(9600);
   // initialize the driver
-  DW1000.begin(PIN_IRQ, PIN_UWB_RST);
+  DW1000.begin(PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI, PIN_UWB_RST);
   DW1000.select(PIN_SPICSN);
   Serial.println(F("DW1000 initialized ..."));
   // general configuration
@@ -39,4 +39,20 @@ void loop() {
   digitalWrite(PIN_LED_OK,LOW);
   digitalWrite(PIN_LED_FAIL,HIGH);
   delay(500);
+  // DEBUG chip info and registers pretty printed
+  char msg[128];
+  DW1000.getPrintableDeviceIdentifier(msg);
+  Serial.print("Device ID: ");
+  Serial.println(msg);
+  DW1000.getPrintableExtendedUniqueIdentifier(msg);
+  Serial.print("Unique ID: ");
+  Serial.println(msg);
+  DW1000.getPrintableNetworkIdAndShortAddress(msg);
+  Serial.print("Network ID & Device Address: ");
+  Serial.println(msg);
+  DW1000.getPrintableDeviceMode(msg);
+  Serial.print("Device mode: ");
+  Serial.println(msg);
+  // wait a bit
+  delay(1000);
 }
