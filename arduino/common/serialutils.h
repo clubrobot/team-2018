@@ -49,8 +49,9 @@ template<> inline void Serializer::write<String>(const String& string)
 struct Deserializer
 {
 	byte* buffer;
+	byte* adr;
 
-	Deserializer(byte buffer[]) : buffer(buffer){}
+	Deserializer(byte buffer[]) : buffer(buffer), adr(buffer){}
 
 	template<typename T> Deserializer& operator>>(T& object)
 	{
@@ -72,6 +73,12 @@ struct Deserializer
 		buffer += sizeof(T);
 		return *(T*)(address);
 	}
+
+	void clear()
+	{
+		free(adr);
+	}
+
 };
 
 template<> inline String Deserializer::read<String>()
@@ -80,5 +87,7 @@ template<> inline String Deserializer::read<String>()
 	buffer += string.length() + 1;
 	return string; 
 }
+
+
 
 #endif // __SERIALUTILS_H__
