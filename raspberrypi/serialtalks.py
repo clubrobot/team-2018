@@ -63,6 +63,9 @@ class SerialTalks:
 		self.queues_dict = dict()
 		self.queues_lock = RLock()
 
+		# Instructions
+		self.instructions = dict()
+
 	def __enter__(self):
 		self.connect()
 		return self
@@ -114,6 +117,12 @@ class SerialTalks:
 		# Unset the connected flag
 		self.is_connected = False
 
+	def bind(self, opcode, instruction):
+		if not opcode in self.instructions:
+			self.instructions[opcode] = instruction
+		else:
+			raise KeyError('opcode {} is already bound to another instruction'.format(opcode))
+	
 	def rawsend(self, rawbytes):
 		try:
 			if hasattr(self, 'stream') and self.stream.is_open:
@@ -179,6 +188,20 @@ class SerialTalks:
 		output = self.poll(retcode, timeout)
 		return output
 
+	def receive(self,input):
+		opcode = input.read(BYTE)
+		retcode= input.read(LONG)
+		try:
+			output = self.instructions[opcode](input)
+			if output is None : return
+			content = LONG(retcode) + output
+			prefix  = SLAVE_BYTE    + BYTE(len(content))
+			self.rawsend(prefix + content)
+		except KeyError:
+			print("request receive but no function to execute")
+			pass
+
+
 	def getuuid(self, timeout=5):
 		output = self.execute(GETUUID_OPCODE, timeout=timeout)
 		return output.read(STRING)
@@ -219,6 +242,7 @@ class SerialListener(Thread):
 
 	def run(self):
 		state  = 'waiting' # ['waiting', 'starting', 'receiving']
+		type_packet = SLAVE_BYTE
 		buffer = bytes()
 		msglen = 0
 		while not self.stop.is_set():
@@ -230,7 +254,8 @@ class SerialListener(Thread):
 				break
 
 			# Finite state machine
-			if state == 'waiting' and inc == SLAVE_BYTE:
+			if state == 'waiting' and inc in [SLAVE_BYTE,MASTER_BYTE]:
+				type_packet = inc
 				state = 'starting'
 				continue
 			
@@ -249,7 +274,8 @@ class SerialListener(Thread):
 			
 			# Process the above message
 			try:
-				self.parent.process(Deserializer(buffer))
+				if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
+				if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
 			except NotConnectedError:
 				self.disconnect()
 				break
