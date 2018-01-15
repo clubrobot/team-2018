@@ -2,6 +2,7 @@
 #define __SERIALTALKS_H__
 
 #include <Arduino.h>
+#include "QueueArray.h"
 #include "serialutils.h"
 
 #ifndef SERIALTALKS_BAUDRATE
@@ -76,6 +77,13 @@ public: // Public API
 	bool execinstruction(byte* inputBuffer);
 	bool execute();
 
+	Serializer getSerializer() {return Serializer(m_outputBuffer);}
+	int send(byte opcode,Serializer output);
+
+	Deserializer poll(long retcode);
+	void flush(long retcode);
+
+	bool available(long retcode);
 	bool isConnected() const {return m_connected;}
 
 	bool waitUntilConnected(float timeout = -1);
@@ -94,6 +102,8 @@ protected: // Protected methods
 
 	int sendback(long retcode, const byte* buffer, int size);
 
+	bool receive(byte * inputBuffer,int size);
+	bool push(long retcode,const byte * element);
 	// Attributes
 
 	Stream*     m_stream;
@@ -110,9 +120,16 @@ protected: // Protected methods
 		SERIALTALKS_INSTRUCTION_STARTING_STATE,
 		SERIALTALKS_INSTRUCTION_RECEIVING_STATE,
 	}           m_state;
+
+	enum// m_order
+	{
+		SERIALTALKS_ORDER,
+		SERIALTALKS_RETURN,
+	}	m_order;
 	
 	byte        m_bytesNumber;
 	byte        m_bytesCounter;
+	QueueArray<byte*> m_bufferQueue[SERIALTALKS_MAX_OPCODE];
 	long        m_lastTime;
 
 private:

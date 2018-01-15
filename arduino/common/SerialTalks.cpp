@@ -78,6 +78,24 @@ void SerialTalks::begin(Stream& stream)
 	bind(SERIALTALKS_SETUUID_OPCODE, SerialTalks::SETUUID);
 }
 
+int SerialTalks::send(byte opcode,Serializer output)
+{
+	int count = 0;
+	unsigned long retcode = opcode;
+
+	if (m_stream != 0 && isConnected())
+	{
+		count += m_stream->write(SERIALTALKS_MASTER_BYTE);
+		count += m_stream->write( byte(sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte)) );
+		count += m_stream->write(opcode);
+
+		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
+		count += m_stream->write(m_outputBuffer, output.buffer-m_outputBuffer);	
+	}
+	return retcode;
+}
+
+
 int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 {
 	int count = 0;
@@ -96,6 +114,39 @@ void SerialTalks::bind(byte opcode, Instruction instruction)
 	// Add a command to execute when receiving the specified opcode
 	if (opcode < SERIALTALKS_MAX_OPCODE)
 		m_instructions[opcode] = instruction;
+}
+
+bool SerialTalks::available(long retcode){
+	return !m_bufferQueue[retcode].isEmpty();
+}
+
+Deserializer SerialTalks::poll(long retcode)
+{
+	Deserializer output (m_bufferQueue[retcode].pop());
+	return output;
+}
+
+
+void SerialTalks::flush(long retcode){
+	byte opcode = retcode & 0xFF;
+	while(!m_bufferQueue[opcode].isEmpty()) m_bufferQueue[opcode].pop();
+}
+
+bool SerialTalks::push(long retcode,const byte* element){
+	byte opcode = retcode & 0xFF; 
+	m_bufferQueue[opcode].push(element);
+	return true;
+}
+
+
+bool SerialTalks::receive(byte* inputBuffer,int size)
+{
+	Deserializer input (inputBuffer);
+	long retcode = input.read<long>();
+	byte * saved_bytes = malloc (sizeof(byte) * size);
+	for(int i=0;i<(size-sizeof(long));i++) *(saved_bytes+i) = input.read<byte>();
+	return push(retcode,saved_bytes);
+
 }
 
 bool SerialTalks::execinstruction(byte* inputBuffer)
@@ -137,9 +188,14 @@ bool SerialTalks::execute()
 		{
 		// An instruction always begin with the Master byte
 		case SERIALTALKS_WAITING_STATE:
-			if (inc == SERIALTALKS_MASTER_BYTE)
+			if (inc == SERIALTALKS_MASTER_BYTE || inc==SERIALTALKS_SLAVE_BYTE){
 				m_state = SERIALTALKS_INSTRUCTION_STARTING_STATE;
+				m_order = (inc == SERIALTALKS_MASTER_BYTE) ?
+					SERIALTALKS_ORDER :
+					SERIALTALKS_RETURN;
+			}
 			continue;
+
 
 		// The second byte is the instruction size (for example: 'R', '\x02', '\x03', '\x31')
 		case SERIALTALKS_INSTRUCTION_STARTING_STATE:
@@ -156,7 +212,8 @@ bool SerialTalks::execute()
 			if (m_bytesCounter >= m_bytesNumber)
 			{
 				m_connected = true;
-				ret |= execinstruction(m_inputBuffer);
+				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
+				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer,m_bytesNumber);
 				m_state = SERIALTALKS_WAITING_STATE;
 			}
 		}
