@@ -25,6 +25,10 @@
 #define SERIALTALKS_UUID_LENGTH	32
 #endif
 
+#ifndef SERIALTALKS_MAX_PROCESSING
+#define SERIALTALKS_MAX_PROCESSING 0x4
+#endif
+
 #ifndef SERIALTALKS_MAX_OPCODE
 #define SERIALTALKS_MAX_OPCODE 0x10
 #endif
@@ -69,10 +73,12 @@ public: // Public API
 	};
 
 	typedef void (*Instruction)(SerialTalks& inst, Deserializer& input, Serializer& output);
+	typedef void (*Processing)(SerialTalks& inst, Deserializer& input);
 
 	void begin(Stream& stream);
 
 	void bind(byte opcode, Instruction instruction);
+	void attach(byte opcode, Processing processing);
 
 	bool execinstruction(byte* inputBuffer);
 	bool execute();
@@ -80,10 +86,6 @@ public: // Public API
 	Serializer getSerializer() {return Serializer(m_outputBuffer);}
 	int send(byte opcode,Serializer output);
 
-	Deserializer poll(long retcode);
-	void flush(long retcode);
-
-	bool available(long retcode);
 	bool isConnected() const {return m_connected;}
 
 	bool waitUntilConnected(float timeout = -1);
@@ -102,14 +104,15 @@ protected: // Protected methods
 
 	int sendback(long retcode, const byte* buffer, int size);
 
-	bool receive(byte * inputBuffer,int size);
-	bool push(long retcode,const byte * element);
+	bool receive(byte * inputBuffer);
+
 	// Attributes
 
 	Stream*     m_stream;
 	bool		m_connected;
 
 	Instruction	m_instructions[SERIALTALKS_MAX_OPCODE];
+	Processing  m_processings[SERIALTALKS_MAX_PROCESSING];
 
 	byte        m_inputBuffer [SERIALTALKS_INPUT_BUFFER_SIZE];
 	byte        m_outputBuffer[SERIALTALKS_OUTPUT_BUFFER_SIZE];
@@ -129,7 +132,6 @@ protected: // Protected methods
 	
 	byte        m_bytesNumber;
 	byte        m_bytesCounter;
-	QueueArray<byte*> m_bufferQueue[SERIALTALKS_MAX_OPCODE];
 	long        m_lastTime;
 
 private:

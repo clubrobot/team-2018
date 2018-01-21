@@ -82,17 +82,16 @@ int SerialTalks::send(byte opcode,Serializer output)
 {
 	int count = 0;
 	unsigned long retcode = opcode;
-
 	if (m_stream != 0 && isConnected())
 	{
 		count += m_stream->write(SERIALTALKS_MASTER_BYTE);
-		count += m_stream->write( byte(sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte)) );
+		count += m_stream->write( sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte) );
 		count += m_stream->write(opcode);
 
 		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
 		count += m_stream->write(m_outputBuffer, output.buffer-m_outputBuffer);	
 	}
-	return retcode;
+	return count;
 }
 
 
@@ -116,36 +115,24 @@ void SerialTalks::bind(byte opcode, Instruction instruction)
 		m_instructions[opcode] = instruction;
 }
 
-bool SerialTalks::available(long retcode){
-	return !m_bufferQueue[retcode].isEmpty();
-}
 
-Deserializer SerialTalks::poll(long retcode)
+void SerialTalks::attach(byte opcode, Processing processing)
 {
-	Deserializer output (m_bufferQueue[retcode].pop());
-	return output;
+	if (opcode < SERIALTALKS_MAX_PROCESSING)
+		m_processings[opcode] = processing;
 }
 
 
-void SerialTalks::flush(long retcode){
-	byte opcode = retcode & 0xFF;
-	while(!m_bufferQueue[opcode].isEmpty()) m_bufferQueue[opcode].pop();
-}
-
-bool SerialTalks::push(long retcode,const byte* element){
-	byte opcode = retcode & 0xFF; 
-	m_bufferQueue[opcode].push(element);
-	return true;
-}
-
-
-bool SerialTalks::receive(byte* inputBuffer,int size)
+bool SerialTalks::receive(byte* inputBuffer)
 {
 	Deserializer input (inputBuffer);
-	long retcode = input.read<long>();
-	byte * saved_bytes = malloc (sizeof(byte) * size);
-	for(int i=0;i<(size-sizeof(long));i++) *(saved_bytes+i) = input.read<byte>();
-	return push(retcode,saved_bytes);
+	byte retcode = (byte) input.read<long>();
+	if(m_processings[retcode]!=0)
+	{
+		m_processings[retcode](*this, input);
+		return true;
+	}
+	return false;
 
 }
 
@@ -213,7 +200,7 @@ bool SerialTalks::execute()
 			{
 				m_connected = true;
 				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
-				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer,m_bytesNumber);
+				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
 				m_state = SERIALTALKS_WAITING_STATE;
 			}
 		}
