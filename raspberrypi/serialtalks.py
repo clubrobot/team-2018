@@ -19,6 +19,7 @@ SLAVE_BYTE  = b'A'
 PING_OPCODE    = 0x00
 GETUUID_OPCODE = 0x01
 SETUUID_OPCODE = 0x02
+DISCONNECT_OPCODE=0x03
 STDOUT_RETCODE = 0xFFFFFFFF
 STDERR_RETCODE = 0xFFFFFFFE
 
@@ -104,6 +105,7 @@ class SerialTalks:
 			self.reset_queues()
 			
 	def disconnect(self):
+		self.send(DISCONNECT_OPCODE)
 		# Stop the listening thread
 		if hasattr(self, 'listener') and self.listener.is_alive():
 			self.listener.stop.set()
