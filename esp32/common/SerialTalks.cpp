@@ -81,7 +81,24 @@ void SerialTalks::begin(Stream& stream)
 	bind(SERIALTALKS_PING_OPCODE,    SerialTalks::PING);
 	bind(SERIALTALKS_GETUUID_OPCODE, SerialTalks::GETUUID);
 	bind(SERIALTALKS_SETUUID_OPCODE, SerialTalks::SETUUID);
+	bind(SERIALTALKS_DISCONNECT_OPCODE,SerialTalks::DISCONNECT);
 }
+int SerialTalks::send(byte opcode,Serializer output)
+{
+	int count = 0;
+	unsigned long retcode = opcode;
+	if (m_stream != 0 && isConnected())
+	{
+		count += m_stream->write(SERIALTALKS_MASTER_BYTE);
+		count += m_stream->write( sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte) );
+		count += m_stream->write(opcode);
+
+		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
+		count += m_stream->write(m_outputBuffer, output.buffer-m_outputBuffer);	
+	}
+	return count;
+}
+
 
 int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 {
@@ -101,6 +118,25 @@ void SerialTalks::bind(byte opcode, Instruction instruction)
 	// Add a command to execute when receiving the specified opcode
 	if (opcode < SERIALTALKS_MAX_OPCODE)
 		m_instructions[opcode] = instruction;
+}
+
+void SerialTalks::attach(byte opcode, Processing processing)
+{
+	if (opcode < SERIALTALKS_MAX_PROCESSING)
+		m_processings[opcode] = processing;
+}
+
+bool SerialTalks::receive(byte* inputBuffer)
+{
+	Deserializer input (inputBuffer);
+	byte retcode = (byte) input.read<long>();
+	if(m_processings[retcode]!=0)
+	{
+		m_processings[retcode](*this, input);
+		return true;
+	}
+	return false;
+
 }
 
 bool SerialTalks::execinstruction(byte* inputBuffer)
@@ -142,8 +178,11 @@ bool SerialTalks::execute()
 		{
 		// An instruction always begin with the Master byte
 		case SERIALTALKS_WAITING_STATE:
-			if (inc == SERIALTALKS_MASTER_BYTE)
+			if (inc == SERIALTALKS_MASTER_BYTE || inc==SERIALTALKS_SLAVE_BYTE)
 				m_state = SERIALTALKS_INSTRUCTION_STARTING_STATE;
+				m_order = (inc == SERIALTALKS_MASTER_BYTE) ?
+					SERIALTALKS_ORDER :
+					SERIALTALKS_RETURN;
 			continue;
 
 		// The second byte is the instruction size (for example: 'R', '\x02', '\x03', '\x31')
@@ -161,7 +200,8 @@ bool SerialTalks::execute()
 			if (m_bytesCounter >= m_bytesNumber)
 			{
 				m_connected = true;
-				ret |= execinstruction(m_inputBuffer);
+				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
+				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
 				m_state = SERIALTALKS_WAITING_STATE;
 			}
 		}
