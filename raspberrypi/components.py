@@ -49,7 +49,6 @@ try:
 		def receive(self,input):
 			opcode = str(input.read(BYTE))+self.uuid
 			retcode= input.read(LONG)
-			print(opcode)
 			output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
 			if output is None : return
 			content = LONG(retcode) + output
