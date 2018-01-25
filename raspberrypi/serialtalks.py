@@ -20,6 +20,8 @@ PING_OPCODE    = 0x00
 GETUUID_OPCODE = 0x01
 SETUUID_OPCODE = 0x02
 DISCONNECT_OPCODE=0x03
+GETEEPROM_OPCODE =0x04
+SETEEPROM_OPCODE =0x05
 STDOUT_RETCODE = 0xFFFFFFFF
 STDERR_RETCODE = 0xFFFFFFFE
 
@@ -226,6 +228,22 @@ class SerialTalks:
 			except TimeoutError:
 				pass
 		return log
+	
+	def save_eeprom(self,file=None,size=1024):
+		binary_file = open(file,mode='w+b')
+		for i in range(size):
+			output = self.execute(GETEEPROM_OPCODE,INT(i))
+			byte = output.read(BYTE)
+			binary_file.write(bytes([byte]))
+		binary_file.close()
+
+	def load_eeprom(self,file=None):
+		binary_file = open(file,mode='r+b')
+		k = 0
+		for byte in binary_file.read():
+			self.send(SETEEPROM_OPCODE,INT(k),BYTE(byte))
+			k+=1
+		binary_file.close()
 
 	def getout(self, timeout=0):
 		return self.getlog(STDOUT_RETCODE, timeout)
