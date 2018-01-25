@@ -30,7 +30,7 @@
 #endif
 
 #ifndef SERIALTALKS_MAX_OPCODE
-#define SERIALTALKS_MAX_OPCODE 0x10
+#define SERIALTALKS_MAX_OPCODE 0x20
 #endif
 
 #define SERIALTALKS_MASTER_BYTE 'R'
@@ -38,9 +38,12 @@
 
 #define SERIALTALKS_DEFAULT_UUID_LENGTH 9
 
-#define SERIALTALKS_PING_OPCODE    0x0
-#define SERIALTALKS_GETUUID_OPCODE 0x1
-#define SERIALTALKS_SETUUID_OPCODE 0x2
+#define SERIALTALKS_PING_OPCODE       0x0
+#define SERIALTALKS_GETUUID_OPCODE    0x1
+#define SERIALTALKS_SETUUID_OPCODE    0x2
+#define SERIALTALKS_DISCONNECT_OPCODE 0x3
+#define SERIALTALKS_GETEEPROM_OPCODE  0x4
+#define SERIALTALKS_SETEEPROM_OPCODE  0x5
 #define SERIALTALKS_STDOUT_RETCODE 0xFFFFFFFF
 #define SERIALTALKS_STDERR_RETCODE 0xFFFFFFFE
 
@@ -139,6 +142,8 @@ private:
 	static void PING   (SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void GETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void SETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
+	static void GETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
+	static void SETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
 };
 
 extern SerialTalks talks;
