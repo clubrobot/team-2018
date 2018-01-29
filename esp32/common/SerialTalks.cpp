@@ -28,6 +28,19 @@ void SerialTalks::SETUUID(SerialTalks& inst, Deserializer& input, Serializer& ou
 	talks.setUUID(uuid);
 }
 
+void SerialTalks::GETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& output)
+{
+	int addr = input.read<int>();
+	output.write<byte>(EEPROM.read(addr));
+}
+
+void SerialTalks::SETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& output)
+{
+	int addr = input.read<int>();
+	byte value = input.read<byte>();
+	EEPROM.write(addr,value);
+	EEPROM.commit();
+}
 
 
 // SerialTalks::ostream
@@ -78,10 +91,12 @@ void SerialTalks::begin(Stream& stream)
 #endif // BOARD_UUID
 
 	// Add UUID accessors
-	bind(SERIALTALKS_PING_OPCODE,    SerialTalks::PING);
-	bind(SERIALTALKS_GETUUID_OPCODE, SerialTalks::GETUUID);
-	bind(SERIALTALKS_SETUUID_OPCODE, SerialTalks::SETUUID);
+	bind(SERIALTALKS_PING_OPCODE,      SerialTalks::PING);
+	bind(SERIALTALKS_GETUUID_OPCODE,   SerialTalks::GETUUID);
+	bind(SERIALTALKS_SETUUID_OPCODE,   SerialTalks::SETUUID);
 	bind(SERIALTALKS_DISCONNECT_OPCODE,SerialTalks::DISCONNECT);
+	bind(SERIALTALKS_GETEEPROM_OPCODE, SerialTalks::GETEEPROM);
+	bind(SERIALTALKS_SETEEPROM_OPCODE, SerialTalks::SETEEPROM);
 }
 int SerialTalks::send(byte opcode,Serializer output)
 {
