@@ -24,5 +24,3 @@ ARDUINO_LIBS = EEPROM
 # Now let the grown-ups do the hard work :D
 MODULEMK_DIR = ..
 include $(MODULEMK_DIR)/Module.mk
-KERNEL=="ttyUSB*", PROGRAM="/usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/ga$
-
