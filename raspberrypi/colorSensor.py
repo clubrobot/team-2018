@@ -9,9 +9,9 @@ from components import SerialTalksProxy
 
 # Instructions
 
-_GET_COLOR_SENSOR_OPCODE   = 0x10
-LED_ON_OPCODE	= 0x11
-LED_OFF_OPCODE	= 0x12
+_GET_COLOR_SENSOR_OPCODE = 0x10
+_LED_ON_OPCODE           = 0x11
+_LED_OFF_OPCODE          = 0x12
 
 class ColorSensor(SerialTalksProxy):
 	def __init__(self, parent, uuid='colorSensor'):
