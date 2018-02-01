@@ -78,7 +78,7 @@ const unsigned int cols[] = {256, 2048, 64, 2, 32, 4096, 8192, 1024}; //Col1,Col
 #define START_CHAR_LED_MATRIX ' '	// Ascii for group separator
 #define END_CHAR_LED_MATRIX '~'
 
-
+ 
 //***********************
 // EEPROM configuration *
 //************************

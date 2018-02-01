@@ -45,5 +45,4 @@ endif
 
 # Here is where the REAL grown-ups come into play ;)
 # Seriously they did an awesome work. Thank you guys!
-ARDMK_DIR = /usr/local/opt/arduino-mk
 include $(ARDMK_DIR)/Arduino.mk

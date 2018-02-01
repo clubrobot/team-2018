@@ -154,13 +154,13 @@ def getlogs(args):
 
 
 def server(args):
-	srv = Server(password=args.password)
+	srv = Server(password=args.password,size=args.size)
 	while True:
 		try:
-			if not srv.is_connected:
+			while not srv.full():
 				srv.connect(None)
-			else:
-				srv.sleep_until_disconnected()
+			srv.sleep_until_one_disconnected()
+
 		except KeyboardInterrupt:
 			srv.disconnect()
 			break
@@ -256,6 +256,7 @@ getlogs_parser.set_defaults(func=getlogs)
 
 server_parser = subparsers.add_parser('server')
 server_parser.add_argument('-p', '--password', type=str, default=None)
+server_parser.add_argument('-s', '--size'    , type=int, default=4   )
 server_parser.set_defaults(func=server)
 
 showip_parser = subparsers.add_parser('showip')

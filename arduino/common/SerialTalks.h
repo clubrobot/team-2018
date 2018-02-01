@@ -2,6 +2,7 @@
 #define __SERIALTALKS_H__
 
 #include <Arduino.h>
+#include "QueueArray.h"
 #include "serialutils.h"
 
 #ifndef SERIALTALKS_BAUDRATE
@@ -24,8 +25,12 @@
 #define SERIALTALKS_UUID_LENGTH	32
 #endif
 
+#ifndef SERIALTALKS_MAX_PROCESSING
+#define SERIALTALKS_MAX_PROCESSING 0x4
+#endif
+
 #ifndef SERIALTALKS_MAX_OPCODE
-#define SERIALTALKS_MAX_OPCODE 0x10
+#define SERIALTALKS_MAX_OPCODE 0x20
 #endif
 
 #define SERIALTALKS_MASTER_BYTE 'R'
@@ -33,9 +38,12 @@
 
 #define SERIALTALKS_DEFAULT_UUID_LENGTH 9
 
-#define SERIALTALKS_PING_OPCODE    0x0
-#define SERIALTALKS_GETUUID_OPCODE 0x1
-#define SERIALTALKS_SETUUID_OPCODE 0x2
+#define SERIALTALKS_PING_OPCODE       0x0
+#define SERIALTALKS_GETUUID_OPCODE    0x1
+#define SERIALTALKS_SETUUID_OPCODE    0x2
+#define SERIALTALKS_DISCONNECT_OPCODE 0x3
+#define SERIALTALKS_GETEEPROM_OPCODE  0x4
+#define SERIALTALKS_SETEEPROM_OPCODE  0x5
 #define SERIALTALKS_STDOUT_RETCODE 0xFFFFFFFF
 #define SERIALTALKS_STDERR_RETCODE 0xFFFFFFFE
 
@@ -68,13 +76,18 @@ public: // Public API
 	};
 
 	typedef void (*Instruction)(SerialTalks& inst, Deserializer& input, Serializer& output);
+	typedef void (*Processing)(SerialTalks& inst, Deserializer& input);
 
 	void begin(Stream& stream);
 
 	void bind(byte opcode, Instruction instruction);
+	void attach(byte opcode, Processing processing);
 
 	bool execinstruction(byte* inputBuffer);
 	bool execute();
+
+	Serializer getSerializer() {return Serializer(m_outputBuffer);}
+	int send(byte opcode,Serializer output);
 
 	bool isConnected() const {return m_connected;}
 
@@ -94,12 +107,15 @@ protected: // Protected methods
 
 	int sendback(long retcode, const byte* buffer, int size);
 
+	bool receive(byte * inputBuffer);
+
 	// Attributes
 
 	Stream*     m_stream;
 	bool		m_connected;
 
 	Instruction	m_instructions[SERIALTALKS_MAX_OPCODE];
+	Processing  m_processings[SERIALTALKS_MAX_PROCESSING];
 
 	byte        m_inputBuffer [SERIALTALKS_INPUT_BUFFER_SIZE];
 	byte        m_outputBuffer[SERIALTALKS_OUTPUT_BUFFER_SIZE];
@@ -110,6 +126,12 @@ protected: // Protected methods
 		SERIALTALKS_INSTRUCTION_STARTING_STATE,
 		SERIALTALKS_INSTRUCTION_RECEIVING_STATE,
 	}           m_state;
+
+	enum// m_order
+	{
+		SERIALTALKS_ORDER,
+		SERIALTALKS_RETURN,
+	}	m_order;
 	
 	byte        m_bytesNumber;
 	byte        m_bytesCounter;
@@ -120,6 +142,8 @@ private:
 	static void PING   (SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void GETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void SETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
+	static void GETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
+	static void SETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
 };
 
 extern SerialTalks talks;

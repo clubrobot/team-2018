@@ -5,8 +5,10 @@ import socket
 import pickle
 import os, sys
 import traceback
+import warnings
 import time
 import random
+import string
 from queue     import Queue, Empty
 from threading import Thread, RLock, Event, current_thread
 
@@ -14,7 +16,9 @@ MASTER_BYTE = b'R'
 SLAVE_BYTE  = b'A'
 
 AUTHENTIFICATION_OPCODE = 0xAA
+ID_GETTER_OPCODE = 0xBB
 
+ID_LENGTH = 6
 
 # Exceptions
 
@@ -23,7 +27,8 @@ class AlreadyConnectedError(ConnectionError): pass
 class ConnectionFailedError(ConnectionError): pass
 class NotConnectedError    (ConnectionError): pass
 class AuthentificationError(Exception): pass
-
+class NoSuchConnectionAvailable(Exception): pass
+class NoIDGiven(RuntimeWarning): pass
 
 # Main class
 
@@ -77,7 +82,7 @@ class TCPTalks:
 	
 	_timeouterror = socket.timeout
 
-	def __init__(self, ip=None, port=25565, password=None):
+	def __init__(self, ip=None, port=25565,id=None, password=None):
 		# Instructions
 		self.instructions = dict()
 
@@ -89,6 +94,10 @@ class TCPTalks:
 
 		# Password
 		self.password = password
+
+		# Id
+		self.id = id if not id is None else ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(ID_LENGTH))
+		self.bind(ID_GETTER_OPCODE,self.get_id)
 
 		# Thread-safe inputs polling
 		self.queues_dict = dict()
@@ -139,7 +148,10 @@ class TCPTalks:
 
 	def authentificate(self, timeout):
 		self.sendback(AUTHENTIFICATION_OPCODE, self.password)
+
 		self.is_authentificated = self.poll(AUTHENTIFICATION_OPCODE, timeout)
+
+
 		return self.is_authentificated
 
 	def wait_for_authentification(self, timeout):
@@ -147,6 +159,9 @@ class TCPTalks:
 		self.is_authentificated = self.password in (None, password)
 		self.sendback(AUTHENTIFICATION_OPCODE, self.is_authentificated)
 		return self.is_authentificated
+
+	def get_id(self):
+		return self.id
 
 	def disconnect(self):
 		# Stop the listening thread
@@ -230,6 +245,8 @@ class TCPTalks:
 			# Make sure that the authentification was well performed
 			if not self.is_authentificated:
 				raise AuthentificationError('you are not authentificated')
+				#AJOUT
+				self.parent.disconnect()
 
 			# Get the function or method associated with the received opcode
 			try:
@@ -301,11 +318,15 @@ class TCPListener(Thread):
 	def run(self):
 		buffer = bytes()
 		while not self.stop.is_set():
+
+
 			# Wait until new bytes arrive
+
 			try:
 				inc = self.parent.socket.recv(256)
 			except (ConnectionResetError, AttributeError):
 				inc = None
+
 			except self.parent._timeouterror:
 				continue
 			
@@ -313,7 +334,7 @@ class TCPListener(Thread):
 			if not inc: # May be None or b''
 				self.parent.disconnect()
 				break
-			
+
 			buffer += inc
 			try:
 				while True:
@@ -329,3 +350,221 @@ class TCPListener(Thread):
 			except NotConnectedError:
 				self.parent.disconnect()
 				break
+
+
+class TCPTalksServer:
+
+	class Client(TCPTalks):
+		_timeouterror = socket.timeout
+
+		def __init__(self, parent,socket, password, id=None):
+			
+			self.socket   = socket
+			self.socket.settimeout(1)
+			self.password = password
+			self.parent = parent
+			self.id = id if not id is None else ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(ID_LENGTH))
+
+			self.is_authentificated = True
+			self.queues_lock = RLock()
+			self.queues_dict = dict()
+			self.instructions = dict()
+			self.socket_lock = RLock()
+			self.listener = TCPListener(self)
+			self.listener.start()
+
+		def __del__(self):
+
+			if self.listener.is_alive():
+				self.listener.stop.set()
+			if self.listener is not current_thread():
+				self.listener.join()
+
+			self.socket.close()
+
+		def authentificate(self, timeout):
+			password = self.poll(AUTHENTIFICATION_OPCODE, timeout)
+			self.is_authentificated = self.password in (None, password)
+			self.sendback(AUTHENTIFICATION_OPCODE, self.is_authentificated)
+			return self.is_authentificated
+
+
+		def get_id(self,timeout):
+			
+			try:
+				self.id = self.execute(ID_GETTER_OPCODE, timeout = timeout)
+			except AuthentificationError:
+				return self.get_id(timeout)
+			except TimeoutError:
+				warnings.warn("No id receive from the new client, we will used this \' {} \' id ".format(self.id), NoIDGiven)
+			return self.id
+
+		def disconnect(self):
+
+			self.parent.disconnect(id=self.id)
+
+		def execinstruction(self, opcode, retcode, *args, **kwargs):
+			try:
+				# Make sure that the authentification was well performed
+				if not self.is_authentificated:
+					raise AuthentificationError('you are not authentificated')
+
+				# Get the function or method associated with the received opcode
+				try:
+					instruction = self.parent.instructions[opcode]
+				except KeyError:
+					try:
+						instruction = self.instructions[opcode]
+					except KeyError:
+						raise KeyError('opcode {} is not bound to any instruction'.format(opcode)) from None
+
+				# Execute the instruction
+				output = instruction(*args, **kwargs)
+
+			except Exception:
+				etype, value, tb = sys.exc_info()
+				output = (etype, value, traceback.extract_tb(tb))
+
+			# Send back the output
+			self.sendback(retcode, output)
+
+	
+	def __init__(self,port=25565,password=None,NbClients=4):
+		# Socket things
+		self.port = port
+		self.password = password
+
+		# Create a server
+		self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.serversocket.bind(('', self.port))
+		self.serversocket.listen(1)
+
+
+		# Common instructions
+		self.instructions = dict()
+
+		# Client 
+		self.NbClients = NbClients
+		self.client = dict()
+		self.disconnect_event = Event()
+		self.disconnect_event.clear()
+
+		# Lock
+		self.connect_lock = RLock()
+
+	def connect(self,timeout=5):
+		# Look availiable slot
+		if len(list(self.client.keys()))>=self.NbClients:
+			raise NoSuchConnectionAvailable() from None
+
+		# Lock the socket for other Thread
+		self.connect_lock.acquire()
+
+		self.serversocket.settimeout(timeout)
+		# Wait for the other to connect
+		try:
+			clientsocket = self.serversocket.accept()[0]
+		except socket.timeout:
+			self.connect_lock.release()
+			raise ForeverAloneError('no connection request') from None
+
+		# Unlock the socket for other Thread
+		self.connect_lock.release()
+
+		# Generate new temp ID
+		temp_name  = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(ID_LENGTH))
+
+		# Create new Client object
+		new_client = TCPTalksServer.Client(self,clientsocket,self.password,temp_name)
+
+		# Try to authentificate with the new instance
+		try:
+			if not new_client.authentificate(1):
+				del new_client
+				raise AuthentificationError('Bad password receive') from None
+				
+		except TimeoutError:
+				del new_client	
+				raise AuthentificationError('No password receive') from None
+
+		# Ask the client ID 
+		new_id = new_client.get_id(1)
+
+		# Save Client to dictionary
+		self.client[new_id] = new_client
+
+		return new_id
+
+
+	def remove_client(self, id):
+		old_client = self.client.pop(id)
+		del old_client
+		self.disconnect_event.set()
+
+	def disconnect(self, id=None):
+		if id is None:
+			while len(self.client)>0:
+				self.disconnect_event.set()
+				self.client.pop(list(self.client.keys())[0]).__del__()
+		else:
+			try:
+				self.disconnect_event.set()
+				self.client.pop(id).__del__()
+			except KeyError:
+				pass
+
+
+	def bind(self, opcode, instruction, id = None):
+		if not id is None:
+			if self.client.get(id,False):
+				if not self.instructions.get(opcode) is None:
+					raise KeyError('opcode {} is already bound to another general instruction'.format(opcode))
+				self.client[id].bind(opcode, instruction)
+		else:
+			if not self.bind_not_exist(opcode):
+				raise KeyError('opcode {} is already bound to another instruction'.format(opcode))
+			self.instructions[opcode] = instruction
+
+
+	def bind_not_exist(self,opcode):
+		for _, client in self.client.items():
+				if not client.instructions.get(opcode) is None:
+					return False
+		#TO TEST
+		if self.instructions.get(opcode) is None:
+			return True
+		return False
+
+	def sleep_until_one_disconnected(self):
+		self.disconnect_event.clear()
+		self.disconnect_event.wait()
+		self.disconnect_event.clear()
+	
+
+	def full(self):
+		return len(self.client)>=self.NbClients
+
+	def send(self, opcode, id=None, *args, **kwargs):
+		try:
+			id = id if not id is None else list(self.client.keys())[0]
+		except IndexError:
+			raise NotConnectedError('No more client to talks')
+
+		return self.client[id].send(opcode, *args, **kwargs)
+
+	def execute(self, opcode, id=None, *args, **kwargs):
+		try:
+			id = id if not id is None else list(self.client.keys())[0]
+		except IndexError:
+			raise NotConnectedError('No more client to talks')
+
+		return self.client[id].execute(opcode, *args, **kwargs)
+
+	def poll(self, opcode, id=None, *args, **kwargs):
+		try:
+			id = id if not id is None else list(self.client.keys())[0]
+		except IndexError:
+			raise NotConnectedError('No more client to talks')
+
+		self.client[id].send(opcode, *args, **kwargs)

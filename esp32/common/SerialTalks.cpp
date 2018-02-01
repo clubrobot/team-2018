@@ -7,7 +7,6 @@
 
 SerialTalks talks;
 
-
 // Built-in instructions
 
 void SerialTalks::PING(SerialTalks& talks, Deserializer& input, Serializer& output)
@@ -27,6 +26,20 @@ void SerialTalks::SETUUID(SerialTalks& inst, Deserializer& input, Serializer& ou
 	char uuid[SERIALTALKS_UUID_LENGTH];
 	input >> uuid;
 	talks.setUUID(uuid);
+}
+
+void SerialTalks::GETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& output)
+{
+	int addr = input.read<int>();
+	output.write<byte>(EEPROM.read(addr));
+}
+
+void SerialTalks::SETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& output)
+{
+	int addr = input.read<int>();
+	byte value = input.read<byte>();
+	EEPROM.write(addr,value);
+	EEPROM.commit();
 }
 
 
@@ -78,11 +91,29 @@ void SerialTalks::begin(Stream& stream)
 #endif // BOARD_UUID
 
 	// Add UUID accessors
-	bind(SERIALTALKS_PING_OPCODE,    SerialTalks::PING);
-	bind(SERIALTALKS_GETUUID_OPCODE, SerialTalks::GETUUID);
-	bind(SERIALTALKS_SETUUID_OPCODE, SerialTalks::SETUUID);
-
+	bind(SERIALTALKS_PING_OPCODE,      SerialTalks::PING);
+	bind(SERIALTALKS_GETUUID_OPCODE,   SerialTalks::GETUUID);
+	bind(SERIALTALKS_SETUUID_OPCODE,   SerialTalks::SETUUID);
+	bind(SERIALTALKS_DISCONNECT_OPCODE,SerialTalks::DISCONNECT);
+	bind(SERIALTALKS_GETEEPROM_OPCODE, SerialTalks::GETEEPROM);
+	bind(SERIALTALKS_SETEEPROM_OPCODE, SerialTalks::SETEEPROM);
 }
+int SerialTalks::send(byte opcode,Serializer output)
+{
+	int count = 0;
+	unsigned long retcode = opcode;
+	if (m_stream != 0 && isConnected())
+	{
+		count += m_stream->write(SERIALTALKS_MASTER_BYTE);
+		count += m_stream->write( sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte) );
+		count += m_stream->write(opcode);
+
+		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
+		count += m_stream->write(m_outputBuffer, output.buffer-m_outputBuffer);	
+	}
+	return count;
+}
+
 
 int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 {
@@ -102,6 +133,25 @@ void SerialTalks::bind(byte opcode, Instruction instruction)
 	// Add a command to execute when receiving the specified opcode
 	if (opcode < SERIALTALKS_MAX_OPCODE)
 		m_instructions[opcode] = instruction;
+}
+
+void SerialTalks::attach(byte opcode, Processing processing)
+{
+	if (opcode < SERIALTALKS_MAX_PROCESSING)
+		m_processings[opcode] = processing;
+}
+
+bool SerialTalks::receive(byte* inputBuffer)
+{
+	Deserializer input (inputBuffer);
+	byte retcode = (byte) input.read<long>();
+	if(m_processings[retcode]!=0)
+	{
+		m_processings[retcode](*this, input);
+		return true;
+	}
+	return false;
+
 }
 
 bool SerialTalks::execinstruction(byte* inputBuffer)
@@ -143,8 +193,11 @@ bool SerialTalks::execute()
 		{
 		// An instruction always begin with the Master byte
 		case SERIALTALKS_WAITING_STATE:
-			if (inc == SERIALTALKS_MASTER_BYTE)
+			if (inc == SERIALTALKS_MASTER_BYTE || inc==SERIALTALKS_SLAVE_BYTE)
 				m_state = SERIALTALKS_INSTRUCTION_STARTING_STATE;
+				m_order = (inc == SERIALTALKS_MASTER_BYTE) ?
+					SERIALTALKS_ORDER :
+					SERIALTALKS_RETURN;
 			continue;
 
 		// The second byte is the instruction size (for example: 'R', '\x02', '\x03', '\x31')
@@ -162,7 +215,8 @@ bool SerialTalks::execute()
 			if (m_bytesCounter >= m_bytesNumber)
 			{
 				m_connected = true;
-				ret |= execinstruction(m_inputBuffer);
+				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
+				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
 				m_state = SERIALTALKS_WAITING_STATE;
 			}
 		}
@@ -203,6 +257,9 @@ void SerialTalks::setUUID(const char* uuid)
 	while(uuid[i++] != '\0');
 	EEPROM.commit();
 }
+
+
+
 
 void SerialTalks::generateRandomUUID(char* uuid, int length)
 {

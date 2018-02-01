@@ -6,6 +6,12 @@
 #ifndef LEDMATRIX_H
 #define LEDMATRIX_H
 
+/** class Pattern
+ *  \brief Gère les motifs à afficher
+ *
+ *  permet de gérer les messages / animations à afficher sur une LedMatrix. 
+ * 
+ */
 class Pattern : public PeriodicProcess
 {
 	friend class LedMatrix;

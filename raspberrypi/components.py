@@ -4,7 +4,7 @@
 import os
 from types import MethodType
 
-from tcptalks import TCPTalks
+from tcptalks import TCPTalks, TCPTalksServer
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
 
@@ -18,6 +18,7 @@ GET_COMPONENT_ATTRIBUTE_OPCODE      = 0x21
 SET_COMPONENT_ATTRIBUTE_OPCODE      = 0x22
 
 UPDATE_MANAGER_PICAMERA_OPCODE      = 0x30
+MAKE_MANAGER_REPLY_OPCODE           = 0x40
 MAKE_MANAGER_EXECUTE_OPCODE         = 0x50
 
 
@@ -27,11 +28,13 @@ class Component():
 	def _cleanup(self): pass
 
 try:
-	from serialtalks import SerialTalks, AlreadyConnectedError
+	from serialtalks import *
 	
 	class SerialTalksComponent(SerialTalks, Component):
 
-		def __init__(self, uuid):
+		def __init__(self,parent, uuid):
+			self.parent = parent
+			self.uuid   = uuid
 			SerialTalks.__init__(self, os.path.join('/dev/arduino', uuid))
 		
 		def _setup(self):
@@ -42,11 +45,22 @@ try:
 		
 		def _cleanup(self):
 			self.disconnect()
+
+		def receive(self,input):
+			opcode = str(input.read(BYTE))+self.uuid
+			retcode= input.read(LONG)
+			output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
+			if output is None : return
+			content = LONG(retcode) + output
+			prefix  = SLAVE_BYTE    + BYTE(len(content))
+			self.rawsend(prefix + content)
+
+
 except ImportError:
 	pass
 
 try:
-	from gpiodevices import Switch, LightButton
+	from gpiodevices import Switch, LightButton, Device
 
 	class SwitchComponent(Switch, Component):
 
@@ -112,10 +126,10 @@ try:
 except ImportError:
 	pass
 
-class Server(TCPTalks):
+class Server(TCPTalksServer):
 
-	def __init__(self, port=COMPONENTS_SERVER_DEFAULT_PORT, password=None):
-		TCPTalks.__init__(self, port=port, password=password)
+	def __init__(self, port=COMPONENTS_SERVER_DEFAULT_PORT, password=None,size=4):
+		TCPTalksServer.__init__(self, port=port, password=password,NbClients=size)
 		self.bind(CREATE_SERIALTALKS_COMPONENT_OPCODE, self.CREATE_SERIALTALKS_COMPONENT)
 		self.bind(CREATE_SWITCH_COMPONENT_OPCODE,      self.CREATE_SWITCH_COMPONENT)
 		self.bind(CREATE_LIGHTBUTTON_COMPONENT_OPCODE, self.CREATE_LIGHTBUTTON_COMPONENT)
@@ -125,8 +139,8 @@ class Server(TCPTalks):
 		self.bind(SET_COMPONENT_ATTRIBUTE_OPCODE,      self.SET_COMPONENT_ATTRIBUTE)
 		self.components = {}
 	
-	def disconnect(self):
-		TCPTalks.disconnect(self)
+	def disconnect(self,id=None):
+		TCPTalksServer.disconnect(self,id=id)
 		self.cleanup()
 		
 	def cleanup(self):
@@ -155,23 +169,28 @@ class Server(TCPTalks):
 		return setattr(comp, attrname, attrvalue)
 
 	def CREATE_SERIALTALKS_COMPONENT(self, uuid):
-		comp = SerialTalksComponent(uuid)
+		comp = SerialTalksComponent(self,uuid)
 		compid = uuid
 		self.addcomponent(comp, compid)
 		return compid
 
+
 	def CREATE_SWITCH_COMPONENT(self, switchpin):
+		if (switchpin,) in self.components:
+			return (switchpin,)
 		comp = SwitchComponent(switchpin)
 		compid = (switchpin,)
 		self.addcomponent(comp, compid)
-		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE, compid)
+		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE, None,compid)
 		return compid
 
 	def CREATE_LIGHTBUTTON_COMPONENT(self, switchpin, ledpin):
+		if  (switchpin, ledpin) in self.components:
+			return (switchpin, ledpin)
 		comp = LightButtonComponent(switchpin, ledpin)
 		compid = (switchpin, ledpin)
 		self.addcomponent(comp, compid)
-		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE, compid)
+		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE,None, compid)
 		return compid
 
 	def CREATE_PICAMERA_COMPONENT(self, resolution, framerate):
@@ -191,8 +210,11 @@ class Manager(TCPTalks):
 		self.picameras = {}
 		# GPIO components
 		self.bind(MAKE_MANAGER_EXECUTE_OPCODE,    self.MAKE_MANAGER_EXECUTE)
-		self.functions = {}
-		self.args      = {}
+		self.functions   = {}
+		self.args        = {}
+		# SerialTalks
+		self.bind(MAKE_MANAGER_REPLY_OPCODE,    self.MAKE_MANAGER_REPLY)
+		self.serial_instructions = {}
 
 	def UPDATE_MANAGER_PICAMERA(self, compid, streamvalue):
 		cvimageflags = 1
@@ -204,6 +226,12 @@ class Manager(TCPTalks):
 	def MAKE_MANAGER_EXECUTE(self, compid):
 		if compid in self.functions:
 			self.functions[compid](*self.args[compid])
+	
+	def MAKE_MANAGER_REPLY(self, opcode, input):
+		if opcode in self.serial_instructions:
+			result = self.serial_instructions[opcode](input)
+			return result
+
 
 class Proxy():
 
@@ -235,6 +263,12 @@ class SerialTalksProxy(Proxy):
 		attrlist = ['port', 'is_connected']
 		methlist = ['connect', 'disconnect', 'send', 'poll', 'flush', 'execute', 'getuuid', 'setuuid', 'getout', 'geterr']
 		Proxy.__init__(self, manager, compid, attrlist, methlist)
+
+	def bind(self,opcode,function):
+		if not str(opcode)+self._compid in self._manager.instructions:
+			self._manager.serial_instructions[str(opcode)+self._compid] = function
+		else:
+			raise KeyError("Opcode already use")
 
 class SwitchProxy(Proxy):
 
