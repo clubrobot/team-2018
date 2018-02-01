@@ -160,6 +160,7 @@ bool SerialTalks::execinstruction(byte* inputBuffer)
 	Serializer   output(m_outputBuffer);
 	byte opcode = input.read<byte>();
 	long retcode = input.read<long>();
+
 	if (m_instructions[opcode] != 0)
 	{
 		m_instructions[opcode](*this, input, output);
