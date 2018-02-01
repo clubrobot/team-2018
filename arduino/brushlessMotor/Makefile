@@ -2,8 +2,6 @@ BOARD_UUID = BrushlessMotor
 BOARD_TAG  = nano
 BOARD_SUB  = atmega328
 
-MONITOR_PORT = /dev/cu.wchusbserial1410
-
 # Sketch sources
 COMMON = ../common
 LOCAL_INO_SRCS = brushlessMotor.ino
