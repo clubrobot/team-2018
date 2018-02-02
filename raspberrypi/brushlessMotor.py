@@ -28,7 +28,7 @@ SAVE_OPCODE                 = 0X0E
 
 
 class BrushlessMotor(SerialTalksProxy):
-	def __init__(self, parent, uuid='/dev/cu.wchusbserial1410'):
+	def __init__(self, parent, uuid='BrushlessMotor'):
 		SerialTalksProxy.__init__(self, parent, uuid)
 
 	def get_velocity(self):
@@ -62,7 +62,7 @@ class BrushlessMotor(SerialTalksProxy):
 	def set_constant(self, constant):
 		self.send(SET_CONSTANT_OPCODE, FLOAT(constant))
 
-	def set_whellRadius(self, wheelRadius):
+	def set_wheelRadius(self, wheelRadius):
 		self.send(SET_WHEELRADIUS_OPCODE, FLOAT(wheelRadius))
 
 	def enable(self):
