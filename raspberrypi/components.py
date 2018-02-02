@@ -141,7 +141,7 @@ class Server(TCPTalksServer):
 	
 	def disconnect(self,id=None):
 		TCPTalksServer.disconnect(self,id=id)
-		self.cleanup()
+		if len(self.client)==0 : self.cleanup()
 		
 	def cleanup(self):
 		for comp in self.components.values():
