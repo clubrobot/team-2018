@@ -29,6 +29,8 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         Serial.println("false");
         digitalWrite(2, LOW);
     }
+
+    //output.dump_long(1000);
 }
 
 TCPTalks::TCPTalks()
@@ -80,7 +82,7 @@ void TCPTalks::connect(int timeout)
     {
         Serial.print(".");
         delay(5);
-        current_time = millis();
+        long current_time = millis();
         if(current_time - last_time > timeout )
         {
             Serial.println("Connexion Failed");
@@ -103,6 +105,8 @@ bool TCPTalks::authentificate(int timeout)
 {
 	byte authentification_frame[17] = {PROTO, DEFAULT_PROTOCOL, SHORT_BINBYTES, 0X01, TCPTALKS_SLAVE_BYTE, BINPUT, 0X00, BININT1, AUTHENTIFICATION_OPCODE,NONE, TUPLE1, BINPUT, 0X01, TUPLE3, BINPUT, 0X02, STOP };
     client.write(authentification_frame, sizeof(authentification_frame));
+
+    //sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
 
     is_authentificated = true;
 	return is_authentificated;
@@ -142,14 +146,16 @@ bool TCPTalks::execinstruction(uint8_t* inputBuffer)
     Serial.print("retcode : ");
     Serial.println(retcode);
 
-    if(input.is_list())
-        input.remove_list_header();
+    if(input.is_tuple())
+        input.remove_tuple_header();
 
     if (m_instructions[opcode] != 0)
     {
         m_instructions[opcode](*this, input, output);
 
-        sendback(NULL, retcode, m_outputBuffer);
+        output.end_frame();
+
+        sendback(NOT_OPCODE, retcode, m_outputBuffer);
 
         return true;
     }
@@ -212,9 +218,9 @@ bool TCPTalks::execute()
 
 int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
 {
-    int ptr = 0;;
+    int ptr = 0;
 
-    byte frame[23];
+    byte frame[TCPTALKS_OUTPUT_BUFFER_SIZE];
 
     /*start header frame*/
     frame[ptr] = (byte)PROTO; 
@@ -234,23 +240,21 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     /* end header frame */
 
     /* ADD opcode if it defined */
-    if(opcode != NULL)
+    if(opcode != NOT_OPCODE)
     {
         frame[ptr] = (byte)BININT1;
         ptr++;
         frame[ptr] = (byte)opcode;
         ptr++;
     }
-    
-    /*add retcode if it defined */
-    if(retcode != NULL)
+    else if(retcode != NOT_RETCODE)
     {
         frame[ptr] = (byte)LONG1;
         ptr++;
         frame[ptr] = (byte)0X05;
         ptr++;
 
-        byte tab[4];
+        byte tab[4] = {0};
         /* add retcode */
         memcpy((byte*)tab, &retcode, sizeof(retcode));
 
@@ -266,14 +270,25 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
         ptr++;
 
     }
+    if(sizeof(args) <= 4)
+    {
+        frame[ptr] = NONE;
+        ptr++;
+        frame[ptr] = (byte)TUPLE1; 
+        ptr++;
+        frame[ptr] = (byte)BINPUT;
+        ptr++;
+        frame[ptr] = (byte)0X01;
+        ptr++;
+    }
+    else
+    {
+        memcpy(frame+ptr,args, sizeof(args));
+        ptr += sizeof(args);
+    }
+
 
     /*ending frame*/
-    frame[ptr] = (byte)TUPLE1; 
-    ptr++;
-    frame[ptr] = (byte)BINPUT;
-    ptr++;
-    frame[ptr] = (byte)0X01;
-    ptr++;
     frame[ptr] = (byte)TUPLE3;
     ptr++;
     frame[ptr] = (byte)BINPUT;
@@ -281,7 +296,16 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     frame[ptr] = (byte)0X02;
     ptr++;
     frame[ptr] = (byte)STOP;
+    ptr++;
 
-    client.write(frame, sizeof(frame));
+    client.write(frame, ptr);
+
+    for(int i = 0; i<=ptr;i++)
+    {
+        Serial.print(frame[i],HEX);
+        Serial.print(" ");
+    }
+
+    Serial.println("");
     
 }

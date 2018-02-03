@@ -90,18 +90,16 @@
 
 #define MAX_OPCODE 		 (8)
 
+#define MAX_BUFFER_SIZE  64
+
 
 class Pickler
 {
 	public:
 		Pickler(uint8_t* current_frame);
 
-		//private:
-
 		void start_frame();
 		void end_frame();
-		void add_list_header();
-		void add_end_list();
 
 		void dump_none();
 		void dump_bool(bool var);
@@ -109,11 +107,11 @@ class Pickler
 		void dump_float(float var);
 		void dump_byte(uint8_t var);
 		void dump_str(char* var);
-		//void save_tuple(auto var);
-		//void save_list();
 
+	private:
 		uint8_t * current_frame = NULL;
-		uint32_t  ptr = 0;
+		uint32_t  ptr;
+		int num;
 };
 
 class UnPickler
@@ -127,19 +125,14 @@ class UnPickler
 		long load_long();
 		float load_float();
 		uint8_t load_byte();
-		bool is_list();
-	//private:
+		bool is_tuple();
+	
 
 		void remove_start_frame();
 		void remove_end_frame();
-		void remove_list_header();
+		void remove_tuple_header();
 
-
-		
-		//void save_str(char* var);
-		//void save_tuple(auto var);
-		//void save_list();
-
+	private:
 		uint8_t * current_frame = NULL;
 		uint32_t  ptr = 0;
 

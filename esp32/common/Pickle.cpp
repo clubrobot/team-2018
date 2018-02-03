@@ -5,44 +5,68 @@ Pickler::Pickler(uint8_t* frame)
 {
 	current_frame = frame;
 	ptr = 0;
-	start_frame();
+	num = 0;
+	//start_frame();
 }
 
 
 void Pickler::start_frame()
 {
-	current_frame[ptr] = (uint8_t)PROTO;
-	ptr++;
-	current_frame[ptr] = (uint8_t)DEFAULT_PROTOCOL;
-	ptr++;
+ 
 }
 
 void Pickler::end_frame()
 {
-	current_frame[ptr] = (uint8_t)TUPLE;
-	ptr++;
-	current_frame[ptr] = (uint8_t)BINPUT;
-	ptr++;
-	current_frame[ptr] = (uint8_t)0X00;
-	ptr++;
-	current_frame[ptr] = (uint8_t)STOP;
-	ptr++;
-}
+	if(num == 1)
+	{
+		// current_frame[ptr] = (uint8_t)TUPLE1;
+		// ptr++;
+		// current_frame[ptr] = (uint8_t)BINPUT;
+		// ptr++;
+		// current_frame[ptr] = (uint8_t)0X01;
+		// ptr++;
+	}
+	else if(num == 2)
+	{
+		current_frame[ptr] = (uint8_t)TUPLE2;
+		ptr++;
+		current_frame[ptr] = (uint8_t)BINPUT;
+		ptr++;
+		current_frame[ptr] = (uint8_t)0X01;
+		ptr++;
+	}
+	else if(num == 3)
+	{
+		current_frame[ptr] = (uint8_t)TUPLE3;
+		ptr++;
+		current_frame[ptr] = (uint8_t)BINPUT;
+		ptr++;
+		current_frame[ptr] = (uint8_t)0X01;
+		ptr++;
+	}
+	else if (num > 3)
+	{
+		current_frame[ptr] = (uint8_t)TUPLE;
+		ptr++;
+		current_frame[ptr] = (uint8_t)BINPUT;
+		ptr++;
+		current_frame[ptr] = (uint8_t)0X01;
+		ptr++;
 
-void Pickler::add_list_header()
-{
-	current_frame[ptr] = (uint8_t)EMPTY_LIST;
-	ptr++;
-	current_frame[ptr] = (uint8_t)BINPUT;
-	ptr++;
-	current_frame[ptr] = (uint8_t)0X01;
-	ptr++;
-	current_frame[ptr] = (uint8_t)MARK;
-	ptr++;
+		uint8_t tmp[MAX_BUFFER_SIZE];
+
+		tmp[0] = (uint8_t)MARK;
+
+		memcpy(tmp+1, current_frame, sizeof(current_frame));
+
+		memcpy(current_frame, tmp, sizeof(tmp));
+	}
+	
 }
 
 void Pickler::dump_bool(bool var)
 {
+	num++;
 	if(var)
 		current_frame[ptr] = (uint8_t) NEWTRUE;
 
@@ -53,6 +77,7 @@ void Pickler::dump_bool(bool var)
 
 void Pickler::dump_long(long var)
 {
+	num++;
 	if(var >= 0)
 	{
 		if(var <= 0xff)
@@ -95,6 +120,7 @@ void Pickler::dump_long(long var)
 
 void Pickler::dump_float(float var)
 {
+	num++;
 	current_frame[ptr] = (uint8_t)BINFLOAT;
 	ptr++;
 
@@ -121,6 +147,7 @@ void Pickler::dump_float(float var)
 
 void Pickler::dump_byte(uint8_t var)
 {
+	num++;
 	int len = sizeof(var);
 
 	if(len <= 0xff)
@@ -175,7 +202,7 @@ void UnPickler::remove_end_frame()
 	ptr++;
 }
 
-void UnPickler::remove_list_header()
+void UnPickler::remove_tuple_header()
 {
 	ptr+=1;
 }
@@ -292,7 +319,7 @@ uint8_t UnPickler::load_byte()
 
 }
 
-bool UnPickler::is_list()
+bool UnPickler::is_tuple()
 {
 	if(current_frame[ptr] == '(')
 	{

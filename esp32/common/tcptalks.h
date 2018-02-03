@@ -22,6 +22,9 @@
 
 #define AUTHENTIFICATION_OPCODE 0xAA
 
+#define NOT_OPCODE  0XFF
+#define NOT_RETCODE 0XFE
+
 #define TCPTALKS_BAUDRATE 115200
 
 typedef uint8_t byte;
@@ -59,8 +62,9 @@ class TCPTalks
 	void sleep_until_disconnected();
 
 	int sendback(uint8_t opcode, long retcode, byte * args);
+
 		
-	protected: // Protected methods
+	//protected: // Protected methods
 
 	char* ip;
 
