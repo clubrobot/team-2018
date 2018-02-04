@@ -101,6 +101,7 @@ class Pickler
 		void start_frame();
 		void end_frame();
 
+		template<typename T> void dump(T var);
 		void dump_none();
 		void dump_bool(bool var);
 		void dump_long(long var);
@@ -119,7 +120,7 @@ class UnPickler
 	public:
 
 		UnPickler(uint8_t* current_frame);
-
+		template<typename T> T load();
 		void load_none();
 		bool load_bool();
 		long load_long();

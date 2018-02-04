@@ -64,6 +64,20 @@ void Pickler::end_frame()
 	
 }
 
+
+template<>
+void Pickler::dump<bool>(bool var){Pickler::dump_bool(var);}
+
+template<>
+void Pickler::dump<long>(long var){Pickler::dump_long(var);}
+
+template<>
+void Pickler::dump<float>(float var){Pickler::dump_float(var);}
+
+template<>
+void Pickler::dump<uint8_t>(uint8_t var){Pickler::dump_byte(var);}
+
+
 void Pickler::dump_bool(bool var)
 {
 	num++;
@@ -206,6 +220,20 @@ void UnPickler::remove_tuple_header()
 {
 	ptr+=1;
 }
+
+template<>
+bool UnPickler::load<bool>(){return UnPickler::load_bool();}
+
+template<>
+long UnPickler::load<long>(){return UnPickler::load_long();}
+
+template<>
+float UnPickler::load<float>(){return UnPickler::load_float();}
+
+template<>
+uint8_t UnPickler::load<uint8_t>(){return UnPickler::load_byte();}
+
+
 
 bool UnPickler::load_bool()
 {
