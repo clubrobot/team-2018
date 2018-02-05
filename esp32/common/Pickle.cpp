@@ -6,7 +6,6 @@ Pickler::Pickler(uint8_t* frame)
 	current_frame = frame;
 	ptr = 0;
 	num = 0;
-	//start_frame();
 }
 
 
@@ -19,12 +18,13 @@ void Pickler::end_frame()
 {
 	if(num == 1)
 	{
-		// current_frame[ptr] = (uint8_t)TUPLE1;
-		// ptr++;
-		// current_frame[ptr] = (uint8_t)BINPUT;
-		// ptr++;
-		// current_frame[ptr] = (uint8_t)0X01;
-		// ptr++;
+		current_frame[ptr] = (uint8_t)TUPLE1;
+		ptr++;
+		current_frame[ptr] = (uint8_t)BINPUT;
+		ptr++;
+		current_frame[ptr] = (uint8_t)0X01;
+		ptr++;
+		
 	}
 	else if(num == 2)
 	{
@@ -44,7 +44,7 @@ void Pickler::end_frame()
 		current_frame[ptr] = (uint8_t)0X01;
 		ptr++;
 	}
-	else if (num > 3)
+	else if (num >= 4)
 	{
 		current_frame[ptr] = (uint8_t)TUPLE;
 		ptr++;
@@ -52,17 +52,22 @@ void Pickler::end_frame()
 		ptr++;
 		current_frame[ptr] = (uint8_t)0X01;
 		ptr++;
-
-		uint8_t tmp[MAX_BUFFER_SIZE];
-
-		tmp[0] = (uint8_t)MARK;
-
-		memcpy(tmp+1, current_frame, sizeof(current_frame));
-
-		memcpy(current_frame, tmp, sizeof(tmp));
 	}
+	current_frame[ptr] = (uint8_t)'\0';
 	
 }
+
+template<>
+void Pickler::dump<bool>(bool var){Pickler::dump_bool(var);}
+
+template<>
+void Pickler::dump<long>(long var){Pickler::dump_long(var);}
+
+template<>
+void Pickler::dump<float>(float var){Pickler::dump_float(var);}
+
+template<>
+void Pickler::dump<uint8_t>(uint8_t var){Pickler::dump_byte(var);}
 
 void Pickler::dump_bool(bool var)
 {
@@ -78,30 +83,29 @@ void Pickler::dump_bool(bool var)
 void Pickler::dump_long(long var)
 {
 	num++;
-	if(var >= 0)
-	{
-		if(var <= 0xff)
-		{
-			current_frame[ptr] = (uint8_t)BININT1;
-			ptr++;
-			current_frame[ptr] = (uint8_t)var;
-			ptr++;
-			return;
 
-		}
-		if(var <= 0xffff)
-		{
-			current_frame[ptr] = (uint8_t) BININT2; // long en uint8_t
-			ptr++;
-			current_frame[ptr] = (uint8_t) var;
-			ptr++;
-			current_frame[ptr] = (uint8_t) (var>>8);
-			ptr++;
-			return;
-		}
+	Serial.println(var,HEX);
+	if(var <= 0xff && var >= 0)
+	{
+		current_frame[ptr] = (uint8_t)BININT1;
+		ptr++;
+		current_frame[ptr] = (uint8_t)var;
+		ptr++;
+		return;
+
+	}
+	else if(var <= 0xffff && var >= 0)
+	{
+		current_frame[ptr] = (uint8_t) BININT2; // long en uint8_t
+		ptr++;
+		current_frame[ptr] = (uint8_t) var;
+		ptr++;
+		current_frame[ptr] = (uint8_t) (var>>8);
+		ptr++;
+		return;
 	}
 
-	if((-0x80000000 <= var) && (var <= 0x7fffffff))
+	if((var >= (-0x80000000)) && (var <= 0x7fffffff))
 	{
 		current_frame[ptr] = (uint8_t) BININT;// long en uint8_t
 		ptr++;
@@ -128,6 +132,13 @@ void Pickler::dump_float(float var)
 	
 	int len = sizeof(p);
 	//big_endian conversion
+	p[len+1] = 0X00;
+	p[len+2] = 0X00;
+	p[len+3] = 0X00;
+	p[len+4] = 0x00;
+
+	len +=4; 
+	
 	for(int i =0; i<len/2; i++)
 	{
 		uint8_t tmp = p[i];
@@ -206,6 +217,18 @@ void UnPickler::remove_tuple_header()
 {
 	ptr+=1;
 }
+
+template<>
+bool UnPickler::load<bool>(){return UnPickler::load_bool();}
+
+template<>
+long UnPickler::load<long>(){return UnPickler::load_long();}
+
+template<>
+float UnPickler::load<float>(){return UnPickler::load_float();}
+
+template<>
+uint8_t UnPickler::load<uint8_t>(){return UnPickler::load_byte();}
 
 bool UnPickler::load_bool()
 {
