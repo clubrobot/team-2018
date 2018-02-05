@@ -7,20 +7,14 @@
 void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
 {
     bool var;
-    long val;
-    float val1;
 
     pinMode(2, OUTPUT);
 
     var = input.load<bool>();
-    val = input.load<long>();
-    val1 = input.load<float>();
-
+   
     if(var)
     {
         Serial.println("ON");
-        Serial.println(val);
-        Serial.println(val1);
         digitalWrite(2, HIGH);
 
     }
@@ -30,13 +24,16 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         digitalWrite(2, LOW);
     }
 
-    //output.dump<bool>(var);
-    //output.dump<long>(10);
-    //output.dump<float>(1.1);
-    // output.dump<long>(11);
-    // output.dump<long>(11);
-    // output.dump<long>(999);
-    output.dump<long>(99999);
+    output.dump<bool>(var);
+    output.dump<long>(10);
+    output.dump<double>(1.1);
+    output.dump<long>(11);
+    output.dump<long>(999);
+
+    //output.dump<char*>("hello world");
+
+
+
 }
 
 TCPTalks::TCPTalks()

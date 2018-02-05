@@ -64,10 +64,10 @@ template<>
 void Pickler::dump<long>(long var){Pickler::dump_long(var);}
 
 template<>
-void Pickler::dump<float>(float var){Pickler::dump_float(var);}
+void Pickler::dump<double>(double var){Pickler::dump_double(var);}
 
 template<>
-void Pickler::dump<uint8_t>(uint8_t var){Pickler::dump_byte(var);}
+void Pickler::dump<char*>(char* var){Pickler::dump_str(var);}
 
 
 void Pickler::dump_bool(bool var)
@@ -85,7 +85,6 @@ void Pickler::dump_long(long var)
 {
 	num++;
 
-	Serial.println(var,HEX);
 	if(var <= 0xff && var >= 0)
 	{
 		current_frame[ptr] = (uint8_t)BININT1;
@@ -123,23 +122,19 @@ void Pickler::dump_long(long var)
 
 }
 
-void Pickler::dump_float(float var)
+void Pickler::dump_double(double var)
 {
 	num++;
 	current_frame[ptr] = (uint8_t)BINFLOAT;
 	ptr++;
 
-	uint8_t * p = (uint8_t *)&var; 
+	uint8_t p[8];
+
+	memcpy(p, &var, sizeof(var));
 	
 	int len = sizeof(p);
-	//big_endian conversion
-	p[len+1] = 0X00;
-	p[len+2] = 0X00;
-	p[len+3] = 0X00;
-	p[len+4] = 0x00;
+	//Serial.println(len);
 
-	len +=4; 
-	
 	for(int i =0; i<len/2; i++)
 	{
 		uint8_t tmp = p[i];
@@ -147,20 +142,22 @@ void Pickler::dump_float(float var)
         p[i] = p[len-i-1];
 
         p[len-i-1] = tmp;
-		current_frame[ptr] = (uint8_t)BINBYTES;
+		
 	}
 
-	ptr++;
+	
 
-	memcpy(current_frame+ptr,&var, len);
+	memcpy(current_frame+ptr,p , len);
 
 	ptr += len;
 }
 
-void Pickler::dump_byte(uint8_t var)
+void Pickler::dump_str(char* var)
 {
 	num++;
-	int len = sizeof(var);
+	long len = strlen(var);
+
+	Serial.println(sizeof(len));
 
 	if(len <= 0xff)
 	{
@@ -174,21 +171,22 @@ void Pickler::dump_byte(uint8_t var)
 	{
 		current_frame[ptr] = (uint8_t)BINUNICODE;
 	}
+
 	ptr++;
 
 	current_frame[ptr] = (uint8_t) len;
 	ptr++;
-	current_frame[ptr] = (uint8_t) (len>>8);
+	current_frame[ptr] = (uint8_t) 0X00;
 	ptr++;
-	current_frame[ptr] = (uint8_t) (len>>16);
+	current_frame[ptr] = (uint8_t) 0X00;
 	ptr++;
-	current_frame[ptr] = (uint8_t) (len>>24);
+	current_frame[ptr] = (uint8_t) 0X00;
 	ptr++;
+
 	
-
-	memcpy(current_frame+ptr, &var, len);
-
-	ptr += len;
+	strcat((char*)current_frame,var);
+	//memcpy(current_frame+ptr, var, strlen(var));
+	ptr += strlen(var);
 
 
 	current_frame[ptr] = (uint8_t)BINPUT;

@@ -106,7 +106,7 @@ class Pickler
 		void dump_none();
 		void dump_bool(bool var);
 		void dump_long(long var);
-		void dump_float(float var);
+		void dump_double(double var);
 		void dump_byte(uint8_t var);
 		void dump_str(char* var);
 
