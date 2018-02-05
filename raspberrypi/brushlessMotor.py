@@ -9,26 +9,26 @@ from components import SerialTalksProxy
 
 # Instructions
 
-GET_VELOCITY_OPCODE         = 0x04
-GET_CONSTANT_OPCODE         = 0x05
-GET_WHEELRADIUS_OPCODE      = 0x06
-GET_MAX_VELOCITY_OPCODE     = 0x06
+GET_VELOCITY_OPCODE         = 0x10
+GET_CONSTANT_OPCODE         = 0x11
+GET_WHEELRADIUS_OPCODE      = 0x12
+GET_MAX_VELOCITY_OPCODE     = 0x13
 
-IS_ENABLED_OPCODE           = 0x07
+IS_ENABLED_OPCODE           = 0x14
 
-SET_VELOCITY_OPCODE         = 0x08
-SET_CONSTANT_OPCODE         = 0x09
-SET_WHEELRADIUS_OPCODE      = 0x0A
+SET_VELOCITY_OPCODE         = 0x15
+SET_CONSTANT_OPCODE         = 0x16
+SET_WHEELRADIUS_OPCODE      = 0x17
 
-ENABLE_OPCODE               = 0X0B
-DISABLE_OPCODE              = 0X0C
+ENABLE_OPCODE               = 0X18
+DISABLE_OPCODE              = 0X19
 
-LOAD_OPCODE                 = 0X0D
-SAVE_OPCODE                 = 0X0E
+LOAD_OPCODE                 = 0X1A
+SAVE_OPCODE                 = 0X1B
 
 
 class BrushlessMotor(SerialTalksProxy):
-	def __init__(self, parent, uuid='/dev/cu.wchusbserial1410'):
+	def __init__(self, parent, uuid='BrushlessMotor'):
 		SerialTalksProxy.__init__(self, parent, uuid)
 
 	def get_velocity(self):
@@ -62,7 +62,7 @@ class BrushlessMotor(SerialTalksProxy):
 	def set_constant(self, constant):
 		self.send(SET_CONSTANT_OPCODE, FLOAT(constant))
 
-	def set_whellRadius(self, wheelRadius):
+	def set_wheelRadius(self, wheelRadius):
 		self.send(SET_WHEELRADIUS_OPCODE, FLOAT(wheelRadius))
 
 	def enable(self):
