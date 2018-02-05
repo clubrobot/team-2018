@@ -69,6 +69,7 @@ void Pickler::dump<float>(float var){Pickler::dump_float(var);}
 template<>
 void Pickler::dump<uint8_t>(uint8_t var){Pickler::dump_byte(var);}
 
+
 void Pickler::dump_bool(bool var)
 {
 	num++;
