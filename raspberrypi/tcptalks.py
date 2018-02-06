@@ -553,7 +553,7 @@ class TCPTalksServer:
 
 		return self.client[id].send(opcode, *args, **kwargs)
 
-	def execute(self, opcode, *args,, id=None, **kwargs):
+	def execute(self, opcode, *args, id=None, **kwargs):
 		try:
 			id = id if not id is None else list(self.client.keys())[0]
 		except IndexError:
