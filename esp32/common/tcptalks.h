@@ -64,7 +64,7 @@ class TCPTalks
 	int sendback(uint8_t opcode, long retcode, byte * args);
 
 		
-	//protected: // Protected methods
+	protected: // Protected methods
 
 	char* ip;
 
