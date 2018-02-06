@@ -51,7 +51,7 @@ try:
 			retcode= input.read(LONG)
 			try:
 				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
-			except: TimeoutError
+			except TimeoutError:
 				return
 			if output is None : return
 			content = LONG(retcode) + output
