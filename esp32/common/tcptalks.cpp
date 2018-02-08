@@ -43,7 +43,7 @@ TCPTalks::TCPTalks()
     
 	port =  25565;
 
-	password = "";
+	password = "\n";
 
 	is_connected = false;
 	is_authentificated = false;
@@ -106,10 +106,23 @@ void TCPTalks::connect(int timeout)
 
 bool TCPTalks::authentificate(int timeout)
 {
-	byte authentification_frame[17] = {PROTO, DEFAULT_PROTOCOL, SHORT_BINBYTES, 0X01, TCPTALKS_SLAVE_BYTE, BINPUT, 0X00, BININT1, AUTHENTIFICATION_OPCODE,NONE, TUPLE1, BINPUT, 0X01, TUPLE3, BINPUT, 0X02, STOP };
-    client.write(authentification_frame, sizeof(authentification_frame));
-    //sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
+    sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
 
+    // last_time = millis();
+    // Serial.print("wait for authentification...");
+
+    // while(!client.connect(ip, port))
+    // {
+    //     Serial.print(".");
+    //     delay(5);
+    //     long current_time = millis();
+    //     if(current_time - last_time > timeout )
+    //     {
+    //         Serial.println("authentification Failed");
+    //         return;
+    //     }
+       
+    // }
     is_authentificated = true;
 	return is_authentificated;
 }
@@ -176,7 +189,6 @@ bool TCPTalks::execute()
         // Abort previous communication
         m_state = TCPTALKS_WAITING_STATE;
     }
-
 
     for (int i = 0; i < length; i++)
     {
@@ -273,7 +285,9 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
         ptr++;
 
     }
-    if(sizeof(args) <= 3)
+
+
+    if(strlen((char*)args) <= 3)
     {
         frame[ptr] = NONE;
         ptr++;

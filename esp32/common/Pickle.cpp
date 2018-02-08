@@ -10,6 +10,8 @@ Pickler::Pickler(uint8_t* frame)
 
 void Pickler::end_frame()
 {
+	size_t size;
+
 	if(num == 1)
 		current_frame[ptr] = (uint8_t)TUPLE1;
 	else if(num == 2)
@@ -17,7 +19,7 @@ void Pickler::end_frame()
 	else if(num == 3)
 		current_frame[ptr] = (uint8_t)TUPLE3;
 	else if (num >= 4)
-		current_frame[ptr] = (uint8_t)TUPLE;
+	    current_frame[ptr] = (uint8_t)TUPLE;
 		
 	ptr++;
 	current_frame[ptr] = (uint8_t)BINPUT;
@@ -25,6 +27,8 @@ void Pickler::end_frame()
 	current_frame[ptr] = (uint8_t)0X01;
 	ptr++;
 	current_frame[ptr] = (uint8_t)'\0';	
+
+	
 }
 
 template<>
@@ -244,34 +248,31 @@ float UnPickler::load<float>()
 template<>
 char* UnPickler::load<char*>()
 {	
-	uint8_t* tab;
+	char* tab;
 
 	if(current_frame[ptr] == BINUNICODE)
 	{
 		ptr+=4;
 		long len = (long)((current_frame[ptr-3] << 24) | (current_frame[ptr-2] << 16) | (current_frame[ptr-1] << 8) | current_frame[ptr] );
-		ptr++;
-		return current_frame[ptr]; 
+		memcpy(tab,(char*)current_frame,len);
 	}
 	if(current_frame[ptr] == BINUNICODE8)
 	{
 		ptr+=4;
 		long len = (long)((current_frame[ptr-3] << 24) | (current_frame[ptr-2] << 16) | (current_frame[ptr-1] << 8) | current_frame[ptr] );
-
-		ptr++;
-		return current_frame[ptr]; 
+		memcpy(tab,(char*)current_frame,len);
 	}
 	if(current_frame[ptr] == SHORT_BINUNICODE)
 	{
 		ptr+=4;
 		long len = (long)((current_frame[ptr-3] << 24) | (current_frame[ptr-2] << 16) | (current_frame[ptr-1] << 8) | current_frame[ptr] );
-
-		ptr++;
-		return current_frame[ptr]; 
+		memcpy(tab,(char*)current_frame,len);
 	}
 	ptr ++;
 	/* switch ending byte frame */
 	ptr+= 2;
+
+	return tab; 
 }
 
 bool UnPickler::is_tuple()
