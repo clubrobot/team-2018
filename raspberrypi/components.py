@@ -49,7 +49,10 @@ try:
 		def receive(self,input):
 			opcode = str(input.read(BYTE))+self.uuid
 			retcode= input.read(LONG)
-			output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
+			try:
+				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
+			except TimeoutError:
+				return
 			if output is None : return
 			content = LONG(retcode) + output
 			prefix  = SLAVE_BYTE    + BYTE(len(content))

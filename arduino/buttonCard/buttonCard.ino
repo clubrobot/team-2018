@@ -1,0 +1,49 @@
+#include <Arduino.h>
+#include "instructions.h"
+#include "../common/SerialTalks.h"
+#include "PIN.h"
+#include "../common/ButtonCard.h"
+
+ButtonCard buttonCard;
+int oldreadmode = 0;
+long timeInverter, timeButton, timeTirette;
+
+void setup() {
+  Serial.begin(SERIALTALKS_BAUDRATE);
+  talks.begin(Serial);
+  //talks.attach(10,button); 
+  buttonCard.setup();
+  talks.bind(ENABLE_LED_OPCODE, ENABLE_LED);
+  talks.bind(DISABLE_LED_OPCODE, DISABLE_LED);
+}
+
+void loop() {
+  talks.execute();
+  for (int i = 1; i < 5; i++){
+    if (buttonCard.readButton(i) == LOW && millis()>timeButton+500){
+      Serializer button = talks.getSerializer();
+         button.write<byte>(i);
+         talks.send(1, button);
+         timeButton = millis();
+     }
+}
+if (buttonCard.readEmergency() == HIGH){
+  Serializer emergency = talks.getSerializer();
+    emergency.write<byte>(1);
+    talks.send(2, emergency);
+}
+if (buttonCard.readTirette() == LOW && millis() > timeTirette + 500){
+  Serializer tirette = talks.getSerializer();
+
+    tirette.write<byte>(1);
+    talks.send(3, tirette);
+    timeTirette = millis();
+}
+if (buttonCard.readMode() != oldreadmode && millis()>timeInverter+10){
+  Serializer mode = talks.getSerializer();
+    mode.write<byte>(buttonCard.readMode());
+    oldreadmode = buttonCard.readMode();
+    talks.send(4, mode);
+    timeInverter = millis();
+  }
+}

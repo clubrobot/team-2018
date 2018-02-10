@@ -64,13 +64,13 @@ class TCPTalks
 	int sendback(uint8_t opcode, long retcode, byte * args);
 
 		
-	//protected: // Protected methods
+	protected: // Protected methods
 
 	char* ip;
 
 	int port;
 
-	char* password;
+	char* password = "";
 
 	bool is_connected;
 	bool is_authentificated;

@@ -545,7 +545,7 @@ class TCPTalksServer:
 	def full(self):
 		return len(self.client)>=self.NbClients
 
-	def send(self, opcode, id=None, *args, **kwargs):
+	def send(self, opcode, *args, id=None, **kwargs):
 		try:
 			id = id if not id is None else list(self.client.keys())[0]
 		except IndexError:
@@ -553,7 +553,7 @@ class TCPTalksServer:
 
 		return self.client[id].send(opcode, *args, **kwargs)
 
-	def execute(self, opcode, id=None, *args, **kwargs):
+	def execute(self, opcode, *args, id=None, **kwargs):
 		try:
 			id = id if not id is None else list(self.client.keys())[0]
 		except IndexError:
@@ -561,7 +561,7 @@ class TCPTalksServer:
 
 		return self.client[id].execute(opcode, *args, **kwargs)
 
-	def poll(self, opcode, id=None, *args, **kwargs):
+	def poll(self, opcode, *args, id=None, **kwargs):
 		try:
 			id = id if not id is None else list(self.client.keys())[0]
 		except IndexError:

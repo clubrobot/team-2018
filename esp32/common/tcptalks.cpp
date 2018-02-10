@@ -7,20 +7,14 @@
 void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
 {
     bool var;
-    long val;
-    float val1;
 
     pinMode(2, OUTPUT);
 
-    var = input.load_bool();
-    val = input.load_long();
-    val1 = input.load_float();
-
+    var = input.load<bool>();
+   
     if(var)
     {
         Serial.println("ON");
-        Serial.println(val);
-        Serial.println(val1);
         digitalWrite(2, HIGH);
 
     }
@@ -30,7 +24,16 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         digitalWrite(2, LOW);
     }
 
-    //output.dump_long(1000);
+    output.dump<bool>(var);
+    output.dump<long>(10);
+    output.dump<double>(1.1);
+    output.dump<long>(11);
+    output.dump<long>(999);
+
+    //output.dump<char*>("hello world");
+
+
+
 }
 
 TCPTalks::TCPTalks()
@@ -40,7 +43,7 @@ TCPTalks::TCPTalks()
     
 	port =  25565;
 
-	password = "";
+	password = "\n";
 
 	is_connected = false;
 	is_authentificated = false;
@@ -103,11 +106,23 @@ void TCPTalks::connect(int timeout)
 
 bool TCPTalks::authentificate(int timeout)
 {
-	byte authentification_frame[17] = {PROTO, DEFAULT_PROTOCOL, SHORT_BINBYTES, 0X01, TCPTALKS_SLAVE_BYTE, BINPUT, 0X00, BININT1, AUTHENTIFICATION_OPCODE,NONE, TUPLE1, BINPUT, 0X01, TUPLE3, BINPUT, 0X02, STOP };
-    client.write(authentification_frame, sizeof(authentification_frame));
+    sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
 
-    //sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
+    // last_time = millis();
+    // Serial.print("wait for authentification...");
 
+    // while(!client.connect(ip, port))
+    // {
+    //     Serial.print(".");
+    //     delay(5);
+    //     long current_time = millis();
+    //     if(current_time - last_time > timeout )
+    //     {
+    //         Serial.println("authentification Failed");
+    //         return;
+    //     }
+       
+    // }
     is_authentificated = true;
 	return is_authentificated;
 }
@@ -136,12 +151,12 @@ bool TCPTalks::execinstruction(uint8_t* inputBuffer)
     UnPickler input(inputBuffer);
     Pickler   output(m_outputBuffer);
 
-    long opcode = input.load_long();
+    long opcode = input.load<long>();
 
     Serial.print("opcode : ");
     Serial.println(opcode, HEX);
 
-    long retcode = input.load_long();
+    long retcode = input.load<long>();
 
     Serial.print("retcode : ");
     Serial.println(retcode);
@@ -174,7 +189,6 @@ bool TCPTalks::execute()
         // Abort previous communication
         m_state = TCPTALKS_WAITING_STATE;
     }
-
 
     for (int i = 0; i < length; i++)
     {
@@ -219,6 +233,7 @@ bool TCPTalks::execute()
 int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
 {
     int ptr = 0;
+    size_t size;
 
     byte frame[TCPTALKS_OUTPUT_BUFFER_SIZE];
 
@@ -270,7 +285,9 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
         ptr++;
 
     }
-    if(sizeof(args) <= 4)
+
+
+    if(strlen((char*)args) <= 3)
     {
         frame[ptr] = NONE;
         ptr++;
@@ -283,8 +300,27 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     }
     else
     {
-        memcpy(frame+ptr,args, sizeof(args));
-        ptr += sizeof(args);
+        /* get argument size */
+        size = strlen((char*)args);
+        Serial.println(size);
+
+        if(args[size - 3] == TUPLE)
+        {
+            Serial.println("big tuple");
+
+            uint8_t tmp[MAX_BUFFER_SIZE];
+            
+            tmp[0] = (uint8_t)MARK;
+            memcpy(tmp+1, args, size);
+
+            memcpy(args, tmp, (size+1));
+
+            size = strlen((char*)args);
+        }
+
+        memcpy(frame+ptr, args, size);
+
+        ptr += size;
     }
 
 

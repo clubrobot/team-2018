@@ -102,15 +102,9 @@ class Pickler
 		void end_frame();
 
 		template<typename T> void dump(T var);
-		void dump_none();
-		void dump_bool(bool var);
-		void dump_long(long var);
-		void dump_float(float var);
-		void dump_byte(uint8_t var);
-		void dump_str(char* var);
 
-	private:
-		uint8_t * current_frame = NULL;
+	protected:
+		uint8_t * current_frame;;
 		uint32_t  ptr;
 		int num;
 };
@@ -120,21 +114,17 @@ class UnPickler
 	public:
 
 		UnPickler(uint8_t* current_frame);
-		template<typename T> T load();
-		void load_none();
-		bool load_bool();
-		long load_long();
-		float load_float();
-		uint8_t load_byte();
-		bool is_tuple();
-	
 
 		void remove_start_frame();
 		void remove_end_frame();
 		void remove_tuple_header();
 
-	private:
-		uint8_t * current_frame = NULL;
+		template<typename T> T load();
+
+		bool is_tuple();
+
+	protected:
+		uint8_t * current_frame;
 		uint32_t  ptr = 0;
 
 };
