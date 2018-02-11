@@ -13,6 +13,7 @@ Servo indoor;
 Servo outdoor;
 Servo trash;
 ColorSensor waterSensor;
+
 #define DOOR_CLOSED 90
 #define TRASH_CLOSED 25
 
@@ -29,6 +30,7 @@ void setup(){
 	talks.bind(_GET_MOTOR_VELOCITY_OPCODE, GET_MOTOR_VELOCITY);
     talks.bind(_SET_MOTOR_VELOCITY_OPCODE, SET_MOTOR_VELOCITY);
 	talks.bind(_GET_WATER_COLOR_OPCODE, GET_WATER_COLOR);
+	talks.bind(_SET_MOTOR_PULSEWIDTH_OPCODE, SET_MOTOR_PULSEWIDTH);
 
 	pinMode(SERVO1, OUTPUT);
     pinMode(SERVO2, OUTPUT);

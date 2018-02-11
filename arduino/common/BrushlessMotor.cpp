@@ -43,3 +43,7 @@ void BrushlessMotor::setVelocity(int velocity)
     }
     //delay(100);
 }
+
+void setPulsewidth(int pulsewidth) {
+	m_esc.writeMicroseconds(pulsewidth);
+}

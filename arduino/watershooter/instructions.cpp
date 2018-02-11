@@ -9,6 +9,7 @@ extern BrushlessMotor motor;
 extern Servo indoor;
 extern Servo outdoor;
 extern Servo trash;
+extern ColorSensor waterSensor;
 
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output){
@@ -48,5 +49,11 @@ void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output)
 	int green = waterSensor.getGreen();
 	int blue = waterSensor.getBlue();
 
-	output.write<int>(red, green, blue);
+	output.write<int>(red);
+	output.write<int>(green);
+	output.write<int>(blue);
+}
+
+void SET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output) {
+	motor.setPulsewidth(input.read<int>());
 }

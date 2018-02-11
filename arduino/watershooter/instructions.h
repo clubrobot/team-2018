@@ -3,15 +3,16 @@
 
 #include "../common/SerialTalks.h"
 
-#define _WRITE_INDOOR_OPCODE        0x11
-#define _GET_INDOOR_OPCODE          0x12
-#define _WRITE_OUTDOOR_OPCODE       0x13
-#define _GET_OUTDOOR_OPCODE         0X14
-#define _WRITE_TRASH_OPCODE        	0x15
-#define _GET_TRASH_OPCODE           0x16
-#define _SET_MOTOR_VELOCITY_OPCODE  0x17
-#define _GET_MOTOR_VELOCITY_OPCODE  0x18
-#define _GET_WATER_COLOR_OPCODE     0x19
+#define _WRITE_INDOOR_OPCODE			0x11
+#define _GET_INDOOR_OPCODE				0x12
+#define _WRITE_OUTDOOR_OPCODE			0x13
+#define _GET_OUTDOOR_OPCODE				0X14
+#define _WRITE_TRASH_OPCODE        		0x15
+#define _GET_TRASH_OPCODE				0x16
+#define _SET_MOTOR_VELOCITY_OPCODE		0x17
+#define _GET_MOTOR_VELOCITY_OPCODE		0x18
+#define _GET_WATER_COLOR_OPCODE			0x19
+#define _SET_MOTOR_PULSEWIDTH_OPCODE	0x20
 
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
@@ -27,5 +28,7 @@ void SET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &outp
 void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output);
+
+void SET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 #endif

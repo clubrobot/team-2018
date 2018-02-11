@@ -21,10 +21,11 @@ public:
 
 	void enable();
 	void disable();
-    void setVelocity   (float velocity);
+    void setVelocity(float velocity);
+	void setPulsewidth(int pulsewidth);
 
-    float getVelocity   () const {return m_velocity;}
-    bool  isEnabled     () const {return m_enabled;}
+    float getVelocity() const {return m_velocity;}
+    bool  isEnabled() const {return m_enabled;}
 
     int readMicroseconds();
 
