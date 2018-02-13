@@ -93,6 +93,8 @@ void setup() {
 	for(uint8_t i=0; i<length; i++){
 		Serial.print(dataBuffer[i],HEX);
 	}
+	Serial.print("Security Keys : ");
+	Serial.println(readU32FromManufacturerAccess((uint16_t)0x0035), HEX);
 }
 
 
@@ -245,7 +247,7 @@ bool writeDataFlashI4(uint16_t address, int32_t dataI4){
 	return ackData;
 }
 
-int readWordFromManufacturerAccess(uint16_t aCommand) {
+uint16_t readWordFromManufacturerAccess(uint16_t aCommand) {
 	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
 	i2c_write(MANUFACTURER_ACCESS);
 	// Write manufacturer command word
@@ -260,17 +262,37 @@ int readWordFromManufacturerAccess(uint16_t aCommand) {
 	uint8_t tLSB = i2c_read(false);
 	uint8_t tMSB = i2c_read(true);
 	i2c_stop();
-	return (int) tLSB | (((int) tMSB) << 8);
+	return (uint16_t) tLSB | (((uint16_t) tMSB) << 8);
 }
 
-int readWord(uint8_t aFunction) {
+uint32_t readU32FromManufacturerAccess(uint16_t aCommand) {
+	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
+	i2c_write(MANUFACTURER_ACCESS);
+	// Write manufacturer command word
+	i2c_rep_start((sI2CDeviceAddress << 1) | I2C_WRITE);
+	i2c_write(aCommand);
+	i2c_write(aCommand >> 8);
+	i2c_stop();
+	// Read manufacturer result word
+	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
+	i2c_write(MANUFACTURER_ACCESS);
+	i2c_rep_start((sI2CDeviceAddress << 1) | I2C_READ);
+	uint8_t u1LSB = i2c_read(false);
+	uint8_t u1MSB = i2c_read(false);
+	uint8_t u2LSB = i2c_read(false);
+	uint8_t u2MSB = i2c_read(true);
+	i2c_stop();
+	return ((uint32_t) u1LSB << 16) | ((uint32_t) u1MSB << 24) | (uint32_t) u2LSB | ((uint32_t) u2MSB << 8);
+}
+
+uint16_t readWord(uint8_t aFunction) {
 	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
 	i2c_write(aFunction);
 	i2c_rep_start((sI2CDeviceAddress << 1) | I2C_READ);
 	uint8_t tLSB = i2c_read(false);
 	uint8_t tMSB = i2c_read(true);
 	i2c_stop();
-	return (int) tLSB | (((int) tMSB) << 8);
+	return (uint16_t) tLSB | (((uint16_t) tMSB) << 8);
 }
 
 uint8_t readBlockFromManufacturerBlockAccess(uint16_t aCommand, uint8_t* aDataBufferPtr, uint8_t aDataBufferLength) {
