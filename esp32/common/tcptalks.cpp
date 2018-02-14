@@ -28,7 +28,7 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
     output.dump<long>(10);
     output.dump<double>(1.1);
     output.dump<long>(11);
-    output.dump<long>(999);
+    output.dump<long>(999999);
 
     //output.dump<char*>("hello world");
 
@@ -39,7 +39,8 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
 TCPTalks::TCPTalks()
 {
 	
-    ip = "192.168.0.16";
+    //ip = "192.168.0.16";
+    ip = "192.168.1.13";
     
 	port =  25565;
 
@@ -48,8 +49,12 @@ TCPTalks::TCPTalks()
 	is_connected = false;
 	is_authentificated = false;
 
-	ssid = "NUMERICABLE-9251_2GEXT";
-	pass = "26338b5a57";
+	// ssid = "NUMERICABLE-9251_2GEXT";
+	// pass = "26338b5a57";
+
+    ssid = "CLUB_ROBOT";
+    pass = "zigouigoui";
+
 }
 
 void TCPTalks::connect(int timeout)
@@ -238,28 +243,28 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     byte frame[TCPTALKS_OUTPUT_BUFFER_SIZE];
 
     /*start header frame*/
-    frame[ptr] = (byte)PROTO; 
+    frame[ptr] = PROTO; 
     ptr++;
-    frame[ptr] = (byte)DEFAULT_PROTOCOL;
+    frame[ptr] = DEFAULT_PROTOCOL;
     ptr++;
-    frame[ptr] = (byte)SHORT_BINBYTES;
+    frame[ptr] = SHORT_BINBYTES;
     ptr++;
-    frame[ptr] = (byte)0X01;
+    frame[ptr] = 0X01;
     ptr++;
-    frame[ptr] = (byte)TCPTALKS_SLAVE_BYTE;
+    frame[ptr] = TCPTALKS_SLAVE_BYTE;
     ptr++;
-    frame[ptr] = (byte)BINPUT;
+    frame[ptr] = BINPUT;
     ptr++;
-    frame[ptr] = (byte)0X00;
+    frame[ptr] = 0X00;
     ptr++;
     /* end header frame */
 
     /* ADD opcode if it defined */
     if(opcode != NOT_OPCODE)
     {
-        frame[ptr] = (byte)BININT1;
+        frame[ptr] = BININT1;
         ptr++;
-        frame[ptr] = (byte)opcode;
+        frame[ptr] = opcode;
         ptr++;
     }
     else if(retcode != NOT_RETCODE)
@@ -271,17 +276,17 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
 
         byte tab[4] = {0};
         /* add retcode */
-        memcpy((byte*)tab, &retcode, sizeof(retcode));
+        memcpy(tab,(byte*)&retcode, sizeof(retcode));
 
-        frame[ptr] = (byte)tab[0];
+        frame[ptr] = tab[0];
         ptr++;
-        frame[ptr] = (byte)tab[1];
+        frame[ptr] = tab[1];
         ptr++;
-        frame[ptr] = (byte)tab[2];
+        frame[ptr] = tab[2];
         ptr++;
-        frame[ptr] = (byte)tab[3];
+        frame[ptr] = tab[3];
         ptr++;
-        frame[ptr] = (byte)0X00;
+        frame[ptr] = 0X00;
         ptr++;
 
     }
@@ -291,11 +296,11 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     {
         frame[ptr] = NONE;
         ptr++;
-        frame[ptr] = (byte)TUPLE1; 
+        frame[ptr] = TUPLE1; 
         ptr++;
-        frame[ptr] = (byte)BINPUT;
+        frame[ptr] = BINPUT;
         ptr++;
-        frame[ptr] = (byte)0X01;
+        frame[ptr] = 0X01;
         ptr++;
     }
     else
@@ -325,13 +330,13 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
 
 
     /*ending frame*/
-    frame[ptr] = (byte)TUPLE3;
+    frame[ptr] = TUPLE3;
     ptr++;
-    frame[ptr] = (byte)BINPUT;
+    frame[ptr] = BINPUT;
     ptr++;
-    frame[ptr] = (byte)0X02;
+    frame[ptr] = 0X02;
     ptr++;
-    frame[ptr] = (byte)STOP;
+    frame[ptr] = STOP;
     ptr++;
 
     client.write(frame, ptr);
