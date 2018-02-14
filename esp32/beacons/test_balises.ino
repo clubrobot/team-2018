@@ -33,6 +33,7 @@ void setup() {
 }
 
 void loop() {
+  //talks.execute();
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,LOW);
   delay(500);

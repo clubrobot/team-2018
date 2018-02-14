@@ -2,11 +2,11 @@ BOARD = esp32
 CHIP = esp32
 
 #Arduino file
-SKETCH = test_balises.ino
+SKETCH = anchor.ino
 
-BOARD_UUID = beacon
-COMMON = ../common
-DWM1000_LIB = ../common/DWM1000
+BOARD_UUID = anchor
+COMMON = ../../common
+DWM1000_LIB = ../../common/DWM1000
 #Setup all libs used !
 LIBS =  $(ESP_LIBS)/EEPROM \
 		$(ESP_LIBS)/SPI \
@@ -26,6 +26,6 @@ CPPFLAGS += -DPUREPURSUIT_MAX_WAYPOINTS=32
 
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
-MODULEMK_DIR = ..
+MODULEMK_DIR = ../..
 include $(MODULEMK_DIR)/Module.mk
 
