@@ -9,7 +9,7 @@ from components import SerialTalksProxy
 
 # Instructions
 
-SET_OPENLOOP_VELOCITIES_OPCODE  = 0x04
+SET_OPENLOOP_VELOCITIES_OPCODE  = 0x12
 
 GET_CODEWHEELS_COUNTERS_OPCODE  = 0x0D
 

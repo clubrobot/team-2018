@@ -6,22 +6,22 @@
 
 
 // Opcodes declaration
-#define GET_VELOCITY_OPCODE         0x04
-#define GET_CONSTANT_OPCODE         0x05
-#define GET_WHEELRADIUS_OPCODE      0x06
-#define GET_MAX_VELOCITY_OPCODE     0x06
+#define GET_VELOCITY_OPCODE         0x10
+#define GET_CONSTANT_OPCODE         0x11
+#define GET_WHEELRADIUS_OPCODE      0x12
+#define GET_MAX_VELOCITY_OPCODE     0x13
 
-#define IS_ENABLED_OPCODE            0x07
+#define IS_ENABLED_OPCODE           0x14
 
-#define SET_VELOCITY_OPCODE         0x08
-#define SET_CONSTANT_OPCODE         0x09
-#define SET_WHEELRADIUS_OPCODE      0x0A
+#define SET_VELOCITY_OPCODE         0x15
+#define SET_CONSTANT_OPCODE         0x16
+#define SET_WHEELRADIUS_OPCODE      0x17
 
-#define ENABLE_OPCODE               0X0B
-#define DISABLE_OPCODE              0X0C
+#define ENABLE_OPCODE               0X18
+#define DISABLE_OPCODE              0X19
 
-#define LOAD_OPCODE                 0X0D
-#define SAVE_OPCODE                 0X0E
+#define LOAD_OPCODE                 0X1A
+#define SAVE_OPCODE                 0X1B
 
 
 // Instructions prototypes

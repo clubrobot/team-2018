@@ -4,7 +4,7 @@
 import os
 from types import MethodType
 
-from tcptalks import TCPTalks
+from tcptalks import TCPTalks, TCPTalksServer
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
 
@@ -49,7 +49,10 @@ try:
 		def receive(self,input):
 			opcode = str(input.read(BYTE))+self.uuid
 			retcode= input.read(LONG)
-			output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
+			try:
+				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
+			except TimeoutError:
+				return
 			if output is None : return
 			content = LONG(retcode) + output
 			prefix  = SLAVE_BYTE    + BYTE(len(content))
@@ -60,7 +63,7 @@ except ImportError:
 	pass
 
 try:
-	from gpiodevices import Switch, LightButton
+	from gpiodevices import Switch, LightButton, Device
 
 	class SwitchComponent(Switch, Component):
 
@@ -126,10 +129,10 @@ try:
 except ImportError:
 	pass
 
-class Server(TCPTalks):
+class Server(TCPTalksServer):
 
-	def __init__(self, port=COMPONENTS_SERVER_DEFAULT_PORT, password=None):
-		TCPTalks.__init__(self, port=port, password=password)
+	def __init__(self, port=COMPONENTS_SERVER_DEFAULT_PORT, password=None,size=4):
+		TCPTalksServer.__init__(self, port=port, password=password,NbClients=size)
 		self.bind(CREATE_SERIALTALKS_COMPONENT_OPCODE, self.CREATE_SERIALTALKS_COMPONENT)
 		self.bind(CREATE_SWITCH_COMPONENT_OPCODE,      self.CREATE_SWITCH_COMPONENT)
 		self.bind(CREATE_LIGHTBUTTON_COMPONENT_OPCODE, self.CREATE_LIGHTBUTTON_COMPONENT)
@@ -139,9 +142,9 @@ class Server(TCPTalks):
 		self.bind(SET_COMPONENT_ATTRIBUTE_OPCODE,      self.SET_COMPONENT_ATTRIBUTE)
 		self.components = {}
 	
-	def disconnect(self):
-		TCPTalks.disconnect(self)
-		self.cleanup()
+	def disconnect(self,id=None):
+		TCPTalksServer.disconnect(self,id=id)
+		if len(self.client)==0 : self.cleanup()
 		
 	def cleanup(self):
 		for comp in self.components.values():
@@ -176,17 +179,21 @@ class Server(TCPTalks):
 
 
 	def CREATE_SWITCH_COMPONENT(self, switchpin):
+		if (switchpin,) in self.components:
+			return (switchpin,)
 		comp = SwitchComponent(switchpin)
 		compid = (switchpin,)
 		self.addcomponent(comp, compid)
-		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE, compid)
+		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE, None,compid)
 		return compid
 
 	def CREATE_LIGHTBUTTON_COMPONENT(self, switchpin, ledpin):
+		if  (switchpin, ledpin) in self.components:
+			return (switchpin, ledpin)
 		comp = LightButtonComponent(switchpin, ledpin)
 		compid = (switchpin, ledpin)
 		self.addcomponent(comp, compid)
-		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE, compid)
+		comp.SetFunction(self.send, MAKE_MANAGER_EXECUTE_OPCODE,None, compid)
 		return compid
 
 	def CREATE_PICAMERA_COMPONENT(self, resolution, framerate):
