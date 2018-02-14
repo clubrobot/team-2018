@@ -13,6 +13,7 @@
 #define RIGHT_MOTOR_DIR 27
 #define DRIVER_RESET    13
 #define DRIVER_FAULT    35
+#define DRIVER_OTW      39
 #define PWM_FREQUENCY 30000
   
 //PWM Chanel
