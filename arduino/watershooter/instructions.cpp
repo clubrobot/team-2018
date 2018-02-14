@@ -37,7 +37,7 @@ void GET_TRASH(SerialTalks &inst, Deserializer &input, Serializer &output){
 }
 
 void SET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){
-	motor.setVelocity(input.read<float>());
+	motor.setVelocity(input.read<int>());
 }
 
 void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){
@@ -45,9 +45,9 @@ void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &outp
 }
 
 void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output){
-	int red = waterSensor.getRed();
-	int green = waterSensor.getGreen();
-	int blue = waterSensor.getBlue();
+	int red = 0;//waterSensor.getRed();
+	int green = 0;//waterSensor.getGreen();
+	int blue = 0;//waterSensor.getBlue();
 
 	output.write<int>(red);
 	output.write<int>(green);
@@ -56,4 +56,9 @@ void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output)
 
 void SET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output) {
 	motor.setPulsewidth(input.read<int>());
+}
+
+void GET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output) {
+	int pulsewidth = motor.readMicroseconds();
+	output.write<int>(pulsewidth);
 }

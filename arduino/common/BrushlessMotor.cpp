@@ -20,7 +20,7 @@ void BrushlessMotor::enable()
 void BrushlessMotor::disable()
 {
     m_enabled = false;
-    m_esc.write(MIN_VELOCITY);
+    m_esc.write(MIN_PULSEWIDTH);
 }
 
 int BrushlessMotor::readMicroseconds()
@@ -30,20 +30,20 @@ int BrushlessMotor::readMicroseconds()
 
 void BrushlessMotor::setVelocity(int velocity)
 {
-    if(m_velocity >= MIN_VELOCITY && m_velocity <= MAX_VELOCITY){
-        m_velocity = (int) map(m_velocity,0,100,0,180);
+    if(velocity >= MIN_VELOCITY && velocity <= MAX_VELOCITY){
+        m_velocity = (int) map(velocity,0,100,MIN_PULSEWIDTH,MAX_PULSEWIDTH);
     } else {
         m_velocity = velocity > MAX_VELOCITY ? MAX_VELOCITY : MIN_VELOCITY;
     }
     if (m_enabled == true) {
-        m_esc.write(m_velocity);
+        m_esc.writeMicroseconds(m_velocity);
     }
     else {
-        m_esc.write(MIN_VELOCITY);
+        m_esc.writeMicroseconds(MIN_PULSEWIDTH);
     }
     //delay(100);
 }
 
-void setPulsewidth(int pulsewidth) {
+void BrushlessMotor::setPulsewidth(int pulsewidth) {
 	m_esc.writeMicroseconds(pulsewidth);
 }

@@ -1,18 +1,18 @@
 #include <Arduino.h>
 #include <Servo.h>
-#include <Wire.h>
+//#include <Wire.h>
 #include "PIN.h"
 #include "instructions.h"
 #include "../common/BrushlessMotor.h"
 #include "../common/SerialTalks.h"
-#include "../common/ColorSensor.h"
+//#include "../common/ColorSensor.h"
 
 
 BrushlessMotor motor;
 Servo indoor;
 Servo outdoor;
 Servo trash;
-ColorSensor waterSensor;
+//ColorSensor waterSensor;
 
 #define DOOR_CLOSED 90
 #define TRASH_CLOSED 25
@@ -31,6 +31,7 @@ void setup(){
     talks.bind(_SET_MOTOR_VELOCITY_OPCODE, SET_MOTOR_VELOCITY);
 	talks.bind(_GET_WATER_COLOR_OPCODE, GET_WATER_COLOR);
 	talks.bind(_SET_MOTOR_PULSEWIDTH_OPCODE, SET_MOTOR_PULSEWIDTH);
+	talks.bind(_GET_MOTOR_PULSEWIDTH_OPCODE, GET_MOTOR_PULSEWIDTH);
 
 	pinMode(SERVO1, OUTPUT);
     pinMode(SERVO2, OUTPUT);
@@ -49,7 +50,7 @@ void setup(){
 	outdoor.write(DOOR_CLOSED);
 	indoor.write(DOOR_CLOSED);
 
-	waterSensor.setup();
+	//waterSensor.setup();
 }
 
 void loop(){

@@ -21,8 +21,8 @@ TRASH_CLOSED = 25
 TRASH_OPEN = 60
 
 class WaterSorter(SerialTalksProxy):	
-    def __init__(self, uuid='/dev/arduino/watersorter'):
-        SerialTalksProxy.__init__(self, uuid)
+    def __init__(self,parent, uuid='/dev/arduino/watershooter'):
+        SerialTalksProxy.__init__(self,parent, uuid)
 
     def write_outdoor(self, ouverture):
         self.send(_WRITE_OUTDOOR_OPCODE,INT(ouverture))

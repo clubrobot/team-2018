@@ -6,8 +6,8 @@
 #include "SerialTalks.h"
 
 
-#define MIN_PULSEWIDTH   (int)   1450     // the shortest pulse sent to a ESC  
-#define MAX_PULSEWIDTH   (int)   2400     // the longest pulse sent to a ESC
+#define MIN_PULSEWIDTH           1995     // the shortest pulse sent to a ESC  
+#define MAX_PULSEWIDTH           2400     // the longest pulse sent to a ESC
 #define MIN_VELOCITY             0
 #define MAX_VELOCITY             100
 
@@ -21,10 +21,10 @@ public:
 
 	void enable();
 	void disable();
-    void setVelocity(float velocity);
+    void setVelocity(int velocity);
 	void setPulsewidth(int pulsewidth);
 
-    float getVelocity() const {return m_velocity;}
+    float getVelocity() const {return map(m_velocity,0,180,0,100);}
     bool  isEnabled() const {return m_enabled;}
 
     int readMicroseconds();
