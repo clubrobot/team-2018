@@ -34,6 +34,7 @@
 //Manufacturer Access Commands
 #define DEVICE_RESET						0x0041
 #define OPERATION_STATUS					0x0054
+#define SECURITY_KEYS                       0x0035
 
 //Data Flash Address
 //Configuration

@@ -3,51 +3,38 @@
 
 #include <Arduino.h>
 #include <Servo.h>
+#include "SerialTalks.h"
 
-#define MIN_PULSEWIDTH   (int)   1000     // the shortest pulse sent to a ESC  
-#define MAX_PULSEWIDTH   (int)   2000     // the longest pulse sent to a ESC
-#define MIN_VELOCITY             37
+
+#define MIN_PULSEWIDTH   (int)   1450     // the shortest pulse sent to a ESC  
+#define MAX_PULSEWIDTH   (int)   2400     // the longest pulse sent to a ESC
+#define MIN_VELOCITY             0
+#define MAX_VELOCITY             100
 
 class BrushlessMotor{
 
 public:
-	BrushlessMotor(): m_enabled(false), m_velocity(0), m_wheelRadius(1 / (2 * M_PI)), m_constant(1){}
+	BrushlessMotor(): m_enabled(false), m_velocity(0){}
 
 	void attach(int PIN);
     void detach();
 
-    void setVelocity   (float velocity){m_velocity = velocity; update();}
-
-    void setConstant   (float constant)   {m_constant    = constant;    update();}
-    void setWheelRadius(float wheelRadius){m_wheelRadius = wheelRadius; update();}
-
-
 	void enable();
 	void disable();
+    void setVelocity(float velocity);
+	void setPulsewidth(int pulsewidth);
 
-    float getVelocity   () const {return m_velocity;}
-    float getConstant   () const {return m_constant;}
-    float getWheelRadius() const {return m_wheelRadius;}
-    bool  isEnabled     () const {return m_enabled;}
+    float getVelocity() const {return m_velocity;}
+    bool  isEnabled() const {return m_enabled;}
 
-    int retour();
-
-    float getMaxVelocity() const;
-
-    void load(int address);
-    void save(int address) const;
+    int readMicroseconds();
 
 private:
-
-	void update();
 
     Servo m_esc;
     bool  m_enabled ;
 
-    float m_velocity; // in mm/s (millimeters per second)
-    float m_wheelRadius; // in mm
-    float m_constant; // (60 * reduction_ratio / velocity_constant_in_RPM) / supplied_voltage_in_V
-
+    int m_velocity; // in %
 };
 
 #endif // __BRUSHLESSMOTOR_H__

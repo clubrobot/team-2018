@@ -25,3 +25,7 @@ void WRITE_OUTDOOR(SerialTalks &inst, Deserializer &input, Serializer &output){
 void WRITE_TRASH(SerialTalks &inst, Deserializer &input, Serializer &output){
 	trash.write(input.read<int>());
 }
+
+void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){
+	output.write<float>(motor.getVelocity());
+}

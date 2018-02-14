@@ -70,7 +70,7 @@ class TCPTalks
 
 	int port;
 
-	char* password;
+	char* password = "";
 
 	bool is_connected;
 	bool is_authentificated;
