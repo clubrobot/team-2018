@@ -107,7 +107,10 @@ class SerialTalks:
 			self.reset_queues()
 			
 	def disconnect(self):
-		self.send(DISCONNECT_OPCODE)
+		try:
+			self.send(DISCONNECT_OPCODE)
+		except NotConnectedError :
+			pass
 		# Stop the listening thread
 		if hasattr(self, 'listener') and self.listener.is_alive():
 			self.listener.stop.set()
