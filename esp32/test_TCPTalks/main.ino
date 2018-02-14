@@ -18,7 +18,7 @@ void setup() {
 
     talk.connect(5000);
 
-    talk.bind(0x05, SWITCH_LED);
+    talk.bind(0x12, SWITCH_LED);
 
 }
 

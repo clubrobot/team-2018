@@ -8,6 +8,24 @@ Pickler::Pickler(uint8_t* frame)
 	num = 0;
 }
 
+void Pickler::start_frame()
+{
+	// frame[ptr] = (byte)PROTO; 
+ //    ptr++;
+ //    frame[ptr] = (byte)DEFAULT_PROTOCOL;
+ //    ptr++;
+ //    frame[ptr] = (byte)SHORT_BINBYTES;
+ //    ptr++;
+ //    frame[ptr] = (byte)0X01;
+ //    ptr++;
+    // frame[ptr] = (byte)TCPTALKS_SLAVE_BYTE;
+    // ptr++;
+    // frame[ptr] = (byte)BINPUT;
+    // ptr++;
+    // frame[ptr] = (byte)0X00;
+    // ptr++;
+}
+
 void Pickler::end_frame()
 {
 	size_t size;
@@ -27,8 +45,6 @@ void Pickler::end_frame()
 	current_frame[ptr] = (uint8_t)0X01;
 	ptr++;
 	current_frame[ptr] = (uint8_t)'\0';	
-
-	
 }
 
 template<>
@@ -66,11 +82,11 @@ void Pickler::dump<long>(long var)
 		ptr++;
 		return;
 	}
-
-	if((var >= (-0x80000000)) && (var <= 0x7fffffff))
+	else
 	{
-		current_frame[ptr] = (uint8_t) BININT;// long en uint8_t
-		ptr++;
+		Serial.println(sizeof(var));
+		current_frame[ptr] = BININT;
+        ptr++;
 		current_frame[ptr] = (uint8_t) var;
 		ptr++;
 		current_frame[ptr] = (uint8_t) (var>>8);
@@ -79,6 +95,8 @@ void Pickler::dump<long>(long var)
 		ptr++;
 		current_frame[ptr] = (uint8_t) (var>>24);
 		ptr++;
+		current_frame[ptr] = 0X00;
+        ptr++;
 		return;
 	}
 }
