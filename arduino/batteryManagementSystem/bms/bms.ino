@@ -67,32 +67,34 @@ void setup() {
 #if WRITE_CONFIG
 	Serial.print("Update AFE CELL MAP : ");
 	Serial.println(writeDataFlashU2(AFE_CELL_MAP,(uint16_t)0x0013));
-  delay(200);
+  	delay(200);
   
 	Serial.print("Update MFG INIT : ");
 	Serial.println(writeDataFlashU2(MANUFACTURING_STATUS_INIT,(uint16_t)0x0230));
-  delay(200);
+  	delay(200);
  
 	Serial.print("Update FET OPTIONS : ");
 	Serial.println(writeDataFlashU2(FET_OPTIONS,(uint16_t)0x0001));
-  delay(200);
+  	delay(200);
   
 	Serial.print("Update DESIGN CAPACITY : ");
 	Serial.println(writeDataFlashI2(DESIGN_CAPACITY_MA_CONFIG,(int16_t)1650));
 	delay(200);
 #endif
 
-  readWordFromManufacturerAccess(DEVICE_RESET);
-  delay(1000);
+  	readWordFromManufacturerAccess(DEVICE_RESET);
+  	delay(1000);
 	Serial.print("Design Capacity mA : ");
 	Serial.println((uint16_t)readWord(DESIGN_CAPACITY));
 	Serial.print("Operation Status - Length :");
 	uint8_t length = readBlockFromManufacturerBlockAccess((uint16_t)0, dataBuffer, DATA_BUFFER_LENGTH);
 	Serial.print(length);
-	Serial.print(" - 0b");
+	Serial.print(" - 0x");
 	for(uint8_t i=0; i<length; i++){
 		Serial.print(dataBuffer[i],HEX);
 	}
+	Serial.print("Security Keys : ");
+	Serial.println(readU32FromManufacturerAccess((uint16_t)0x0035), HEX);
 }
 
 
@@ -245,7 +247,7 @@ bool writeDataFlashI4(uint16_t address, int32_t dataI4){
 	return ackData;
 }
 
-int readWordFromManufacturerAccess(uint16_t aCommand) {
+uint16_t readWordFromManufacturerAccess(uint16_t aCommand) {
 	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
 	i2c_write(MANUFACTURER_ACCESS);
 	// Write manufacturer command word
@@ -260,17 +262,37 @@ int readWordFromManufacturerAccess(uint16_t aCommand) {
 	uint8_t tLSB = i2c_read(false);
 	uint8_t tMSB = i2c_read(true);
 	i2c_stop();
-	return (int) tLSB | (((int) tMSB) << 8);
+	return (uint16_t) tLSB | (((uint16_t) tMSB) << 8);
 }
 
-int readWord(uint8_t aFunction) {
+uint32_t readU32FromManufacturerAccess(uint16_t aCommand) {
+	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
+	i2c_write(MANUFACTURER_ACCESS);
+	// Write manufacturer command word
+	i2c_rep_start((sI2CDeviceAddress << 1) | I2C_WRITE);
+	i2c_write(aCommand);
+	i2c_write(aCommand >> 8);
+	i2c_stop();
+	// Read manufacturer result word
+	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
+	i2c_write(MANUFACTURER_ACCESS);
+	i2c_rep_start((sI2CDeviceAddress << 1) | I2C_READ);
+	uint8_t u1LSB = i2c_read(false);
+	uint8_t u1MSB = i2c_read(false);
+	uint8_t u2LSB = i2c_read(false);
+	uint8_t u2MSB = i2c_read(true);
+	i2c_stop();
+	return ((uint32_t) u1LSB << 16) | ((uint32_t) u1MSB << 24) | (uint32_t) u2LSB | ((uint32_t) u2MSB << 8);
+}
+
+uint16_t readWord(uint8_t aFunction) {
 	i2c_start((sI2CDeviceAddress << 1) | I2C_WRITE);
 	i2c_write(aFunction);
 	i2c_rep_start((sI2CDeviceAddress << 1) | I2C_READ);
 	uint8_t tLSB = i2c_read(false);
 	uint8_t tMSB = i2c_read(true);
 	i2c_stop();
-	return (int) tLSB | (((int) tMSB) << 8);
+	return (uint16_t) tLSB | (((uint16_t) tMSB) << 8);
 }
 
 uint8_t readBlockFromManufacturerBlockAccess(uint16_t aCommand, uint8_t* aDataBufferPtr, uint8_t aDataBufferLength) {
@@ -278,7 +300,7 @@ uint8_t readBlockFromManufacturerBlockAccess(uint16_t aCommand, uint8_t* aDataBu
 	i2c_write(MANUFACTURER_BLOCK_ACCESS);
 	i2c_write((uint8_t)2);
 	// Write manufacturer command word
-	i2c_write(aCommand);
+	i2c_write(aCommand & 0xFF);
 	i2c_write(aCommand >> 8);
 	i2c_stop();
 
@@ -307,6 +329,30 @@ uint8_t readBlockFromManufacturerBlockAccess(uint16_t aCommand, uint8_t* aDataBu
 uint8_t readBlock(uint8_t aCommand, uint8_t* aDataBufferPtr, uint8_t aDataBufferLength) {
 	i2c_start((sI2CDeviceAddress << 1) + I2C_WRITE);
 	i2c_write(aCommand);
+	i2c_rep_start((sI2CDeviceAddress << 1) + I2C_READ);
+
+	// First read length of data
+	uint8_t tLengthOfData = i2c_read(false);
+	if (tLengthOfData > aDataBufferLength) {
+		tLengthOfData = aDataBufferLength;
+	}
+
+	// then read data
+	uint8_t tIndex;
+	for (tIndex = 0; tIndex < tLengthOfData - 1; tIndex++) {
+		aDataBufferPtr[tIndex] = i2c_read(false);
+	}
+	// Read last byte with "true"
+	aDataBufferPtr[tIndex++] = i2c_read(true);
+
+	i2c_stop();
+	return tLengthOfData;
+}
+
+uint8_t readBlockDataFlash(uint8_t aCommand, uint8_t* aDataBufferPtr, uint8_t aDataBufferLength) {
+	i2c_start((sI2CDeviceAddress << 1) + I2C_WRITE);
+	i2c_write(aCommand & 0xFF);
+	i2c_write(aCommand >> 8);
 	i2c_rep_start((sI2CDeviceAddress << 1) + I2C_READ);
 
 	// First read length of data
