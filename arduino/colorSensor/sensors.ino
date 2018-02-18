@@ -14,6 +14,8 @@ void setup() {
   Serial.begin(SERIALTALKS_BAUDRATE);
   talks.begin(Serial);
   talks.bind(GET_COLOR_OPCODE, GET_COLOR);
+  talks.bind(ENABLE_LED_OPCODE, ENABLE_LED);
+  talks.bind(DISABLE_LED_OPCODE, DISABLE_LED)
   sensor.begin();
   pinMode(12, OUTPUT);
 }
