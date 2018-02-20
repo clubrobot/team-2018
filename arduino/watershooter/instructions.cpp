@@ -3,13 +3,15 @@
 #include "PIN.h"
 #include "../common/SerialTalks.h"
 #include "../common/BrushlessMotor.h"
-#include "../common/ColorSensor.h"
+#include "../common/Adafruit_TCS34725.h"
+#include "../common/Wire.h"
 
 extern BrushlessMotor motor;
 extern Servo indoor;
 extern Servo outdoor;
 extern Servo trash;
-extern ColorSensor waterSensor;
+extern Adafruit_TCS34725 waterSensor;
+uint16_t red, green, blue, clear;
 
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output){
@@ -45,10 +47,8 @@ void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &outp
 }
 
 void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output){
-	int red = 0;//waterSensor.getRed();
-	int green = 0;//waterSensor.getGreen();
-	int blue = 0;//waterSensor.getBlue();
-
+	waterSensor.setInterrupt(false);
+    waterSensor.getRawData(&red, &green, &blue, &clear);
 	output.write<int>(red);
 	output.write<int>(green);
 	output.write<int>(blue);

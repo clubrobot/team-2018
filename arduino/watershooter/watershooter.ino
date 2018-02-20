@@ -5,14 +5,15 @@
 #include "instructions.h"
 #include "../common/BrushlessMotor.h"
 #include "../common/SerialTalks.h"
-//#include "../common/ColorSensor.h"
+#include "../common/Adafruit_TCS34725.h"
+#include "../common/Wire.h"
 
 
 BrushlessMotor motor;
 Servo indoor;
 Servo outdoor;
 Servo trash;
-//ColorSensor waterSensor;
+Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 #define DOOR_CLOSED 90
 #define TRASH_CLOSED 25
@@ -49,8 +50,7 @@ void setup(){
 	trash.write(TRASH_CLOSED);
 	outdoor.write(DOOR_CLOSED);
 	indoor.write(DOOR_CLOSED);
-
-	//waterSensor.setup();
+	waterSensor.begin();
 }
 
 void loop(){
