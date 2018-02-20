@@ -13,7 +13,7 @@ _SET_MOTOR_PULSEWIDTH_OPCODE	= 0x1A
 _GET_MOTOR_PULSEWIDTH_OPCODE	= 0x1B
 
 class WaterLauncher(SerialTalksProxy):	
-	def __init__(self,parent, uuid='/dev/arduino/watershooter'):
+	def __init__(self,parent, uuid='watershooter'):
 		SerialTalksProxy.__init__(self, parent, uuid)
 
 	def set_motor_velocity(self, velocity):

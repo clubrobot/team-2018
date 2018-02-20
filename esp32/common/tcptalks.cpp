@@ -40,7 +40,8 @@ TCPTalks::TCPTalks()
 {
 	
     //ip = "192.168.0.16";
-    ip = "192.168.1.13";
+    //ip = "192.168.1.13";
+    ip = "172.20.10.8";
     
 	port =  25565;
 
@@ -52,8 +53,11 @@ TCPTalks::TCPTalks()
 	// ssid = "NUMERICABLE-9251_2GEXT";
 	// pass = "26338b5a57";
 
-    ssid = "CLUB_ROBOT";
-    pass = "zigouigoui";
+    // ssid = "CLUB_ROBOT";
+    // pass = "zigouigoui";
+
+    ssid = "iPhone_Mathis";
+    pass = "azertyuiop";
 
 }
 
