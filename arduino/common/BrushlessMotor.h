@@ -15,7 +15,7 @@
 class BrushlessMotor: public PeriodicProcess {
 
 public:
-	BrushlessMotor(): m_enabled(false), m_velocity(0), timeDelay(0){}
+	BrushlessMotor(): m_enabled(false), m_velocity(0), timeDelay(0), processingSetup(false){}
 
 	void attach(int PIN);
     void detach();
@@ -25,8 +25,8 @@ public:
     void updateSetup();
     void enableMotor();
     void disableMotor();
-    void setVelocity(int velocity);
-	void setPulsewidth(int pulsewidth);
+    bool setVelocity(int velocity);
+	bool setPulsewidth(int pulsewidth);
     void update();
     void setupRise();
     void setupFall();
@@ -37,7 +37,7 @@ public:
     int readMicroseconds();
 
 private:
-
+    bool processingSetup;
     Servo m_esc;
     bool  m_enabled ;
     unsigned long timeDelay;

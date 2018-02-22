@@ -3,7 +3,7 @@
 import time
 import math
 
-from serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
+from serialtalks import BYTE, INT, LONG, FLOAT, BOOL, SerialTalks
 from components import SerialTalksProxy
 
 
@@ -17,7 +17,13 @@ class WaterLauncher(SerialTalksProxy):
 		SerialTalksProxy.__init__(self, parent, uuid)
 
 	def set_motor_velocity(self, velocity):
-		self.send(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
+		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
+		inSetup = output.read(BOOL)
+		if(inSetup):
+			msg = "Please wait, ESC in setup..."
+		else:
+			msg = ""
+		return msg
 
 	def get_motor_velocity(self):
 		output = self.execute(_GET_MOTOR_VELOCITY_OPCODE)
@@ -29,7 +35,13 @@ class WaterLauncher(SerialTalksProxy):
 		self.set_motor_velocity(velocity)
 
 	def set_motor_pulsewidth(self, pulsewidth):
-		self.send(_SET_MOTOR_PULSEWIDTH_OPCODE, INT(pulsewidth))
+		output = self.execute(_SET_MOTOR_PULSEWIDTH_OPCODE,INT(pulsewidth))
+		inSetup = output.read(BOOL)
+		if(inSetup):
+			msg = "Please wait, ESC in setup..."
+		else:
+			msg = ""
+		return msg
 
 	def get_motor_pulsewidth(self):
 		output = self.execute(_GET_MOTOR_PULSEWIDTH_OPCODE)
