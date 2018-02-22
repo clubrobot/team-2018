@@ -42,7 +42,6 @@ void setup()
 	ledmatrix3.setTimestep(LED_MATRIX_TIMESTEP);
 	ledmatrix3.enable();
 
-	
 
 }
 
