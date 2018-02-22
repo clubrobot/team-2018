@@ -14,7 +14,7 @@
 #endif
 
 #ifndef TCPTALKS_MAX_OPCODE
-#define TCPTALKS_MAX_OPCODE 0x10
+#define TCPTALKS_MAX_OPCODE 0x20
 #endif
 
 #define TCPTALKS_MASTER_BYTE (uint8_t)'R'

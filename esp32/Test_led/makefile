@@ -17,7 +17,11 @@ LIBS = $(ESP_LIBS)/EEPROM \
 	   $(COMMON)/FastLED/lib8tion.cpp \
 	   $(COMMON)/FastLED/noise.cpp \
 	   $(COMMON)/FastLED/power_mgt.cpp \
-	   $(COMMON)/FastLED/wiring.cpp
+	   $(COMMON)/FastLED/wiring.cpp \
+	   $(COMMON)/DomotiquePannel.cpp \
+	   $(COMMON)/PannelÈffects.cpp
+
+
 
 
 

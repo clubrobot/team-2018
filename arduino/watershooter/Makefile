@@ -10,8 +10,12 @@ LOCAL_INO_SRCS = watershooter.ino
 LOCAL_CPP_SRCS = \
     instructions.cpp \
     $(COMMON)/SerialTalks.cpp \
-    $(COMMON)/BrushlessMotor.cpp
+    $(COMMON)/BrushlessMotor.cpp \
+	$(COMMON)/Adafruit_TCS34725.cpp \
+	$(COMMON)/Wire.cpp
 
+LOCAL_C_SRCS = \
+	$(COMMON)/twi.c
 
 
 #sketch libraries

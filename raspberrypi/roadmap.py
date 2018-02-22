@@ -18,6 +18,24 @@ def intersect(A, B):
 		tB = (-dyA * (xB - xA) + dxA * (yB - yA)) / det
 		return tA > 0 and tA < 1 and tB > 0 and tB < 1
 
+class Obstacle:
+    def __init__(self,roadmap ,shape):
+        self.roadmap  = roadmap
+        self.shape    = shape
+        self.position = (-1000,-1000)
+        self.edges    = set()
+
+    def get_shape(self):
+        return [(a+self.position[0],b+self.position[1]) for (a,b) in self.shape]
+
+    def set_position(self,x,y):
+        self.position = (x,y)
+        self.roadmap.reset_obstacle(self)
+        self.roadmap.cut_obstacle(self)
+    
+    def disable(self):
+        self.roadmap.reset_obstacle(self)
+
 class RoadMap:
 
 	def __init__(self, vertices=list(), edges=set()):
@@ -38,6 +56,25 @@ class RoadMap:
 			target = self.graph.vs[edge.target]['coords']
 			if intersect((source, target), cutline):
 				edge['weight'] = math.inf
+				
+    def create_obstacle(self, shape):
+        return Obstacle(self,shape)
+
+    def cut_obstacle(self, obstacle):
+        obstacle_shape = obstacle.get_shape()
+        for edge in self.graph.es:
+            source = self.graph.vs[edge.source]['coords']
+            target = self.graph.vs[edge.target]['coords']
+            for i in range(len(obstacle_shape)):
+                cutline = (obstacle_shape[i], obstacle_shape[(i+1)%len(obstacle_shape)])
+                if intersect((source, target), cutline):
+                    edge['weight'] = math.inf
+                    obstacle.edges.add(edge)
+
+    def reset_obstacle(self, obstacle):
+        for edge in obstacle.edges:
+            vertex = self.graph.vs[edge.target]['coords']
+            edge['weight'] = self.get_vertex_distance(edge.source, vertex)
 
 	def get_vertex_distance(self, vid, vertex):
 		x0, y0 = self.graph.vs[vid]['coords']
