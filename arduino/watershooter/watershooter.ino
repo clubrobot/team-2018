@@ -37,7 +37,10 @@ void setup(){
     pinMode(SERVO2, OUTPUT);
 	pinMode(SERVO3, OUTPUT);
 	pinMode(SERVO4, OUTPUT);
+	pinMode(SWITCH1 INPUT_PULLUP);
 
+	attachInterrupt(digitalPinToInterrupt(SWITCH1), setupESC, CHANGE);
+	
 	motor.attach(SERVO4);
 	motor.enable();
 	motor.setVelocity(MIN_VELOCITY);
@@ -53,8 +56,18 @@ void setup(){
 	//waterSensor.setup();
 }
 
+void setupESC(){
+	if(digitalRead(SWITCH1)==HIGH){
+		motor.setupRise(true);
+		motor.enableSetup();
+	} else {
+		motor.setupFall();
+	}
+}
+
 void loop(){
      talks.execute();
+	 motor.updateSetup();
 }
 
 
