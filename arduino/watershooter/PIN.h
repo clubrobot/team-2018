@@ -82,13 +82,14 @@ TOR_2 		8
 */
 // Servos
 
-#define SERVO1 A4
-#define SERVO2 A5
+#define SERVO1 5
+#define SERVO2 6
 #define SERVO3 A3
 #define SERVO4 A2
+#define SERVO5 9
+#define SERVO6 10
 
-
-
+#define LED 12
 
 //V1.0
 //Serial : 

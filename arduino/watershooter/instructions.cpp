@@ -62,3 +62,11 @@ void GET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &ou
 	int pulsewidth = motor.readMicroseconds();
 	output.write<int>(pulsewidth);
 }
+
+void SET_LED_ON(SerialTalks& inst, Deserializer& input, Serializer& output){
+	digitalWrite(LED, HIGH);
+}
+
+void SET_LED_OFF(SerialTalks& inst, Deserializer& input, Serializer& output){
+	digitalWrite(LED, LOW);
+}
