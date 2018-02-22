@@ -6,13 +6,7 @@ import math
 
 from serialtalks import BYTE, INT, LONG, FLOAT
 from components import SerialTalksProxy
-"""
-t= SerialTalks('/dev/ttyACM0')
-t.bind(10,button)
-t.bind(11,emergency)
-t.bind(12,tirette)
-t.bind(13,mode)
-"""
+
 LED_ON_OPCODE	= 0x011
 LED_OFF_OPCODE	= 0x012
 class ButtonCard (SerialTalksProxy):
