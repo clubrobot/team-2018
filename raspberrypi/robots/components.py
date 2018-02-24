@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+import sys
+sys.path.append("../common/")
+
 
 import os
 from types import MethodType
-
 from tcptalks import TCPTalks, TCPTalksServer
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566

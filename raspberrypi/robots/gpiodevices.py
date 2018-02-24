@@ -1,6 +1,9 @@
 from RPi import GPIO
 import time
 #10 GPIO.BOARD
+import sys
+sys.path.append("../common/")
+
 
 class Device:
 	list_pin = [0] * 59
