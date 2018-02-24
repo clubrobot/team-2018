@@ -13,6 +13,11 @@ LOCAL_CPP_SRCS = \
 # Sketch libraries
 ARDUINO_LIBS = EEPROM Servo
 
+
+#Define constant
+
+CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
+
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
 MODULEMK_DIR = ..
