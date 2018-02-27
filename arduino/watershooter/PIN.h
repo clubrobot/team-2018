@@ -82,8 +82,8 @@ TOR_2 		8
 */
 // Servos
 
-#define SERVO1 5
-#define SERVO2 6
+#define SERVO1 6
+#define SERVO2 5
 #define SERVO3 A3
 #define SERVO4 A2
 #define SERVO5 9
