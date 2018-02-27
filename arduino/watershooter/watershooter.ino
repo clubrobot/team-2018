@@ -41,11 +41,14 @@ void setup(){
     pinMode(SERVO2, OUTPUT);
 	pinMode(SERVO3, OUTPUT);
 	pinMode(SERVO4, OUTPUT);
+	pinMode(SERVO5, OUTPUT);
+	pinMode(SERVO6, OUTPUT);
+	pinMode(BRUSHLESS, OUTPUT);
 	pinMode(SWITCH1 INPUT_PULLUP);
 
 	attachInterrupt(digitalPinToInterrupt(SWITCH1), setupESC, CHANGE);
 	
-	motor.attach(SERVO4);
+	motor.attach(BRUSHLESS);
 	motor.enable();
 	motor.setVelocity(MIN_VELOCITY);
 
