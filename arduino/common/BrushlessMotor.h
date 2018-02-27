@@ -28,7 +28,7 @@ public:
     bool setVelocity(int velocity);
 	bool setPulsewidth(int pulsewidth);
     void update();
-    void setupRise();
+    void setupRise(bool start);
     void setupFall();
 
     float getVelocity() const {return map(m_velocity,0,180,0,100);}
@@ -42,6 +42,8 @@ private:
     bool  m_enabled ;
     unsigned long timeDelay;
     int m_velocity; // in %
+
+protected:
     virtual void process(float timestep);
 };
 

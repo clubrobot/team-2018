@@ -18,6 +18,7 @@ Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 #define DOOR_CLOSED 90
 #define TRASH_CLOSED 25
 
+void setupESC();
 
 void setup(){
     Serial.begin(SERIALTALKS_BAUDRATE);
@@ -41,7 +42,7 @@ void setup(){
     pinMode(SERVO2, OUTPUT);
 	pinMode(SERVO3, OUTPUT);
 	pinMode(SERVO4, OUTPUT);
-	pinMode(SWITCH1 INPUT_PULLUP);
+	pinMode(SWITCH1, INPUT_PULLUP);
 
 	attachInterrupt(digitalPinToInterrupt(SWITCH1), setupESC, CHANGE);
 	
