@@ -222,7 +222,6 @@ bool SerialTalks::execute()
 			}
 		}
 	}
-
 	return ret;
 }
 

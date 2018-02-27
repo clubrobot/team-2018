@@ -5,10 +5,6 @@
 #include "Pickle.h"
 #include <WiFi/src/WiFi.h>
 
-#ifndef EEPROM_SIZE
-#define EEPROM_SIZE 1024
-#endif
-
 #ifndef TCPTALKS_INPUT_BUFFER_SIZE
 #define TCPTALKS_INPUT_BUFFER_SIZE 64
 #endif
@@ -21,23 +17,8 @@
 #define TCPTALKS_MAX_OPCODE 0x20
 #endif
 
-#ifndef TCPTALKS_UUID_ADDRESS
-#define TCPTALKS_UUID_ADDRESS 0x0000000000
-#endif
-
-#ifndef TCPTALKS_UUID_LENGTH
-#define TCPTALKS_UUID_LENGTH	32
-#endif
-
 #define TCPTALKS_MASTER_BYTE (uint8_t)'R'
 #define TCPTALKS_SLAVE_BYTE  (uint8_t)'A'
-
-#define TCPTALKS_PING_OPCODE       0x0
-#define TCPTALKS_GETUUID_OPCODE    0x1
-#define TCPTALKS_SETUUID_OPCODE    0x2
-#define TCPTALKS_DISCONNECT_OPCODE 0x3
-#define TCPTALKS_GETEEPROM_OPCODE  0x4
-#define TCPTALKS_SETEEPROM_OPCODE  0x5
 
 #define AUTHENTIFICATION_OPCODE 0xAA
 
@@ -82,11 +63,6 @@ class TCPTalks
 
 	int sendback(uint8_t opcode, long retcode, byte * args);
 
-	bool getUUID(char* uuid);
-	void setUUID(const char* uuid);
-
-	static void generateRandomUUID(char* uuid, int length);
-
 		
 	protected: // Protected methods
 
@@ -121,14 +97,7 @@ class TCPTalks
 	byte  m_inputBuffer [TCPTALKS_INPUT_BUFFER_SIZE];
 	byte  m_outputBuffer[TCPTALKS_OUTPUT_BUFFER_SIZE];
 
-	private:
 
-	static void PING   (TCPTalks& inst, UnPickler& input, Pickler& output);
-	static void GETUUID(TCPTalks& inst, UnPickler& input, Pickler& output);
-	static void SETUUID(TCPTalks& inst, UnPickler& input, Pickler& output);
-	static void DISCONNECT(TCPTalks& inst, UnPickler& input, Pickler& output){ESP.restart();}
-	static void GETEEPROM(TCPTalks& inst, UnPickler& input, Pickler& output);
-	static void SETEEPROM(TCPTalks& inst, UnPickler& input, Pickler& output);
 };
 
 

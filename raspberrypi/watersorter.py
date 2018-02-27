@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
-sys.path.append("../common/")
-
 import time
 import math
 
@@ -17,8 +14,6 @@ _GET_OUTDOOR_OPCODE       =  0X14
 _WRITE_TRASH_OPCODE       =  0x15
 _GET_TRASH_OPCODE         =  0x16
 _GET_WATER_COLOR_OPCODE   =  0x19
-_LED_ON_OPCODE            =  0x1C
-_LED_OFF_OPCODE           =  0x1D
 
 DOOR_CLOSED = 90
 DOOR_OPEN = 30
@@ -75,9 +70,3 @@ class WaterSorter(SerialTalksProxy):
         output = self.execute(_GET_WATER_COLOR_OPCODE)
         color = output.read(INT, INT, INT)
         return color
-
-    def led_off(self):
-        self.send(_LED_OFF_OPCODE,BYTE(1))
-
-    def led_on(self):
-        self.send(_LED_ON_OPCODE,BYTE(1))

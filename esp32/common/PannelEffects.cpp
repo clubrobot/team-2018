@@ -1,7 +1,4 @@
-#include <Arduino.h>
-#include <FastLED/FastLED.h>
 #include "PannelEffects.h"
-
 
 /* Constuctor */
 PannelEffects::PannelEffects()
@@ -14,20 +11,16 @@ PannelEffects::PannelEffects()
   	LEDS.addLeds<CHIPSET, BAR_PIN, COLOR_ORDER>(leds_bar,NUM_LEDS_BAR);
 
   	LEDS.setBrightness(BRIGHTNESS);
-
-    animation[FIRE]  = fire_effect;
-    animation[CYLON] = cylon;
 }
 
 
 /* public methodes */
-void PannelEffects::execute_animation()
-{
-  /* execute animation */
-  animation[id_a_engr](leds_engr, NUM_LEDS_ENGR);
-  animation[id_a_logo](leds_logo, NUM_LEDS_LOGO);
-  animation[id_a_bar ](leds_bar, NUM_LEDS_BAR);
-}
+
+
+
+
+
+
 
 /* Private methods */
 

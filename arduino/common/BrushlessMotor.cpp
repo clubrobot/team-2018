@@ -37,10 +37,10 @@ bool BrushlessMotor::setVelocity(int velocity)
         m_velocity = velocity > MAX_VELOCITY ? MAX_PULSEWIDTH : MIN_PULSEWIDTH;
     }
     if (m_enabled == true) {
-        return this.setPulsewidth(m_velocity);
+        return this->setPulsewidth(m_velocity);
     }
     else {
-        return this.setPulsewidth(MIN_PULSEWIDTH);
+        return this->setPulsewidth(MIN_PULSEWIDTH);
     }
 }
 
@@ -58,11 +58,11 @@ void BrushlessMotor::setupRise(bool start){
     if(start){ 
         timeDelay = millis();           //ESC just went back on -> start counting time
     } else {
-        if(timeDelay > 5000){
+        if(timeDelay > 3000){
             m_esc.writeMicroseconds(MIN_PULSEWIDTH);   //After 5 seconds, write MIN_PULSEWIDTH to setup ESC min
         }
-        if(timeDelay > 6200){
-            this.disableSetup();        //End of setup
+        if(timeDelay > 4200){
+            this->disableSetup();        //End of setup
             processingSetup = false;
         }
     }
@@ -74,17 +74,17 @@ void BrushlessMotor::setupFall(){
 }
 
 void BrushlessMotor::enableSetup(){
-	this.enable();
+	enable();
 }
 
 void BrushlessMotor::disableSetup(){
-	this.disable();
+	disable();
 }
 
 void BrushlessMotor::updateSetup(){
-	this.update();
+	PeriodicProcess::update();
 }
 
-void BrushlessMotor::process(){
-    this.setupRise(false);
+void BrushlessMotor::process(float timestep){
+    this->setupRise(false);
 }

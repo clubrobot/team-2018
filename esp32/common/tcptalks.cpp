@@ -1,10 +1,8 @@
 #include <Arduino.h>
 #include "tcptalks.h"
 #include "Pickle.h"
-#include "EEPROM.h"
 #include <WiFi/src/WiFi.h>
 
-TCPTalks tcpt;
 
 void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
 {
@@ -26,53 +24,24 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         digitalWrite(2, LOW);
     }
 
-    // output.dump<bool>(var);
-     output.dump<long>(10);
-    // output.dump<double>(1.1);
-    
-    //output.dump<char>(0X02);
+    output.dump<bool>(var);
+    output.dump<long>(10);
+    output.dump<double>(1.1);
     output.dump<long>(11);
+    output.dump<long>(999999);
 
     //output.dump<char*>("hello world");
-}
 
-void TCPTalks::PING(TCPTalks& inst, UnPickler& input, Pickler& output)
-{
-    output.dump<bool>(true);
-}
 
-void TCPTalks::GETUUID(TCPTalks& inst, UnPickler& input, Pickler& output)
-{
-    char uuid[TCPTALKS_UUID_LENGTH];
-    tcpt.getUUID(uuid);
-    output.dump<char*>(uuid);
-}
 
-void TCPTalks::SETUUID(TCPTalks& inst, UnPickler& input, Pickler& output)
-{   
-    char* uuid;//[TCPTALKS_UUID_LENGTH];
-    uuid = input.load<char*>();
-    tcpt.setUUID(uuid);
-}
-
-void TCPTalks::GETEEPROM(TCPTalks& inst, UnPickler& input, Pickler& output)
-{
-    int addr = input.load<long>();
-    output.dump<char>(EEPROM.read(addr));
-}
-
-void TCPTalks::SETEEPROM(TCPTalks& inst, UnPickler& input, Pickler& output)
-{
-    int addr = input.load<long>();
-    byte value = input.load<char>();
-    EEPROM.write(addr,value);
-    EEPROM.commit();
 }
 
 TCPTalks::TCPTalks()
-{	
-    //ip = "192.168.0.12";
-    ip = "192.168.1.13";
+{
+	
+    //ip = "192.168.0.16";
+    //ip = "192.168.1.13";
+    ip = "172.20.10.8";
     
 	port =  25565;
 
@@ -84,33 +53,11 @@ TCPTalks::TCPTalks()
 	// ssid = "NUMERICABLE-9251_2GEXT";
 	// pass = "26338b5a57";
 
-    ssid = "CLUB_ROBOT";
-    pass = "zigouigoui";
+    // ssid = "CLUB_ROBOT";
+    // pass = "zigouigoui";
 
-    //m_state = TCPTALKS_WAITING_STATE;
-
-    //Initialize EEPROM
- //   EEPROM.begin(EEPROM_SIZE);
-
-        // Initialize UUID stuff
-// #ifdef BOARD_UUID
-//     setUUID(BOARD_UUID);
-//     EEPROM.commit();
-// #else
-//     char uuid[SERIALTALKS_UUID_LENGTH];
-//     if (!getUUID(uuid) || uuid[0] == '\0')
-//     {
-//         generateRandomUUID(uuid, SERIALTALKS_DEFAULT_UUID_LENGTH);
-//         setUUID(uuid);
-//     }
-// #endif // BOARD_UUID
-
-    bind(TCPTALKS_PING_OPCODE,      TCPTalks::PING);
-    bind(TCPTALKS_GETUUID_OPCODE,   TCPTalks::GETUUID);
-    bind(TCPTALKS_SETUUID_OPCODE,   TCPTalks::SETUUID);
-    bind(TCPTALKS_DISCONNECT_OPCODE,TCPTalks::DISCONNECT);
-    bind(TCPTALKS_GETEEPROM_OPCODE, TCPTalks::GETEEPROM);
-    bind(TCPTALKS_SETEEPROM_OPCODE, TCPTalks::SETEEPROM);
+    ssid = "iPhone_Mathis";
+    pass = "azertyuiop";
 
 }
 
@@ -145,6 +92,8 @@ void TCPTalks::connect(int timeout)
 
     while(!client.connect(ip, port))
     {
+        Serial.print(".");
+        delay(5);
         long current_time = millis();
         if(current_time - last_time > timeout )
         {
@@ -244,23 +193,18 @@ bool TCPTalks::execute()
     int length = client.available();
 
     long currentTime = millis();
-
-    //Serial.println(currentTime);
-    if (m_state != TCPTALKS_WAITING_STATE && (currentTime - m_lastTime > 100)) // 0.1s timeout // 100  m_state != TCPTALKS_WAITING_STATE && 
+    if (m_state != TCPTALKS_WAITING_STATE && currentTime - m_lastTime > 100) // 0.1s timeout
     {
         // Abort previous communication
-        Serial.println("abort");
         m_state = TCPTALKS_WAITING_STATE;
     }
 
-    for (int i = 0; i < length ; i++)
+    for (int i = 0; i < length; i++)
     {
         // Read the incoming byte
         byte inc;
 
-        //Serial.println("in");
         client.read(&inc , 1);
-        //Serial.println("out");
 
         Serial.println(inc,HEX);
         m_lastTime = currentTime;
@@ -268,29 +212,28 @@ bool TCPTalks::execute()
         switch (m_state)
         {
         // An instruction always begin with the Master byte
-            case TCPTALKS_WAITING_STATE:
-                if (inc == TCPTALKS_MASTER_BYTE)
-                {
-                    m_state = TCPTALKS_INSTRUCTION_RECEIVING_STATE;
-                    m_bytesCounter = 0;
-                }
-               
-                Serial.println("wait...");
-                continue;
+        case TCPTALKS_WAITING_STATE:
+            if (inc == TCPTALKS_MASTER_BYTE)
+            {
+                m_state = TCPTALKS_INSTRUCTION_RECEIVING_STATE;
+                m_bytesCounter = 0;
+            }
+           
+            Serial.println("wait...");
+            continue;
 
-            case TCPTALKS_INSTRUCTION_RECEIVING_STATE:
-                m_inputBuffer[m_bytesCounter] = inc;
-                m_bytesCounter++;
+        case TCPTALKS_INSTRUCTION_RECEIVING_STATE:
+            m_inputBuffer[m_bytesCounter] = inc;
+            m_bytesCounter++;
 
-                Serial.println("exec");
-                if(inc == '.')
-                {
-                    is_connected = true;
-                    ret |= execinstruction(m_inputBuffer);
-                    m_state = TCPTALKS_WAITING_STATE;
-                    client.flush();
-                }
-                break;
+            Serial.println("exec");
+            if(inc == '.')
+            {
+                Serial.println();
+                is_connected = true;
+                ret |= execinstruction(m_inputBuffer);
+                m_state = TCPTALKS_WAITING_STATE;
+            }
         }
     }
     return ret;
@@ -410,54 +353,4 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
 
     Serial.println("");
     
-}
-
-bool TCPTalks::getUUID(char* uuid)
-{
-
-    for (int i = 0; i < EEPROM_SIZE; i++)
-    {
-        uuid[i] = EEPROM.read(TCPTALKS_UUID_ADDRESS + i);
-        switch(byte(uuid[i]))
-        {
-        case '\0': return true;
-        case 0xFF: return false;
-        default  : continue;
-        }
-    }
-    return false;
-}
-
-void TCPTalks::setUUID(const char* uuid)
-{
-    int i = 0;
-    do
-        EEPROM.write(TCPTALKS_UUID_ADDRESS + i, uuid[i]);
-    while(uuid[i++] != '\0');
-    EEPROM.commit();
-}
-
-
-
-
-void TCPTalks::generateRandomUUID(char* uuid, int length)
-{
-    // Initialize the random number generator
-    randomSeed(analogRead(0));
-
-    // Generate the UUID from a list of random hexadecimal numbers
-    for (int i = 0; i < length; i++)
-    {
-        if (i % 5 == 4)
-            uuid[i] = '-';
-        else
-        {
-            long digit = random(16);
-            if (digit < 10)
-                uuid[i] = char('0' + digit);
-            else
-                uuid[i] = char('a' + digit - 10);
-        }
-    }
-    uuid[length] = '\0';
 }

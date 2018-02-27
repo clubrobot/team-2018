@@ -12,7 +12,9 @@ LOCAL_CPP_SRCS = \
     $(COMMON)/SerialTalks.cpp \
     $(COMMON)/BrushlessMotor.cpp \
 	$(COMMON)/Adafruit_TCS34725.cpp \
-	$(COMMON)/Wire.cpp
+	$(COMMON)/Wire.cpp \
+	$(COMMON)/PeriodicProcess.cpp
+
 
 LOCAL_C_SRCS = \
 	$(COMMON)/twi.c
