@@ -5,8 +5,9 @@
 #include "../common/ButtonCard.h"
 
 ButtonCard buttonCard;
-int oldreadmode = 0;
+int oldreadmode = 1;
 long timeInverter, timeButton, timeTirette;
+int oldemergency = 0;
 
 void setup() {
   Serial.begin(SERIALTALKS_BAUDRATE);
@@ -27,8 +28,9 @@ void loop() {
          timeButton = millis();
      }
 }
-if (buttonCard.readEmergency() == HIGH){
+if (buttonCard.readEmergency() == LOW){
   Serializer emergency = talks.getSerializer();
+    oldreadmode = buttonCard.readMode();
     emergency.write<byte>(1);
     talks.send(2, emergency);
 }

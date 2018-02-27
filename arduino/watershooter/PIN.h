@@ -100,11 +100,11 @@ TOR_2 		8
 //EndStop : 
 #define SWITCH1		2
 #define SWITCH2		4
-
+#define BRUSHLESS  11
 //Driver : 
-#define DRIVER_RESET	12
+//#define DRIVER_RESET	12
 
-
+/*
 //Moteur: 
 #define MOTOR1_EN       6
 #define MOTOR1_PWM      3
@@ -112,7 +112,7 @@ TOR_2 		8
 #define MOTOR2_EN       9
 #define MOTOR2_PWM      11
 #define MOTOR2_DIR      10
-
+*/
 //TOR: 
 #define TOR_1 		7
 #define TOR_2 		8
