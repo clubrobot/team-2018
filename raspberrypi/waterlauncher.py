@@ -3,7 +3,7 @@
 import time
 import math
 
-from serialtalks import BYTE, INT, LONG, FLOAT, BOOL, SerialTalks
+from serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
 from components import SerialTalksProxy
 
 
@@ -18,7 +18,7 @@ class WaterLauncher(SerialTalksProxy):
 
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
-		inSetup = output.read(BOOL)
+		inSetup = BOOL(output.read(BYTE))
 		if(inSetup):
 			msg = "Please wait, ESC in setup..."
 		else:
