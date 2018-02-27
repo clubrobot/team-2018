@@ -37,11 +37,12 @@ public:
     int readMicroseconds();
 
 private:
-    bool processingSetup;
     Servo m_esc;
     bool  m_enabled ;
-    unsigned long timeDelay;
     int m_velocity; // in %
+    unsigned long timeDelay;
+    bool processingSetup;
+
 
 protected:
     virtual void process(float timestep);
