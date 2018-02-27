@@ -170,6 +170,22 @@ void Pickler::dump<char*>(char* var)
 	ptr++;
 }
 
+template<>
+void Pickler::dump<char>(char var)
+{
+	current_frame[ptr] = (uint8_t)SHORT_BINBYTES;
+	ptr++;
+	current_frame[ptr] = (uint8_t)0X01;
+	ptr++;
+	current_frame[ptr] = (uint8_t)var;
+	ptr++;
+    current_frame[ptr] = (uint8_t)BINPUT;
+    ptr++;
+    current_frame[ptr] = (uint8_t)0X00;
+    ptr++;
+
+}
+
 UnPickler::UnPickler(uint8_t* frame)
 {
 	current_frame = frame;
@@ -291,6 +307,19 @@ char* UnPickler::load<char*>()
 	ptr+= 2;
 
 	return tab; 
+}
+
+template<>
+char UnPickler::load<char>()
+{
+	if(current_frame[ptr] == SHORT_BINBYTES)
+	{
+		ptr+=2;
+		char tmp = current_frame[ptr];
+		ptr++;
+		return tmp;
+	}
+
 }
 
 bool UnPickler::is_tuple()

@@ -2,7 +2,7 @@ BOARD = esp32
 CHIP = esp32
 
 #Arduino file
-SKETCH = Blink.ino
+SKETCH = blink.ino
 
 BOARD_UUID = esp32
 COMMON = ../common
@@ -18,14 +18,21 @@ LIBS = $(ESP_LIBS)/EEPROM \
 	   $(COMMON)/FastLED/noise.cpp \
 	   $(COMMON)/FastLED/power_mgt.cpp \
 	   $(COMMON)/FastLED/wiring.cpp \
-	   $(COMMON)/DomotiquePannel.cpp \
-	   $(COMMON)/PannelÈffects.cpp
-
-
-
-
-
-
+	   $(COMMON)/Effects.cpp \
+	   $(COMMON)/tcptalks.cpp \
+	   $(COMMON)/WiFi/src/WiFi.cpp \
+	   $(COMMON)/WiFi/src/ETH.cpp \
+	   $(COMMON)/WiFi/src/WiFiAP.cpp \
+	   $(COMMON)/WiFi/src/WiFiClient.cpp \
+	   $(COMMON)/WiFi/src/WiFiGeneric.cpp \
+	   $(COMMON)/WiFi/src/WiFiMulti.cpp \
+	   $(COMMON)/WiFi/src/WiFiSTA.cpp \
+	   $(COMMON)/WiFi/src/WiFiScan.cpp \
+	   $(COMMON)/WiFi/src/WiFiServer.cpp \
+	   $(COMMON)/WiFi/src/WiFiUdp.cpp \
+	   $(COMMON)/Pickle.cpp \
+	   $(COMMON)/PeriodicProcess.cpp \
+	   instructions.cpp
 
 CPPFLAGS = -fexceptions
 # Congratulations! You made a pretty Makefile :)
