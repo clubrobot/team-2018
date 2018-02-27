@@ -58,10 +58,10 @@ void BrushlessMotor::setupRise(bool start){
     if(start){ 
         timeDelay = millis();           //ESC just went back on -> start counting time
     } else {
-        if(timeDelay > 5000){
+        if(timeDelay > 4000){
             m_esc.writeMicroseconds(MIN_PULSEWIDTH);   //After 5 seconds, write MIN_PULSEWIDTH to setup ESC min
         }
-        if(timeDelay > 6200){
+        if(timeDelay > 8000){
             this->disableSetup();        //End of setup
             processingSetup = false;
         }

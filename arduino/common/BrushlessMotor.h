@@ -8,7 +8,7 @@
 
 
 #define MIN_PULSEWIDTH           1000     // the shortest pulse sent to a ESC  
-#define MAX_PULSEWIDTH           1900     // the longest pulse sent to a ESC
+#define MAX_PULSEWIDTH           2000     // the longest pulse sent to a ESC
 #define MIN_VELOCITY             0
 #define MAX_VELOCITY             100
 
