@@ -50,7 +50,6 @@ void setup(){
 	attachInterrupt(digitalPinToInterrupt(SWITCH1), resetVelocity, CHANGE);
 	
 	motor.attach(BRUSHLESS);
-	motor.enable();
 	motor.setVelocity(MIN_VELOCITY);
 
 	indoor.attach(SERVO2);
@@ -64,12 +63,12 @@ void setup(){
 }
 
 void resetVelocity(){
-	motor.startupProcess();
+	motor.enableStartup();
 }
 
 void loop(){
-     talks.execute();
-	 motor.updateStartup();
+    talks.execute();
+	motor.updateStartup();
 }
 
 

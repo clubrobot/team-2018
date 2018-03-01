@@ -19,11 +19,10 @@ class WaterLauncher(SerialTalksProxy):
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
 		inSetup = output.read(INT)
-		if not inSetup :
-			msg = "Please wait, ESC in setup..."
-		else:
-			msg = ""
-		return msg
+		return inSetup
+		#if not inSetup :
+		#	return "Please wait, ESC in startup..."
+		
 
 	def get_motor_velocity(self):
 		output = self.execute(_GET_MOTOR_VELOCITY_OPCODE)
@@ -36,12 +35,10 @@ class WaterLauncher(SerialTalksProxy):
 
 	def set_motor_pulsewidth(self, pulsewidth):
 		output = self.execute(_SET_MOTOR_PULSEWIDTH_OPCODE,INT(pulsewidth))
-		inSetup = output.read(BOOL)
-		if(inSetup):
-			msg = "Please wait, ESC in startup..."
-		else:
-			msg = ""
-		return msg
+		inSetup = output.read(INT)
+		return inSetup
+		#if not inSetup:
+		#	return "Please wait, ESC in startup..."
 
 	def get_motor_pulsewidth(self):
 		output = self.execute(_GET_MOTOR_PULSEWIDTH_OPCODE)

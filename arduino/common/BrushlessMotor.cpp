@@ -4,7 +4,7 @@
 void BrushlessMotor::attach(int pin)
 {
     m_esc.attach(pin, MIN_PULSEWIDTH, MAX_PULSEWIDTH);
-    PeriodicProcess::setTimestep(0.001);
+    //PeriodicProcess::setTimestep(0.001);
 }
 
 void BrushlessMotor::detach()
@@ -37,7 +37,8 @@ int BrushlessMotor::setVelocity(int velocity)
         m_velocity = velocity > MAX_VELOCITY ? MAX_PULSEWIDTH : MIN_PULSEWIDTH;
     }
     if (m_enabled == true) {
-        return this->setPulsewidth(m_velocity);
+        /*return */this->setPulsewidth(m_velocity);
+        return m_velocity;
     }
     else {
         return this->setPulsewidth(MIN_PULSEWIDTH);
@@ -45,34 +46,27 @@ int BrushlessMotor::setVelocity(int velocity)
 }
 
 int BrushlessMotor::setPulsewidth(int pulsewidth) {
-    if(!processingSetup){
+    if(!processingStartup){
     	m_esc.writeMicroseconds(pulsewidth);
         return 1;
     } else {
-        return 0;
+        return 0 ;
     }
 }
 
-void BrushlessMotor::startupProcess(bool start){
-    processingStartup = true;
-    if(start){
-        m_esc.writeMicroseconds(MIN_PULSEWIDTH);
-        timeDelay = millis();           //ESC just went back on -> start counting time
-    } else {
-        if(millis() - timeDelay > 5000){
-            m_esc.writeMicroseconds(MIN_PULSEWIDTH);
-            this->disableStartup();        //Stay at min velocity for correct ESC startup
-            processingStartup = false;
-        }
-    }
+void BrushlessMotor::startupProcess(){
+    this->disableStartup();
 }
 
 void BrushlessMotor::enableStartup(){
-	enable();
+    m_esc.writeMicroseconds(MIN_PULSEWIDTH);   //ESC just went back on -> start counting time
+    processingStartup = true;
+    enable();
 }
 
 void BrushlessMotor::disableStartup(){
-	disable();
+	processingStartup = false;
+    disable();
 }
 
 void BrushlessMotor::updateStartup(){
@@ -80,5 +74,5 @@ void BrushlessMotor::updateStartup(){
 }
 
 void BrushlessMotor::process(float timestep){
-    this->setupRise(false);
+    this->startupProcess();
 }
