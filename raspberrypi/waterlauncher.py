@@ -19,7 +19,7 @@ class WaterLauncher(SerialTalksProxy):
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
 		inSetup = output.read(INT)
-		if(!inSetup):
+		if not inSetup :
 			msg = "Please wait, ESC in setup..."
 		else:
 			msg = ""
