@@ -18,7 +18,7 @@ Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 #define DOOR_CLOSED 90
 #define TRASH_CLOSED 25
 
-void setupESC();
+void resetVelocity();
 
 void setup(){
     Serial.begin(SERIALTALKS_BAUDRATE);
@@ -47,7 +47,7 @@ void setup(){
 	pinMode(BRUSHLESS, OUTPUT);
 	pinMode(SWITCH1, INPUT_PULLUP);
 
-	attachInterrupt(digitalPinToInterrupt(SWITCH1), setupESC, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(SWITCH1), resetVelocity, CHANGE);
 	
 	motor.attach(BRUSHLESS);
 	motor.enable();
@@ -63,18 +63,13 @@ void setup(){
 	waterSensor.begin();
 }
 
-void setupESC(){
-	if(digitalRead(SWITCH1)==HIGH){
-		motor.setupRise(true);
-		motor.enableSetup();
-	} else {
-		motor.setupFall();
-	}
+void resetVelocity(){
+	motor.startupProcess();
 }
 
 void loop(){
      talks.execute();
-	 motor.updateSetup();
+	 motor.updateStartup();
 }
 
 

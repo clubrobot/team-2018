@@ -28,7 +28,7 @@ public:
     bool setVelocity(int velocity);
 	bool setPulsewidth(int pulsewidth);
     void update();
-    void setupRise(bool start);
+    void startupProcess(bool start);
     void setupFall();
 
     float getVelocity() const {return map(m_velocity,0,180,0,100);}

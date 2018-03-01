@@ -39,7 +39,7 @@ void GET_TRASH(SerialTalks &inst, Deserializer &input, Serializer &output){
 }
 
 void SET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){
-	output.write<bool>(motor.setVelocity(input.read<int>()));
+	output.write<int>(motor.setVelocity(input.read<int>()));
 }
 
 void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){
@@ -55,7 +55,7 @@ void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output)
 }
 
 void SET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output) {
-	output.write<bool>(motor.setPulsewidth(input.read<int>()));
+	output.write<int>(motor.setPulsewidth(input.read<int>()));
 }
 
 void GET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output) {
