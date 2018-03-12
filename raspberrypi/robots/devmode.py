@@ -35,10 +35,10 @@ class ButtonGesture():
         self.buttons.affect(BLUE_BUTTON, self._select)
 
     def ip_funct(self):
-		ip = ''
-		while not ip:
-			proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
-			ip = proc.stdout.strip().decode('utf8')
+        ip = ''
+        while not ip:
+            proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
+            ip = proc.stdout.strip().decode('utf8')
         display.set_message(ip)
 
     def reboot_funct(self):
@@ -51,8 +51,8 @@ class ButtonGesture():
 
     def make_funct(self,arduino):
         arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
-		self.display.set_message("updating...")
-		subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
+        self.display.set_message("updating...")
+        subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
         self.reset()
 
     def pull_funct(self):
