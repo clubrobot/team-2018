@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+import sys
+sys.path.append("../common/")
 
 import time
 import math
@@ -23,10 +25,10 @@ class ColorSensor(SerialTalksProxy):
 		return r,g,b
 
 	def led_on(self, **kwargs):
-		self.send(LED_ON_OPCODE, BYTE(1))
+		self.send(_LED_ON_OPCODE, BYTE(1))
 	
 	def led_off(self, **kwargs):
-		self.send(LED_OFF_OPCODE, BYTE(1))
+		self.send(_LED_OFF_OPCODE, BYTE(1))
 
 		
 
