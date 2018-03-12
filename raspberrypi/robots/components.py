@@ -51,9 +51,13 @@ try:
 		def receive(self,input):
 			opcode = str(input.read(BYTE))+self.uuid
 			retcode= input.read(LONG)
+
 			try:
 				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
-			except TimeoutError:
+			except Exception:
+				etype, value, _ = sys.exc_info()
+				print("Error with an request from {} arduino".format(self.uuid))
+				print(etype, value)
 				return
 			if output is None : return
 			content = LONG(retcode) + output
