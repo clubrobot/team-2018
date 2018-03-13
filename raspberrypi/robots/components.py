@@ -6,7 +6,7 @@ sys.path.append("../common/")
 import os
 from types import MethodType
 
-from tcptalks import TCPTalks, TCPTalksServer
+from tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
 
@@ -54,6 +54,8 @@ try:
 
 			try:
 				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input,timeout=0.5)
+			except ConnectionError:
+				return
 			except Exception:
 				etype, value, _ = sys.exc_info()
 				print("Error with an request from {} arduino".format(self.uuid))
