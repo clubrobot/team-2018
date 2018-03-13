@@ -27,13 +27,13 @@ void loop() {
          talks.send(1, button);
          timeButton = millis();
      }
-}
+}/*
 if (buttonCard.readEmergency() == LOW){
   Serializer emergency = talks.getSerializer();
     oldreadmode = buttonCard.readMode();
     emergency.write<byte>(1);
     talks.send(2, emergency);
-}
+}*/
 if (buttonCard.readTirette() == LOW && millis() > timeTirette + 500){
   Serializer tirette = talks.getSerializer();
 
