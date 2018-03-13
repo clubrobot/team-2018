@@ -48,5 +48,5 @@ if (buttonCard.readMode() != oldreadmode && millis()>timeInverter+10){
     oldreadmode = buttonCard.readMode();
     talks.send(4, mode);
     timeInverter = millis();
-  }
-}*/
+  }*/
+}
