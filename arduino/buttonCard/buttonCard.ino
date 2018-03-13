@@ -20,20 +20,20 @@ void setup() {
 
 void loop() {
   talks.execute();
-  for (int i = 1; i < 5; i++){
+  for (int i = 0; i < 5; i++){
     if (buttonCard.readButton(i) == LOW && millis()>timeButton+500){
       Serializer button = talks.getSerializer();
          button.write<byte>(i);
          talks.send(1, button);
          timeButton = millis();
      }
-}
+}/*
 if (buttonCard.readEmergency() == LOW){
   Serializer emergency = talks.getSerializer();
     oldreadmode = buttonCard.readMode();
     emergency.write<byte>(1);
     talks.send(2, emergency);
-}
+}*/
 if (buttonCard.readTirette() == LOW && millis() > timeTirette + 500){
   Serializer tirette = talks.getSerializer();
 
