@@ -41,6 +41,7 @@ if (buttonCard.readTirette() == LOW && millis() > timeTirette + 500){
     talks.send(3, tirette);
     timeTirette = millis();
 }
+/*
 if (buttonCard.readMode() != oldreadmode && millis()>timeInverter+10){
   Serializer mode = talks.getSerializer();
     mode.write<byte>(buttonCard.readMode());
@@ -48,4 +49,4 @@ if (buttonCard.readMode() != oldreadmode && millis()>timeInverter+10){
     talks.send(4, mode);
     timeInverter = millis();
   }
-}
+}*/
