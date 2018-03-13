@@ -63,6 +63,10 @@ void GET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &ou
 	output.write<int>(pulsewidth);
 }
 
+void FORCE_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output){
+	motor.forcePulsewidth(input.read<int>());
+}
+
 void SET_LED_ON(SerialTalks& inst, Deserializer& input, Serializer& output){
 	digitalWrite(LED, HIGH);
 }

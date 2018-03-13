@@ -37,8 +37,7 @@ int BrushlessMotor::setVelocity(int velocity)
         m_velocity = velocity > MAX_VELOCITY ? MAX_PULSEWIDTH : MIN_PULSEWIDTH;
     }
     if (m_enabled == true) {
-        /*return */this->setPulsewidth(m_velocity);
-        return m_velocity;
+        return this->setPulsewidth(m_velocity);
     }
     else {
         return this->setPulsewidth(MIN_PULSEWIDTH);
@@ -52,6 +51,10 @@ int BrushlessMotor::setPulsewidth(int pulsewidth) {
     } else {
         return 0 ;
     }
+}
+
+void BrushlessMotor::forcePulsewidth(int pulsewidth){
+    m_esc.writeMicroseconds(pulsewidth);
 }
 
 void BrushlessMotor::startupProcess(){

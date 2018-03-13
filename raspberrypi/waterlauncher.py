@@ -11,6 +11,7 @@ _SET_MOTOR_VELOCITY_OPCODE		= 0x17
 _GET_MOTOR_VELOCITY_OPCODE		= 0x18
 _SET_MOTOR_PULSEWIDTH_OPCODE	= 0x1A
 _GET_MOTOR_PULSEWIDTH_OPCODE	= 0x1B
+_FORCE_PULSEWIDTH				= 0x1E
 
 class WaterLauncher(SerialTalksProxy):	
 	def __init__(self,parent, uuid='watershooter'):
@@ -19,9 +20,8 @@ class WaterLauncher(SerialTalksProxy):
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
 		inSetup = output.read(INT)
-		return inSetup
-		#if not inSetup :
-		#	return "Please wait, ESC in startup..."
+		if not inSetup :
+			return "Please wait, ESC in startup..."
 		
 
 	def get_motor_velocity(self):
@@ -36,22 +36,24 @@ class WaterLauncher(SerialTalksProxy):
 	def set_motor_pulsewidth(self, pulsewidth):
 		output = self.execute(_SET_MOTOR_PULSEWIDTH_OPCODE,INT(pulsewidth))
 		inSetup = output.read(INT)
-		return inSetup
-		#if not inSetup:
-		#	return "Please wait, ESC in startup..."
+		if not inSetup:
+			return "Please wait, ESC in startup..."
 
 	def get_motor_pulsewidth(self):
 		output = self.execute(_GET_MOTOR_PULSEWIDTH_OPCODE)
 		return output.read(INT)
 
+	def force_pulsewidth(self, pulsewidth):
+		self.send(_FORCE_PULSEWIDTH, INT(pulsewidth))
+
 	def setupPulsewidthESC(self):
 		print("Please activate emergency stop")
 		print("Press enter when ready");
 		input()
-		self.set_motor_velocity(100);
+		self.force_pulsewidth(2000);
 		print("Please disable emergency stop and wait for 123 melody, 2 short beep")
 		print("Press enter directly after the last 2 beep")
 		input()
-		self.set_motor_velocity(0);
+		self.force_pulsewidth(1000);
 		print("Wait for 3 beep for battery cell count and a long final beep")
 		print("End of ESC setup and motor ready to go !")

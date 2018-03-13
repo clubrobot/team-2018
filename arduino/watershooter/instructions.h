@@ -14,9 +14,9 @@
 #define _GET_WATER_COLOR_OPCODE			0x19
 #define _SET_MOTOR_PULSEWIDTH_OPCODE    0x1A
 #define _GET_MOTOR_PULSEWIDTH_OPCODE    0x1B
-#define _GET_MOTOR_PULSEWIDTH_OPCODE    0x1B
-#define _SET_LED_ON_OPCODE    0x1C
-#define _SET_LED_OFF_OPCODE    0x1D
+#define _SET_LED_ON_OPCODE              0x1C
+#define _SET_LED_OFF_OPCODE             0x1D
+#define _FORCE_PULSEWIDTH               0x1E
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
@@ -34,6 +34,8 @@ void GET_WATER_COLOR(SerialTalks &inst, Deserializer &input, Serializer &output)
 
 void SET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_MOTOR_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output);
+
+void FORCE_PULSEWIDTH(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 void SET_LED_ON(SerialTalks& inst, Deserializer& input, Serializer& output);
 void SET_LED_OFF(SerialTalks& inst, Deserializer& input, Serializer& output);

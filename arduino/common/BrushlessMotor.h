@@ -29,6 +29,7 @@ public:
     void disableMotor();
     int setVelocity(int velocity);
 	int setPulsewidth(int pulsewidth);
+    void forcePulsewidth(int pulsewidth);
     void update();
     void startupProcess();
 
