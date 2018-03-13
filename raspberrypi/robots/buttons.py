@@ -10,8 +10,8 @@ import math
 from serialtalks import BYTE, INT, LONG, FLOAT
 from components import SerialTalksProxy
 
-LED_ON_OPCODE	= 0x011
-LED_OFF_OPCODE	= 0x012
+LED_ON_OPCODE	= 0x11
+LED_OFF_OPCODE	= 0x12
 class ButtonCard (SerialTalksProxy):
 	BUTTON_ID = 1
 	RED_BUTTON = 1
@@ -25,11 +25,14 @@ class ButtonCard (SerialTalksProxy):
 
 	def __init__(self, parent, uuid='buttonCard'):
 		SerialTalksProxy.__init__(self, parent, uuid)
-		self.functions = list()
+		self.functions = dict()
 		self.bind(1,self._compute)
 
 	def _compute(self,args):
-		self.function[bytes.read(BYTE)]()
+		try:
+			self.functions[args.read(BYTE)]()
+		except KeyError:
+			pass
 
 	def affect(self,ID,function):
 		self.functions[ID] = function
