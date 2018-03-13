@@ -48,12 +48,12 @@ try:
 		def _cleanup(self):
 			self.disconnect()
 
-		def receive(self,input):
+		def receive(self,input,timeout=0.5):
 			opcode = str(input.read(BYTE))+self.uuid
 			retcode= input.read(LONG)
 
 			try:
-				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
+				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input,timeout=0.5)
 			except Exception:
 				etype, value, _ = sys.exc_info()
 				print("Error with an request from {} arduino".format(self.uuid))

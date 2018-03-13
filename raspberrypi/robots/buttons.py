@@ -28,16 +28,16 @@ class ButtonCard (SerialTalksProxy):
 		self.functions = list()
 		self.bind(1,self._compute)
 
-	def _compute(args):
+	def _compute(self,args):
 		self.function[bytes.read(BYTE)]()
 
-	def affect(ID,function):
+	def affect(self,ID,function):
 		self.functions[ID] = function
 
 	def setLedOn(self, nb):
 		self.send(LED_ON_OPCODE, BYTE(nb))
 
-	def setLedOff(nb):
+	def setLedOff(self,nb):
 		self.send(LED_OFF_OPCODE, BYTE(nb))
 
 
