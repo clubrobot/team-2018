@@ -8,9 +8,9 @@
 extern ButtonCard buttonCard;
 
 void ENABLE_LED(SerialTalks& inst, Deserializer& input, Serializer& output){
-    digitalWrite(input.read<int>(), HIGH);
+    buttonCard.setLed(input.read<int>(), 1);
 }
 
 void DISABLE_LED(SerialTalks& inst, Deserializer& input, Serializer& output){
-    digitalWrite(input.read<int>(), LOW);
+    buttonCard.setLed(input.read<int>(), 0);
 }
