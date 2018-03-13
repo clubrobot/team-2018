@@ -33,10 +33,10 @@ void ButtonCard::setup(){
 
 void ButtonCard::setLed(int no, bool value){
     if (value == 0){
-        digitalWrite(ledRemap[no], LOW);
+        digitalWrite(ledRemap[no-1], LOW);
     }
     if (value == 1){
-        digitalWrite(ledRemap[no], HIGH);
+        digitalWrite(ledRemap[no-1], HIGH);
     }
 }
 

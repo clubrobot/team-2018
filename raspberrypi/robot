@@ -2,15 +2,21 @@
 
 import os, sys
 import time
+from argparse  import ArgumentParser
+from threading import Thread
 
-from argparse import ArgumentParser
+sys.path.append("{}/common/".format(sys.path[0]))
+sys.path.append("{}/robots/".format(sys.path[0]))
 
 from serialtalks import SerialTalks
+from buttons import ButtonCard
+from devmode import ButtonGesture
+from display import SevenSegments
 from components  import Server
 #from bornibus    import Bornibus
 #from murray      import Murray
 
-from threading import Thread
+DEV_MODE = True
 
 
 arduino_list=['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector']
@@ -104,6 +110,17 @@ class Starter(Thread):
 
 		self.RedButton.Off()
 		self.GreenButton.Off()
+
+
+def buttons(args):
+	if not DEV_MODE : return
+	try:
+		button_card = ButtonCard()
+		screen      = SevenSegments()
+	except:
+		return 
+	button_gesture = ButtonGesture(button_card,screen)
+	while not button_gesture.exiting : time.sleep(0.2)
 
 
 def getuuid(args):
@@ -244,6 +261,8 @@ def update(args):
 parser = ArgumentParser()
 subparsers = parser.add_subparsers()
 
+button_parser = subparsers.add_parser('buttons')
+button_parser.set_defaults(func=buttons)
 getuuid_parser = subparsers.add_parser('getuuid')
 getuuid_parser.add_argument('port', type=str)
 getuuid_parser.add_argument('-t', '--timeout', type=float, default=5)

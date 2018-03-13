@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+import sys
+sys.path.append("../common/")
 
 import os
 from types import MethodType
 
-from tcptalks import TCPTalks, TCPTalksServer
+from tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
 
@@ -46,12 +48,18 @@ try:
 		def _cleanup(self):
 			self.disconnect()
 
-		def receive(self,input):
+		def receive(self,input,timeout=0.5):
 			opcode = str(input.read(BYTE))+self.uuid
 			retcode= input.read(LONG)
+
 			try:
-				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input)
-			except TimeoutError:
+				output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE,opcode,input,timeout=0.5)
+			except ConnectionError:
+				return
+			except Exception:
+				etype, value, _ = sys.exc_info()
+				print("Error with an request from {} arduino".format(self.uuid))
+				print(etype, value)
 				return
 			if output is None : return
 			content = LONG(retcode) + output

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+import sys
+sys.path.append("../common/")
+
 
 import time
 import math
@@ -7,13 +10,13 @@ import math
 from serialtalks import BYTE, INT, LONG, FLOAT
 from components import SerialTalksProxy
 
-LED_ON_OPCODE	= 0x011
-LED_OFF_OPCODE	= 0x012
+LED_ON_OPCODE	= 0x11
+LED_OFF_OPCODE	= 0x12
 class ButtonCard (SerialTalksProxy):
 	BUTTON_ID = 1
-	RED_BUTTON = 1
+	RED_BUTTON = 3
 	GREEN_BUTTON = 2
-	BLUE_BUTTON = 3
+	BLUE_BUTTON = 1
 	YELLOW_BUTTON = 4
 	EMERGENCY = 5
 	PLAY_MODE = 6
@@ -22,19 +25,22 @@ class ButtonCard (SerialTalksProxy):
 
 	def __init__(self, parent, uuid='buttonCard'):
 		SerialTalksProxy.__init__(self, parent, uuid)
-		self.functions = list()
+		self.functions = dict()
 		self.bind(1,self._compute)
 
-	def _compute(args):
-		self.function[bytes.read(BYTE)]()
+	def _compute(self,args):
+		try:
+			self.functions[args.read(BYTE)]()
+		except KeyError:
+			pass
 
-	def affect(ID,function):
+	def affect(self,ID,function):
 		self.functions[ID] = function
 
 	def setLedOn(self, nb):
 		self.send(LED_ON_OPCODE, BYTE(nb))
 
-	def setLedOff(nb):
+	def setLedOff(self,nb):
 		self.send(LED_OFF_OPCODE, BYTE(nb))
 
 

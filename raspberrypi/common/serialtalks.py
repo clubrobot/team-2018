@@ -205,7 +205,6 @@ class SerialTalks:
 			prefix  = SLAVE_BYTE    + BYTE(len(content))
 			self.rawsend(prefix + content)
 		except KeyError:
-			print("request receive but no function to execute")
 			pass
 
 
