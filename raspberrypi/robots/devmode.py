@@ -29,7 +29,7 @@ class ButtonGesture():
         for i in range(5):
             self.buttons.setLedOn(i)
             sleep(0.1)
-        for i in range(5):
+        for i in reversed(range(5)):
             self.buttons.setLedOff(i)
             sleep(0.1)
 
@@ -56,15 +56,12 @@ class ButtonGesture():
     def make_funct(self,arduino):
         arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../../arduino/' + arduino.lower()
         self.display.set_message("updating...")
-        print("UPDATE")
         subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
         self.reset()
 
     def pull_funct(self):
         self.display.set_message("pulling...")
-        print(sys.path[0])
         subprocess.run(['/usr/bin/git', '-C', sys.path[0], 'pull', '-f'], stdout=subprocess.PIPE)
-        print("PULL")
         self.reset()
 
     def exit_funct(self):
@@ -99,7 +96,6 @@ class ButtonGesture():
     def _valid(self):
         if time()-self.last_call<0.3 : return
         self.last_call = time()
-        # Case of under menu
         if self.menus_dict[self.menu_selected][self.item_selected] in self.menus_dict:
             self.menu_selected = self.menus_dict[self.menu_selected][self.item_selected]
             self.item_selected = 0
