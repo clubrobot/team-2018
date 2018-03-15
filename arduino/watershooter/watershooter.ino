@@ -36,6 +36,7 @@ void setup(){
 	talks.bind(_GET_MOTOR_PULSEWIDTH_OPCODE, GET_MOTOR_PULSEWIDTH);
 	talks.bind(_SET_LED_OFF_OPCODE, SET_LED_OFF);
 	talks.bind(_SET_LED_ON_OPCODE, SET_LED_ON);
+	talks.bind(_FORCE_PULSEWIDTH, FORCE_PULSEWIDTH);
 
 
 	pinMode(SERVO1, OUTPUT);
@@ -47,10 +48,11 @@ void setup(){
 	pinMode(BRUSHLESS, OUTPUT);
 	pinMode(SWITCH1, INPUT_PULLUP);
 
-	attachInterrupt(digitalPinToInterrupt(SWITCH1), resetVelocity, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(SWITCH1), resetVelocity, FALLING);
 	
 	motor.attach(BRUSHLESS);
 	motor.setVelocity(MIN_VELOCITY);
+	motor.enableMotor();
 
 	indoor.attach(SERVO2);
 	outdoor.attach(SERVO3);
