@@ -313,6 +313,7 @@ public:
 	// general configuration state
 	static void newConfiguration();
 	static void commitConfiguration();
+	static void setAntennaDelay(int delay);
 	
 	// reception state
 	static void newReceive();
