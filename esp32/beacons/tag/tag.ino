@@ -8,6 +8,10 @@
 #include <SPI.h>
 #include "DW1000Ranging.h"
 #include "pin.h"
+#include "SSD1306.h"
+#include <Wire.h>
+
+SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
 void newRange()
 {
@@ -19,6 +23,16 @@ void newRange()
   Serial.print("\t RX power: ");
   Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
   Serial.println(" dBm");
+
+  display.clear();
+  float distance = DW1000Ranging.getDistantDevice()->getRange() * 100;
+  String toDisplay = "Distance : \n";
+  toDisplay += distance;
+  toDisplay += "cm";
+  display.drawString(64, 0, toDisplay);
+  display.display();
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
 void newDevice(DW1000Device *device)
@@ -32,6 +46,12 @@ void inactiveDevice(DW1000Device *device)
 {
   Serial.print("delete inactive device: ");
   Serial.println(device->getShortAddress(), HEX);
+
+  display.clear();
+  display.drawString(64, 0, "INACTIVE");
+  display.display();
+  digitalWrite(PIN_LED_OK, LOW);
+  digitalWrite(PIN_LED_FAIL, HIGH);
 }
 
 void setup() {
@@ -48,6 +68,20 @@ void setup() {
   
   //we start the module as a tag
   DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+
+  display.init();
+  display.flipScreenVertically();
+  display.setFont(ArialMT_Plain_10);
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+
+  pinMode(PIN_LED_FAIL, OUTPUT);
+  pinMode(PIN_LED_OK, OUTPUT);
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, HIGH);
+  display.drawString(64, 24, "SYNCHRONISATION\n(tag)");
+  display.display();
+
+  display.setFont(ArialMT_Plain_24);
 }
 
 void loop() {
