@@ -11,6 +11,7 @@ SKETCH_LIBS = ~/Arduino/libraries/ESP8266_and_ESP32_Oled_Driver_for_SSD1306_disp
 
 #Setup all libs used !
 LIBS = 	$(ESP_LIBS)/SPI \
+		$(ESP_LIBS)/EEPROM \
 		$(ESP_LIBS)/Wire \
 	    $(COMMON)/SerialTalks.cpp \
 		$(COMMON)/mathutils.cpp \
