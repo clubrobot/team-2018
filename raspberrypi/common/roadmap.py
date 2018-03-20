@@ -3,7 +3,8 @@
 
 import igraph
 from geogebra import GeoGebra
-
+from threading import Thread, Event
+from time      import sleep, time
 import math
 
 
@@ -19,22 +20,56 @@ def intersect(A, B):
 		return tA > 0 and tA < 1 and tB > 0 and tB < 1
 
 class Obstacle:
-    def __init__(self,roadmap ,shape):
-        self.roadmap  = roadmap
-        self.shape    = shape
-        self.position = (-1000,-1000)
-        self.edges    = set()
+	def __init__(self,roadmap ,shape):
+		self.roadmap  = roadmap
+		self.shape    = shape
+		self.theta    = 0
+		self.position = (-1000,-1000)
 
-    def get_shape(self):
-        return [(a+self.position[0],b+self.position[1]) for (a,b) in self.shape]
+	def get_shape(self):
+		return [(math.cos(self.theta)*a-math.sin(self.theta)*b+self.position[0],
+				math.sin(self.theta)*a + math.cos(self.theta)*b+self.position[1]) for (a,b) in self.shape]
 
-    def set_position(self,x,y):
-        self.position = (x,y)
-        self.roadmap.reset_obstacle(self)
-        self.roadmap.cut_obstacle(self)
+	def set_position(self,x,y,theta = 0):
+		self.position = (x,y)
+		self.theta = 0
+		self.roadmap.reset_obstacle(self)
+		self.roadmap.cut_obstacle(self)
     
-    def disable(self):
-        self.roadmap.reset_obstacle(self)
+	def disable(self):
+		self.roadmap.reset_obstacle(self)
+
+class ObstacleTemp(Obstacle):
+	def __init__(self,roadmap,shape,timeout= 1):
+		Obstacle.__init__(self,roadmap,shape)
+		self.thread = Thread(target=self._temp_disable)
+		self.event  = Event()
+		self.timeout = timeout
+
+	def set_position(self,x,y,theta = 0,blocking = False):
+		if self.thread.is_alive() :
+			return False
+		self.position = (x,y)
+		self.theta = theta
+		self.roadmap.reset_obstacle(self)
+		self.roadmap.cut_obstacle(self)
+		self.event.set()
+		if self.thread.is_alive() :
+			self.thread.join()
+		self.event.clear()
+		self.thread = Thread(target=self._temp_disable)
+		self.thread.start()
+		return True
+
+
+	def _temp_disable(self):
+		start_time = time()
+		while time()-start_time<self.timeout and not self.event.is_set():
+			sleep(0.1)
+		self.disable()
+
+
+
 
 class RoadMap:
 
@@ -49,6 +84,7 @@ class RoadMap:
 		for edge in self.graph.es:
 			vertex = self.graph.vs[edge.target]['coords']
 			edge['weight'] = self.get_vertex_distance(edge.source, vertex)
+			edge['cuted_by'] = list()
 
 	def cut_edges(self, cutline):
 		for edge in self.graph.es:
@@ -56,25 +92,59 @@ class RoadMap:
 			target = self.graph.vs[edge.target]['coords']
 			if intersect((source, target), cutline):
 				edge['weight'] = math.inf
-				
-    def create_obstacle(self, shape):
-        return Obstacle(self,shape)
+	
 
-    def cut_obstacle(self, obstacle):
-        obstacle_shape = obstacle.get_shape()
-        for edge in self.graph.es:
-            source = self.graph.vs[edge.source]['coords']
-            target = self.graph.vs[edge.target]['coords']
-            for i in range(len(obstacle_shape)):
-                cutline = (obstacle_shape[i], obstacle_shape[(i+1)%len(obstacle_shape)])
-                if intersect((source, target), cutline):
-                    edge['weight'] = math.inf
-                    obstacle.edges.add(edge)
+	def temp_cut_edges(self, cutline, time =1):
+		cuted_edges = list()
+		for edge in self.graph.es:
+			source = self.graph.vs[edge.source]['coords']
+			target = self.graph.vs[edge.target]['coords']
+			if intersect((source, target), cutline):
+				edge['weight'] = math.inf
+				edge['cuted_by'].append("temp_cut")
+				cuted_edges.append(edge)
+		Thread(target= lambda : self._remove_cut_edges(cuted_edges,time)).start()
 
-    def reset_obstacle(self, obstacle):
-        for edge in obstacle.edges:
-            vertex = self.graph.vs[edge.target]['coords']
-            edge['weight'] = self.get_vertex_distance(edge.source, vertex)
+
+	def _remove_cut_edges(self, cuted_edges, time):
+		sleep(time)
+		for edge in cuted_edges:
+			try:
+				edge['cuted_by'].remove('temp_cut')
+			except AttributeError:
+				pass
+			if len(edge['cuted_by'])==0:
+				vertex = self.graph.vs[edge.target]['coords']
+				edge['weight'] = self.get_vertex_distance(edge.source, vertex)
+
+	def create_obstacle(self, shape):
+		return Obstacle(self,shape)
+
+	def create_temp_obstacle(self,shape,timeout = 1):
+		return ObstacleTemp(self,shape,timeout)
+
+	def cut_obstacle(self, obstacle):
+		obstacle_shape = obstacle.get_shape()
+		for edge in self.graph.es:
+			source = self.graph.vs[edge.source]['coords']
+			target = self.graph.vs[edge.target]['coords']
+			for i in range(len(obstacle_shape)):
+				cutline = (obstacle_shape[i], obstacle_shape[(i+1)%len(obstacle_shape)])
+				if intersect((source, target), cutline):
+					edge['weight'] = math.inf
+					if not obstacle in edge['cuted_by']:
+						edge['cuted_by'].append(obstacle)
+
+	def reset_obstacle(self, obstacle):
+		for edge in obstacle.edges:
+			try:
+				edge['cuted_by'].remove(obstacle)
+			except (AttributeError,ValueError):
+				pass
+
+			if len(edge['cuted_by'])==0:
+				vertex = self.graph.vs[edge.target]['coords']
+				edge['weight'] = self.get_vertex_distance(edge.source, vertex)
 
 	def get_vertex_distance(self, vid, vertex):
 		x0, y0 = self.graph.vs[vid]['coords']
