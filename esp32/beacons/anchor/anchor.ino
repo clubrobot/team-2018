@@ -12,6 +12,7 @@
 #include "SSD1306.h"
 #include <Wire.h>
 #include <EEPROM.h>
+#include "configuration.h"
 
 #define EEPROM_SIZE 64
 
@@ -77,7 +78,7 @@ void setup() {
   DW1000Ranging.useRangeFilter(true);
   
   //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:5B:D5:A9:9A:E2:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[0]);
   int antennaDelay = 16560;
 #if 0
   EEPROM.write(50, antennaDelay >> 8);
