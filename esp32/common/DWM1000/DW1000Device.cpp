@@ -79,13 +79,13 @@ byte* DW1000Device::getByteAddress() {
 	return _ownAddress;
 }
 
-/*
+
 String DW1000Device::getAddress(){
     char string[25];
     sprintf(string, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
             _ownAddress[0], _ownAddress[1], _ownAddress[2], _ownAddress[3], _ownAddress[4], _ownAddress[5], _ownAddress[6], _ownAddress[7]);
     return String(string);
-}*/
+}
 
 byte* DW1000Device::getByteShortAddress() {
 	return _shortAddress;
