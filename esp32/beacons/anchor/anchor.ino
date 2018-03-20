@@ -5,14 +5,22 @@
  *  - fix deprecated convertation form string to char* startAsAnchor
  *  - give example description
  */
+
+#include "pin.h"
+#include "configuration.h"
+#include <EEPROM.h>
+
 #include <SPI.h>
 #include "DW1000Ranging.h"
 #include "DW1000.h"
-#include "pin.h"
+
 #include "SSD1306.h"
 #include <Wire.h>
-#include <EEPROM.h>
-#include "configuration.h"
+
+#include "../../common/SerialTalks.h"
+#include "instructions.h"
+
+
 
 #define EEPROM_SIZE 64
 
@@ -60,7 +68,14 @@ void inactiveDevice(DW1000Device *device)
 }
 
 void setup() {
-  Serial.begin(115200);
+  
+  Serial.begin(SERIALTALKS_BAUDRATE);
+  talks.begin(Serial);
+  
+  talks.bind(UPDATE_ANCHOR_NUMBER_OPCODE, UPDATE_ANCHOR_NUMBER);
+  talks.bind(UPDATE_CONFIGURATION_OPCODE, UPDATE_CONFIGURATION);
+  talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
+
   if (!EEPROM.begin(EEPROM_SIZE))
   {
     Serial.println("failed to initialise EEPROM");
@@ -70,7 +85,6 @@ void setup() {
   //init the configuration
   //initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2, int8_t sck = -1, int8_t miso = -1, int8_t mosi = -1)
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
-  //define the sketch as anchor. It will be great to dynamically change the type of module
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
@@ -78,8 +92,8 @@ void setup() {
   DW1000Ranging.useRangeFilter(true);
   
   //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[0]);
-  int antennaDelay = 16560;
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[CURRENT_BEACON_NUMBER]);
+  int antennaDelay = ANTENNA_DELAY[CURRENT_BEACON_NUMBER];
 #if 0
   EEPROM.write(50, antennaDelay >> 8);
   EEPROM.write(51, antennaDelay % 256);
@@ -88,7 +102,7 @@ void setup() {
   antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
   Serial.println("antennaDelay : ");
   Serial.println(antennaDelay);
-  Serial.println("EEPROM values :");
+  Serial.println("EEPROM values : ");
   Serial.println(EEPROM.read(50));
   Serial.println(EEPROM.read(51));
   DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, 16530 for anchor
@@ -111,6 +125,7 @@ void setup() {
 
 void loop() {
   DW1000Ranging.loop();
+  talks.execute();
 }
 
 
