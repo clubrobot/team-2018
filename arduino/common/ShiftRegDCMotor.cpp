@@ -30,9 +30,9 @@ void ShiftRegDCMotor::update()
 		analogWrite(m_PWM, PWM);
 
 		if(m_velocity * m_constant * m_wheelRadius > 0)
-			reg.SetHigh(m_DIRPOS);
-		else 
 			reg.SetLow(m_DIRPOS);
+		else 
+			reg.SetHigh(m_DIRPOS);
 	}
 	else
 	{
