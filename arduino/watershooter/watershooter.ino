@@ -19,8 +19,9 @@ Servo shakerLeft;
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
-#define DOOR_CLOSED 90
-#define TRASH_CLOSED 25
+#define OUTDOOR_DOOR_CLOSED 90
+#define INDOOR_DOOR_CLOSED 20
+#define TRASH_CLOSED 128
 
 void resetVelocity();
 
@@ -66,8 +67,8 @@ void setup(){
 	trash.attach(SERVO3);
 
 	trash.write(TRASH_CLOSED);
-	outdoor.write(DOOR_CLOSED);
-	indoor.write(DOOR_CLOSED);
+	outdoor.write(OUTDOOR_DOOR_CLOSED);
+	indoor.write(INDOOR_DOOR_CLOSED);
 	waterSensor.begin();
 }
 

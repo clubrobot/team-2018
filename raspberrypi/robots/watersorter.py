@@ -18,10 +18,14 @@ _WRITE_TRASH_OPCODE       =  0x15
 _GET_TRASH_OPCODE         =  0x16
 _GET_WATER_COLOR_OPCODE   =  0x19
 
-DOOR_CLOSED = 90
-DOOR_OPEN = 30
-TRASH_CLOSED = 25
-TRASH_OPEN = 60
+INDOOR_DOOR_OPEN = 44
+OUTDOOR_DOOR_OPEN = 50
+
+OUTDOOR_DOOR_CLOSED = 90
+INDOOR_DOOR_CLOSED = 20
+
+TRASH_CLOSED = 128
+TRASH_OPEN = 150
 
 class WaterSorter(SerialTalksProxy):	
     def __init__(self,parent, uuid='watershooter'):
@@ -37,26 +41,26 @@ class WaterSorter(SerialTalksProxy):
         self.send(_WRITE_TRASH_OPCODE,INT(ouverture))
 
     def close_outdoor(self):
-        self.send(_WRITE_OUTDOOR_OPCODE,INT(DOOR_CLOSED))
+        self.send(_WRITE_OUTDOOR_OPCODE,INT(OUTDOOR_DOOR_CLOSED))
 
     def open_outdoor(self):
-        self.send(_WRITE_OUTDOOR_OPCODE,INT(DOOR_OPEN))
+        self.send(_WRITE_OUTDOOR_OPCODE,INT(OUTDOOR_DOOR_OPEN))
 
     def is_outdoor_closed(self):
         output = self.execute(_GET_OUTDOOR_OPCODE)
         outdoorAngle = output.read(INT)
-        return bool(outdoorAngle == DOOR_CLOSED)
+        return bool(outdoorAngle == OUTDOOR_DOOR_CLOSED)
 
     def close_indoor(self):
-        self.send(_WRITE_INDOOR_OPCODE,INT(DOOR_CLOSED))
+        self.send(_WRITE_INDOOR_OPCODE,INT(INDOOR_DOOR_CLOSED))
 
     def open_indoor(self):
-        self.send(_WRITE_INDOOR_OPCODE,INT(DOOR_OPEN))
+        self.send(_WRITE_INDOOR_OPCODE,INT(INDOOR_DOOR_OPEN))
 
     def is_indoor_closed(self):
         output = self.execute(_GET_INDOOR_OPCODE)
         indoorAngle = output.read(INT)
-        return bool(indoorAngle == DOOR_CLOSED)
+        return bool(indoorAngle == INDOOR_DOOR_CLOSED)
 
     def close_trash(self):
         self.send(_WRITE_TRASH_OPCODE,INT(TRASH_CLOSED))
