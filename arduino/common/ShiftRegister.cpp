@@ -13,14 +13,21 @@ void ShiftRegister::attach(int latchpin, int clockpin, int datapin)
 
 void ShiftRegister::SetHigh(int pos)
 {
-	m_register |= (1 << pos); 
-	update();
+	if(pos <= 7 && pos >= 0)
+	{
+		m_register |= (1 << pos); 
+		update();
+	}
+	
 }
 
 void ShiftRegister::SetLow(int pos)
 {
-	m_register &= ~(1 << pos); 
-	update();
+	if(pos <= 7 && pos >= 0)
+	{
+		m_register &= ~(1 << pos); 
+		update();
+	}
 }
 
 void ShiftRegister::update()
