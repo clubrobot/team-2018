@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <Servo.h>
+
+#include "PIN.h"
 #include "instructions.h"
 #include "../../common/SerialTalks.h"
 
