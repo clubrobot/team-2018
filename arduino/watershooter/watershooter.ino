@@ -13,6 +13,10 @@ BrushlessMotor motor;
 Servo indoor;
 Servo outdoor;
 Servo trash;
+Servo trashUnloader;
+Servo shakerRight;
+Servo shakerLeft;
+
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 #define DOOR_CLOSED 90
@@ -54,9 +58,12 @@ void setup(){
 	motor.setVelocity(MIN_VELOCITY);
 	motor.enableMotor();
 
-	indoor.attach(SERVO2);
-	outdoor.attach(SERVO3);
-	trash.attach(SERVO1);
+	indoor.attach(SERVO1);
+	trashUnloader.attach(SERVO4);
+	shakerRight.attach(SERVO5);
+	shakerLeft.attach(SERVO6);
+	outdoor.attach(SERVO2);
+	trash.attach(SERVO3);
 
 	trash.write(TRASH_CLOSED);
 	outdoor.write(DOOR_CLOSED);
