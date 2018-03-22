@@ -22,8 +22,6 @@
 
 
 
-#define EEPROM_SIZE 64
-
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
 void newRange()
@@ -73,17 +71,16 @@ void setup() {
   talks.begin(Serial);
   
   talks.bind(UPDATE_ANCHOR_NUMBER_OPCODE, UPDATE_ANCHOR_NUMBER);
-  talks.bind(UPDATE_CONFIGURATION_OPCODE, UPDATE_CONFIGURATION);
+  talks.bind(UPDATE_ANTENNA_DELAY_OPCODE, UPDATE_ANTENNA_DELAY);
   talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
 
-  if (!EEPROM.begin(EEPROM_SIZE))
+  /*if (!EEPROM.begin(EEPROM_SIZE))
   {
     Serial.println("failed to initialise EEPROM");
     delay(1000000);
-  }
-  delay(100);
-  //init the configuration
-  //initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2, int8_t sck = -1, int8_t miso = -1, int8_t mosi = -1)
+  }*/
+
+// init communication
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
@@ -93,18 +90,8 @@ void setup() {
   
   //we start the module as an anchor
   DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[CURRENT_BEACON_NUMBER]);
-  int antennaDelay = ANTENNA_DELAY[CURRENT_BEACON_NUMBER];
-#if 0
-  EEPROM.write(50, antennaDelay >> 8);
-  EEPROM.write(51, antennaDelay % 256);
-  EEPROM.commit();
-#endif
-  antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
-  Serial.println("antennaDelay : ");
-  Serial.println(antennaDelay);
-  Serial.println("EEPROM values : ");
-  Serial.println(EEPROM.read(50));
-  Serial.println(EEPROM.read(51));
+
+  int antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
   DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, 16530 for anchor
 
 
