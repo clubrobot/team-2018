@@ -52,7 +52,7 @@ class GeoGebra():
 		self.zipfile.close()
 		stream = BytesIO()
 		self.loadxml.write(stream, encoding='utf-8', xml_declaration=True)
-		self._clean_ggb()
+		#self._clean_ggb()
 		self.zipfile = ZipFile('roadmap.ggb', mode='a')
 		self.zipfile.writestr('geogebra.xml', stream.getvalue().decode('utf8'))
 		self.zipfile.close()
