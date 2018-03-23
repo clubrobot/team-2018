@@ -121,7 +121,7 @@ def buttons():
 		screen      = SevenSegments(m)
 	except:
 		return 
-	button_gesture = ButtonGesture(button_card,screen)
+	button_gesture = ButtonGesture(button_card,screen,m)
 	while not button_gesture.exiting : time.sleep(0.2)
 	button_card.disconnect()
 	screen.disconnect()
