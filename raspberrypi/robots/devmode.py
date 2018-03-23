@@ -58,7 +58,7 @@ class ButtonGesture():
     def make_funct(self,arduino):
         arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../../arduino/' + arduino.lower()
         self.display.set_message("updating...")
-        self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect")
+        self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect",list(),dict())
         subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
         self.reset()
 
