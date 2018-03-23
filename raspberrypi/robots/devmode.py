@@ -24,7 +24,7 @@ class ButtonGesture():
                            "Git pull": self.pull_funct,
                            "Exit": self.exit_funct,
                            "WheeledBase": lambda : self.make_funct("WheeledBase"),
-                           "WaterShooter": lambda : self.make_funct("WaterShooter"),
+                           "WaterSorter": lambda : self.make_funct("WaterSorter"),
                            "Display":     lambda : self.make_funct("Display"),
                            "Sensors":     lambda : self.make_funct("Sensors")
                            }
@@ -58,7 +58,10 @@ class ButtonGesture():
     def make_funct(self,arduino):
         arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../../arduino/' + arduino.lower()
         self.display.set_message("updating...")
-        self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect")
+        try:
+            self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect",list(),dict())
+        except KeyError:
+            pass
         subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
         self.reset()
 
