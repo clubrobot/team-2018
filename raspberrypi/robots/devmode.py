@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 from buttons import LED_ON_OPCODE, LED_OFF_OPCODE, ButtonCard
+from components import MAKE_COMPONENT_EXECUTE_OPCODE
 from time    import sleep, time
 from threading import Thread
 import subprocess
 import os
 import sys
 class ButtonGesture():
-    def __init__(self, buttons, display):
+    def __init__(self, buttons, display, server):
         self.buttons = buttons
+        self.server = server
         self.last_call = time()
         self.menu_selected = "Menu"
         self.item_selected = 0
@@ -22,7 +24,7 @@ class ButtonGesture():
                            "Git pull": self.pull_funct,
                            "Exit": self.exit_funct,
                            "WheeledBase": lambda : self.make_funct("WheeledBase"),
-                           "WaterSorter": lambda : self.make_funct("WaterSorter"),
+                           "WaterShooter": lambda : self.make_funct("WaterShooter"),
                            "Display":     lambda : self.make_funct("Display"),
                            "Sensors":     lambda : self.make_funct("Sensors")
                            }
@@ -33,9 +35,9 @@ class ButtonGesture():
             self.buttons.setLedOff(i)
             sleep(0.1)
 
-        self.buttons.affect(2,self.button_back)
-        self.buttons.affect(1, self.button_valid)
-        self.buttons.affect(0, self.button_select)
+        self.buttons.affect(1,self.button_back)
+        self.buttons.affect(0, self.button_valid)
+        self.buttons.affect(2, self.button_select)
         self.display.set_message("Menu")
     def ip_funct(self):
         ip = ''
@@ -56,6 +58,7 @@ class ButtonGesture():
     def make_funct(self,arduino):
         arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../../arduino/' + arduino.lower()
         self.display.set_message("updating...")
+        self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect")
         subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
         self.reset()
 
@@ -89,7 +92,7 @@ class ButtonGesture():
 
     def _back(self):
         for menu, menu_item in self.menus_dict.items():
-            if self.menus_dict[self.menu_selected] in menu_item:
+            if self.menu_selected in menu_item:
                 self.menu_selected = menu
                 self.item_selected = 0
 
