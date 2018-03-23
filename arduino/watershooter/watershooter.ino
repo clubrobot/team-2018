@@ -14,14 +14,17 @@ Servo indoor;
 Servo outdoor;
 Servo trash;
 Servo trashUnloader;
-Servo shakerRight;
-Servo shakerLeft;
+Servo shakerHorizontal;
+Servo shakerVertical;
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 #define OUTDOOR_DOOR_CLOSED 90
 #define INDOOR_DOOR_CLOSED 20
 #define TRASH_CLOSED 128
+#define SHAKER_SIDE_HORIZONTAL 35
+#define SHAKER_SIDE_VERTICAL 35
+
 
 void resetVelocity();
 
@@ -34,6 +37,13 @@ void setup(){
 	talks.bind(_WRITE_OUTDOOR_OPCODE, WRITE_OUTDOOR);
 	talks.bind(_GET_TRASH_OPCODE, GET_TRASH);
 	talks.bind(_WRITE_TRASH_OPCODE, WRITE_TRASH);
+
+	talks.bind(_GET_SHAKER_HORIZONTAL_OPCODE, GET_SHAKER_HORIZONTAL);
+	talks.bind(_WRITE_SHAKER_HORIZONTAL_OPCODE, WRITE_SHAKER_HORIZONTAL);
+
+	talks.bind(_GET_SHAKER_VERTICAL_OPCODE, GET_SHAKER_VERTICAL);
+	talks.bind(_WRITE_SHAKER_VERTICAL_OPCODE, WRITE_SHAKER_VERTICAL);
+
 	talks.bind(_GET_MOTOR_VELOCITY_OPCODE, GET_MOTOR_VELOCITY);
     talks.bind(_SET_MOTOR_VELOCITY_OPCODE, SET_MOTOR_VELOCITY);
 	talks.bind(_GET_WATER_COLOR_OPCODE, GET_WATER_COLOR);
@@ -41,7 +51,7 @@ void setup(){
 	talks.bind(_GET_MOTOR_PULSEWIDTH_OPCODE, GET_MOTOR_PULSEWIDTH);
 	talks.bind(_SET_LED_OFF_OPCODE, SET_LED_OFF);
 	talks.bind(_SET_LED_ON_OPCODE, SET_LED_ON);
-	talks.bind(_FORCE_PULSEWIDTH, FORCE_PULSEWIDTH);
+	talks.bind(_FORCE_PULSEWIDTH_OPCODE, FORCE_PULSEWIDTH);
 
 
 	pinMode(SERVO1, OUTPUT);
@@ -61,14 +71,16 @@ void setup(){
 
 	indoor.attach(SERVO1);
 	trashUnloader.attach(SERVO4);
-	shakerRight.attach(SERVO5);
-	shakerLeft.attach(SERVO6);
+	shakerHorizontal.attach(SERVO5);
+	shakerVertical.attach(SERVO6);
 	outdoor.attach(SERVO2);
 	trash.attach(SERVO3);
 
 	trash.write(TRASH_CLOSED);
 	outdoor.write(OUTDOOR_DOOR_CLOSED);
 	indoor.write(INDOOR_DOOR_CLOSED);
+	shakerHorizontal.write(SHAKER_SIDE_HORIZONTAL);
+	shakerVertical.write(SHAKER_SIDE_VERTICAL);
 	waterSensor.begin();
 }
 

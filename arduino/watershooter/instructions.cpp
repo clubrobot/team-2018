@@ -38,6 +38,23 @@ void GET_TRASH(SerialTalks &inst, Deserializer &input, Serializer &output){
 	output.write<int>(trash.read());
 }
 
+
+void WRITE_SHAKER_VERTICAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shakerVertical.write(input.read<int>());
+}
+
+void GET_SHAKER_VERTICAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	output.write<int>(shakerVertical.read());
+}
+
+void WRITE_SHAKER_HORIZONTAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shakerHorizontal.write(input.read<int>());
+}
+
+void GET_SHAKER_HORIZONTAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	output.write<int>(shakerHorizontal.read());
+}
+
 void SET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){
 	output.write<int>(motor.setVelocity(input.read<int>()));
 }

@@ -17,6 +17,11 @@ _GET_OUTDOOR_OPCODE       =  0X14
 _WRITE_TRASH_OPCODE       =  0x15
 _GET_TRASH_OPCODE         =  0x16
 _GET_WATER_COLOR_OPCODE   =  0x19
+_GET_SHAKER_HORIZONTAL_OPCODE    =      0x1F
+_WRITE_SHAKER_HORIZONTAL_OPCODE  =      0x20
+_GET_SHAKER_VERTICAL_OPCODE      =      0x21
+_WRITE_SHAKER_VERTICAL_OPCODE    =      0x22
+
 
 INDOOR_DOOR_OPEN = 44
 OUTDOOR_DOOR_OPEN = 50
@@ -77,3 +82,9 @@ class WaterSorter(SerialTalksProxy):
         output = self.execute(_GET_WATER_COLOR_OPCODE)
         color = output.read(INT, INT, INT)
         return color
+
+    def write_shaker_horizontal(self, ouverture):
+        self.send(_WRITE_SHAKER_HORIZONTAL_OPCODE,INT(ouverture))
+
+    def write_shaker_vertical(self, ouverture):
+        self.send(_WRITE_SHAKER_VERTICAL_OPCODE,INT(ouverture))
