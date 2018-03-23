@@ -54,8 +54,8 @@ void BallsShaker::enableShaker(){
 }
 
 void BallsShaker::disableShaker(){
-    self.writeHorizontal(SHAKER_HORIZONTAL_1);
-    self.writeVertical(SHAKER_VERTICAL_1);
+    this.writeHorizontal(SHAKER_HORIZONTAL_1);
+    this.writeVertical(SHAKER_VERTICAL_1);
     disable();
 }
 
