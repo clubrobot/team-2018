@@ -12,6 +12,7 @@ extern Servo outdoor;
 extern Servo trash;
 extern Servo shakerHorizontal;
 extern Servo shakerVertical;
+extern Servo trashUnloader;
 extern Adafruit_TCS34725 waterSensor;
 uint16_t red, green, blue, clear;
 
@@ -55,6 +56,13 @@ void WRITE_SHAKER_HORIZONTAL(SerialTalks &inst, Deserializer &input, Serializer 
 
 void GET_SHAKER_HORIZONTAL(SerialTalks &inst, Deserializer &input, Serializer &output){
 	output.write<int>(shakerHorizontal.read());
+}
+
+void WRITE_TRASH_UNLOADER(SerialTalks &inst, Deserializer &input, Serializer &output){
+	trashUnloader.write(input.read<int>());
+}
+void GET_TRASH_UNLOADER(SerialTalks &inst, Deserializer &input, Serializer &output){
+	output.write<int>(trashUnloader.read());
 }
 
 void SET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output){

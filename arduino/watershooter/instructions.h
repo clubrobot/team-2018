@@ -21,6 +21,8 @@
 #define _WRITE_SHAKER_HORIZONTAL_OPCODE        0x20
 #define _GET_SHAKER_VERTICAL_OPCODE            0x21
 #define _WRITE_SHAKER_VERTICAL_OPCODE          0x22
+#define _GET_TRASH_UNLOADER_OPCODE             0x23
+#define _WRITE_TRASH_UNLOADER_OPCODE           0x24
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
@@ -36,6 +38,9 @@ void GET_SHAKER_HORIZONTAL(SerialTalks &inst, Deserializer &input, Serializer &o
 
 void WRITE_SHAKER_VERTICAL(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_SHAKER_VERTICAL(SerialTalks &inst, Deserializer &input, Serializer &output);
+
+void WRITE_TRASH_UNLOADER(SerialTalks &inst, Deserializer &input, Serializer &output);
+void GET_TRASH_UNLOADER(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 void SET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_MOTOR_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output);
