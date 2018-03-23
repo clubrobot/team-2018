@@ -17,6 +17,12 @@ _GET_OUTDOOR_OPCODE       =  0X14
 _WRITE_TRASH_OPCODE       =  0x15
 _GET_TRASH_OPCODE         =  0x16
 _GET_WATER_COLOR_OPCODE   =  0x19
+_GET_SHAKER_HORIZONTAL_OPCODE    =      0x1F
+_WRITE_SHAKER_HORIZONTAL_OPCODE  =      0x20
+_GET_SHAKER_VERTICAL_OPCODE      =      0x21
+_WRITE_SHAKER_VERTICAL_OPCODE    =      0x22
+_GET_TRASH_UNLOADER_OPCODE       =      0x23
+_WRITE_TRASH_UNLOADER_OPCODE     =      0x24
 
 INDOOR_DOOR_OPEN = 44
 OUTDOOR_DOOR_OPEN = 50
@@ -26,6 +32,15 @@ INDOOR_DOOR_CLOSED = 20
 
 TRASH_CLOSED = 128
 TRASH_OPEN = 150
+
+SHAKER_HORIZONTAL_1 = 60
+SHAKER_HORIZONTAL_2 = 300
+
+SHAKER_VERTICAL_1 = 100
+SHAKER_VERTICAL_2 = 170
+
+TRASH_UNLOADER_OPEN = 30
+TRASH_UNLOADER_CLOSED = 90
 
 class WaterSorter(SerialTalksProxy):	
     def __init__(self,parent, uuid='watershooter'):
@@ -77,3 +92,24 @@ class WaterSorter(SerialTalksProxy):
         output = self.execute(_GET_WATER_COLOR_OPCODE)
         color = output.read(INT, INT, INT)
         return color
+
+    def write_shaker_horizontal(self, ouverture):
+        self.send(_WRITE_SHAKER_HORIZONTAL_OPCODE,INT(ouverture))
+
+    def write_shaker_vertical(self, ouverture):
+        self.send(_WRITE_SHAKER_VERTICAL_OPCODE,INT(ouverture))
+
+    def write_trash_unloader(self, ouverture):
+        self.send(_WRITE_TRASH_UNLOADER_OPCODE,INT(ouverture))
+
+    def get_shaker_horizontal(self):
+        output = self.execute(_GET_SHAKER_HORIZONTAL_OPCODE)
+        return output.read(INT)
+    
+    def get_shaker_vertical(self):
+        output = self.execute(_GET_SHAKER_VERTICAL_OPCODE)
+        return output.read(INT)
+
+    def get_trash_unloader(self):
+        output = self.execute(_GET_TRASH_UNLOADER_OPCODE)
+        return output.read(INT)
