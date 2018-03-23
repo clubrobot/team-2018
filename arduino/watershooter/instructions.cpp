@@ -10,6 +10,8 @@ extern BrushlessMotor motor;
 extern Servo indoor;
 extern Servo outdoor;
 extern Servo trash;
+extern Servo shakerHorizontal;
+extern Servo shakerVertical;
 extern Adafruit_TCS34725 waterSensor;
 uint16_t red, green, blue, clear;
 
