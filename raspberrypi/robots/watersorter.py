@@ -113,3 +113,14 @@ class WaterSorter(SerialTalksProxy):
     def get_trash_unloader(self):
         output = self.execute(_GET_TRASH_UNLOADER_OPCODE)
         return output.read(INT)
+
+    def toggle_shaker(self): 
+        if self.get_shaker_horizontal == SHAKER_HORIZONTAL_1 :
+            self.write_shaker_horizontal(SHAKER_HORIZONTAL_2)
+        else :
+            self.write_shaker_horizontal(SHAKER_HORIZONTAL_1)
+
+        if self.get_shaker_vertical == SHAKER_VERTICAL_1 :
+            self.write_shaker_vertical(SHAKER_VERTICAL_2)
+        else :
+            self.write_shaker_vertical(SHAKER_VERTICAL_1)
