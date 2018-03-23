@@ -39,8 +39,8 @@ SHAKER_HORIZONTAL_2 = 300
 SHAKER_VERTICAL_1 = 100
 SHAKER_VERTICAL_2 = 170
 
-TRASH_UNLOADER_OPEN = 30
-TRASH_UNLOADER_CLOSED = 90
+TRASH_UNLOADER_OPEN = 125
+TRASH_UNLOADER_CLOSED = 80
 
 class WaterSorter(SerialTalksProxy):	
     def __init__(self,parent, uuid='watershooter'):
@@ -113,6 +113,12 @@ class WaterSorter(SerialTalksProxy):
     def get_trash_unloader(self):
         output = self.execute(_GET_TRASH_UNLOADER_OPCODE)
         return output.read(INT)
+
+    def open_trash_unloader(self):
+        self.write_trash_unloader(TRASH_UNLOADER_OPEN)
+
+    def close_trash_unloader(self):
+        self.write_trash_unloader(TRASH_UNLOADER_CLOSED)
 
     def toggle_shaker(self): 
         if self.get_shaker_horizontal == SHAKER_HORIZONTAL_1 :
