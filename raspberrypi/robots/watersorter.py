@@ -38,8 +38,8 @@ TRASH_OPEN = 150
 SHAKER_HORIZONTAL_1 = 60
 SHAKER_HORIZONTAL_2 = 300
 
-SHAKER_VERTICAL_1 = 100
-SHAKER_VERTICAL_2 = 170
+SHAKER_VERTICAL_1 = 85
+SHAKER_VERTICAL_2 = 130
 
 TRASH_UNLOADER_OPEN = 125
 TRASH_UNLOADER_CLOSED = 80
@@ -123,7 +123,7 @@ class WaterSorter(SerialTalksProxy):
         self.write_trash_unloader(TRASH_UNLOADER_CLOSED)
 
     def enable_shaker(self):
-        self.execute(_ENABLE_SHAKING_OPCODE)
+        self.send(_ENABLE_SHAKING_OPCODE)
 
     def disable_shaker(self):
-        self.execute(_DISABLE_SHAKING_OPCODE)
+        self.send(_DISABLE_SHAKING_OPCODE)

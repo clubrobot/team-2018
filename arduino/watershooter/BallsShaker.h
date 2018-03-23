@@ -9,8 +9,8 @@
 #define SHAKER_HORIZONTAL_1 60
 #define SHAKER_HORIZONTAL_2 300
 
-#define SHAKER_VERTICAL_1 100
-#define SHAKER_VERTICAL_2 170
+#define SHAKER_VERTICAL_1 85
+#define SHAKER_VERTICAL_2 130
 
 class BallsShaker: public PeriodicProcess {
 
