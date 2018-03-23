@@ -23,6 +23,8 @@ _GET_SHAKER_VERTICAL_OPCODE      =      0x21
 _WRITE_SHAKER_VERTICAL_OPCODE    =      0x22
 _GET_TRASH_UNLOADER_OPCODE       =      0x23
 _WRITE_TRASH_UNLOADER_OPCODE     =      0x24
+_ENABLE_SHAKING_OPCODE           =      0x25
+_DISABLE_SHAKING_OPCODE          =      0x26
 
 INDOOR_DOOR_OPEN = 44
 OUTDOOR_DOOR_OPEN = 50
@@ -120,13 +122,8 @@ class WaterSorter(SerialTalksProxy):
     def close_trash_unloader(self):
         self.write_trash_unloader(TRASH_UNLOADER_CLOSED)
 
-    def toggle_shaker(self): 
-        if self.get_shaker_horizontal == SHAKER_HORIZONTAL_1 :
-            self.write_shaker_horizontal(SHAKER_HORIZONTAL_2)
-        else :
-            self.write_shaker_horizontal(SHAKER_HORIZONTAL_1)
+    def enable_shaker(self):
+        self.execute(_ENABLE_SHAKING_OPCODE)
 
-        if self.get_shaker_vertical == SHAKER_VERTICAL_1 :
-            self.write_shaker_vertical(SHAKER_VERTICAL_2)
-        else :
-            self.write_shaker_vertical(SHAKER_VERTICAL_1)
+    def disable_shaker(self):
+        self.execute(_DISABLE_SHAKING_OPCODE)

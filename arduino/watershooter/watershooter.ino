@@ -7,15 +7,14 @@
 #include "../common/SerialTalks.h"
 #include "../common/Adafruit_TCS34725.h"
 #include "../common/Wire.h"
-
+#include "BallsShaker.h"
 
 BrushlessMotor motor;
 Servo indoor;
 Servo outdoor;
 Servo trash;
 Servo trashUnloader;
-Servo shakerHorizontal;
-Servo shakerVertical;
+BallsShaker shaker;
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
@@ -52,6 +51,8 @@ void setup(){
 	talks.bind(_SET_LED_OFF_OPCODE, SET_LED_OFF);
 	talks.bind(_SET_LED_ON_OPCODE, SET_LED_ON);
 	talks.bind(_FORCE_PULSEWIDTH_OPCODE, FORCE_PULSEWIDTH);
+	talks.bind(_ENABLE_SHAKING_OPCODE, ENABLE_SHAKING);
+	talks.bind(_DISABLE_SHAKING_OPCODE, DISABLE_SHAKING);
 
 
 	pinMode(SERVO1, OUTPUT);
@@ -71,16 +72,14 @@ void setup(){
 
 	indoor.attach(SERVO1);
 	trashUnloader.attach(SERVO4);
-	shakerHorizontal.attach(SERVO5);
-	shakerVertical.attach(SERVO6);
+	shaker.attachVertical(SERVO6);
+	shaker.attachHorizontal(SERVO5);
 	outdoor.attach(SERVO2);
 	trash.attach(SERVO3);
 
 	trash.write(TRASH_CLOSED);
 	outdoor.write(OUTDOOR_DOOR_CLOSED);
 	indoor.write(INDOOR_DOOR_CLOSED);
-	shakerHorizontal.write(SHAKER_SIDE_HORIZONTAL);
-	shakerVertical.write(SHAKER_SIDE_VERTICAL);
 	trashUnloader.write(TRASH_UNLOADER_CLOSED);
 	waterSensor.begin();
 }
@@ -92,6 +91,7 @@ void resetVelocity(){
 void loop(){
     talks.execute();
 	motor.updateStartup();
+	shaker.updateShaker();
 }
 
 
