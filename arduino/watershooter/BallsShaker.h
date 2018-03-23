@@ -16,7 +16,7 @@ class BallsShaker: public PeriodicProcess {
 
 public:
 	BallsShaker(): shaking(false){
-        setTimestep(0.5);
+        setTimestep(0.15);
     }
 
 	void attachVertical(int PIN);
