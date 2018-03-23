@@ -73,11 +73,14 @@ rm = RoadMap.load('murray.ggb')
 #     4 : [],
 #     5 : [0]
 # }
-class AutomateBornibus:
+class Bornibus:
 
     cube="cube"
     dispenser = "disp"
     shot = "shot"
+    GREEN  = 0
+    ORANGE = 1
+
     #real one
     impossibleAccessFor = {
         cube:{
@@ -97,95 +100,76 @@ class AutomateBornibus:
     }
 
 
+    def __init__(self, side, roadmap, wheeledbase, waterlauncher, watersorter):
+        # Save arduinos
+        self.wheeledbase   = wheeledbase
+        self.waterlauncher = waterlauncher
+        self.watersorter   = watersorter
 
-    def giveMeARandomAccessButAccessible(self,numberCroix):
-        acc = randint(0,3)
-        assert numberCroix in impossibleAccessFor
-        while acc in impossibleAccessFor[cube][numberCroix]:
-            acc = randint(0,3)
-        return acc
+        # Save annexes inf
+        self.side    = side
+        self.roadmap = roadmap
 
+        # Apply cube obstacle
+        self.reset_cube()
 
-    def gimmeARandomStackOfActionsButPossibleAndInAConsistantOrder(self,robot,buildColl,watDisp,ordre,croixSpot,depots,ordreDisp,dispensers,shots):
-        listelistActionsCroix = [croix.getAction(robot,buildColl,watDisp) for croix in croixSpot]
-        listelistActionsDisp = [dsp.getAction(robot,buildColl,watDisp) for dsp in dispensers]
-        listelistActionsShot = [sh.getAction(robot,buildColl,watDisp) for sh in shots]
-        listdepots = [dep.getAction(robot,buildColl,watDisp) for dep in depots]
-        DoneCubeIndex=[]
-        DoneDispIndex=[]
+        self.action_list = [list(),list()]
         
-        #[Act1,Act2]
-        finalListActions=[]
-        indexDep=0
-        while len(DoneCubeIndex)+len(DoneDispIndex)!=len(listelistActionsCroix)+len(listelistActionsDisp):
-            print("--------------------")
-            print("select random")
-            print("DoneCubeIndex : "+str(DoneCubeIndex))
-            print("DoneDispIndex : "+str(DoneDispIndex))
-            print("len(listelistActionsCroix) : "+str(len(listelistActionsCroix)))
-            print("len(listelistActionsDisp) : "+str(len(listelistActionsDisp)))
-            print("--------------------")
+        # Generate Dispenser
+        self.d1 = Dispenser(1,self.roadmap,  self.wheeledbase, self.watersorter)
+        self.d2 = Dispenser(2,self.roadmap,  self.wheeledbase, self.watersorter)
+        self.d3 = Dispenser(3,self.roadmap,  self.wheeledbase, self.watersorter)
+        self.d4 = Dispenser(4,self.roadmap,  self.wheeledbase, self.watersorter)
             
-            cubeOrDisp = randint(0,1)
-            if(cubeOrDisp==1 and len(DoneCubeIndex)!=len(listelistActionsCroix)):
-                #on prend une série de cube
-                cubeNb = randint(0,len(listelistActionsCroix)-1)
-                while cubeNb in DoneCubeIndex :
-                    cubeNb = randint(0,len(listelistActionsCroix)-1)
-                    print(" random cu")
+        # Generate buttons
+        self.bie   = Abeille(self.side, self.wheeledbase)
+        self.panel = Interrupteur(self.side, self.wheeledbase)
 
-                DoneCubeIndex.append(cubeNb)
-                index = ordre[cubeNb]
-                acc = randint(0,len(listelistActionsCroix[cubeNb])-1)
-                while acc in impossibleAccessFor[cube][index]:
-                    acc = randint(0,len(listelistActionsCroix[cubeNb])-1)
-                print("Random CUBE ACCes "+str(acc)+" SELECTED")
-                finalListActions.append(listelistActionsCroix[cubeNb][acc])
-                if(indexDep>5):
-                    raise Exception("Erreur de dépot (generation)")
-                finalListActions.append(listdepots[indexDep][0])
-                indexDep+=1
-            elif len(DoneDispIndex)!=len(listelistActionsDisp):
-                #on prend une série de disp
-                dispNb = randint(0,len(listelistActionsDisp)-1)
-                while dispNb in DoneDispIndex :
-                    dispNb = randint(0,len(listelistActionsDisp)-1)
-                DoneDispIndex.append(dispNb)
+        # Generate balls manipulate
+        self.treatment = Treatment(self.side, self.roadmap, self.wheeledbase, self.watersorter)
+        self.shot      = Shot(self.side, self.roadmap, self.wheeledbase,  self.watersorter, self.waterlauncher)
 
-                index = ordreDisp[dispNb]
-                acc = randint(0,len(listelistActionsDisp[dispNb])-1)
-                while acc in impossibleAccessFor[dispenser][index]:
-                    acc = randint(0,len(listelistActionsDisp[dispNb])-1)
-                    print("random dispNBACC")
+        # Generate order list
 
-                finalListActions.append(listelistActionsDisp[dispNb][acc])
-                finalListActions.append(listelistActionsShot[dispNb][0])
-        finalListActions.reverse()
-        return finalListActions
+        self.action_list[Bornibus.GREEN] = [
+            #self.panel.getAction()[0],
+            #self.d1.getAction()[0],
+            self.shot.getAction()[0],
+            #self.treatment.getAction()[0],
+            ]
         
 
-    def putOnStackCubeSpot(self,rm,index,access,logicalActionStackHardMade,robot,waterDispenser):
+
+
+
+    def reset_cube(self):
+        index = 0
+        access =1
         croi = CubesSpotPoints(index,rm)    
-        logicalActionStackHardMade.append(croi.getAction(robot,builderCollector,waterDispenser)[access])
-    def putOnStackFirstDepot(self,gestionDepot,logicalActionStackHardMade,robot,waterDispenser):
-        depo = gestionDepot.getFirstDepotAvaibleAndDoneIt()
-        logicalActionStackHardMade.append(depo.getAction(robot,builderCollector,waterDispenser)[0])
 
-    def putOnStackDispAction(self,rm,index,access,logicalActionStackHardMade,robot,waterLauncher,waterSorter):
-        d=Dispenser(index,rm)
-        logicalActionStackHardMade.append(d.getAction(robot,waterLauncher,waterSorter)[access])
+        index = 1
+        access =3
+        croi = CubesSpotPoints(index,rm)    
 
-    def putOnStackShootAction(self,rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter):
-        sh=Shot(side,rm,index)
-        logicalActionStackHardMade.append(sh.getAction(robot,waterLauncher,waterSorter)[0])
+        index = 2
+        access =0
+        croi = CubesSpotPoints(index,rm)    
 
-    def putOnStackTreatmentAction(self,rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter):
-        sh=Treatment(side,rm,index)
-        logicalActionStackHardMade.append(sh.getAction(robot,waterLauncher,waterSorter)[0])
+        index = 3
+        access =3
+        croi = CubesSpotPoints(index,rm)    
+
+        index = 4
+        access =3
+        croi = CubesSpotPoints(index,rm)    
+
+        index = 5
+        access=3
+        croi = CubesSpotPoints(index,rm)    
+
 
     def getHarcodedStackOfAction(self,side,rm,robot,waterLauncher,waterSorter):
-        gestionDepot=DepotGestion(side,rm)
-        logicalActionStackHardMade=[]
+        
 
 
     #     #schema du plateau : (cube)
@@ -197,29 +181,7 @@ class AutomateBornibus:
 
     #OBLIGER d'init les cubes ! (pour les points non accessible)
     #---o
-        index = 0
-        access =1
-        croi = CubesSpotPoints(index,rm)    
-    #---
-        index = 1
-        access =3
-        croi = CubesSpotPoints(index,rm)    
-    #---
-        index = 2
-        access =0
-        croi = CubesSpotPoints(index,rm)    
-    #---
-        index = 3
-        access =3
-        croi = CubesSpotPoints(index,rm)    
-    #---
-        index = 4
-        access =3
-        croi = CubesSpotPoints(index,rm)    
-    #---
-        index = 5
-        access=3
-        croi = CubesSpotPoints(index,rm)    
+
     #---
 
             #schema du plateau : (dispenser)
@@ -283,12 +245,7 @@ class AutomateBornibus:
         return logicalActionStackHardMade
 
 
-    def runAutomate(self,side,robot,waterLauncher,waterSorter):
-    #     #A ou B (cf schema du plateau)
-    #     gestionDepotA=DepotGestion(side,rm)
-    #     gestionShootA=ShootGestion(side,rm)
-    #     #définition de l'ordre de sele      ction des croixx
-
+    def run(self):
     #     #schema du plateau :
     #     #         3     0       
     #     #  5                    2 
@@ -296,72 +253,18 @@ class AutomateBornibus:
     #     #
     #     #       A           B
 
-
-    #     logicalActionStackHardMade=[]
-    #     #Initialisations des spots de cubes
-    #     #ATTENTION : obliger de tous les initialiser si on veut avoir les détours ! 
-    #     # sinon fait comme si les blocs n'existent pas
-    #     ordre=[0,1,2,3,4,5]    
-    #     #shuffle(ordre) 
-    #     croix=[]
-    #     depots=[]
-    #     for spot in ordre:
-    #         croi = CubesSpotPoints(spot,rm)
-    #         croix.append(croi)
-    #         depo = gestionDepotA.getFirstDepotAvaibleAndDoneIt()
-    #         depots.append(depo)
-    #         logicalActionStackHardMade.append(croi.getAction(robot,builderCollector,waterDispenser)[0])
-    #         logicalActionStackHardMade.append(depo.getAction(robot,builderCollector,waterDispenser)[0])
-            
-    #     #initilisation des dispenser et shoot
-    #     ordreD=[1,2,3,4]
-    #     #shuffle(ordreD)
-    #     dispensers=[]
-    #     shoots = []
-    #     for i in ordreD:
-    #         d=Dispenser(i,rm)
-    #         dispensers.append(d)
-    #         sh=Shot(side,rm,i)
-    #         shoots.append(sh)
-    #         logicalActionStackHardMade.append(d.getAction(robot,builderCollector,waterDispenser)[0])
-    #         logicalActionStackHardMade.append(sh.getAction(robot,builderCollector,waterDispenser)[0])
-
-
-    #     all = croix+dispensers+shoots
-    #     allActions=[]
-    #     for act in all:
-    #         allActions.append(act.getAction(robot,builderCollector,waterDispenser))
-
-
-        
-    #     #realisations des actions de récup de cubes et dépot
-    #     # for croi in croix:
-    #     #     access=giveMeARandomAccessButAccessible(croi.numberCroix)#which way
-    #     #     croi.goPickUp(access,robot,builderCollector)#recup
-    #     #     gestionDepotA.realizeFirstDepotAvaible(robot,builderCollector)#depot
-        
-    #     # #realisations des dispensers
-    #     # for disp in dispensers:
-    #     #     disp.goPickUpBalls(1,robot,waterDispenser)
-    #     #     gestionShootA.placeAndDoTheShot(robot,waterDispenser,disp.numberDispenser)
-
-    #    # actions = gimmeARandomStackOfActionsButPossibleAndInAConsistantOrder(robot,builderCollector,waterDispenser,ordre,croix,depots,ordreD,dispensers,shoots)
-    #     actions = logicalActionStackHardMade
-    #     #print(actions)
-        robot.set_position(592, 290,0)
-        actions = self.getHarcodedStackOfAction(side,rm,robot,waterLauncher,waterSorter)
-        while len(actions)!=0:
-            act = actions.pop()
+        self.wheeledbase.set_position(592, 290,0)
+        self.wheeledbase.lookahead.set(200)
+        while len(self.action_list[self.side])!=0:
+            act = self.action_list[self.side].pop(0)
             if(act.typ!=ShootGestion.emptyTyp):
-                currentPosXY=robot.get_position()[:2]
-                path = rm.get_shortest_path( currentPosXY , act.actionPoint )
-                AutomateTools.myPurepursuite(robot,path)
+                currentPosXY=self.wheeledbase.get_position()[:2]
+                path = self.roadmap.get_shortest_path( currentPosXY , act.actionPoint )
+                AutomateTools.myPurepursuite(self.wheeledbase,path)
                 act()
 
 
 
-automate = AutomateBornibus()
-#  d = WaterSorter(m)
-#  l = WaterLauncher(m)
-automate.runAutomate('B',b,l,d)
+automate = Bornibus(Bornibus.GREEN, rm, b, l, d)
+automate.run()
 b.stop()

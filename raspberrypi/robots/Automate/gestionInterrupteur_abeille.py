@@ -10,10 +10,11 @@ geoBornibus = GeoGebra('bornibus.ggb')
 
 class Interrupteur(Actionnable):
     typ="Interrupteur"
-    def __init__(self,side):
+    def __init__(self,side, wheeledbase):
         self.side=side
-        self.preparation=geoBornibus.get('Interrupteur'+str(self.side)+'_{0}')
-        self.interrupteur=geoBornibus.get('Interrupteur'+str(self.side)+'_{1}')
+        self.wheeledbase = wheeledbase
+        self.preparation=geoBornibus.get('Interrupteur'+str(self.side)+'_0')
+        self.interrupteur=geoBornibus.get('Interrupteur'+str(self.side)+'_1')
 
     def realize(self,robot):
         #print("Realisation")
@@ -25,13 +26,14 @@ class Interrupteur(Actionnable):
         AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
 
         #override Actionnable
-    def getAction(self,robot,builerCollector,waterDispenser):
-            return [Action(self.preparation,lambda : self.realize(robot),Interrupteur.typ) ]
+    def getAction(self):
+            return [Action(self.preparation,lambda : self.realize(self.wheeledbase),Interrupteur.typ) ]
 
 class Abeille(Actionnable):
     typ="Abeille"
-    def __init__(self,side):
+    def __init__(self, side, wheeledbase):
         self.side=side
+        self.wheeledbase = wheeledbase
         self.preparation=geoBornibus.get('Abeille'+str(self.side)+'_{0}')
         self.interrupteur=geoBornibus.get('Abeille'+str(self.side)+'_{1}')
 
@@ -45,15 +47,16 @@ class Abeille(Actionnable):
         AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
 
         #override Actionnable
-    def getAction(self,robot,builerCollector,waterDispenser):
-            return [Action(self.preparation,lambda : self.realize(robot),Interrupteur.typ) ]
+    def getAction(self):
+            return [Action(self.preparation,lambda : self.realize(self.wheeledbase),Interrupteur.typ) ]
 
 class Abeille(Actionnable):
     typ="Abeille"
-    def __init__(self,side):
+    def __init__(self,side,wheeledbase):
         self.side=side
-        self.preparation=geoBornibus.get('Abeille'+str(self.side)+'_{0}')
-        self.interrupteur=geoBornibus.get('Abeille'+str(self.side)+'_{1}')
+        self.wheeledbase = wheeledbase
+        self.preparation=geoBornibus.get('Abeille'+str(self.side)+'_0')
+        self.interrupteur=geoBornibus.get('Abeille'+str(self.side)+'_1')
 
     def realize(self,robot):
         #print("Realisation")
@@ -66,7 +69,7 @@ class Abeille(Actionnable):
 
         #override Actionnable
     def getAction(self,robot,builerCollector,waterDispenser):
-            return [Action(self.preparation,lambda : self.realize(robot),Abeille.typ) ]
+            return [Action(self.preparation,lambda : self.realize(self.wheeledbase),Abeille.typ) ]
 
 class Odometrie(Actionnable):
     typ="Odometrie"
