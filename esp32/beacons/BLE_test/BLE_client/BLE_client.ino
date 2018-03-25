@@ -6,9 +6,9 @@
 //#include "BLEScan.h"
 
 // The remote service we wish to connect to.
-static BLEUUID serviceUUID("91bad492-b950-4226-aa2b-4ede9fa42f59");
+static BLEUUID serviceUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
 // The characteristic of the remote service we are interested in.
-static BLEUUID    charUUID("0d563a58-196a-48ce-ace2-dfec78acc814");
+static BLEUUID charUUID("beb5483e-36e1-4688-b7f5-ea07361b26a8");
 
 static BLEAddress *pServerAddress;
 static boolean doConnect = false;
@@ -75,7 +75,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     Serial.println(advertisedDevice.toString().c_str());
 
     // We have found a device, let us now see if it contains the service we are looking for.
-    if (advertisedDevice.haveServiceUUID() && advertisedDevice.getServiceUUID().equals(serviceUUID)) {
+   // if (advertisedDevice.haveServiceUUID() && advertisedDevice.getServiceUUID().equals(serviceUUID)) {
 
       // 
       Serial.print("Found our device!  address: "); 
@@ -83,8 +83,11 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 
       pServerAddress = new BLEAddress(advertisedDevice.getAddress());
       doConnect = true;
+      Serial.println("Connecting ... ");
 
-    } // Found our server
+    //} else {
+      Serial.println("Characteristic UUID not matching");
+    //}
   } // onResult
 }; // MyAdvertisedDeviceCallbacks
 
@@ -124,7 +127,7 @@ void loop() {
   // with the current time since boot.
   if (connected) {
     String newValue = "Time since boot: " + String(millis()/1000);
-    Serial.println("Setting new characteristic value to \"" + newValue + "\"");
+    Serial.println("Setting new characteristic value to \"" + newValue + "\" Notify value is : ");
     
     // Set the characteristic's value to be the array of bytes that is actually a string.
     pRemoteCharacteristic->writeValue(newValue.c_str(), newValue.length());

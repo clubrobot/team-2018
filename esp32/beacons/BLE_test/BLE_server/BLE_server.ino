@@ -13,6 +13,24 @@
 #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
+class MyCallbacks : public BLECharacteristicCallbacks{
+  void onWrite(BLECharacteristic *pCharacteristic){
+    std::string rxValue = pCharacteristic->getValue();
+    int dataLength = rxValue.length();
+    Serial.print("Received value (" );
+    Serial.print( dataLength );
+    Serial.println( " bytes)");
+    Serial.print("Received : ");
+    char rxData[dataLength];
+    for(int i = 0; i < dataLength; ++i){
+      rxData[i] = rxValue[i];
+      Serial.print(rxData[i]);
+    }
+    Serial.println("");
+    //Serial.println(rxData);
+  }
+};
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
@@ -26,6 +44,7 @@ void setup() {
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
 
+  pCharacteristic->setCallbacks(new MyCallbacks());
   pCharacteristic->setValue("Hello World says Neil");
   pService->start();
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
