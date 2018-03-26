@@ -9,17 +9,30 @@ COMMON = ../common
 #Setup all libs used !
 LIBS = $(ESP_LIBS)/EEPROM \
 	   $(COMMON)/SerialTalks.cpp \
-	   $(COMMON)/FastLED/FastLED.cpp \
-	   $(COMMON)/FastLED/bitswap.cpp \
-	   $(COMMON)/FastLED/colorpalettes.cpp \
-	   $(COMMON)/FastLED/colorutils.cpp \
-	   $(COMMON)/FastLED/hsv2rgb.cpp \
-	   $(COMMON)/FastLED/lib8tion.cpp \
-	   $(COMMON)/FastLED/noise.cpp \
-	   $(COMMON)/FastLED/power_mgt.cpp \
-	   $(COMMON)/FastLED/wiring.cpp \
-	   $(COMMON)/DomotiquePannel.cpp \
-	   $(COMMON)/PannelÈffects.cpp
+	   $(COMMON)/fastLED/FastLED.cpp \
+	   $(COMMON)/fastLED/bitswap.cpp \
+	   $(COMMON)/fastLED/colorpalettes.cpp \
+	   $(COMMON)/fastLED/colorutils.cpp \
+	   $(COMMON)/fastLED/hsv2rgb.cpp \
+	   $(COMMON)/fastLED/lib8tion.cpp \
+	   $(COMMON)/fastLED/noise.cpp \
+	   $(COMMON)/fastLED/power_mgt.cpp \
+	   $(COMMON)/fastLED/wiring.cpp \
+	   $(COMMON)/WiFi/src/WiFi.cpp \
+	   $(COMMON)/WiFi/src/ETH.cpp \
+	   $(COMMON)/WiFi/src/WiFiAP.cpp \
+	   $(COMMON)/WiFi/src/WiFiClient.cpp \
+	   $(COMMON)/WiFi/src/WiFiGeneric.cpp \
+	   $(COMMON)/WiFi/src/WiFiMulti.cpp \
+	   $(COMMON)/WiFi/src/WiFiSTA.cpp \
+	   $(COMMON)/WiFi/src/WiFiScan.cpp \
+	   $(COMMON)/WiFi/src/WiFiServer.cpp \
+	   $(COMMON)/WiFi/src/WiFiUdp.cpp \
+	   $(COMMON)/PannelEffects.cpp \
+	   $(COMMON)/Pickle.cpp \
+	   $(COMMON)/tcptalks.cpp \
+	   instructions.cpp
+
 
 
 
