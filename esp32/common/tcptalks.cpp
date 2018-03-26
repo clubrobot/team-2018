@@ -24,15 +24,13 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         digitalWrite(2, LOW);
     }
 
-    output.dump<bool>(var);
-    output.dump<long>(10);
-    output.dump<double>(1.1);
-    output.dump<long>(11);
-    output.dump<long>(999999);
 
-    //output.dump<char*>("hello world");
-
-
+    // output.dump<bool>(var);
+    //output.dump<long>(10);
+    // output.dump<double>(1.1);
+    
+    output.dump<char>(0X02);
+    //output.dump<long>(11);
 
 }
 
@@ -310,7 +308,7 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     else
     {
         /* get argument size */
-        size = strlen((char*)args);
+        size = strlen((char*)args)+1;
         Serial.println(size);
 
         if(args[size - 3] == TUPLE)
