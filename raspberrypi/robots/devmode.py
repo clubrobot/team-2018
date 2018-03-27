@@ -24,7 +24,7 @@ class ButtonGesture():
                            "Git pull": self.pull_funct,
                            "Exit": self.exit_funct,
                            "WheeledBase": lambda : self.make_funct("WheeledBase"),
-                           "WaterSorter": lambda : self.make_funct("WaterSorter"),
+                           "WaterShooter": lambda : self.make_funct("WaterShooter"),
                            "Display":     lambda : self.make_funct("Display"),
                            "Sensors":     lambda : self.make_funct("Sensors")
                            }
