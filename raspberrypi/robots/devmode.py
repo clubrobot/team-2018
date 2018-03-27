@@ -17,7 +17,7 @@ class ButtonGesture():
         self.display = display
         self.exiting = False
         self.menus_dict = {"Menu": ["Make", "IP", "Git pull","Reboot", "Shutdown", "Exit"],
-                           "Make": ["WheeledBase", "WaterSorter", "Display", "Sensors"]}
+                           "Make": ["WheeledBase", "WaterShooter", "Display", "Sensors"]}
         self.prog_dict  = {"IP" : self.ip_funct,
                            "Reboot": self.reboot_funct,
                            "Shutdown": self.shutdown_funct,
