@@ -11,20 +11,71 @@ PannelEffects::PannelEffects()
   	LEDS.addLeds<CHIPSET, BAR_PIN, COLOR_ORDER>(leds_bar,NUM_LEDS_BAR);
 
   	LEDS.setBrightness(BRIGHTNESS);
+
+    m_animations[DEFAULT_CODE] = fire_effect;
+    m_animations[FIRE_CODE]    = fire_effect;
+    m_animations[CYLON_CODE]   = cylon;
 }
 
 
 /* public methodes */
 
+void PannelEffects::set_bar_animation(int id)
+{
+    if(id < MAX_ANIMATION)
+      m_id_bar = id;
+}
 
+void PannelEffects::set_engr_animation(int id)
+{
+    if(id < MAX_ANIMATION)
+      m_id_engr = id;
+}
 
+void PannelEffects::set_logo_animation(int id)
+{
+    if(id < MAX_ANIMATION)
+      m_id_logo = id;
+}
 
+int  PannelEffects::get_bar_animation()
+{
+    return m_id_bar;
+}
 
+int  PannelEffects::get_engr_animation()
+{
+    return m_id_engr;
+}
 
+int  PannelEffects::get_logo_animation()
+{
+    return m_id_logo;
+}
 
-/* Private methods */
+void PannelEffects::execute()
+{
+    static int inc = 0;
 
-void PannelEffects::fire_effect(CRGB * led_matrix, const int size)
+    if(inc == 0)
+    {
+        m_animations[m_id_bar];
+        inc++;
+    }
+    else if(inc == 1)
+    {
+        m_animations[m_id_logo];
+        inc++;
+    }
+    else if(inc == 2)
+    {
+        m_animations[m_id_engr];
+        inc = 0;
+    }
+}
+/* animattion func */
+
+void fire_effect(CRGB * led_matrix, const int size)
 {
 	// Array of temperature readings at each simulation cell
    byte heat[size];
@@ -52,18 +103,16 @@ void PannelEffects::fire_effect(CRGB * led_matrix, const int size)
     {
       CRGB color = HeatColor( heat[j]);
       int pixelnumber;
-      if( gReverseDirection ) {
-        pixelnumber = (size-1) - j;
-      } else {
-        pixelnumber = j;
-      }
+      
+      pixelnumber = (size-1) - j;
+
       led_matrix[pixelnumber] = color;
     }
     FastLED.show(); // display this frame
     FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void PannelEffects::fadeall(CRGB *led_matrix, const int size)
+void fadeall(CRGB *led_matrix, const int size)
 { 
 	for(int i = 0; i < size; i++) 
 	{ 
@@ -71,7 +120,7 @@ void PannelEffects::fadeall(CRGB *led_matrix, const int size)
 	}
 }
 
-void PannelEffects::cylon(CRGB * led_matrix, const int size)
+void cylon(CRGB * led_matrix, const int size)
 {
 	static uint8_t hue = 0;
 
@@ -106,7 +155,7 @@ void PannelEffects::cylon(CRGB * led_matrix, const int size)
 
 /* MATRIX METHODS */
 
-uint16_t PannelEffects::XY(uint8_t x, uint8_t y)
+uint16_t XY(uint8_t x, uint8_t y)
 {
 	uint16_t i;
 

@@ -24,15 +24,13 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         digitalWrite(2, LOW);
     }
 
-    output.dump<bool>(var);
-    output.dump<long>(10);
-    output.dump<double>(1.1);
-    output.dump<long>(11);
-    output.dump<long>(999999);
 
-    //output.dump<char*>("hello world");
-
-
+    //output.dump<bool>(var);
+    //output.dump<long>(10);
+    //output.dump<double>(1.1);
+    
+    output.dump<char>(0X02);
+    //output.dump<long>(11);
 
 }
 
@@ -41,7 +39,7 @@ TCPTalks::TCPTalks()
 	
     //ip = "192.168.0.16";
     //ip = "192.168.1.13";
-    ip = "172.20.10.8";
+    ip = "192.168.0.41";
     
 	port =  25565;
 
@@ -50,14 +48,14 @@ TCPTalks::TCPTalks()
 	is_connected = false;
 	is_authentificated = false;
 
-	// ssid = "NUMERICABLE-9251_2GEXT";
-	// pass = "26338b5a57";
+	 ssid = "delphi";
+	pass = "mattomluk";
 
     // ssid = "CLUB_ROBOT";
     // pass = "zigouigoui";
 
-    ssid = "iPhone_Mathis";
-    pass = "azertyuiop";
+    // ssid = "iPhone_Mathis";
+    // pass = "azertyuiop";
 
 }
 
