@@ -15,21 +15,23 @@
 class BrushlessMotor: public PeriodicProcess {
 
 public:
-	BrushlessMotor(): m_enabled(false), m_velocity(0), timeDelay(0), processingSetup(false){}
+	BrushlessMotor(): m_enabled(false), m_velocity(0), processingStartup(false){
+        setTimestep(5);
+    }
 
 	void attach(int PIN);
     void detach();
 
-	void enableSetup();
-	void disableSetup();
-    void updateSetup();
+	void enableStartup();
+	void disableStartup();
+    void updateStartup();
     void enableMotor();
     void disableMotor();
-    bool setVelocity(int velocity);
-	bool setPulsewidth(int pulsewidth);
+    int setVelocity(int velocity);
+	int setPulsewidth(int pulsewidth);
+    void forcePulsewidth(int pulsewidth);
     void update();
-    void setupRise(bool start);
-    void setupFall();
+    void startupProcess();
 
     float getVelocity() const {return map(m_velocity,0,180,0,100);}
     bool  isEnabled() const {return m_enabled;}
@@ -40,8 +42,7 @@ private:
     Servo m_esc;
     bool  m_enabled ;
     int m_velocity; // in %
-    unsigned long timeDelay;
-    bool processingSetup;
+    bool processingStartup;
 
 
 protected:

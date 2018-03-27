@@ -4,27 +4,79 @@
 PannelEffects::PannelEffects()
 {
 	/* Led matrix initialisation */
-	  LEDS.addLeds<CHIPSET, ENGR_PIN, COLOR_ORDER>(leds_engr,NUM_LEDS_ENGR);
+	  LEDS.addLeds<CHIPSET, ENGR_PIN, COLOR_ORDER>(leds_engr,NUM_LEDS_ENGR).setCorrection(TypicalSMD5050);
 
-  	LEDS.addLeds<CHIPSET, LOGO_PIN, COLOR_ORDER>(leds_logo,NUM_LEDS_LOGO);
+  	LEDS.addLeds<CHIPSET, LOGO_PIN, COLOR_ORDER>(leds_logo,NUM_LEDS_LOGO).setCorrection(TypicalSMD5050);
 
-  	LEDS.addLeds<CHIPSET, BAR_PIN, COLOR_ORDER>(leds_bar,NUM_LEDS_BAR);
+  	LEDS.addLeds<CHIPSET, BAR_PIN, COLOR_ORDER>(leds_bar,NUM_LEDS_BAR).setCorrection(TypicalSMD5050);
 
   	LEDS.setBrightness(BRIGHTNESS);
+
+    m_animations[DEFAULT_CODE] = fire_effect;
+    m_animations[FIRE_CODE]    = fire_effect;
+    m_animations[CYLON_CODE]   = cylon;
+    m_animations[MATRIX_CODE]   = matrix;
 }
 
 
 /* public methodes */
 
+void PannelEffects::set_bar_animation(int id)
+{
+    if(id < MAX_ANIMATION)
+      m_id_bar = id;
+}
 
+void PannelEffects::set_engr_animation(int id)
+{
+    if(id < MAX_ANIMATION)
+      m_id_engr = id;
+}
 
+void PannelEffects::set_logo_animation(int id)
+{
+    if(id < MAX_ANIMATION)
+      m_id_logo = id;
+}
 
+int  PannelEffects::get_bar_animation()
+{
+    return m_id_bar;
+}
 
+int  PannelEffects::get_engr_animation()
+{
+    return m_id_engr;
+}
 
+int  PannelEffects::get_logo_animation()
+{
+    return m_id_logo;
+}
 
-/* Private methods */
+void PannelEffects::execute()
+{
+    static int inc = 0;
 
-void PannelEffects::fire_effect(CRGB * led_matrix, const int size)
+    if(inc == 0)
+    {
+        m_animations[m_id_bar](leds_bar, NUM_LEDS_BAR);
+        inc++;
+    }
+    else if(inc == 1)
+    {
+        m_animations[m_id_logo](leds_logo, NUM_LEDS_LOGO);
+        inc++;
+    }
+    else if(inc == 2)
+    {
+        m_animations[m_id_engr](leds_engr, NUM_LEDS_ENGR);
+        inc = 0;
+    }
+}
+/* animattion func */
+
+void fire_effect(CRGB * led_matrix, const int size)
 {
 	// Array of temperature readings at each simulation cell
    byte heat[size];
@@ -52,18 +104,16 @@ void PannelEffects::fire_effect(CRGB * led_matrix, const int size)
     {
       CRGB color = HeatColor( heat[j]);
       int pixelnumber;
-      if( gReverseDirection ) {
-        pixelnumber = (size-1) - j;
-      } else {
-        pixelnumber = j;
-      }
+      
+      pixelnumber = (size-1) - j;
+
       led_matrix[pixelnumber] = color;
     }
     FastLED.show(); // display this frame
     FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void PannelEffects::fadeall(CRGB *led_matrix, const int size)
+void fadeall(CRGB *led_matrix, const int size)
 { 
 	for(int i = 0; i < size; i++) 
 	{ 
@@ -71,7 +121,7 @@ void PannelEffects::fadeall(CRGB *led_matrix, const int size)
 	}
 }
 
-void PannelEffects::cylon(CRGB * led_matrix, const int size)
+void cylon(CRGB * led_matrix, const int size)
 {
 	static uint8_t hue = 0;
 
@@ -106,7 +156,7 @@ void PannelEffects::cylon(CRGB * led_matrix, const int size)
 
 /* MATRIX METHODS */
 
-uint16_t PannelEffects::XY(uint8_t x, uint8_t y)
+uint16_t XY(uint8_t x, uint8_t y)
 {
 	uint16_t i;
 
@@ -123,4 +173,35 @@ uint16_t PannelEffects::XY(uint8_t x, uint8_t y)
 	}
 		  
 	return i;
+}
+
+void matrix(CRGB * led_matrix, const int size)
+{
+    uint32_t ms = millis();
+    int32_t yHueDelta32 = ((int32_t)cos16( ms * (27/1) ) * (350 / KMATRIXWIDTH));
+    int32_t xHueDelta32 = ((int32_t)cos16( ms * (39/1) ) * (310 / KMATRIXHEIGHT));
+
+    DrawOneFrame(led_matrix, ms / 65536, yHueDelta32 / 32768, xHueDelta32 / 32768);
+    if( ms < 5000 ) {
+      FastLED.setBrightness( scale8( BRIGHTNESS, (ms * 256) / 5000));
+    } else {
+      FastLED.setBrightness(BRIGHTNESS);
+    }
+    FastLED.show();
+}
+void DrawOneFrame(CRGB * led_matrix, byte startHue8, int8_t yHueDelta8, int8_t xHueDelta8)
+{
+  byte lineStartHue = startHue8;
+
+  for( byte y = 0 ; y < KMATRIXHEIGHT; y++)
+  {
+      lineStartHue += yHueDelta8;
+      byte pixelHue = lineStartHue; 
+
+      for( byte x = 0; x < KMATRIXWIDTH; x++)
+      {
+          pixelHue += xHueDelta8;
+          led_matrix[ XY(x, y)]  = CHSV( pixelHue, 255, 255);
+      }
+  }
 }

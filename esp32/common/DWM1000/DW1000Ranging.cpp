@@ -160,24 +160,15 @@ void DW1000RangingClass::generalStart() {
 }
 
 
-void DW1000RangingClass::startAsAnchor(char address[], const byte mode[], const bool randomShortAddress) {
+void DW1000RangingClass::startAsAnchor(char address[], const byte mode[], const byte anchorAddress) {
 	//save the address
 	DW1000.convertToByte(address, _currentAddress);
 	//write the address on the DW1000 chip
 	DW1000.setEUI(address);
 	Serial.print("device address: ");
 	Serial.println(address);
-	if (randomShortAddress) {
-		//we need to define a random short address:
-		randomSeed(analogRead(0));
-		_currentShortAddress[0] = random(0, 256);
-		_currentShortAddress[1] = random(0, 256);
-	}
-	else {
-		// we use first two bytes in addess for short address
-		_currentShortAddress[0] = _currentAddress[0];
-		_currentShortAddress[1] = _currentAddress[1];
-	}
+	_currentShortAddress[0] = anchorAddress;
+	_currentShortAddress[1] = 0;
 	
 	//we configur the network for mac filtering
 	//(device Address, network ID, frequency)

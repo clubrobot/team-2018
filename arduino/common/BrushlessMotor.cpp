@@ -4,7 +4,7 @@
 void BrushlessMotor::attach(int pin)
 {
     m_esc.attach(pin, MIN_PULSEWIDTH, MAX_PULSEWIDTH);
-    PeriodicProcess::setTimestep(0.001);
+    //PeriodicProcess::setTimestep(0.001);
 }
 
 void BrushlessMotor::detach()
@@ -21,7 +21,7 @@ void BrushlessMotor::enableMotor()
 void BrushlessMotor::disableMotor()
 {
     m_enabled = false;
-    m_esc.write(MIN_PULSEWIDTH);
+    m_esc.writeMicroseconds(MIN_PULSEWIDTH);
 }
 
 int BrushlessMotor::readMicroseconds()
@@ -29,7 +29,7 @@ int BrushlessMotor::readMicroseconds()
     return m_esc.readMicroseconds();
 }
 
-bool BrushlessMotor::setVelocity(int velocity)
+int BrushlessMotor::setVelocity(int velocity)
 {
     if(velocity >= MIN_VELOCITY && velocity <= MAX_VELOCITY){
         m_velocity = (int) map(velocity,0,100,MIN_PULSEWIDTH,MAX_PULSEWIDTH);
@@ -44,47 +44,38 @@ bool BrushlessMotor::setVelocity(int velocity)
     }
 }
 
-bool BrushlessMotor::setPulsewidth(int pulsewidth) {
-    if(processingSetup){
+int BrushlessMotor::setPulsewidth(int pulsewidth) {
+    if(!processingStartup){
     	m_esc.writeMicroseconds(pulsewidth);
-        return true;
+        return 1;
     } else {
-        return false;
+        return 0 ;
     }
 }
 
-void BrushlessMotor::setupRise(bool start){
-    processingSetup = true;
-    if(start){ 
-        timeDelay = millis();           //ESC just went back on -> start counting time
-    } else {
-        if(timeDelay > 4000){
-            m_esc.writeMicroseconds(MIN_PULSEWIDTH);   //After 5 seconds, write MIN_PULSEWIDTH to setup ESC min
-        }
-        if(timeDelay > 8000){
-            this->disableSetup();        //End of setup
-            processingSetup = false;
-        }
-    }
+void BrushlessMotor::forcePulsewidth(int pulsewidth){
+    m_esc.writeMicroseconds(pulsewidth);
 }
 
-void BrushlessMotor::setupFall(){
-    processingSetup = true;
-    m_esc.writeMicroseconds(MAX_PULSEWIDTH);
+void BrushlessMotor::startupProcess(){
+    this->disableStartup();
 }
 
-void BrushlessMotor::enableSetup(){
-	enable();
+void BrushlessMotor::enableStartup(){
+    m_esc.writeMicroseconds(MIN_PULSEWIDTH);   //ESC just went back on -> start counting time
+    processingStartup = true;
+    enable();
 }
 
-void BrushlessMotor::disableSetup(){
-	disable();
+void BrushlessMotor::disableStartup(){
+	processingStartup = false;
+    disable();
 }
 
-void BrushlessMotor::updateSetup(){
+void BrushlessMotor::updateStartup(){
 	PeriodicProcess::update();
 }
 
 void BrushlessMotor::process(float timestep){
-    this->setupRise(false);
+    this->startupProcess();
 }

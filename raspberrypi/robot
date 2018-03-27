@@ -2,15 +2,21 @@
 
 import os, sys
 import time
+from argparse  import ArgumentParser
+from threading import Thread
 
-from argparse import ArgumentParser
+sys.path.append("{}/common/".format(sys.path[0]))
+sys.path.append("{}/robots/".format(sys.path[0]))
 
 from serialtalks import SerialTalks
-from components  import Server
+from buttons import ButtonCard
+from devmode import ButtonGesture
+from display import SevenSegments
+from components  import Server, Manager
 #from bornibus    import Bornibus
 #from murray      import Murray
 
-from threading import Thread
+DEV_MODE = True
 
 
 arduino_list=['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector']
@@ -106,6 +112,21 @@ class Starter(Thread):
 		self.GreenButton.Off()
 
 
+def buttons():
+	if not DEV_MODE : return
+	m = Manager()
+	m.connect()
+	try:
+		button_card = ButtonCard(m)
+		screen      = SevenSegments(m)
+	except:
+		return 
+	button_gesture = ButtonGesture(button_card,screen,m)
+	while not button_gesture.exiting : time.sleep(0.2)
+	button_card.disconnect()
+	screen.disconnect()
+
+
 def getuuid(args):
 	talks = SerialTalks(args.port)
 	try:
@@ -155,6 +176,7 @@ def getlogs(args):
 
 def server(args):
 	srv = Server(password=args.password,size=args.size)
+	if DEV_MODE : Thread(target=buttons,daemon=True).start()
 	while True:
 		try:
 			while not srv.full():

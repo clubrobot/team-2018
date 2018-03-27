@@ -78,7 +78,7 @@ public:
 	static void initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2, int8_t sck = -1, int8_t miso = -1, int8_t mosi = -1);
 	static void    configureNetwork(uint16_t deviceAddress, uint16_t networkId, const byte mode[]);
 	static void    generalStart();
-	static void    startAsAnchor(char address[], const byte mode[], const bool randomShortAddress = true);
+	static void    startAsAnchor(char address[], const byte mode[], const byte anchorAddress);
 	static void    startAsTag(char address[], const byte mode[], const bool randomShortAddress = true);
 	static boolean addNetworkDevices(DW1000Device* device, boolean shortAddress);
 	static boolean addNetworkDevices(DW1000Device* device);
