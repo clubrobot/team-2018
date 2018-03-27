@@ -45,17 +45,14 @@ TCPTalks::TCPTalks()
 
 	password = "\n";
 
-	is_connected = false;
-	is_authentificated = false;
+	m_connected = false;
+	m_authentificated = false;
 
 	 ssid = "delphi";
 	pass = "mattomluk";
 
     // ssid = "CLUB_ROBOT";
     // pass = "zigouigoui";
-
-    // ssid = "iPhone_Mathis";
-    // pass = "azertyuiop";
 
 }
 
@@ -101,14 +98,11 @@ void TCPTalks::connect(int timeout)
        
     }
 
-    is_connected = true;
+    m_connected = true;
     Serial.println("connected");
 
 
     authentificate(5);
-
-    /* add authentification steps */
-
 }
 
 bool TCPTalks::authentificate(int timeout)
@@ -130,15 +124,15 @@ bool TCPTalks::authentificate(int timeout)
     //     }
        
     // }
-    is_authentificated = true;
-	return is_authentificated;
+    m_authentificated = true;
+	return m_authentificated;
 }
 
 void TCPTalks::disconnect()
 {	
 	client.stop();
     
-	is_connected = false;
+	m_connected = false;
 }
 
 void TCPTalks::bind(uint8_t opcode, Instruction instruction)
@@ -228,13 +222,23 @@ bool TCPTalks::execute()
             if(inc == '.')
             {
                 Serial.println();
-                is_connected = true;
+                m_connected = true;
                 ret |= execinstruction(m_inputBuffer);
                 m_state = TCPTALKS_WAITING_STATE;
             }
         }
     }
     return ret;
+}
+
+bool TCPTalks::is_connected()
+{
+    return m_connected;
+}
+
+bool TCPTalks::is_authentificated()
+{
+    return m_authentificated;
 }
 
 int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
