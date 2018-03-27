@@ -3,6 +3,7 @@
 
 
 extern PannelEffects Animation;
+extern TCPTalks talk;
 
 void SET_BAR(TCPTalks &inst, UnPickler& input, Pickler& output)
 {
@@ -35,4 +36,9 @@ void SET_ENGR(TCPTalks &inst, UnPickler& input, Pickler& output)
 void GET_ENGR(TCPTalks &inst, UnPickler& input, Pickler& output)
 {
 	output.dump<long>(Animation.get_engr_animation());
+}
+
+void IS_CONNECTED(TCPTalks &inst, UnPickler& input, Pickler& output)
+{
+	output.dump<bool>(talk.is_connected());
 }

@@ -178,8 +178,8 @@ uint16_t XY(uint8_t x, uint8_t y)
 void matrix(CRGB * led_matrix, const int size)
 {
     uint32_t ms = millis();
-    int32_t yHueDelta32 = 1;//((int32_t)cos16( ms * (27/1) ) * (350 / KMATRIXWIDTH));
-    int32_t xHueDelta32 = 1;//((int32_t)cos16( ms * (39/1) ) * (310 / KMATRIXHEIGHT));
+    int32_t yHueDelta32 = ((int32_t)cos16( ms * (27/1) ) * (350 / KMATRIXWIDTH));
+    int32_t xHueDelta32 = ((int32_t)cos16( ms * (39/1) ) * (310 / KMATRIXHEIGHT));
 
     DrawOneFrame(led_matrix, ms / 65536, yHueDelta32 / 32768, xHueDelta32 / 32768);
     if( ms < 5000 ) {

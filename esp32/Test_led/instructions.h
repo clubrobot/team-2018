@@ -14,6 +14,7 @@
 #define SET_ENGR_OPCODE	 0X15
 #define GET_ENGR_OPCODE	 0X16
 
+#define IS_CONNECTED_OPCODE 0X17	
 
 void SET_BAR(TCPTalks &inst, UnPickler& input, Pickler& output);
 
@@ -26,6 +27,8 @@ void GET_LOGO(TCPTalks &inst, UnPickler& input, Pickler& output);
 void SET_ENGR(TCPTalks &inst, UnPickler& input, Pickler& output);
 
 void GET_ENGR(TCPTalks &inst, UnPickler& input, Pickler& output);
+
+void IS_CONNECTED(TCPTalks &inst, UnPickler& input, Pickler& output);
 
 #endif //__INSTRUCTIONS_H__
 
