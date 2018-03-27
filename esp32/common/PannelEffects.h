@@ -27,6 +27,7 @@
 #define DEFAULT_CODE 0X01
 #define FIRE_CODE 	 0X01
 #define CYLON_CODE	 0X02
+#define MATRIX_CODE	 0X03
 
 /* **************************FIRE PARAMETERS *********************************
 * COOLING: How much does the air cool as it rises?
@@ -90,3 +91,5 @@ void cylon(CRGB * led_matrix, const int size);
 /* MATRIX func */
 /* return index in led array */
 uint16_t XY(uint8_t x, uint8_t y); 
+void matrix(CRGB * led_matrix, const int size);
+void DrawOneFrame(CRGB * led_matrix, byte startHue8, int8_t yHueDelta8, int8_t xHueDelta8);
