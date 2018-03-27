@@ -2,8 +2,8 @@
  * A BLE client example that is rich in capabilities.
  */
 
-#include "BLEDevice.h"
-//#include "BLEScan.h"
+#include <BLEDevice.h>
+#include <BLEClient.h>
 
 // The remote service we wish to connect to.
 static BLEUUID serviceUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
@@ -14,6 +14,14 @@ static BLEAddress *pServerAddress;
 static boolean doConnect = false;
 static boolean connected = false;
 static BLERemoteCharacteristic* pRemoteCharacteristic;
+
+static String stringify(std::string s){
+  String ret;
+  for(int i = 0; i < s.length();++i){
+    ret[i] = s[i];
+  }
+  return ret;
+}
 
 static void notifyCallback(
   BLERemoteCharacteristic* pBLERemoteCharacteristic,
@@ -26,6 +34,22 @@ static void notifyCallback(
     Serial.println(length);
 }
 
+class ClientCallbacks : public BLEClientCallbacks
+{
+  void onDisconnect(BLEClient *pClient)
+  {
+    Serial.println("Disconnected. Restarting device")
+    ESP.restart();    // TODO : find a better way to handle disconnections
+
+  }
+  void onConnect(BLEClient *pClient)
+  {
+    Serial.print("Client connected (address = ");
+    Serial.print(stringify(pClient->getPeerAddress().toString()));
+    Serial.println(")");
+  }
+};
+
 bool connectToServer(BLEAddress pAddress) {
     Serial.print("Forming a connection to ");
     Serial.println(pAddress.toString().c_str());
@@ -33,9 +57,10 @@ bool connectToServer(BLEAddress pAddress) {
     BLEClient*  pClient  = BLEDevice::createClient();
     Serial.println(" - Created client");
 
-    // Connect to the remove BLE Server.
+    // Connect to the remote BLE Server.
     pClient->connect(pAddress);
     Serial.println(" - Connected to server");
+    pClient->setClientCallbacks(new ClientCallbacks());
 
     // Obtain a reference to the service we are after in the remote BLE server.
     BLERemoteService* pRemoteService = pClient->getService(serviceUUID);
