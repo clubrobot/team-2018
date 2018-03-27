@@ -6,8 +6,8 @@
 #include "../common/SerialTalks.h"
 #include "../common/PeriodicProcess.h"
 
-#define SHAKER_HORIZONTAL_1 60
-#define SHAKER_HORIZONTAL_2 300
+#define SHAKER_HORIZONTAL_1 0
+#define SHAKER_HORIZONTAL_2 135
 
 #define SHAKER_VERTICAL_1 85
 #define SHAKER_VERTICAL_2 130
@@ -16,7 +16,7 @@ class BallsShaker: public PeriodicProcess {
 
 public:
 	BallsShaker(): shaking(false){
-        setTimestep(0.15);
+        setTimestep(0.3);
     }
 
 	void attachVertical(int PIN);
