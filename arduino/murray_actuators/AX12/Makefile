@@ -1,14 +1,15 @@
-BOARD_UUID = BrushlessMotor
+BOARD_UUID = AX12_testu
 BOARD_TAG  = nano
 BOARD_SUB  = atmega328
 
 # Sketch sources
 COMMON = ../common
-LOCAL_INO_SRCS = brushlessMotor.ino
+LOCAL_INO_SRCS = main.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
-	$(COMMON)/BrushlessMotor.cpp 
+	$(COMMON)/ShiftRegister.cpp \
+	$(COMMON)/AX12.cpp 
 
 # Sketch libraries
 ARDUINO_LIBS = EEPROM Servo

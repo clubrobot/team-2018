@@ -24,15 +24,13 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
         digitalWrite(2, LOW);
     }
 
-    output.dump<bool>(var);
-    output.dump<long>(10);
-    output.dump<double>(1.1);
-    output.dump<long>(11);
-    output.dump<long>(999999);
 
-    //output.dump<char*>("hello world");
-
-
+    //output.dump<bool>(var);
+    //output.dump<long>(10);
+    //output.dump<double>(1.1);
+    
+    output.dump<char>(0X02);
+    //output.dump<long>(11);
 
 }
 
@@ -41,23 +39,20 @@ TCPTalks::TCPTalks()
 	
     //ip = "192.168.0.16";
     //ip = "192.168.1.13";
-    ip = "172.20.10.8";
+    ip = "192.168.0.41";
     
 	port =  25565;
 
 	password = "\n";
 
-	is_connected = false;
-	is_authentificated = false;
+	m_connected = false;
+	m_authentificated = false;
 
-	// ssid = "NUMERICABLE-9251_2GEXT";
-	// pass = "26338b5a57";
+	 ssid = "delphi";
+	pass = "mattomluk";
 
     // ssid = "CLUB_ROBOT";
     // pass = "zigouigoui";
-
-    ssid = "iPhone_Mathis";
-    pass = "azertyuiop";
 
 }
 
@@ -103,14 +98,11 @@ void TCPTalks::connect(int timeout)
        
     }
 
-    is_connected = true;
+    m_connected = true;
     Serial.println("connected");
 
 
     authentificate(5);
-
-    /* add authentification steps */
-
 }
 
 bool TCPTalks::authentificate(int timeout)
@@ -132,15 +124,15 @@ bool TCPTalks::authentificate(int timeout)
     //     }
        
     // }
-    is_authentificated = true;
-	return is_authentificated;
+    m_authentificated = true;
+	return m_authentificated;
 }
 
 void TCPTalks::disconnect()
 {	
 	client.stop();
     
-	is_connected = false;
+	m_connected = false;
 }
 
 void TCPTalks::bind(uint8_t opcode, Instruction instruction)
@@ -230,13 +222,23 @@ bool TCPTalks::execute()
             if(inc == '.')
             {
                 Serial.println();
-                is_connected = true;
+                m_connected = true;
                 ret |= execinstruction(m_inputBuffer);
                 m_state = TCPTALKS_WAITING_STATE;
             }
         }
     }
     return ret;
+}
+
+bool TCPTalks::is_connected()
+{
+    return m_connected;
+}
+
+bool TCPTalks::is_authentificated()
+{
+    return m_authentificated;
 }
 
 int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)

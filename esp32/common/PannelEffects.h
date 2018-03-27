@@ -21,6 +21,14 @@
 #define BRIGHTNESS  200
 #define FRAMES_PER_SECOND 30
 
+#define MAX_ANIMATION 10
+
+
+#define DEFAULT_CODE 0X01
+#define FIRE_CODE 	 0X01
+#define CYLON_CODE	 0X02
+#define MATRIX_CODE	 0X03
+
 /* **************************FIRE PARAMETERS *********************************
 * COOLING: How much does the air cool as it rises?
 * Less cooling = taller flames.  More cooling = shorter flames.
@@ -39,21 +47,24 @@ class PannelEffects
 {
 	public:
 		PannelEffects();
-		~PannelEffects();
 
 		void show(){ FastLED.show(); }
 
 		void delay(unsigned long time_ms){ FastLED.delay(time_ms); }
 
-		void set_bar_animation(unsigned char id);
+		void set_bar_animation(int id);
 
-		void set_engr_animation(unsigned char id);
+		void set_engr_animation(int id);
 
-		void set_logo_animation(unsigned char id);	
+		void set_logo_animation(int id);	
 
-		void start();
+		int  get_bar_animation();
 
+		int  get_engr_animation();
 
+		int  get_logo_animation();
+
+		void execute();
 
 	private:
 
@@ -61,14 +72,24 @@ class PannelEffects
 		CRGB leds_logo[NUM_LEDS_LOGO];
 		CRGB leds_bar[NUM_LEDS_BAR];
 
-		bool gReverseDirection = true; /* used in fire_effect()*/
+		typedef void (*Animation)(CRGB * led_matrix, const int size);
 
-		void fire_effect(CRGB * led_matrix, const int size);
-		void fadeall(CRGB *led_matrix, const int size);
-		void cylon(CRGB * led_matrix, const int size);
+		Animation m_animations[MAX_ANIMATION];
 
-		/* MATRIX METHODS */
+		int m_id_engr = DEFAULT_CODE;
 
-		/* return index in led array */
-		uint16_t XY(uint8_t x, uint8_t y); 
+		int m_id_logo = DEFAULT_CODE;
+
+		int m_id_bar  = DEFAULT_CODE;
+
 };
+
+void fire_effect(CRGB * led_matrix, const int size);
+void fadeall(CRGB *led_matrix, const int size);
+void cylon(CRGB * led_matrix, const int size);
+
+/* MATRIX func */
+/* return index in led array */
+uint16_t XY(uint8_t x, uint8_t y); 
+void matrix(CRGB * led_matrix, const int size);
+void DrawOneFrame(CRGB * led_matrix, byte startHue8, int8_t yHueDelta8, int8_t xHueDelta8);

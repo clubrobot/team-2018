@@ -10,7 +10,9 @@ class AutomateTools:
             print("Patinage")
             robot.set_velocities(-300,0)
             time.sleep(0.2)
+            
             r = action()
+
             if(r==AutomateTools.stopThisAction):
                 return
             AutomateTools.myWait(robot,action)

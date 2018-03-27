@@ -63,6 +63,10 @@ class TCPTalks
 
 	int sendback(uint8_t opcode, long retcode, byte * args);
 
+	bool is_connected();
+
+	bool is_authentificated();
+
 		
 	protected: // Protected methods
 
@@ -72,8 +76,8 @@ class TCPTalks
 
 	char* password = "";
 
-	bool is_connected;
-	bool is_authentificated;
+	bool m_connected;
+	bool m_authentificated;
 
 	char* ssid     = "";
 	char* pass = "";
@@ -96,6 +100,7 @@ class TCPTalks
 
 	byte  m_inputBuffer [TCPTALKS_INPUT_BUFFER_SIZE];
 	byte  m_outputBuffer[TCPTALKS_OUTPUT_BUFFER_SIZE];
+
 
 
 };
