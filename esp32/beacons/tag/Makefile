@@ -7,7 +7,7 @@ SKETCH = tag.ino
 BOARD_UUID = tag
 COMMON = ../../common
 DWM1000_LIB = ../../common/DWM1000
-SKETCH_LIBS = ~/Arduino/libraries/ESP8266_and_ESP32_Oled_Driver_for_SSD1306_display
+SKETCH_LIBS = ~/Arduino/libraries/ESP8266_and_ESP32_Oled_Driver_for_SSD1306_display/src
 
 #Setup all libs used !
 LIBS = 	$(ESP_LIBS)/SPI \
