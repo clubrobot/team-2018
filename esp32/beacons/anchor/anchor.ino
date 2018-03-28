@@ -98,7 +98,7 @@ void setup() {
   EEPROM.write(EEPROM_REPLY_DELAY + 1, replyTime % 256);
   EEPROM.commit();
   #endif
-  replyTime = (EEPROM.read(EEPROM_REPLY_DELAY) << 8) + EEPROM.read(EEPROM_REPLY_DELAY);
+  replyTime = (EEPROM.read(EEPROM_REPLY_DELAY) << 8) + EEPROM.read(EEPROM_REPLY_DELAY+1);
   DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
@@ -119,7 +119,11 @@ void setup() {
   pinMode(PIN_LED_OK,OUTPUT);
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
-  display.drawString(64, 24, "SYNCHRONISATION\n(anchor)");
+  String toDisplay = "SYNCHRONISATION\n(anchor : ";
+  toDisplay += currentBeaconNumber;
+  toDisplay += ")\n";
+  toDisplay += replyTime;
+  display.drawString(64, 64/4, toDisplay);
   display.display();
 
   display.setFont(ArialMT_Plain_24);
