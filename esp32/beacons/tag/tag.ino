@@ -10,11 +10,25 @@
 #include "pin.h"
 #include "SSD1306.h"
 #include <Wire.h>
+#include "MatrixMath.h"
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
 void newRange()
 {
+  const float x_1 = 5;
+  const float y_1 = -49;
+  const float x_2 = 1000;
+  const float y_2 = 3049;
+  const float x_3 = 1950;
+  const float y_3 = -49;
+  
+
+  static String toDisplay[4];
+  static float d1 = 1500;
+  static float d2 = 2097;
+  static float d3 = 1380;
+
   Serial.print("from: ");
   Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
   Serial.print("\t Range: ");
@@ -24,12 +38,59 @@ void newRange()
   Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
   Serial.println(" dBm");
 
+  byte id = DW1000Ranging.getDistantDevice()->getShortAddress();
+
   display.clear();
-  float distance = DW1000Ranging.getDistantDevice()->getRange() * 100;
-  String toDisplay = "Distance : \n";
-  toDisplay += distance;
-  toDisplay += "cm";
-  display.drawString(64, 0, toDisplay);
+  float distance = DW1000Ranging.getDistantDevice()->getRange() * 1000;
+
+  switch(id){
+    case 35:    //TODO : should be 0
+      d1 = distance;
+      toDisplay[0] = "anch0 : ";
+      toDisplay[0] += distance;
+      toDisplay[0] += " mm";
+      break;
+    case 36: //TODO : should be 1
+      d2 = distance;
+      toDisplay[1] = "anch1 : ";
+      toDisplay[1] += distance;
+      toDisplay[1] += " mm";
+      break;
+    case 37: //TODO : should be 2
+      d3 = distance;
+      toDisplay[2] = "anch2 : ";
+      toDisplay[2] += distance;
+      toDisplay[2] += " mm";
+      break;
+    /*default:
+      toDisplay[3] = "(";
+      toDisplay[3] += id;
+      toDisplay[3] += ") : ";
+      toDisplay[3] += distance;
+      toDisplay[3] += " mm";*/
+  }
+
+  // Trilateration algorithm
+  float A[2][2] = {{-2 * (x_1 - x_3), -2 * (y_1 - y_3)},
+                   {-2 * (x_2 - x_3), -2 * (y_2 - y_3)}};
+
+  float b[2] = {d1 * d1 - x_1 * x_1 - y_1 * y_1 - d3 * d3 + x_3 * x_3 + y_3 * y_3, d2 * d2 - x_2 * x_2 - y_2 * y_2 - d3 * d3 + x_3 * x_3 + y_3 * y_3};
+  float Ainv[2][2];
+  memcpy(&Ainv[0][0], &A[0][0], sizeof(float) * 4);
+  Matrix.Invert(&Ainv[0][0], 2);
+  float p[2];
+  Matrix.Multiply(&Ainv[0][0], &b[0], 2, 2, 1, &p[0]);
+
+  toDisplay[3] = "position : (";
+  toDisplay[3] += p[0];
+  toDisplay[3] += ",";
+  toDisplay[3] += p[1];
+  toDisplay[3] += ")";
+
+  display.drawString(64, 0, toDisplay[0]);
+  display.drawString(64, 15, toDisplay[1]);
+  display.drawString(64, 30, toDisplay[2]);
+  display.drawString(64, 45, toDisplay[3]);
   display.display();
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -81,7 +142,7 @@ void setup() {
   display.drawString(64, 24, "SYNCHRONISATION\n(tag)");
   display.display();
 
-  display.setFont(ArialMT_Plain_24);
+  //display.setFont(ArialMT_Plain_24);
 }
 
 void loop() {
