@@ -18,12 +18,25 @@ class Dispenser(Actionnable):
         self.preparationPoint=geo.get('Dispenser'+str(self.numberDispenser)+'_0')
 
     def realize(self,robot,watersorter):
-        theta = math.atan2(self.preparationPoint[1]-self.targetPoint[1],self.preparationPoint[0]-self.targetPoint[0])
-
+        theta = math.atan2(self.preparationPoint[1]-self.targetPoint[1],self.preparationPoint[0]-self.targetPoint[0])+3.141592
+        robot.max_linvel.set(300)
+        robot.max_angvel.set(1)
+        watersorter.close_trash()
+        watersorter.close_outdoor()
+        watersorter.open_indoor()
         robot.turnonthespot(theta)
-        robot.wait()
+        while True:
+            try:
+                robot.wait()
+                break
+            except:
+                time.sleep(0.2)
+                robot.turnonthespot(theta)
+
         path = [self.preparationPoint,self.targetPoint]
-        robot.purepursuit(path,direction='backward')
+        robot.purepursuit(path,direction='forward')
+        robot.max_linvel.set(500)
+        robot.max_angvel.set(6)
 
         #AutomateTools.myPurepursuite(robot,path)
         #AutomateTools.myTurnonthespot(robot,robot.get_position()[-1] +3.141592)
@@ -34,7 +47,15 @@ class Dispenser(Actionnable):
             self.watersorter.enable_shaker()
             time.sleep(3)
             self.watersorter.disable_shaker()
+        init_pos = robot.get_position()[:-1]
 
+        robot.set_velocities(-200,0)
+        pos = robot.get_position()[:-1]
+        while math.hypot(pos[0]-init_pos[0],pos[1]-init_pos[1])<300:
+            time.sleep(0.5)
+            pos = robot.get_position()[:-1]
+        
+        robot.stop()
 
     def funForWaitDisp(self,robot,path):
         if True:
@@ -99,40 +120,113 @@ class Shot(Actionnable):
         self.castlePoint=geo.get('Castle'+str(self.side))
         
         
-    def realize(self,wheeledbase, watersorter, waterlauncher):
+    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher,timeout=5):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         wheeledbase.turnonthespot(theta)
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
+       
         time.sleep(0.2)
-        waterlauncher.set_motor_velocity(13)#9
+        waterlauncher.set_motor_velocity(9)#9
+        time.sleep(1) # Wait the motor running
         watersorter.enable_shaker()
-        watersorter.write_trash(129)
-        watersorter.close_indoor()
+        watersorter.write_trash(128)
+        watersorter.open_indoor()
         watersorter.close_outdoor()
-        time.sleep(0.3)
-        for i in range(6):
-            watersorter.open_indoor()
+        timeout_reached = False
+        nb_ball = 0
+        while not timeout_reached and nb_ball<8:
+            #watersorter.open_indoor()
             watersorter.close_outdoor()
-            time.sleep(1.3)
-            watersorter.close_indoor()
+            open_time = time.time()
+            while time.time()-open_time<timeout and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
+                time.sleep(0.3)
+                print(watersorter.get_water_color())
+            if time.time()-open_time>(timeout):
+                print("TIMEOUT")
+                break
+            #watersorter.close_indoor()
+            
+            print("New ball geted ! {}".format(nb_ball))
+            #Verification de la sortie dans le canon
+
+            time.sleep(0.5)
+            nb_ball+=1
+            print("New ball geted ! {}".format(nb_ball))
+            
             watersorter.open_outdoor()
-            time.sleep(1.3)
+            while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
+                time.sleep(0.05)
+                print("En attente de la sortie")
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
         waterlauncher.set_motor_velocity(0)
             
+    def realize_with_sort(self,wheeledbase, watersorter, waterlauncher,timeout=5):
+        currentPosXY=wheeledbase.get_position()[:2]
+        theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
+        wheeledbase.turnonthespot(theta)
+        old = wheeledbase.angpos_threshold.get()
+        wheeledbase.angpos_threshold.set(0.1)
+       
+        time.sleep(0.2)
+        waterlauncher.set_motor_velocity(9)#9
+        time.sleep(1) # Wait the motor running
+        watersorter.enable_shaker()
+        watersorter.write_trash(128)
+        watersorter.close_indoor()
+        watersorter.write_trash_unloader(100)
+        watersorter.close_outdoor()
+        timeout_reached = False
+        nb_ball = 0
+        while not timeout_reached and nb_ball<8:
+            watersorter.open_indoor()
+            watersorter.close_trash()
+            watersorter.close_outdoor()
+            open_time = time.time()
+            while time.time()-open_time<timeout and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
+                time.sleep(0.3)
+                print(watersorter.get_water_color())
+            if time.time()-open_time>(timeout):
+                print("TIMEOUT")
+                break
+            watersorter.close_indoor()
+            
+            print("New ball geted ! {}".format(nb_ball))
+            #Verification de la sortie dans le canon
 
-    #override
+            time.sleep(0.7)
+            nb_ball+=1
+            print("New ball geted ! {}".format(nb_ball))
+            # On verifie si la code couleur est bon
+            if(watersorter.get_water_color()[0]<watersorter.get_water_color()[1]):
+                watersorter.open_outdoor()
+            else:
+                watersorter.open_trash()
+
+            while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
+                time.sleep(0.4)
+                print("En attente de la sortie")
+            time.sleep(1.3)
+        watersorter.disable_shaker()
+        wheeledbase.angpos_threshold.set(old)
+        waterlauncher.set_motor_velocity(0)
+
+
     def getAction(self):
         
-        act =Action(
+        act_without_sort =Action(
                 self.shootCastlePoint,
-                lambda  :self.realize(self.wheeledbase,self.watersorter,self.waterlauncher) ,
+                lambda  :self.realize_without_sort(self.wheeledbase,self.watersorter,self.waterlauncher) ,
                 Shot.typ
                 )
-        return [act]
+        act_with_sort =Action(
+                self.shootCastlePoint,
+                lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher) ,
+                Shot.typ
+                )   
+        return [act_without_sort,act_with_sort]
 
 
 class Treatment(Actionnable):
@@ -147,15 +241,26 @@ class Treatment(Actionnable):
         
     def realize(self, shotDirection,robot,waterSorter):
         currentPosXY=robot.get_position()[:2]
-        theta = math.atan2(shotDirection[1]-currentPosXY[1],shotDirection[0]-currentPosXY[0])
-        AutomateTools.myTurnonthespot(robot,theta)
-        #AutomateTools.myDrop(waterSorter)
+        robot.purepursuit([currentPosXY,shotDirection])
+        
+        robot.wait()
+        robot.turnonthespot(3.141592/2)
+        robot.wait()
+        waterSorter.open_trash_unloader()
+        time.sleep(2)
+        waterSorter.open_trash()
+        time.sleep(0.7)
+        waterSorter.close_trash()
+        time.sleep(2)
+        waterSorter.close_trash_unloader()
+        robot.turnonthespot(0)
+        robot.goto(*currentPosXY)
 
     #override
     def getAction(self):
         act =Action(
-                self.shootTreatmentPoint,
-                lambda  :self.realize(self.treatmentPoint,self.wheeledbase ,self.watersorter) ,
+                self.treatmentPoint,
+                lambda  :self.realize(self.shootTreatmentPoint,self.wheeledbase ,self.watersorter) ,
                 Treatment.typ
             )
         return [act]

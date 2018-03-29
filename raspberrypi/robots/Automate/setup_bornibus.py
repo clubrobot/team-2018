@@ -37,6 +37,9 @@ from sensors            import *
 # Define temporary modules
 
 # Connect to the Raspberry Pi and the different modules
+MAX_VEL = 500
+MAX_ROT = 6
+
 
 try:
 	m = Manager(hostname)
@@ -76,3 +79,12 @@ except :
 #yb = LightButtonModule(m, 35, 36)
 #gb = LightButtonModule(m, 21, 22)
 #sw = SwitchModule(m, 29)
+#b.set_position(592, 290,0)
+
+#b.purepursuit(((592.0, 290.0), (550.361579875327, 522.9456982944794), (396.51542602917317, 611.768816631345), (242.66927218301936, 700.5919349682105), (242.66927218301936, 878.2381716419414), (242.66927218301936, 1055.8844083156723), (351.6070411096273, 1219.2644750469503)))
+#b.wait()
+#b.goto(592.0, 290.0)
+
+d.open_outdoor()
+
+#l.set_motor_velocity(20)

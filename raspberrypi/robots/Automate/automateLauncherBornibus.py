@@ -132,9 +132,11 @@ class Bornibus:
         # Generate order list
 
         self.action_list[Bornibus.GREEN] = [
-            #self.panel.getAction()[0],
-            #self.d1.getAction()[0],
+            self.d1.getAction()[0],
             self.shot.getAction()[0],
+            #self.panel.getAction()[0],
+            #self.d3.getAction()[0],
+            #self.shot.getAction()[1],
             #self.treatment.getAction()[0],
             ]
         
@@ -168,100 +170,29 @@ class Bornibus:
         croi = CubesSpotPoints(index,rm)    
 
 
-    def getHarcodedStackOfAction(self,side,rm,robot,waterLauncher,waterSorter):
-        
-
-
-    #     #schema du plateau : (cube)
-    #     #         3     0       
-    #     #  5                    2 
-    #     #      4            1        
-    #     #
-    #     #       A           B
-
-    #OBLIGER d'init les cubes ! (pour les points non accessible)
-    #---o
-
-    #---
-
-            #schema du plateau : (dispenser)
-        #       3          2    
-        #                       
-        #  4                    1
-        #
-        #       A           B
-
-        #initilisation des dispenser et shoot
-  
-#    ---
-        # index = 1
-        # access=0
-        #self.putOnStackDispAction(rm,index,access,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        
-        #self.putOnStackShootAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        #self.putOnStackTreatmentAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-
-    #---
-        index = 2
-        access=0
-    #     self.putOnStackDispAction(rm,index,access,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        
-    #   self.putOnStackShootAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        self.putOnStackTreatmentAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-
-    # #---
-    #     index = 3
-    #     access=0
-    #     self.putOnStackDispAction(rm,index,access,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        
-    #     self.putOnStackShootAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-    #     self.putOnStackTreatmentAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-
-    # #---
-    #     index = 4
-    #     access=0
-    #     self.putOnStackDispAction(rm,index,access,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        
-    #     self.putOnStackShootAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-    #     self.putOnStackTreatmentAction(rm,side,index,logicalActionStackHardMade,robot,waterLauncher,waterSorter)
-        #---
-    #     odometrie_Bas = Odometrie(side,0).getAction(robot,waterLauncher,waterSorter)[0]
-    #     logicalActionStackHardMade.append(odometrie_Bas)
-    # #---
-    #     odometrie_Droit = Odometrie(side,1).getAction(robot,waterLauncher,waterSorter)[0]
-    #     logicalActionStackHardMade.append(odometrie_Droit)
-    #---
-        # actionnerInterrupteur = Interrupteur(side).getAction(robot,waterLauncher,waterSorter)[0]
-        # logicalActionStackHardMade.append(actionnerInterrupteur)
-    #---
-        # actionnerAbeille = Abeille(side).getAction(robot,waterLauncher,waterSorter)[0]
-        # logicalActionStackHardMade.append(actionnerAbeille)
-  
-    #---
-
-
-    #------------------------------------------
-        logicalActionStackHardMade.reverse()
-        return logicalActionStackHardMade
-
-
     def run(self):
     #     #schema du plateau :
     #     #         3     0       
     #     #  5                    2 
     #     #      4            1    
     #     #
-    #     #       A           B
+    #     #       TIME*TIME_STEA           B
 
         self.wheeledbase.set_position(592, 290,0)
         self.wheeledbase.lookahead.set(200)
+        self.wheeledbase.max_linvel.set(500)
+        self.wheeledbase.max_angvel.set(6)
         while len(self.action_list[self.side])!=0:
             act = self.action_list[self.side].pop(0)
             if(act.typ!=ShootGestion.emptyTyp):
                 currentPosXY=self.wheeledbase.get_position()[:2]
                 path = self.roadmap.get_shortest_path( currentPosXY , act.actionPoint )
+                print(path)
                 AutomateTools.myPurepursuite(self.wheeledbase,path)
+                print("Make action")
                 act()
+                self.wheeledbase.max_linvel.set(500)
+                self.wheeledbase.max_angvel.set(6)
 
 
 

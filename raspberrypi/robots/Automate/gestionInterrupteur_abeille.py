@@ -24,6 +24,11 @@ class Interrupteur(Actionnable):
         robot.purepursuit(path)
             #si on patine alors on stop l'action
         AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
+        robot.goto(self.preparation[0],self.preparation[1])
+        try:
+            robot.wait()
+        except:
+            pass
 
         #override Actionnable
     def getAction(self):
