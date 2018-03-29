@@ -7,7 +7,7 @@ from cubes import *
 c = camth()
 v = vision(c)
 time.sleep(0.5)
-v.enable_raw_image()
+v.enable_raw_display()
 v.refresh_image()
 deb = time.monotonic()
 v.calibration()

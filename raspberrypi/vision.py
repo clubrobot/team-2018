@@ -71,6 +71,8 @@ class vision():
 
       def refresh_image(self):
           self.raw_image = self.camera.image.copy()
+		  for p in self.piles:
+			  p.refresh_image(self.raw_image)
           return self.raw_image
 	 
       def calibration(self):
