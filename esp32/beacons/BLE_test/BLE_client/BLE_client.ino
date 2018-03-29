@@ -15,13 +15,6 @@ static boolean doConnect = false;
 static boolean connected = false;
 static BLERemoteCharacteristic* pRemoteCharacteristic;
 
-static String stringify(std::string s){
-  String ret;
-  for(int i = 0; i < s.length();++i){
-    ret[i] = s[i];
-  }
-  return ret;
-}
 
 static void notifyCallback(
   BLERemoteCharacteristic* pBLERemoteCharacteristic,
@@ -38,14 +31,14 @@ class ClientCallbacks : public BLEClientCallbacks
 {
   void onDisconnect(BLEClient *pClient)
   {
-    Serial.println("Disconnected. Restarting device")
+    Serial.println("Disconnected. Restarting device");
     ESP.restart();    // TODO : find a better way to handle disconnections
 
   }
   void onConnect(BLEClient *pClient)
   {
     Serial.print("Client connected (address = ");
-    Serial.print(stringify(pClient->getPeerAddress().toString()));
+    Serial.print(pClient->getPeerAddress().toString().c_str());
     Serial.println(")");
   }
 };

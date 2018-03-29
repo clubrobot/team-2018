@@ -1,4 +1,6 @@
 #include "instructions.h"
+#include "configuration.h"
+#include "EEPROM.h"
 
 void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "update anchor number\n";

@@ -2,12 +2,12 @@ BOARD = esp32
 CHIP = esp32
 
 #Arduino file
-SKETCH = tag.ino
+SKETCH = triangulation.ino
 
-BOARD_UUID = tag
+BOARD_UUID = triangulation
 COMMON = ../../common
 DWM1000_LIB = ../../common/DWM1000
-SKETCH_LIBS = ~/Arduino/libraries/ESP8266_and_ESP32_Oled_Driver_for_SSD1306_display/src
+SKETCH_LIBS = ~/Arduino/libraries/ESP8266_and_ESP32_Oled_Driver_for_SSD1306_display
 
 #Setup all libs used !
 LIBS = 	$(ESP_LIBS)/SPI \

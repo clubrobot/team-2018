@@ -74,25 +74,40 @@ void setup() {
   talks.bind(UPDATE_ANTENNA_DELAY_OPCODE, UPDATE_ANTENNA_DELAY);
   talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
 
-  /*if (!EEPROM.begin(EEPROM_SIZE))
+  /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
     Serial.println("failed to initialise EEPROM");
     delay(1000000);
   }*/
 
-// init communication
+  byte currentBeaconNumber = 2;
+  #if 0
+  EEPROM.write(EEPROM_NUM_ANCHOR, currentBeaconNumber);
+  EEPROM.commit();
+  #endif
+  currentBeaconNumber = EEPROM.read(EEPROM_NUM_ANCHOR);
+
+  // init communication
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  unsigned int replyTime = 35000;
+  #if 0
+  EEPROM.write(EEPROM_REPLY_DELAY, replyTime >> 8);
+  EEPROM.write(EEPROM_REPLY_DELAY + 1, replyTime % 256);
+  EEPROM.commit();
+  #endif
+  replyTime = (EEPROM.read(EEPROM_REPLY_DELAY) << 8) + EEPROM.read(EEPROM_REPLY_DELAY+1);
+  DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
   
   //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[CURRENT_BEACON_NUMBER]);
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
 
   int antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
-  DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, 16530 for anchor
+  DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, approximately 16530 for anchors
 
 
   display.init();
@@ -104,7 +119,11 @@ void setup() {
   pinMode(PIN_LED_OK,OUTPUT);
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
-  display.drawString(64, 24, "SYNCHRONISATION\n(anchor)");
+  String toDisplay = "SYNCHRONISATION\n(anchor : ";
+  toDisplay += currentBeaconNumber;
+  toDisplay += ")\n";
+  toDisplay += replyTime;
+  display.drawString(64, 64/4, toDisplay);
   display.display();
 
   display.setFont(ArialMT_Plain_24);

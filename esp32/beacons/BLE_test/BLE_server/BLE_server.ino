@@ -6,6 +6,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <BLE2902.h>
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
@@ -13,9 +14,25 @@
 #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
+BLECharacteristic *pCharacteristic;
+boolean deviceConnected = false;
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    deviceConnected = true;
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+    deviceConnected = false;
+  }
+};
+
 class MyCallbacks : public BLECharacteristicCallbacks{
-  void onWrite(BLECharacteristic *pCharacteristic){
-    std::string rxValue = pCharacteristic->getValue();
+  void onWrite(BLECharacteristic *mCharacteristic){
+    std::string rxValue = mCharacteristic->getValue();
     int dataLength = rxValue.length();
     Serial.print("Received value (" );
     Serial.print( dataLength );
@@ -35,13 +52,15 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
 
-  BLEDevice::init("MyESP32");
+  BLEDevice::init("Server");
   BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = pServer->createService(SERVICE_UUID);
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+  pCharacteristic = pService->createCharacteristic(
                                          CHARACTERISTIC_UUID,
                                          BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE
+                                         BLECharacteristic::PROPERTY_WRITE |
+                                         BLECharacteristic::PROPERTY_NOTIFY
                                        );
 
   pCharacteristic->setCallbacks(new MyCallbacks());
@@ -55,4 +74,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   delay(2000);
+  if (deviceConnected)
+  {
+    pCharacteristic->notify();
+  }
 }
