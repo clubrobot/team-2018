@@ -56,16 +56,16 @@ void newRange()
 
   switch(id){
     case 35:    //TODO : should be 0
-      d1 = distance;
+      d1 = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
       break;
     case 36: //TODO : should be 1
-      d2 = distance;
+      d2 = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
       break;
     case 37: //TODO : should be 2
-      d3 = distance;
+      d3 = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
       break;
     case 38: //TODO : should be 3
-      d4 = distance;
+      d4 = sqrt(distance * distance - ((z_central - z_tag) * (z_central - z_tag))); // projection dans le plan des tags
       break;
   }
 
@@ -131,7 +131,7 @@ void newRange()
         d[count] = d4;
         count++;
       }
-      // Trilateration algorithm
+      // 3D Trilateration algorithm
       float A[2][2] = {{-2 * (x[0] - x[2]), -2 * (y[0] - y[2])},
                        {-2 * (x[1] - x[2]), -2 * (y[1] - y[2])}};
 
@@ -151,7 +151,25 @@ void newRange()
       break;
     case 4:
     {
-      toDisplay = "(4)";
+      // 4D Trilateration algorithm
+      float A[3][2] = {{-2 * (x_1 - x_4), -2 * (y_1 - y_4)},
+                       {-2 * (x_2 - x_4), -2 * (y_2 - y_4)},
+                       {-2 * (x_3 - x_4), -2 * (y_3 - y_4)}};
+
+      float b[3] = {d1 * d1 - x_1 * x_1 - y_1 * y_1 - d4 * d4 + x_4 * x_4 + y_4 * y_4, d2 * d2 - x_2 * x_2 - y_2 * y_2 - d4 * d4 + x_4 * x_4 + y_4 * y_4, d3 * d3 - x_3 * x_3 - y_3 * y_3 - d4 * d4 + x_4 * x_4 + y_4 * y_4};
+      float Atr[2][3];
+      Matrix.Transpose(&A[0][0], 3, 2, &Atr[0][0]);
+      float Ainv[2][2];
+      Matrix.Multiply(&Atr[0][0], &A[0][0], 2, 3, 2, &Ainv[0][0]);
+      Matrix.Invert(&Ainv[0][0], 2);
+      float Atemp[2][3];
+      Matrix.Multiply(&Ainv[0][0], &Atr[0][0], 2, 2, 3, &Atemp[0][0]);
+      Matrix.Multiply(&Atemp[0][0], &b[0], 2, 3, 1, &p[0]);
+      toDisplay = "(";
+      toDisplay += round(p[0] / 10);
+      toDisplay += ",";
+      toDisplay += round(p[1] / 10);
+      toDisplay += ")\n(4)";
       display.drawString(64, 0, toDisplay);
       display.display();
     }
@@ -223,7 +241,7 @@ void setup() {
   DW1000Ranging.attachNewDevice(newDevice);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
   //Enable the filter to smooth the distance
-  DW1000Ranging.useRangeFilter(true);
+  DW1000Ranging.useRangeFilter(false);
   
   //we start the module as a tag
   DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);

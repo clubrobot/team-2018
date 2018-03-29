@@ -9,6 +9,9 @@ const byte ANCHOR_SHORT_ADDRESS[MAX_ANCHORS] = {35, 36, 37, 38};
 const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16530, 16530, 16530, 16530};
 
 
+const float z_tag = 484.3;
+const float z_anchor = 438.3;
+const float z_central = 1016.3;
 
 /**
  * EEPROM addresses
@@ -18,7 +21,7 @@ const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16530, 16530, 16530, 16530};
 
 #define EEPROM_NUM_ANCHOR       EEPROM_BASE_ADDRESS         // 1 octet
 #define EEPROM_ANTENNA_DELAY    (EEPROM_NUM_ANCHOR+1)       // 2 octets
-#define EEPROM_REPLY_DELAY    (EEPROM_ANTENNA_DELAY+2)      // 2 octet
+//#define EEPROM_REPLY_DELAY    (EEPROM_ANTENNA_DELAY+2)      // 2 octet
 //#define EEPROM_LONG_ADDRESS     (EEPROM_SHORT_ADDRESS+2)    // 16 octets
 
 

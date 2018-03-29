@@ -24,6 +24,8 @@
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
+byte currentBeaconNumber = 3;
+
 void newRange()
 {
   Serial.print("from: ");
@@ -37,6 +39,18 @@ void newRange()
 
   display.clear();
   float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
+  switch (currentBeaconNumber){
+    case 0: // TODO : mettre les adresses dans configuration.h
+    case 1:
+    case 2: // balises fixes
+      distance = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
+      break;
+    case 3: // balise centrale
+      distance = sqrt(distance * distance - ((z_central - z_tag) * (z_central - z_tag))); // projection dans le plan des tags
+      break;
+  }
+    
+
   String toDisplay = "Distance : \n";
   toDisplay += distance;
   toDisplay += "cm";
@@ -80,7 +94,6 @@ void setup() {
     delay(1000000);
   }*/
 
-  byte currentBeaconNumber = 2;
   #if 0
   EEPROM.write(EEPROM_NUM_ANCHOR, currentBeaconNumber);
   EEPROM.commit();
@@ -92,23 +105,37 @@ void setup() {
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
-  unsigned int replyTime = 35000;
-  #if 0
-  EEPROM.write(EEPROM_REPLY_DELAY, replyTime >> 8);
-  EEPROM.write(EEPROM_REPLY_DELAY + 1, replyTime % 256);
-  EEPROM.commit();
-  #endif
-  replyTime = (EEPROM.read(EEPROM_REPLY_DELAY) << 8) + EEPROM.read(EEPROM_REPLY_DELAY+1);
+  unsigned int replyTime;
+  switch (currentBeaconNumber){
+    case 0 :
+      replyTime = 7000;
+      break;
+    case 1:
+      replyTime = 21000;
+      break;
+    case 2:
+      replyTime = 35000;
+      break;
+    case 3:
+      replyTime = 49000;
+      break;
+  }
+  
   DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
-  DW1000Ranging.useRangeFilter(true);
+  DW1000Ranging.useRangeFilter(false);
   
-  //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
-
-  int antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
+  int antennaDelay = 16530;
+  #if 0
+  EEPROM.write(EEPROM_ANTENNA_DELAY, antennaDelay >> 8);
+  EEPROM.write(EEPROM_ANTENNA_DELAY + 1, antennaDelay % 256);
+  EEPROM.commit();
+  #endif
+  antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
   DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, approximately 16530 for anchors
 
+  //we start the module as an anchor
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();
@@ -119,6 +146,7 @@ void setup() {
   pinMode(PIN_LED_OK,OUTPUT);
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
+
   String toDisplay = "SYNCHRONISATION\n(anchor : ";
   toDisplay += currentBeaconNumber;
   toDisplay += ")\n";
