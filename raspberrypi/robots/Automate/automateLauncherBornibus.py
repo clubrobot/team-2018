@@ -132,7 +132,7 @@ class Bornibus:
         # Generate order list
 
         self.action_list[Bornibus.GREEN] = [
-            #self.d1.getAction()[0],
+            self.d1.getAction()[0],
             self.shot.getAction()[0],
             #self.panel.getAction()[0],
             #self.d3.getAction()[0],
@@ -176,7 +176,7 @@ class Bornibus:
     #     #  5                    2 
     #     #      4            1    
     #     #
-    #     #       A           B
+    #     #       TIME*TIME_STEA           B
 
         self.wheeledbase.set_position(592, 290,0)
         self.wheeledbase.lookahead.set(200)
