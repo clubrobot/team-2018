@@ -131,7 +131,7 @@ void newRange()
         d[count] = d4;
         count++;
       }
-      // Trilateration algorithm
+      // 3D Trilateration algorithm
       float A[2][2] = {{-2 * (x[0] - x[2]), -2 * (y[0] - y[2])},
                        {-2 * (x[1] - x[2]), -2 * (y[1] - y[2])}};
 
@@ -151,6 +151,7 @@ void newRange()
       break;
     case 4:
     {
+      // 4D Trilateration algorithm
       float A[3][2] = {{-2 * (x_1 - x_4), -2 * (y_1 - y_4)},
                        {-2 * (x_2 - x_4), -2 * (y_2 - y_4)},
                        {-2 * (x_3 - x_4), -2 * (y_3 - y_4)}};
@@ -160,7 +161,6 @@ void newRange()
       Matrix.Transpose(&A[0][0], 3, 2, &Atr[0][0]);
       float Ainv[2][2];
       Matrix.Multiply(&Atr[0][0], &A[0][0], 2, 3, 2, &Ainv[0][0]);
-      //memcpy(&Ainv[0][0],&A[0][0],sizeof(float)*4);
       Matrix.Invert(&Ainv[0][0], 2);
       float Atemp[2][3];
       Matrix.Multiply(&Ainv[0][0], &Atr[0][0], 2, 2, 3, &Atemp[0][0]);
@@ -241,7 +241,7 @@ void setup() {
   DW1000Ranging.attachNewDevice(newDevice);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
   //Enable the filter to smooth the distance
-  DW1000Ranging.useRangeFilter(true);
+  DW1000Ranging.useRangeFilter(false);
   
   //we start the module as a tag
   DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
