@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import sys
 import math
+from cubes import *
 
 
 LEFT = -1
@@ -71,8 +72,8 @@ class vision():
 
       def refresh_image(self):
           self.raw_image = self.camera.image.copy()
-		  for p in self.piles:
-			  p.refresh_image(self.raw_image)
+          for p in self.piles:
+			        p.refresh_image(self.raw_image)
           return self.raw_image
 	 
       def calibration(self):
@@ -98,6 +99,8 @@ class vision():
       def setTimestep(self, timestep):   
           self.timestep = timestep 
 
+      def save_raw_image(self):
+          cv2.imwrite('terrain.jpg', self.raw_image)
 
       def update(self):
           self.refresh_image()
