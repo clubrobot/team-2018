@@ -42,6 +42,15 @@ void SerialTalks::SETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& 
 	EEPROM.update(addr,value);
 }
 
+// Built-in Processing 
+void SerialTalks::LAUNCHWARNING(String message)
+{
+	output = getSerializer();
+	output.write(message);
+	send(SERIALTALKS_WARNING_OPCODE, output);
+}
+
+
 // SerialTalks::ostream
 
 void SerialTalks::ostream::begin(SerialTalks& parent, long retcode)

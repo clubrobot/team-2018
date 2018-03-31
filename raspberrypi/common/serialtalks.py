@@ -6,6 +6,7 @@ import serial
 from serial.serialutil import SerialException
 import time
 import random
+import warnings
 from queue		import Queue, Empty
 from threading	import Thread, RLock, Event, current_thread
 
@@ -24,6 +25,8 @@ GETEEPROM_OPCODE =0x04
 SETEEPROM_OPCODE =0x05
 STDOUT_RETCODE = 0xFFFFFFFF
 STDERR_RETCODE = 0xFFFFFFFE
+
+WARNING_OPCODE = 0xFE
 
 BYTEORDER = 'little'
 ENCODING  = 'utf-8'
@@ -51,7 +54,7 @@ class AlreadyConnectedError(ConnectionError): pass
 class ConnectionFailedError(ConnectionError): pass
 class NotConnectedError    (ConnectionError): pass
 class MuteError(TimeoutError): pass
-
+class SerialTalksWarning(UserWarning, ConnectionError): pass
 
 # Main class
 
@@ -68,6 +71,7 @@ class SerialTalks:
 
 		# Instructions
 		self.instructions = dict()
+		self.instructions[WARNING_OPCODE] = self.launch_warning_
 
 	def __enter__(self):
 		self.connect()
@@ -213,7 +217,7 @@ class SerialTalks:
 		return output.read(STRING)
 		
 	def setuuid(self, uuid):
-		return self.send(SETUUID_OPCODE, STRING(uuid))
+		return self.send(SETUUID_OPCODE, STRINSERIALTALKS_WARNING_OPCODEG(uuid))
 
 	def getlog(self, retcode, timeout=0):
 		log = str()
@@ -246,6 +250,9 @@ class SerialTalks:
 			self.send(SETEEPROM_OPCODE,INT(k),BYTE(byte))
 			k+=1
 		binary_file.close()
+
+	def launch_warning_(self,message):
+		warnings.warn(message,SerialTalksWarning)
 
 	def getout(self, timeout=0):
 		return self.getlog(STDOUT_RETCODE, timeout)
