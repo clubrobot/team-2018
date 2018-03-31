@@ -32,6 +32,8 @@ GET_PARAMETER_VALUE_OPCODE      = 0x19
 RESET_PUREPURSUIT_OPCODE        = 0x1A
 ADD_PUREPURSUIT_WAYPOINT_OPCODE = 0x1B
 
+GET_VELOCITIES_WANTED_OPCODE    = 0x1C
+
 LEFTWHEEL_RADIUS_ID	            = 0x10
 LEFTWHEEL_CONSTANT_ID           = 0x11
 LEFTWHEEL_MAXPWM_ID             = 0x12
@@ -163,6 +165,11 @@ class WheeledBase(SerialTalksProxy):
 		if bool(spinurgency):
 			raise RuntimeError('spin urgency')
 		return bool(isarrived)
+
+	
+	def get_velocities_wanted(self):
+		output = self.execute(GET_VELOCITIES_WANTED_OPCODE)
+		return output.read(FLOAT, FLOAT)
 
 	def wait(self, timestep=0.1, **kwargs):
 		while not self.isarrived(**kwargs):

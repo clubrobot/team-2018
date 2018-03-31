@@ -26,6 +26,8 @@
 #define RESET_PUREPURSUIT_OPCODE        0x1A //0x10
 #define ADD_PUREPURSUIT_WAYPOINT_OPCODE 0x1B //0x11
 
+#define GET_VELOCITIES_WANTED_OPCODE    0x1C
+
 // Parameters identifiers
 
 #define LEFTWHEEL_RADIUS_ID             0x10
@@ -82,6 +84,8 @@ void START_PUREPURSUIT(SerialTalks& talks, Deserializer& input, Serializer& outp
 void START_TURNONTHESPOT(SerialTalks& talks, Deserializer& input, Serializer& output);
 
 void POSITION_REACHED(SerialTalks& talks, Deserializer& input, Serializer& output);
+
+void GET_VELOCITIES_WANTED(SerialTalks& talks, Deserializer& input, Serializer& output);
 
 void SET_POSITION(SerialTalks& talks, Deserializer& input, Serializer& output);
 
