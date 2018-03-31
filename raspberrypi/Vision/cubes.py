@@ -68,7 +68,7 @@ class pilesOfCubes():
 		self.init_hsv_tresh()
 		for c in self.color: 
 			self.init_cube_center(c)
-			
+		
 		
 	def convert2hsv(self):
 		self.hsv_image = cv2.cvtColor(self.image, cv2.COLOR_BGR2HSV)
@@ -180,7 +180,7 @@ class pilesOfCubes():
 				if hsv_min[2] <= 0 : 
 					subv = False
 
-			#print("bool : addh =", not addh, "adds =", not adds,"addv =", not addv, "subh =", not subh, "subs =", not subs, "subv =", not subv)
+			print("bool : addh =", not addh, "adds =", not adds,"addv =", not addv, "subh =", not subh, "subs =", not subs, "subv =", not subv)
 		
 		return (hsv_min, hsv_max)
 
@@ -221,10 +221,12 @@ class pilesOfCubes():
 
 	def save_img(self):
 		cv2.imwrite('image.jpg', self.image)
-	def display_img(self): 
-		cv2.imshow('image', self.hsv_image)
+	
+	def display_img(self, window_name): 
+		cv2.imshow(window_name, self.image)
+		cv2.waitKey(1)
 		
-	def display_cube(self, color): 
+	def display_cube(self, color, window_name): 
 		if(color == 'blue'):
 			hsv_min, hsv_max = self.hsv_blue
 		elif(color == 'yellow'):
@@ -241,8 +243,8 @@ class pilesOfCubes():
 		mask_inv = cv2.bitwise_not(gray)
 
 		res = cv2.bitwise_and(self.image, self.image, mask=mask_inv)
-		cv2.imshow(color, res)
-		
+		cv2.imshow(window_name + color, res)
+		cv2.waitKey(1)		
 
 	def set_coord(self, min, max):
 		
@@ -255,6 +257,10 @@ class pilesOfCubes():
 
 	def perspective_remover(self): 
 		self.image = cv2.warpPerspective(self.image, self.mat,(100,100))
+		#cv2.imshow('image', self.image)
+		#while cv2.waitKey(1) & 0xFF != ord("q"): 
+				#cv2.waitKey(1)
+		#cv2.destroyAllWindows()
 		self.set_region(100, 100)
 		
 	def sort_corner(self):
@@ -342,13 +348,35 @@ class pilesOfCubes():
 
 	def set_region(self, w, h): 
 		self.region_shape = (w, h)
+						  
+						  		  			  
 	def is_moved(self): 
-		return blue_moved and black_moved and green_moved and orange_moved and yellow_moved
+		return self.blue_moved or self.black_moved or self.green_moved or self.orange_moved or self.yellow_moved
+			   
+			   			  		
+	def is_color_moved(self, color):
+		if(color == 'blue'):
+			return self.blue_moved
+		elif(color == 'yellow'):
+			return self.yellow_moved
+		elif(color == 'black'):
+			return self.black_moved
+		elif(color == 'green'):
+			return self.green_moved
+		elif(color == 'orange'):
+			return self.orange_moved
+	
+	
 	def refresh_image(self, img):
-		self.image = img[self.coord_min[1]: self.coord_max[1], self.coord_min[0]: self.coord_max[0]]
+		self.image = img[self.coord_min[1]: self.coord_max[1], self.coord_min[0]: self.coord_max[0]].copy()
 
 	def find_corner(self):
 		gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+	  
+		#cv2.imshow('gray', gray)
+		#while cv2.waitKey(1) & 0xFF != ord("q"): 
+				#cv2.waitKey(1)
+		#cv2.destroyAllWindows()
 		corners = cv2.goodFeaturesToTrack(gray,20,0.01,10)
 		corners = np.int0(corners)
 
@@ -410,7 +438,7 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_blue
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.blue_moved = False
-			if ((pos_xy[0]-2 < self.init_blue_cube[0]) or  (pos_xy[0]+2 > self.init_blue_cube[0]) or (pos_xy[1]-2 < self.init_blue_cube[1]) or (pos_xy[1]+2 > self.init_blue_cube[1])):
+			if not ((pos_xy[0] <= self.init_blue_cube[0]+2) or  (pos_xy[0] >= self.init_blue_cube[0]-2) or (pos_xy[1] <= self.init_blue_cube[1]+2) or (pos_xy[1]>= self.init_blue_cube[1]-2)):
 				self.blue_moved = True
 			self.blue_cube = pos_xy
 
@@ -418,7 +446,7 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_yellow
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.yellow_moved = False
-			if ((pos_xy[0]-2 < self.init_yellow_cube[0]) or  (pos_xy[0]+2 > self.init_yellow_cube[0]) or (pos_xy[1]-2 < self.init_yellow_cube[1]) or (pos_xy[1]+2 > self.init_yellow_cube[1]) ):
+			if not ((pos_xy[0] <= self.init_yellow_cube[0]+2) or  (pos_xy[0] >= self.init_yellow_cube[0]-2) or (pos_xy[1] <= self.init_yellow_cube[1]+2 )or (pos_xy[1]>= self.init_yellow_cube[1]-2)):
 				self.yellow_moved = True
 			self.yellow_cube = pos_xy
 
@@ -426,7 +454,7 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_black
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.black_moved = False
-			if ((pos_xy[0]-2 < self.init_black_cube[0]) or  (pos_xy[0]+2 > self.init_black_cube[0]) or (pos_xy[1]-2 < self.init_black_cube[1]) or (pos_xy[1]+2 > self.init_black_cube[1]) ):
+			if not ((pos_xy[0] <= self.init_black_cube[0]+2) or  (pos_xy[0] >= self.init_black_cube[0]-2) or (pos_xy[1] <= self.init_black_cube[1]+2) or (pos_xy[1]>= self.init_black_cube[1]-2)):
 				self.black_moved = True
 			self.black_cube = pos_xy
 
@@ -434,14 +462,14 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_green
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.green_moved = False
-			if ((pos_xy[0]-2 < self.init_green_cube[0]) or  (pos_xy[0]+2 > self.init_green_cube[0]) or (pos_xy[1]-2 < self.init_green_cube[1]) or (pos_xy[1]+2 > self.init_green_cube[1]) ):
+			if not ((pos_xy[0] <= self.init_green_cube[0]+2) or  (pos_xy[0] >= self.init_green_cube[0]-2) or (pos_xy[1] <= self.init_green_cube[1]+2) or (pos_xy[1]>= self.init_green_cube[1]-2)):
 				self.green_moved = True
 			self.green_cube = pos_xy
 		elif(color == 'orange'):
 			hsv_min, hsv_max = self.hsv_orange
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.orange_moved = False
-			if ((pos_xy[0]-2 < self.init_orange_cube[0]) or  (pos_xy[0]+2 > self.init_orange_cube[0]) or (pos_xy[1]-2 < self.init_orange_cube[1]) or (pos_xy[1]+2 > self.init_orange_cube[1]) ):
+			if not ((pos_xy[0] <= self.init_orange_cube[0]+2) or  (pos_xy[0] >= self.init_orange_cube[0]-2) or (pos_xy[1] <= self.init_orange_cube[1]+2 )or (pos_xy[1]>= self.init_orange_cube[1]-2)):
 				self.orange_moved = True
 			self.orange_cube = pos_xy
 
