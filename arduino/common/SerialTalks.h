@@ -145,6 +145,7 @@ private:
 	static void SETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void GETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void SETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
+	static void LAUNCHWARNING(string message);
 };
 
 extern SerialTalks talks;
