@@ -233,12 +233,14 @@ bool SerialTalks::execute()
 
 		// The first instruction byte is the opcode and the others the parameters
 		case SERIALTALKS_INSTRUCTION_RECEIVING_STATE:
-		
+			m_inputBuffer[m_bytesCounter++] = inc;
+			if (m_bytesCounter >= m_bytesNumber)
+			{
 				m_connected = true;
 				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
 				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
 				m_state = SERIALTALKS_WAITING_STATE;
-			
+			}
 		}
 	}
 	return ret;
