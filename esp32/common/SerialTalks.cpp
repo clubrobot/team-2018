@@ -42,6 +42,13 @@ void SerialTalks::SETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& 
 	EEPROM.commit();
 }
 
+// Built-in Processing 
+void SerialTalks::LAUNCHWARNING(String message)
+{
+	Serializer output = getSerializer();
+	output.write(message);
+	send(SERIALTALKS_WARNING_OPCODE, output);
+}
 
 // SerialTalks::ostream
 
@@ -61,7 +68,6 @@ size_t SerialTalks::ostream::write(const uint8_t *buffer, size_t size)
 {
 	return m_parent->sendback(m_retcode, buffer, size + 1);
 }
-
 
 // SerialTalks
 
@@ -209,17 +215,30 @@ bool SerialTalks::execute()
 				SERIALTALKS_INSTRUCTION_RECEIVING_STATE :
 				SERIALTALKS_WAITING_STATE;
 			continue;
+		// CheckSum verification
+		// case SERIALTALKS_CHECKSUM_VERIFICATION_STATE:
+		// 	m_inputBuffer[m_bytesCounter++] = inc;
+		// 	if (m_bytesCounter >= m_bytesNumber)
+		// 	{
+		// 		//checksuming
+
+		// 		//si ok go SERIALTALKS_INSTRUCTION_RECEIVING_STATE
+
+		// 		//sinon SERIALTALKS_WAITING_STATE + warning
+
+		
+		// 	}
+
+		// 	continue;
 
 		// The first instruction byte is the opcode and the others the parameters
 		case SERIALTALKS_INSTRUCTION_RECEIVING_STATE:
-			m_inputBuffer[m_bytesCounter++] = inc;
-			if (m_bytesCounter >= m_bytesNumber)
-			{
+		
 				m_connected = true;
 				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
 				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
 				m_state = SERIALTALKS_WAITING_STATE;
-			}
+			
 		}
 	}
 	return ret;
