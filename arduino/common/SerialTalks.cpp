@@ -45,7 +45,7 @@ void SerialTalks::SETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& 
 // Built-in Processing 
 void SerialTalks::LAUNCHWARNING(String message)
 {
-	output = getSerializer();
+	Serializer output = getSerializer();
 	output.write(message);
 	send(SERIALTALKS_WARNING_OPCODE, output);
 }
