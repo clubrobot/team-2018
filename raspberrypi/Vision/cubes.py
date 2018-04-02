@@ -60,8 +60,6 @@ class pilesOfCubes():
 
 	def init(self, img):
 		self.refresh_image(img)
-		self.perspective_remover()
-		self.convert2hsv()
 		self.find_corner()
 		self.sort_corner()
 		self.init_cube_center_arbitrary()
@@ -75,7 +73,7 @@ class pilesOfCubes():
 
 	def init_hsv_tresh(self):
 		for c in self.color: 
-			hsv_min, hsv_max = self.hsv_treshold_finder(c, 0.95)
+			hsv_min, hsv_max = self.hsv_treshold_finder(c, 0.97)
 			self.set_hsv_tresh(c, hsv_min, hsv_max)
 		
 
@@ -242,7 +240,7 @@ class pilesOfCubes():
 		gray = self.filtrage(gray)
 		mask_inv = cv2.bitwise_not(gray)
 
-		res = cv2.bitwise_and(self.image, self.image, mask=mask_inv)
+		res = cv2.bitwise_and(self.image,self.image,mask = mask_inv)
 		cv2.imshow(window_name + color, res)
 		cv2.waitKey(1)		
 
@@ -342,7 +340,6 @@ class pilesOfCubes():
 		else:
 			xg = -1
 			yg = -1
-		
 		pos = (round(xg), round(yg))
 		return pos
 
@@ -369,6 +366,8 @@ class pilesOfCubes():
 	
 	def refresh_image(self, img):
 		self.image = img[self.coord_min[1]: self.coord_max[1], self.coord_min[0]: self.coord_max[0]].copy()
+		self.perspective_remover()
+		self.convert2hsv()
 
 	def find_corner(self):
 		gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
@@ -438,15 +437,16 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_blue
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.blue_moved = False
-			if not ((pos_xy[0] <= self.init_blue_cube[0]+2) or  (pos_xy[0] >= self.init_blue_cube[0]-2) or (pos_xy[1] <= self.init_blue_cube[1]+2) or (pos_xy[1]>= self.init_blue_cube[1]-2)):
-				self.blue_moved = True
 			self.blue_cube = pos_xy
+			if not ((pos_xy[0] <= self.init_blue_cube[0]+2) and  (pos_xy[0] >= self.init_blue_cube[0]-2) and (pos_xy[1] <= self.init_blue_cube[1]+2) and (pos_xy[1]>= self.init_blue_cube[1]-2)):
+				self.blue_moved = True
+			
 
 		elif(color == 'yellow'):
 			hsv_min, hsv_max = self.hsv_yellow
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.yellow_moved = False
-			if not ((pos_xy[0] <= self.init_yellow_cube[0]+2) or  (pos_xy[0] >= self.init_yellow_cube[0]-2) or (pos_xy[1] <= self.init_yellow_cube[1]+2 )or (pos_xy[1]>= self.init_yellow_cube[1]-2)):
+			if not ((pos_xy[0] <= self.init_yellow_cube[0]+2) and  (pos_xy[0] >= self.init_yellow_cube[0]-2) and (pos_xy[1] <= self.init_yellow_cube[1]+2 )and (pos_xy[1]>= self.init_yellow_cube[1]-2)):
 				self.yellow_moved = True
 			self.yellow_cube = pos_xy
 
@@ -454,7 +454,7 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_black
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.black_moved = False
-			if not ((pos_xy[0] <= self.init_black_cube[0]+2) or  (pos_xy[0] >= self.init_black_cube[0]-2) or (pos_xy[1] <= self.init_black_cube[1]+2) or (pos_xy[1]>= self.init_black_cube[1]-2)):
+			if not ((pos_xy[0] <= self.init_black_cube[0]+2) and  (pos_xy[0] >= self.init_black_cube[0]-2) and (pos_xy[1] <= self.init_black_cube[1]+2) and (pos_xy[1]>= self.init_black_cube[1]-2)):
 				self.black_moved = True
 			self.black_cube = pos_xy
 
@@ -462,14 +462,14 @@ class pilesOfCubes():
 			hsv_min, hsv_max = self.hsv_green
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.green_moved = False
-			if not ((pos_xy[0] <= self.init_green_cube[0]+2) or  (pos_xy[0] >= self.init_green_cube[0]-2) or (pos_xy[1] <= self.init_green_cube[1]+2) or (pos_xy[1]>= self.init_green_cube[1]-2)):
+			if not ((pos_xy[0] <= self.init_green_cube[0]+2) and  (pos_xy[0] >= self.init_green_cube[0]-2) and (pos_xy[1] <= self.init_green_cube[1]+2) and (pos_xy[1]>= self.init_green_cube[1]-2)):
 				self.green_moved = True
 			self.green_cube = pos_xy
 		elif(color == 'orange'):
 			hsv_min, hsv_max = self.hsv_orange
 			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
 			self.orange_moved = False
-			if not ((pos_xy[0] <= self.init_orange_cube[0]+2) or  (pos_xy[0] >= self.init_orange_cube[0]-2) or (pos_xy[1] <= self.init_orange_cube[1]+2 )or (pos_xy[1]>= self.init_orange_cube[1]-2)):
+			if not ((pos_xy[0] <= self.init_orange_cube[0]+2) and  (pos_xy[0] >= self.init_orange_cube[0]-2) and (pos_xy[1] <= self.init_orange_cube[1]+2 )and (pos_xy[1]>= self.init_orange_cube[1]-2)):
 				self.orange_moved = True
 			self.orange_cube = pos_xy
 
