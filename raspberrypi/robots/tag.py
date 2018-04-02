@@ -14,14 +14,14 @@ from components import SerialTalksProxy
 GET_POSITION_OPCODE  = 0x10
 
 
-class tag(SerialTalksProxy):
+class Tag(SerialTalksProxy):
 
 	def __init__(self, parent, uuid='tag'):
 		SerialTalksProxy.__init__(self, parent, uuid)
 
 	def get_position(self, **kwargs):
 		output = self.execute(GET_POSITION_OPCODE, **kwargs)
-		x, y = output.read(FLOAT, FLOAT)
+		x, y = output.read(INT, INT)
 		return x, y
 	
 
