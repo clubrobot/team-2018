@@ -30,7 +30,6 @@
 typedef uint8_t byte;
 
 
-
 class TCPTalks
 {
 	public: // Public API
@@ -41,13 +40,11 @@ class TCPTalks
 
 	void connect(int timeout);
 
-	bool authentificate(int timeout);
+	void authentificate();
 		
 	void disconnect();
 		
 	void bind(uint8_t opcode, Instruction instruction);
-
-	//void rawsend(uint8_t* rawbytes);
 		
 	void send(uint8_t opcode, uint8_t* args);
 
@@ -91,6 +88,7 @@ class TCPTalks
 		TCPTALKS_WAITING_STATE,
 		TCPTALKS_INSTRUCTION_STARTING_STATE,
 		TCPTALKS_INSTRUCTION_RECEIVING_STATE,
+		TCPTALKS_AUTHENTIFICATION_STATE,
 	}m_state;
 
 
@@ -104,7 +102,5 @@ class TCPTalks
 
 
 };
-
-
 void SWITCH_LED(TCPTalks& inst, UnPickler& input, Pickler& output);
 #endif // __TCPTALKS_H__

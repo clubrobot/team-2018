@@ -27,10 +27,10 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
 
     //output.dump<bool>(var);
     //output.dump<long>(10);
-    //output.dump<double>(1.1);
+    output.dump<double>(1.1);
     
-    output.dump<char>(0X02);
-    //output.dump<long>(11);
+    //output.dump<char>(0X02);
+    output.dump<long>(11);
 
 }
 
@@ -101,31 +101,30 @@ void TCPTalks::connect(int timeout)
     m_connected = true;
     Serial.println("connected");
 
+    last_time = millis();
+    Serial.println("wait for authentification...");
 
-    authentificate(5);
+    authentificate();
+
+    while(!is_authentificated())
+    {
+        Serial.print(".");
+        delay(5);
+        long current_time = millis();
+        if(current_time - last_time > timeout )
+        {
+            Serial.println("authentification Failed");
+            return;
+        }
+       
+    }
+
+    Serial.println("authentificated");
 }
 
-bool TCPTalks::authentificate(int timeout)
+void TCPTalks::authentificate()
 {
     sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
-
-    // last_time = millis();
-    // Serial.print("wait for authentification...");
-
-    // while(!client.connect(ip, port))
-    // {
-    //     Serial.print(".");
-    //     delay(5);
-    //     long current_time = millis();
-    //     if(current_time - last_time > timeout )
-    //     {
-    //         Serial.println("authentification Failed");
-    //         return;
-    //     }
-       
-    // }
-    m_authentificated = true;
-	return m_authentificated;
 }
 
 void TCPTalks::disconnect()
@@ -205,9 +204,16 @@ bool TCPTalks::execute()
         {
         // An instruction always begin with the Master byte
         case TCPTALKS_WAITING_STATE:
+
             if (inc == TCPTALKS_MASTER_BYTE)
             {
                 m_state = TCPTALKS_INSTRUCTION_RECEIVING_STATE;
+                m_bytesCounter = 0;
+            }
+
+            if (inc == AUTHENTIFICATION_OPCODE)
+            {
+                m_state = TCPTALKS_AUTHENTIFICATION_STATE;
                 m_bytesCounter = 0;
             }
            
@@ -215,6 +221,7 @@ bool TCPTalks::execute()
             continue;
 
         case TCPTALKS_INSTRUCTION_RECEIVING_STATE:
+
             m_inputBuffer[m_bytesCounter] = inc;
             m_bytesCounter++;
 
@@ -226,6 +233,26 @@ bool TCPTalks::execute()
                 ret |= execinstruction(m_inputBuffer);
                 m_state = TCPTALKS_WAITING_STATE;
             }
+            break;
+
+        case TCPTALKS_AUTHENTIFICATION_STATE:
+
+            m_inputBuffer[m_bytesCounter] = inc;
+            m_bytesCounter++;
+
+            if(inc == '.')
+            {
+                Serial.print("is_authentificated : ");
+                Serial.println(m_authentificated);
+
+                UnPickler input(m_inputBuffer);
+                m_authentificated = input.load<bool>();
+                m_state = TCPTALKS_WAITING_STATE;
+                
+                Serial.print("is_authentificated : ");
+                Serial.println(m_authentificated);
+            }
+            break;
         }
     }
     return ret;

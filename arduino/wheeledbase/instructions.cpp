@@ -120,6 +120,13 @@ void POSITION_REACHED(SerialTalks& talks, Deserializer& input, Serializer& outpu
 	output.write<byte>(spinUrgency);
 }
 
+void GET_VELOCITIES_WANTED(SerialTalks& talks, Deserializer& input, Serializer& output)
+{
+	output.write<float>(velocityControl.getLinSpinGoal());
+	output.write<float>(velocityControl.getAngSpinGoal());
+}
+
+
 void SET_POSITION(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
 	float x     = input.read<float>();

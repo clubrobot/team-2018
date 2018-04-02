@@ -22,7 +22,6 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/mathutils.cpp
 
 # Define
-CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x20
 CPPFLAGS += -DPUREPURSUIT_MAX_WAYPOINTS=32
 
 # Sketch libraries

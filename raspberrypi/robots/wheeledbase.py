@@ -11,26 +11,28 @@ from components import SerialTalksProxy
 
 # Instructions
 
-SET_OPENLOOP_VELOCITIES_OPCODE  = 0x12
+SET_OPENLOOP_VELOCITIES_OPCODE  = 0x13
 
-GET_CODEWHEELS_COUNTERS_OPCODE  = 0x0D
+GET_CODEWHEELS_COUNTERS_OPCODE  = 0x1C
 
-SET_VELOCITIES_OPCODE           = 0x06
+SET_VELOCITIES_OPCODE           = 0x10
 
-START_PUREPURSUIT_OPCODE        = 0x07
-START_TURNONTHESPOT_OPCODE      = 0x09
+START_PUREPURSUIT_OPCODE        = 0x11
+START_TURNONTHESPOT_OPCODE      = 0x12
 
-POSITION_REACHED_OPCODE         = 0x08
+POSITION_REACHED_OPCODE         = 0x14
 
-SET_POSITION_OPCODE	            = 0x0A
-GET_POSITION_OPCODE	            = 0x0B
-GET_VELOCITIES_OPCODE           = 0x0C
+SET_POSITION_OPCODE	            = 0x15
+GET_POSITION_OPCODE	            = 0x16
+GET_VELOCITIES_OPCODE           = 0x17
 
-SET_PARAMETER_VALUE_OPCODE      = 0x0E
-GET_PARAMETER_VALUE_OPCODE      = 0x0F
+SET_PARAMETER_VALUE_OPCODE      = 0x18
+GET_PARAMETER_VALUE_OPCODE      = 0x19
 
-RESET_PUREPURSUIT_OPCODE        = 0x10
-ADD_PUREPURSUIT_WAYPOINT_OPCODE = 0x11
+RESET_PUREPURSUIT_OPCODE        = 0x1A
+ADD_PUREPURSUIT_WAYPOINT_OPCODE = 0x1B
+
+GET_VELOCITIES_WANTED_OPCODE    = 0x1C
 
 LEFTWHEEL_RADIUS_ID	            = 0x10
 LEFTWHEEL_CONSTANT_ID           = 0x11
@@ -163,6 +165,11 @@ class WheeledBase(SerialTalksProxy):
 		if bool(spinurgency):
 			raise RuntimeError('spin urgency')
 		return bool(isarrived)
+
+	
+	def get_velocities_wanted(self):
+		output = self.execute(GET_VELOCITIES_WANTED_OPCODE)
+		return output.read(FLOAT, FLOAT)
 
 	def wait(self, timestep=0.1, **kwargs):
 		while not self.isarrived(**kwargs):
