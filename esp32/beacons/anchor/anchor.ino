@@ -123,7 +123,7 @@ void setup() {
   
   DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
-  DW1000Ranging.useRangeFilter(false);
+  DW1000Ranging.useRangeFilter(true);
   
   int antennaDelay = 16530;
   #if 0
@@ -148,7 +148,7 @@ void setup() {
   digitalWrite(PIN_LED_FAIL,HIGH);
 
   String toDisplay = "SYNCHRONISATION\n(anchor : ";
-  toDisplay += currentBeaconNumber;
+  toDisplay += DW1000Ranging.getCurrentShortAddress()[0]; //currentBeaconNumber;
   toDisplay += ")\n";
   toDisplay += replyTime;
   display.drawString(64, 64/4, toDisplay);
