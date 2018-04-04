@@ -21,7 +21,7 @@ class Sensors(SerialTalksProxy):
 		SerialTalksProxy.__init__(self, parent, uuid)
 
 	def get_normal(self):
-		output = self.execute(_GET_MESURE_SENSOR_OPCODE, **kwargs)
+		output = self.execute(_GET_NORMAL_OPCODE)
 		av_std, av_var, ar_std, ar_var = output.read(FLOAT, FLOAT, FLOAT, FLOAT)
 		return ((av_std,av_var),(ar_std,ar_var))
 
