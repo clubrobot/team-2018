@@ -38,7 +38,13 @@ void SensorListener::process(float timestep)
         std /= nb_measure;
         for(int i=0;i<nb_measure;i++)
         {
-            var += pow((m_mesures.dequeue()-std),2);
+            m = m_mesures.dequeue();
+            if (m==(float) NULL)
+            {
+                var=0;
+                break;
+            }
+            var += pow((m-std),2);
         }
         var /= nb_measure;
 
@@ -55,7 +61,7 @@ void SensorListener::process(float timestep)
 
 void SensorListener::storeStd(float std)
 {
-    for(int i=0;i<LISTENER_MAX_HISTORY-1;i++) m_oldStd[i+1] = m_oldStd[i];
+    for(int i=(LISTENER_MAX_HISTORY-1);i>=1;i--) m_oldStd[i] = m_oldStd[i-1];
 
     m_oldStd[0] = std;
 
@@ -64,7 +70,7 @@ void SensorListener::storeStd(float std)
 
 void SensorListener::storeVar(float var)
 {
-    for(int i=0;i<LISTENER_MAX_HISTORY-1;i++) m_oldVar[i+1] = m_oldVar[i];
+    for(int i=(LISTENER_MAX_HISTORY-1);i>=1;i--) m_oldVar[i] = m_oldVar[i-1];
 
     m_oldVar[0] = var;
 
