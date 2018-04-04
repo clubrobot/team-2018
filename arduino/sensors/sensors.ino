@@ -18,6 +18,7 @@ void setup() {
     Serial.begin(SERIALTALKS_BAUDRATE);
     talks.begin(Serial);
     talks.bind(GET_MESURE_OPCODE, GET_MESURE);
+    talks.bind(GET_NORMAL_OPCODE,GET_NORMAL);
     SensorAv.attach(TRIGGPIN7, ECHOPIN2);
     SensorAr.attach(TRIGGPIN8, ECHOPIN3);
     SensorAv.trig();
