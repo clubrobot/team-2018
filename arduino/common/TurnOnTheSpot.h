@@ -10,8 +10,8 @@
 class TurnOnTheSpot : public AbstractMoveStrategy
 {
 public:
-	TurnOnTheSpot() : m_direction(FORWARD){}
-	enum Direction {FORWARD=1, BACKWARD=-1};
+	TurnOnTheSpot() : m_direction(TRIG){}
+	enum Direction {TRIG=1, CLOCK=-1};
 	void setDirection(Direction direction);
 protected:
 
