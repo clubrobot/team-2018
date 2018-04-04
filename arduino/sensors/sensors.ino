@@ -22,8 +22,8 @@ void setup() {
     SensorAr.attach(TRIGGPIN8, ECHOPIN3);
     SensorAv.trig();
     SensorAr.trig();
-    ListenerAv.attach(SensorAv,1000);
-    ListenerAr.attach(SensorAr,1000);
+    ListenerAv.attach(&SensorAv,1000);
+    ListenerAr.attach(&SensorAr,1000);
 
 }
 

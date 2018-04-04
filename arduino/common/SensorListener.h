@@ -18,8 +18,8 @@ class SensorListener : public PeriodicProcess
 
         void process(float timestep);
 
-        float getStd(int delta) const;
-        float getVar(int delta) const;
+        float getStd(int delta);
+        float getVar(int delta);
 
 
     private:
@@ -35,4 +35,6 @@ class SensorListener : public PeriodicProcess
         float m_oldVar[LISTENER_MAX_HISTORY];
 
 
-}
+};
+
+#endif
