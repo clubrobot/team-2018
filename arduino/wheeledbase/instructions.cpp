@@ -106,6 +106,11 @@ void START_TURNONTHESPOT(SerialTalks& talks, Deserializer& input, Serializer& ou
 {
 	Position posSetpoint = odometry.getPosition();
 	posSetpoint.theta = input.read<float>();
+	switch(input.read<byte>())
+	{
+		case 0: turnOnTheSpot.setDirection(TurnOnTheSpot::FORWARD); break;
+		case 1: turnOnTheSpot.setDirection(TurnOnTheSpot::BACKWARD); break;
+	}
 	velocityControl.enable();
 	positionControl.setPosSetpoint(posSetpoint);
 	positionControl.setMoveStrategy(turnOnTheSpot);

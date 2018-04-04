@@ -16,7 +16,7 @@ void TurnOnTheSpot::computeVelSetpoints(float timestep)
 	const float angVelKp  = getAngVelKp();
 	const float angVelMax = getAngVelMax();
 
-	const float linPosSetpoint = cos(theta) * dx + sin(theta) * dy;
+	const float linPosSetpoint = cos(theta*m_direction) * dx + sin(theta*m_direction) * dy;
 	const float angPosSetpoint = inrange(getPosSetpoint().theta - theta, -M_PI, M_PI);
 
 	const float linVelSetpoint = saturate(linVelKp * linPosSetpoint, -linVelMax, linVelMax);
@@ -29,4 +29,9 @@ bool TurnOnTheSpot::getPositionReached()
 	const float theta = getPosInput().theta;
 	const float angPosSetpoint = inrange(getPosSetpoint().theta - theta, -M_PI, M_PI);
 	return abs(angPosSetpoint) < getAngPosThreshold();
+}
+
+void TurnOnTheSpot::setDirection(Direction direction)
+{
+	m_direction = direction;
 }
