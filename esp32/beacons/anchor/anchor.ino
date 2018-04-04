@@ -124,6 +124,7 @@ void setup() {
   DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
+  DW1000Ranging.setRangeFilterValue(5);
   
   int antennaDelay = 16530;
   #if 0
