@@ -21,8 +21,8 @@ LIBS = 	$(ESP_LIBS)/SPI \
 		$(DWM1000_LIB)/DW1000Ranging.cpp\
 		$(DWM1000_LIB)/DW1000Time.cpp\
 		$(DWM1000_LIB)/DW1000Mac.cpp\
-		$(SKETCH_LIBS)/OLEDDisplay.cpp
-		#instructions.cpp 
+		$(SKETCH_LIBS)/OLEDDisplay.cpp\
+		instructions.cpp 
 
 # Define
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x20

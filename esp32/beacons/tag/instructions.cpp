@@ -4,7 +4,6 @@ extern float p[2]; // Target point
 
 void GET_POSITION(SerialTalks &talks, Deserializer &input, Serializer &output)
 {
-    output.write<float>(p[0]);
-    output.write<float>(p[1]);
-
+    output.write<int16_t>((int16_t)p[0]);
+    output.write<int16_t>((int16_t)p[1]);
 }
