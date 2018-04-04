@@ -2,7 +2,7 @@ BOARD = esp32
 CHIP = esp32
 
 #Arduino file
-SKETCH = Blink.ino
+SKETCH = panel.ino
 
 BOARD_UUID = esp32
 COMMON = ../common
