@@ -23,8 +23,12 @@ void setup() {
     SensorAr.attach(TRIGGPIN8, ECHOPIN3);
     SensorAv.trig();
     SensorAr.trig();
+    ListenerAr.setTimestep(0.025);
+    ListenerAv.setTimestep(0.025);
     ListenerAv.attach(&SensorAv,1000);
     ListenerAr.attach(&SensorAr,1000);
+    ListenerAr.enable();
+    ListenerAv.enable();
 
 }
 
