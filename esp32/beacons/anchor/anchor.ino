@@ -28,28 +28,18 @@ byte currentBeaconNumber = 3;
 
 void newRange()
 {
-  Serial.print("from: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
-  Serial.print("\t Range: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getRange());
-  Serial.print(" m");
-  Serial.print("\t RX power: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
-  Serial.println(" dBm");
+  //Serial.print("from: ");
+  //Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
+  //Serial.print("\t Range: ");
+  //Serial.print(DW1000Ranging.getDistantDevice()->getRange());
+  //Serial.print(" m");
+  //Serial.print("\t RX power: ");
+  //Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
+  //Serial.println(" dBm");
 
   display.clear();
   float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
-  switch (currentBeaconNumber){
-    case 0: // TODO : mettre les adresses dans configuration.h
-    case 1:
-    case 2: // balises fixes
-      distance = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
-      break;
-    case 3: // balise centrale
-      distance = sqrt(distance * distance - ((z_central - z_tag) * (z_central - z_tag))); // projection dans le plan des tags
-      break;
-  }
-    
+  distance = sqrt(distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG))); // projection dans le plan des tags
 
   String toDisplay = "Distance : \n";
   toDisplay += distance;
@@ -62,15 +52,15 @@ void newRange()
 
 void newBlink(DW1000Device *device)
 {
-  Serial.print("blink; 1 device added ! -> ");
-  Serial.print(" short:");
-  Serial.println(device->getShortAddress(), HEX);
+  //Serial.print("blink; 1 device added ! -> ");
+  //Serial.print(" short:");
+  //Serial.println(device->getShortAddress(), HEX);
 }
 
 void inactiveDevice(DW1000Device *device)
 {
-  Serial.print("delete inactive device: ");
-  Serial.println(device->getShortAddress(), HEX);
+  //Serial.print("delete inactive device: ");
+  //Serial.println(device->getShortAddress(), HEX);
 
   display.clear();
   display.drawString(64, 0, "INACTIVE");
@@ -90,7 +80,7 @@ void setup() {
 
   /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
-    Serial.println("failed to initialise EEPROM");
+    //Serial.println("failed to initialise EEPROM");
     delay(1000000);
   }*/
 
@@ -124,6 +114,7 @@ void setup() {
   DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
+  DW1000Ranging.setRangeFilterValue(5);
   
   int antennaDelay = 16530;
   #if 0

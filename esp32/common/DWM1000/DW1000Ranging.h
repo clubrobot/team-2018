@@ -90,9 +90,7 @@ public:
 	
 	//getters
 	static byte* getCurrentAddress() { return _currentAddress; };
-	
 	static byte* getCurrentShortAddress() { return _currentShortAddress; };
-	
 	static uint8_t getNetworkDevicesNumber() { return _networkDevicesNumber; };
 	
 	//ranging functions
@@ -104,13 +102,12 @@ public:
 	
 	//Handlers:
 	static void attachNewRange(void (* handleNewRange)(void)) { _handleNewRange = handleNewRange; };
-	
 	static void attachBlinkDevice(void (* handleBlinkDevice)(DW1000Device*)) { _handleBlinkDevice = handleBlinkDevice; };
-	
 	static void attachNewDevice(void (* handleNewDevice)(DW1000Device*)) { _handleNewDevice = handleNewDevice; };
-	
 	static void attachInactiveDevice(void (* handleInactiveDevice)(DW1000Device*)) { _handleInactiveDevice = handleInactiveDevice; };
 	
+	// Auto calibration
+	static void startAutoCalibration(int realDistance);
 	
 	
 	static DW1000Device* getDistantDevice();
@@ -170,6 +167,9 @@ private:
 	static int16_t _bias_PRF_16[17]; // TODO remove or use
 	//17 bytes in SRAM
 	static char  _bias_PRF_64[17]; // TODO remove or use
+	// for auto calibration
+	static boolean _calibrate;
+	static int _realDistance;
 	
 	
 	//methods

@@ -165,6 +165,7 @@ void newRange()
     case 4:
     {
       // 4D Trilateration algorithm
+      /*
       float A[3][2] = {{-2 * (x_1 - x_4), -2 * (y_1 - y_4)},
                        {-2 * (x_2 - x_4), -2 * (y_2 - y_4)},
                        {-2 * (x_3 - x_4), -2 * (y_3 - y_4)}};
@@ -185,7 +186,71 @@ void newRange()
       toDisplay += ")\n(4)";
       display.drawString(64, 0, toDisplay);
       display.display();
+      */
+
+     // 3D Trilateration algorithm without the nearest anchor distance
+
     }
+      int count = 0;
+      float x[3];
+      float y[3];
+      float z[3];
+      float d[3];
+      String nAnch = "";
+      if (d1>d2 || d1>d3 || d1>d4)
+      {
+        x[count] = x_1;
+        y[count] = y_1;
+        z[count] = z_anchor;
+        d[count] = d1;
+        count++;
+        nAnch += "A1";
+      }
+      if (d2>d1 || d2>d3 || d2>d4)
+      {
+        x[count] = x_2;
+        y[count] = y_2;
+        z[count] = z_anchor;
+        d[count] = d2;
+        count++;
+        nAnch += "A2";
+      }
+      if (d3>d1 || d3>d2 || d3>d4)
+      {
+        x[count] = x_3;
+        y[count] = y_3;
+        z[count] = z_anchor;
+        d[count] = d3;
+        count++;
+        nAnch += "A3";
+      }
+      if (count < 3 && (d4>d1 || d4>d2 || d4>d3))
+      {
+        x[count] = x_4;
+        y[count] = y_4;
+        z[count] = z_central;
+        d[count] = d4;
+        count++;
+        nAnch += "A4";
+      }
+      // 3D Trilateration algorithm
+      float A[2][2] = {{-2 * (x[0] - x[2]), -2 * (y[0] - y[2])},
+                       {-2 * (x[1] - x[2]), -2 * (y[1] - y[2])}};
+
+      float b[2] = {d[0] * d[0] - x[0] * x[0] - y[0] * y[0] - d[2] * d[2] + x[2] * x[2] + y[2] * y[2], d[1] * d[1] - x[1] * x[1] - y[1] * y[1] - d[2] * d[2] + x[2] * x[2] + y[2] * y[2]};
+      float Ainv[2][2];
+      memcpy(&Ainv[0][0], &A[0][0], sizeof(float) * 4);
+      Matrix.Invert(&Ainv[0][0], 2);
+      Matrix.Multiply(&Ainv[0][0], &b[0], 2, 2, 1, &p[0]);
+      toDisplay = "(";
+      toDisplay += round(p[0] / 10);
+      toDisplay += ",";
+      toDisplay += round(p[1] / 10);
+      toDisplay += ")\n(";
+      toDisplay += nAnch;
+      toDisplay += ")";
+      display.drawString(64, 0, toDisplay);
+      display.display();
       break;
   }
   
@@ -260,7 +325,8 @@ void setup() {
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
-  
+  DW1000Ranging.setRangeFilterValue(5);
+
   //we start the module as a tag
   DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 

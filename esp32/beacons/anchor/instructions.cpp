@@ -7,7 +7,9 @@ void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &o
     byte number = input.read<byte>();
     EEPROM.write(EEPROM_NUM_ANCHOR,number);
     EEPROM.commit();
-    // TODO : update current configuration
+    // Restart to update current configuration
+    talks.out << "restarting to update configuration\n";
+    ESP.restart();
 }
 
 

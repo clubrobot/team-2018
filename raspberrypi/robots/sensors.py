@@ -15,6 +15,8 @@ _GET_MESURE_SENSOR_OPCODE    = 0x10
 _ACTIVATE_SENSORS_OPCODE 	 = 0x11
 _DESACTIVATE_SENSORS_OPCODE  = 0x12
 _GET_NORMAL_OPCODE           = 0x13
+_GET_LEFT_SWITCH_OPCODE      = 0x14
+_GET_RIGHT_SWITCH_OPCODE     = 0x15
 
 class Sensors(SerialTalksProxy):
 	def __init__(self, parent, uuid='sensors'):
@@ -35,3 +37,11 @@ class Sensors(SerialTalksProxy):
 
 	def desactivate(self):
 		self.send(_DESACTIVATE_SENSORS_OPCODE, BYTE(0))
+
+	def get_left_switch(self):
+		output = self.execute(_GET_LEFT_SWITCH_OPCODE)
+		return bool(output.read(BYTE))
+	
+	def get_right_switch(self):
+		output = self.execute(_GET_RIGHT_SWITCH_OPCODE)
+		return bool(output.read(BYTE))
