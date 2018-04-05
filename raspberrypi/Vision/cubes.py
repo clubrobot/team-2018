@@ -14,6 +14,9 @@ def mydiv(x,y):
 	for i in range(len(x)):
 		z.append(x[i] / y)
 	return tuple(z)
+ 
+def getNorm(p1, p2):
+  return math.sqrt(math.pow((p1[0] - p2[0]), 2) + math.pow((p1[1] - p2[1]), 2))
 
 class pilesOfCubes():
 	def __init__(self, matPersp, side, coord_min, coord_max):
@@ -44,7 +47,7 @@ class pilesOfCubes():
 		self.hsv_blue = ( (h,s,v ), (h,s,v ))
 		self.hsv_black = ( (h,s,v), (h,s,v ))
 		self.hsv_yellow = ( (h,s,v), (h,s,v ))
-		self.hsv_orange = ( (h,s,v), (h,s,v ))
+		self.hsv_orange = ((7, 175, 200),(9, 187, 210))
 		self.hsv_green = ( (h,s,v), (h,s,v ))
 
 		self.mat = np.copy(matPersp)
@@ -73,24 +76,11 @@ class pilesOfCubes():
 
 	def init_hsv_tresh(self):
 		for c in self.color: 
-			hsv_min, hsv_max = self.hsv_treshold_finder(c, 0.97)
+			hsv_min, hsv_max = self.hsv_treshold_finder(c)
 			self.set_hsv_tresh(c, hsv_min, hsv_max)
 		
-
-	def treshold_counter(self, cube_min, cube_max, hsv_min, hsv_max):
-		cube_area = (cube_max[0]-cube_min[0]) *(cube_max[1]-cube_min[1])
-		nbCube = 0
-		for row in range(cube_min[0], cube_max[0]):
-			for col in range(cube_min[1], cube_max[1]):
-				h, s, v = self.hsv_image[col, row]
-				if (   (h >= hsv_min[0]) and (s >= hsv_min[1]) and (v >= hsv_min[2]) and (h <= hsv_max[0]) and (s <= hsv_max[1]) and (v <= hsv_max[2])  ):
-					nbCube +=1
-			
-		return (nbCube / cube_area)
 		
-		
-		
-	def hsv_treshold_finder(self, color, seuil):
+	def hsv_treshold_finder(self, color):
 		if(color == 'blue'):
 			cube_min = (self.init_blue_cube[0] - 4 , self.init_blue_cube[1] - 4 )
 			cube_max = (self.init_blue_cube[0] + 4 , self.init_blue_cube[1] + 4 )
@@ -106,82 +96,48 @@ class pilesOfCubes():
 		elif(color == 'orange'):
 			cube_min = (self.init_orange_cube[0] - 4 , self.init_orange_cube[1] - 4 )
 			cube_max = (self.init_orange_cube[0] + 4 , self.init_orange_cube[1] + 4 )
-		
-		
-		hstep = 1
-		sstep = 1
-		vstep = 1
-		
-		hsv_max = (0,0,0)
-		hsv_min = (180, 255, 255)
-		addh = True
-		adds = True
-		addv = True
-
-		subh = True
-		subs = True
-		subv = True
-
-		while(addh or adds or addv or subh or subs or subv):
-			if(addh):
-				addh = False
-				res = self.treshold_counter(cube_min, cube_max, (0, 0 , 0), (hsv_max[0]+hstep, 255, 255))
-				if(res <= seuil):
-					hsv_max = myadd(hsv_max, (hstep, 0, 0))
-					addh = True
-				if hsv_max[0] >= 180 : 
-					addh = False
-
-			if(adds):
-				adds = False
-				res = self.treshold_counter(cube_min, cube_max,  (0, 0, 0), (180, hsv_max[1]+sstep, 255))
-				if(res <= seuil):
-					hsv_max = myadd(hsv_max, (0, sstep, 0))
-					adds = True 
-				if hsv_max[1] >= 255 : 
-					adds = False
-				
-
-			if(addv):
-				addv = False
-				res = self.treshold_counter(cube_min, cube_max,  (0, 0 , 0), (255, 255, hsv_max[2] + vstep))
-				if(res <= seuil ):
-					hsv_max = myadd(hsv_max, (0, 0, vstep))
-					addv = True
-				if hsv_max[2] >= 255 : 
-					addv = False
-
-			if(subh):
-				subh = False
-				res = self.treshold_counter(cube_min, cube_max,(hsv_min[0]-hstep , 0 , 0), ( 255, 255, 255))
-				if(res <= seuil ):
-					hsv_min = myadd(hsv_min, (-hstep, 0, 0))
-					subh = True 
-				if hsv_min[0] <= 0 : 
-					subh = False
-
-			if(subs):
-				subs = False
-				res = self.treshold_counter(cube_min, cube_max, (0, hsv_min[1]-sstep, 0), ( 255, 255, 255))
-				if(res <= seuil):
-					hsv_min = myadd(hsv_min, (0 , -sstep, 0))
-					subs = True
-				if hsv_min[1] <= 0 : 
-					subs = False
-
-			if(subv):
-				subv = False
-				res = self.treshold_counter(cube_min, cube_max, (0, 0 , hsv_min[2]-vstep), ( 255, 255, 255))
-				if(res <= seuil):
-					hsv_min = myadd(hsv_min, ( 0, 0, -vstep))
-					subv = True
-				if hsv_min[2] <= 0 : 
-					subv = False
-
-			print("bool : addh =", not addh, "adds =", not adds,"addv =", not addv, "subh =", not subh, "subs =", not subs, "subv =", not subv)
-		
-		return (hsv_min, hsv_max)
-
+			#image2 = np.copy(self.image)
+			#cv2.circle(image2, cube_min ,3,255,-1)
+			#cv2.circle(image2, cube_max ,3,255,-1)
+			#cv2.imshow('image', image2)
+			#while( cv2.waitKey(100) != ord("q")):
+			 #   i=0
+			#cv2.destroyAllWindows()    
+	  
+		hsv_min = [180,255,255]
+		hsv_max = [0,0,0]
+   
+		for row in range(cube_min[0], cube_max[0]):
+			for col in range(cube_min[1], cube_max[1]):
+				h, s, v = self.hsv_image[col, row]
+		  
+				if h > hsv_max[0]:
+					hsv_max[0] = h
+				if h < hsv_min[0]:
+					hsv_min[0] = h
+ 			  
+				if s > hsv_max[1]:
+					hsv_max[1] = s
+				if s < hsv_min[1]:
+					hsv_min[1] = s
+					
+				if v > hsv_max[2]:
+					hsv_max[2] = v
+				if v < hsv_min[2]:
+					hsv_min[2] = v
+				 
+		hsv_min[2] -= 50
+		hsv_max[2] += 50
+   
+		hsv_min[1] -= 50
+		hsv_max[1] += 50
+   
+		hsv_min[0] -= 2
+		hsv_max[0] += 2
+   
+		return (tuple(hsv_min), tuple(hsv_max))
+	
+	
 	def init_cube_center_arbitrary(self):
 		moy_x = 0
 		moy_y = 0
@@ -225,23 +181,16 @@ class pilesOfCubes():
 		cv2.waitKey(1)
 		
 	def display_cube(self, color, window_name): 
-		if(color == 'blue'):
-			hsv_min, hsv_max = self.hsv_blue
-		elif(color == 'yellow'):
-			hsv_min, hsv_max = self.hsv_yellow
-		elif(color == 'black'):
-			hsv_min, hsv_max = self.hsv_black
-		elif(color == 'green'):
-			hsv_min, hsv_max = self.hsv_green
-		elif(color == 'orange'):
-			hsv_min, hsv_max = self.hsv_orange
+		hsv_min, hsv_max = self.get_hsv_tresh(color)
 
-		gray =  cv2.inRange(self.hsv_image, hsv_min, hsv_max)
-		gray = self.filtrage(gray)
+		min_array = np.array([hsv_min[0],hsv_min[1],hsv_min[2]])
+		max_array = np.array([hsv_max[0],hsv_max[1],hsv_max[2]])
+		gray =  cv2.inRange(self.hsv_image, min_array, max_array)
+		#gray = self.filtrage(gray)
 		mask_inv = cv2.bitwise_not(gray)
 
 		res = cv2.bitwise_and(self.image,self.image,mask = mask_inv)
-		cv2.imshow(window_name + color, res)
+		cv2.imshow(window_name + "  "+color, res )
 		cv2.waitKey(1)		
 
 	def set_coord(self, min, max):
@@ -255,10 +204,6 @@ class pilesOfCubes():
 
 	def perspective_remover(self): 
 		self.image = cv2.warpPerspective(self.image, self.mat,(100,100))
-		#cv2.imshow('image', self.image)
-		#while cv2.waitKey(1) & 0xFF != ord("q"): 
-				#cv2.waitKey(1)
-		#cv2.destroyAllWindows()
 		self.set_region(100, 100)
 		
 	def sort_corner(self):
@@ -322,9 +267,12 @@ class pilesOfCubes():
 		x_sum = 0 
 		y_sum = 0
 		
-		gray =  cv2.inRange(self.hsv_image, hsv_min, hsv_max)
+   
+		min_array = np.array([hsv_min[0],hsv_min[1],hsv_min[2]])
+		max_array = np.array([hsv_max[0],hsv_max[1],hsv_max[2]])
+		gray =  cv2.inRange(self.hsv_image, min_array, max_array)
 		
-		gray = self.filtrage(gray)
+		#gray = self.filtrage(gray)
 		
 		for x in range(width):
 			for y in range(height):
@@ -362,6 +310,18 @@ class pilesOfCubes():
 			return self.green_moved
 		elif(color == 'orange'):
 			return self.orange_moved
+	  
+	def set_color_moved(self, color, moved):
+		if(color == 'blue'):
+			self.blue_moved = moved
+		elif(color == 'yellow'):
+			self.yellow_moved = moved
+		elif(color == 'black'):
+			self.black_moved = moved
+		elif(color == 'green'):
+			self.green_moved = moved
+		elif(color == 'orange'):
+			self.orange_moved = moved
 	
 	
 	def refresh_image(self, img):
@@ -372,10 +332,6 @@ class pilesOfCubes():
 	def find_corner(self):
 		gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
 	  
-		#cv2.imshow('gray', gray)
-		#while cv2.waitKey(1) & 0xFF != ord("q"): 
-				#cv2.waitKey(1)
-		#cv2.destroyAllWindows()
 		corners = cv2.goodFeaturesToTrack(gray,20,0.01,10)
 		corners = np.int0(corners)
 
@@ -414,6 +370,18 @@ class pilesOfCubes():
 				self.green_cube = pos_xy
 			elif(color == 'orange'):
 				self.orange_cube = pos_xy
+	
+	def get_init_cube_position(self, color):
+			if(color == 'blue'):
+				return self.init_blue_cube
+			elif(color == 'yellow'):
+				return self.init_yellow_cube
+			elif(color == 'black'):
+				return self.init_black_cube
+			elif(color == 'green'):
+				return self.init_green_cube
+			elif(color == 'orange'):
+				return self.init_orange_cube
 
 	def set_hsv_tresh(self, color, min, max):
 			if(color == 'blue'):
@@ -427,51 +395,33 @@ class pilesOfCubes():
 			elif(color == 'orange'):
 				self.hsv_orange = (min, max)
 
+	def get_hsv_tresh(self, color):
+			if(color == 'blue'):
+				return self.hsv_blue
+			elif(color == 'yellow'):
+				return self.hsv_yellow
+			elif(color == 'black' ):
+				return self.hsv_black
+			elif(color == 'green'):
+				return self.hsv_green
+			elif(color == 'orange'):
+				return self.hsv_orange
 
 	def update_pile_position(self): 
 		for c in self.color : 
 			self.update_cube_position(c)
 
 	def update_cube_position(self, color):
-		if(color == 'blue'):
-			hsv_min, hsv_max = self.hsv_blue
-			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
-			self.blue_moved = False
-			self.blue_cube = pos_xy
-			if not ((pos_xy[0] <= self.init_blue_cube[0]+2) and  (pos_xy[0] >= self.init_blue_cube[0]-2) and (pos_xy[1] <= self.init_blue_cube[1]+2) and (pos_xy[1]>= self.init_blue_cube[1]-2)):
-				self.blue_moved = True
-			
+		hsv_min, hsv_max = self.get_hsv_tresh(color)
+	
+		pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
+		self.set_cube_position(color, pos_xy)
+	
+		norm = getNorm(self.get_init_cube_position(color), self.get_cube_position(color))
+		flag = norm >=10
+	
+		self.set_color_moved(color, flag)
 
-		elif(color == 'yellow'):
-			hsv_min, hsv_max = self.hsv_yellow
-			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
-			self.yellow_moved = False
-			if not ((pos_xy[0] <= self.init_yellow_cube[0]+2) and  (pos_xy[0] >= self.init_yellow_cube[0]-2) and (pos_xy[1] <= self.init_yellow_cube[1]+2 )and (pos_xy[1]>= self.init_yellow_cube[1]-2)):
-				self.yellow_moved = True
-			self.yellow_cube = pos_xy
-
-		elif(color == 'black'):
-			hsv_min, hsv_max = self.hsv_black
-			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
-			self.black_moved = False
-			if not ((pos_xy[0] <= self.init_black_cube[0]+2) and  (pos_xy[0] >= self.init_black_cube[0]-2) and (pos_xy[1] <= self.init_black_cube[1]+2) and (pos_xy[1]>= self.init_black_cube[1]-2)):
-				self.black_moved = True
-			self.black_cube = pos_xy
-
-		elif(color == 'green'):
-			hsv_min, hsv_max = self.hsv_green
-			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
-			self.green_moved = False
-			if not ((pos_xy[0] <= self.init_green_cube[0]+2) and  (pos_xy[0] >= self.init_green_cube[0]-2) and (pos_xy[1] <= self.init_green_cube[1]+2) and (pos_xy[1]>= self.init_green_cube[1]-2)):
-				self.green_moved = True
-			self.green_cube = pos_xy
-		elif(color == 'orange'):
-			hsv_min, hsv_max = self.hsv_orange
-			pos_xy = self.gravitycenter_search(hsv_min, hsv_max)
-			self.orange_moved = False
-			if not ((pos_xy[0] <= self.init_orange_cube[0]+2) and  (pos_xy[0] >= self.init_orange_cube[0]-2) and (pos_xy[1] <= self.init_orange_cube[1]+2 )and (pos_xy[1]>= self.init_orange_cube[1]-2)):
-				self.orange_moved = True
-			self.orange_cube = pos_xy
 
 	def get_cube_position(self, color):
 		if(color == 'blue'):
