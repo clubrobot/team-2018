@@ -991,3 +991,7 @@ void DW1000RangingClass::startAutoCalibration(int realDistance, unsigned long ti
 	_startCalibrationTime = millis();
 	_calibrationTimeOut = timeOut;
 }
+
+void DW1000RangingClass::stopCalibration(){
+	_calibrate = false;
+}

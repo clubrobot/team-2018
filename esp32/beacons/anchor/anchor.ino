@@ -30,6 +30,8 @@ void newRange()
 {
 
   display.clear();
+  display.setFont(ArialMT_Plain_24);
+  DW1000Ranging.setRangeFilterValue(5);
   float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
   distance = sqrt(distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG))); // projection dans le plan des tags
 
@@ -43,9 +45,17 @@ void newRange()
 }
 
 void calibration(int realDistance, int mesure){
-  String toDisplay = "target : ";
+  DW1000Ranging.setRangeFilterValue(15);
+  mesure = sqrt(mesure * mesure - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG))); // projection dans le plan des tags
+  if(abs(realDistance - mesure)<5){ // end of calibration
+    DW1000Ranging.stopCalibration();
+  }
+  
+  display.clear();
+  display.setFont(ArialMT_Plain_16);
+  String toDisplay = "target: ";
   toDisplay += realDistance;
-  toDisplay += "mm\n mesure : ";
+  toDisplay += "mm\nmesure: ";
   toDisplay += mesure;
   toDisplay += "mm";
   display.drawString(64, 0, toDisplay);

@@ -109,7 +109,8 @@ public:
 
 	// Auto calibration
 	static void startAutoCalibration(int realDistance, unsigned long timeOut);
-	
+	static void stopCalibration();
+
 
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);
@@ -175,9 +176,8 @@ private:
 	static unsigned long _startCalibrationTime;	//ms
 	static unsigned long _calibrationTimeOut;	//ms
 
-		//methods
-		static void
-		handleSent();
+	//methods
+	static void handleSent();
 	static void handleReceived();
 	static void noteActivity();
 	static void resetInactive();
