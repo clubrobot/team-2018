@@ -23,18 +23,15 @@ class Anchor(SerialTalksProxy):
 
 	def update_beacon_number(self, number):
 		self.send(UPDATE_ANCHOR_NUMBER_OPCODE,BYTE(number))
-		time.sleep(0.2)
-		print(self.getout())
+		print(self.getout(timeout=1))
 	
 	def update_antenna_delay(self, delay):
 		self.send(UPDATE_ANTENNA_DELAY_OPCODE,INT(delay))
-		time.sleep(0.2)
-		print(self.getout())
+		print(self.getout(timeout=1))
 
 #	real_distance in mm, timeout in ms
 	def calibrate(self,real_distance, timeout):
 		self.send(CALIBRATION_ROUTINE_OPCODE,INT(real_distance),ULONG(timeout))
-		time.sleep(0.2)
-		print(self.getout())
+		print(self.getout(timeout=1))
 	
 
