@@ -63,6 +63,9 @@ boolean          DW1000RangingClass::_protocolFailed = false;
 int32_t            DW1000RangingClass::timer           = 0;
 int16_t            DW1000RangingClass::counterForBlink = 0; // TODO 8 bit?
 
+// for auto calibration
+boolean DW1000RangingClass::_calibrate = false;
+int DW1000RangingClass::_realDistance = 0;
 
 // data buffer
 byte          DW1000RangingClass::data[LEN_DATA];
@@ -970,5 +973,11 @@ float DW1000RangingClass::filterValue(float value, float previousValue, uint16_t
 	return (value * k) + previousValue * (1.0f - k);
 }
 
+/* ###########################################################################
+ * #### Auto calibration  ####################################################
+ * ######################################################################### */
 
-
+void DW1000RangingClass::startAutoCalibration(int realDistance){
+	_realDistance = realDistance;
+	_calibrate = true;
+}

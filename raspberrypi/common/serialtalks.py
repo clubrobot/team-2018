@@ -7,6 +7,7 @@ from serial.serialutil import SerialException
 import time
 import random
 import warnings
+from CRC16 import *
 from queue		import Queue, Empty
 from threading	import Thread, RLock, Event, current_thread
 
@@ -145,7 +146,9 @@ class SerialTalks:
 	def send(self, opcode, *args):
 		retcode = random.randint(0, 0xFFFFFFFF)
 		content = BYTE(opcode) + ULONG(retcode) + bytes().join(args)
-		prefix  = MASTER_BYTE + BYTE(len(content))
+		#crc calculation
+		crc = CRCprocessBuffer(content)
+		prefix  = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
 		self.rawsend(prefix + content)
 		return retcode
 
@@ -273,6 +276,7 @@ class SerialListener(Thread):
 		state  = 'waiting' # ['waiting', 'starting', 'receiving']
 		type_packet = SLAVE_BYTE
 		buffer = bytes()
+		crc_buf = bytes()
 		msglen = 0
 		while not self.stop.is_set():
 			# Wait until new bytes arrive
@@ -290,21 +294,32 @@ class SerialListener(Thread):
 			
 			elif state == 'starting' and inc:
 				msglen = inc[0]
-				state  = 'receiving'
+				state  = 'crc'
+				continue
+
+			elif state == 'crc':
+				crc_buf += inc
+				if (len(crc_buf) >= 2):
+					crc_val = (crc_buf[1] << 8) | crc_buf[0]
+					state  = 'receiving'
 				continue
 
 			elif state == 'receiving':
 				buffer += inc
 				if (len(buffer) < msglen):
 					continue
-			
+
 			# Junk byte
 			else: continue
 			
 			# Process the above message
 			try:
-				if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
-				if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
+					if(CRCcheck(buffer,crc_val)):
+						if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
+						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
+					else:
+						print('error') #replace by warning
+				
 			except NotConnectedError:
 				self.disconnect()
 				break
@@ -312,3 +327,4 @@ class SerialListener(Thread):
 			# Reset the finite state machine
 			state  = 'waiting'
 			buffer = bytes()
+			crc_buf = bytes()

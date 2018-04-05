@@ -11,6 +11,7 @@ DWM1000_LIB = ../common/DWM1000
 LIBS =  $(ESP_LIBS)/EEPROM \
 		$(ESP_LIBS)/SPI \
 	    $(COMMON)/SerialTalks.cpp \
+	    $(COMMON)/CRC16.cpp \
 		$(COMMON)/mathutils.cpp \
 		$(DWM1000_LIB)/DW1000Device.cpp\
 		$(DWM1000_LIB)/DW1000.cpp\

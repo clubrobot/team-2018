@@ -9,6 +9,7 @@ COMMON = ../common
 #Setup all libs used !
 LIBS = $(ESP_LIBS)/EEPROM \
 	   $(COMMON)/SerialTalks.cpp \
+	   $(COMMON)/CRC16.cpp \
 	   $(COMMON)/tcptalks.cpp \
 	   $(COMMON)/WiFi/src/WiFi.cpp \
 	   $(COMMON)/WiFi/src/ETH.cpp \
