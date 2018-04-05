@@ -66,6 +66,8 @@ int16_t            DW1000RangingClass::counterForBlink = 0; // TODO 8 bit?
 // for auto calibration
 boolean DW1000RangingClass::_calibrate = false;
 int DW1000RangingClass::_realDistance = 0;
+unsigned long DW1000RangingClass::_startCalibrationTime = 0;
+unsigned long DW1000RangingClass::_calibrationTimeOut = 0;
 
 // data buffer
 byte          DW1000RangingClass::data[LEN_DATA];
@@ -87,6 +89,7 @@ void (* DW1000RangingClass::_handleNewRange)(void) = 0;
 void (* DW1000RangingClass::_handleBlinkDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleNewDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveDevice)(DW1000Device*) = 0;
+void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
 
 /* ###########################################################################
  * #### Init and end #######################################################
@@ -592,8 +595,13 @@ void DW1000RangingClass::loop() {
 								
 								//we have finished our range computation. We send the corresponding handler
 								_lastDistantDevice = myDistantDevice->getIndex();
-								if(_handleNewRange != 0) {
+								if(_calibrate && _handleCalibration != 0){
+									(*_handleCalibration)(_realDistance, (int)(distance*1000));
+								} else if(_handleNewRange != 0) {
 									(*_handleNewRange)();
+								}
+								if(_calibrate && (millis() -_startCalibrationTime > _calibrationTimeOut)){
+									_calibrate = false;
 								}
 								
 							}
@@ -980,4 +988,5 @@ float DW1000RangingClass::filterValue(float value, float previousValue, uint16_t
 void DW1000RangingClass::startAutoCalibration(int realDistance){
 	_realDistance = realDistance;
 	_calibrate = true;
+	_startCalibrationTime = millis();
 }
