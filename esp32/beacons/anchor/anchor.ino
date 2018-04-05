@@ -24,7 +24,7 @@
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
-byte currentBeaconNumber = 3;
+byte currentBeaconNumber = 0;
 
 void newRange()
 {
@@ -45,10 +45,35 @@ void newRange()
 }
 
 void calibration(int realDistance, int mesure){
+  static int lastErrors[3] = {100,100,100};
+  static int errorIndex = 0;
+  static uint16_t antennaDelay = (EEPROM.read(EEPROM_ANTENNA_DELAY) << 8) + EEPROM.read(EEPROM_ANTENNA_DELAY+1);
   DW1000Ranging.setRangeFilterValue(15);
   mesure = sqrt(mesure * mesure - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG))); // projection dans le plan des tags
-  if(abs(realDistance - mesure)<5){ // end of calibration
-    DW1000Ranging.stopCalibration();
+  
+  lastErrors[errorIndex++] = realDistance - mesure;
+  
+  if(errorIndex > 2){
+    errorIndex = 0;
+    int meanError = (lastErrors[0] + lastErrors[1] + lastErrors[2]) / 3;
+
+    if (abs(meanError) < 5)
+    { // end of calibration
+      DW1000Ranging.stopCalibration();
+      lastErrors[0] = 100;
+      lastErrors[1] = 100;
+      lastErrors[2] = 100;
+      EEPROM.write(EEPROM_ANTENNA_DELAY, antennaDelay >> 8);    // TODO bug potentiel ici (valeurs incohérentes à la relecture de l'eeprom)
+      EEPROM.write(EEPROM_ANTENNA_DELAY + 1, antennaDelay % 256);
+      EEPROM.commit();
+      ESP.restart();
+    } else if (meanError < 0) {
+      antennaDelay++;
+      DW1000Class::setAntennaDelay(antennaDelay);
+    } else {
+      antennaDelay--;
+      DW1000Class::setAntennaDelay(antennaDelay);
+    }
   }
   
   display.clear();
@@ -57,7 +82,8 @@ void calibration(int realDistance, int mesure){
   toDisplay += realDistance;
   toDisplay += "mm\nmesure: ";
   toDisplay += mesure;
-  toDisplay += "mm";
+  toDisplay += "mm\ndelay: ";
+  toDisplay += antennaDelay;
   display.drawString(64, 0, toDisplay);
   display.display();
 }
@@ -131,7 +157,7 @@ void setup() {
   EEPROM.write(EEPROM_ANTENNA_DELAY + 1, antennaDelay % 256);
   EEPROM.commit();
   #endif
-  antennaDelay = (EEPROM.read(50)<<8) + EEPROM.read(51);
+  antennaDelay = (EEPROM.read(EEPROM_ANTENNA_DELAY) << 8) + EEPROM.read(EEPROM_ANTENNA_DELAY+1);
   DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, approximately 16530 for anchors
 
   //we start the module as an anchor
@@ -150,7 +176,7 @@ void setup() {
   String toDisplay = "SYNCHRONISATION\n(anchor : ";
   toDisplay += DW1000Ranging.getCurrentShortAddress()[0]; //currentBeaconNumber;
   toDisplay += ")\n";
-  toDisplay += replyTime;
+  toDisplay += antennaDelay;
   display.drawString(64, 64/4, toDisplay);
   display.display();
 
