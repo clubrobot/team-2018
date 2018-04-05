@@ -85,6 +85,3 @@ except :
 #b.wait()
 #b.goto(592.0, 290.0)
 
-d.open_outdoor()
-
-#l.set_motor_velocity(20)

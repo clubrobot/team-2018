@@ -8,6 +8,7 @@ LOCAL_INO_SRCS = main.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/ShiftRegDCMotor.cpp \
 	$(COMMON)/ShiftRegister.cpp 
 

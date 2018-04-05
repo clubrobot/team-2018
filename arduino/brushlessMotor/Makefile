@@ -8,6 +8,7 @@ LOCAL_INO_SRCS = brushlessMotor.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/BrushlessMotor.cpp 
 
 # Sketch libraries

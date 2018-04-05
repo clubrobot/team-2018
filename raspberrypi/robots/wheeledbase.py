@@ -156,8 +156,8 @@ class WheeledBase(SerialTalksProxy):
 			finalangle = math.atan2(waypoints[-1][1] - waypoints[-2][1], waypoints[-1][0] - waypoints[-2][0])
 		self.send(START_PUREPURSUIT_OPCODE, BYTE({'forward':0, 'backward':1}[direction]), FLOAT(finalangle))
 
-	def turnonthespot(self, theta):
-		self.send(START_TURNONTHESPOT_OPCODE, FLOAT(theta))
+	def turnonthespot(self, theta, direction='forward'):
+		self.send(START_TURNONTHESPOT_OPCODE, FLOAT(theta), BYTE({'forward':0, 'backward':1}[direction]))
 
 	def isarrived(self, **kwargs):
 		output = self.execute(POSITION_REACHED_OPCODE, **kwargs)

@@ -7,6 +7,7 @@ COMMON = ../common
 LOCAL_INO_SRCS = buttonCard.ino
 LOCAL_CPP_SRCS = \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/Clock.cpp \
 	$(COMMON)/ButtonCard.cpp \
 	instructions.cpp\

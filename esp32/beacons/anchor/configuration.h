@@ -7,11 +7,11 @@
 
 const byte ANCHOR_SHORT_ADDRESS[MAX_ANCHORS] = {35, 36, 37, 38};
 const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16530, 16530, 16530, 16530};
+const float Z_ANCHOR = 438.3;
+const float Z_CENTRAL = 1016.3;
+const float Z_TAG = 483.3;
+const float Z_HEIGHT[MAX_ANCHORS] = {Z_ANCHOR, Z_ANCHOR, Z_ANCHOR, Z_CENTRAL};
 
-
-const float z_tag = 484.3;
-const float z_anchor = 438.3;
-const float z_central = 1016.3;
 
 /**
  * EEPROM addresses

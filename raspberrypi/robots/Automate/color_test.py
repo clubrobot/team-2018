@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from setup_bornibus import *
 from time           import sleep
-TIME = 1
+TIME = 20
 TIME_STEP = 0.01
 STEP = TIME/TIME_STEP
 print(STEP)
