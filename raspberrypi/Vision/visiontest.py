@@ -17,6 +17,8 @@ v.show_pile('ld', 'all')
 v.enable()
 
 v.calibration()
+print( "init orange : ")
+print(v.ld_pile.get_init_cube_position('orange'))
 
 print(deb - time.monotonic())
 while(True):
