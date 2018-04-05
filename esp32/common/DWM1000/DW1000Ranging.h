@@ -108,9 +108,9 @@ public:
 	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
 
 	// Auto calibration
-	static void startAutoCalibration(int realDistance);
+	static void startAutoCalibration(int realDistance, unsigned long timeOut);
 	
-	
+
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);
 	

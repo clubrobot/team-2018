@@ -985,8 +985,9 @@ float DW1000RangingClass::filterValue(float value, float previousValue, uint16_t
  * #### Auto calibration  ####################################################
  * ######################################################################### */
 
-void DW1000RangingClass::startAutoCalibration(int realDistance){
+void DW1000RangingClass::startAutoCalibration(int realDistance, unsigned long timeOut){
 	_realDistance = realDistance;
 	_calibrate = true;
 	_startCalibrationTime = millis();
+	_calibrationTimeOut = timeOut;
 }
