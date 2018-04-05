@@ -16,7 +16,7 @@ void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &o
 
 void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "update antenna delay\n";
-    int antennaDelay = input.read<int>();
+    int antennaDelay = input.read<uint16_t>();
     EEPROM.write(EEPROM_ANTENNA_DELAY, antennaDelay >> 8);
     EEPROM.write(EEPROM_ANTENNA_DELAY+1, antennaDelay % 256);
     EEPROM.commit();
@@ -28,7 +28,7 @@ void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &o
  
 void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "calibration routine\n";
-    int realDistance = input.read<int>();
-    unsigned long timeoutDelay = input.read<long>();
+    int realDistance = input.read<uint16_t>();
+    unsigned long timeoutDelay = input.read<unsigned int>();
     DW1000Ranging.startAutoCalibration(realDistance, timeoutDelay);
 }
