@@ -319,6 +319,7 @@ class SerialListener(Thread):
 						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
 					else:
 						print('error') #replace by warning
+						state = 'waiting'
 				
 			except NotConnectedError:
 				self.disconnect()
