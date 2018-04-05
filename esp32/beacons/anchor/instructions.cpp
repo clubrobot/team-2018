@@ -19,10 +19,12 @@ void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &o
     EEPROM.write(EEPROM_ANTENNA_DELAY, antennaDelay >> 8);
     EEPROM.write(EEPROM_ANTENNA_DELAY+1, antennaDelay % 256);
     EEPROM.commit();
-    // TODO : update current configuration
+    // Restart to update current configuration
+    talks.out << "restarting to update configuration\n";
+    ESP.restart();
 }
 
-
+ 
 void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "calibration routine\n";
     int realDistance = input.read<int>();
