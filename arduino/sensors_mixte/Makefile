@@ -8,6 +8,7 @@ LOCAL_INO_SRCS = sensors.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/Clock.cpp \
 	$(COMMON)/PeriodicProcess.cpp \
 	$(COMMON)/EndStop.cpp \

@@ -19,9 +19,6 @@ def CRCcheck(buffer,crc):
     
     new_crc = CRCprocessBuffer(buffer)
 
-    #print("new_crc = ")
-    #print(hex(new_crc))
-
     if crc == new_crc:
         return True
     else:

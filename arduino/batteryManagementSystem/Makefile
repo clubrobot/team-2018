@@ -10,6 +10,7 @@ LOCAL_INO_SRCS = bms/bms.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp
 	#$(COMMON)/BMS.cpp 
 
 # Sketch libraries

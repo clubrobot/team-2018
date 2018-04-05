@@ -9,6 +9,7 @@ LOCAL_INO_SRCS = wheeledbase.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/DCMotor.cpp \
 	$(COMMON)/Codewheel.cpp \
 	$(COMMON)/PeriodicProcess.cpp \

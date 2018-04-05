@@ -16,6 +16,9 @@ void TEST_LED(SerialTalks& inst, Deserializer& input, Serializer& output)
 			pinMode(2, OUTPUT);
         	digitalWrite(2, LOW);	
 		}
+
+		output.write<bool>(true);
+		output.write<int>(100);
 }
 
 void setup() {

@@ -107,9 +107,18 @@ int SerialTalks::send(byte opcode,Serializer output)
 	unsigned long retcode = opcode;
 	if (m_stream != 0 && isConnected())
 	{
+		/*******************************crc computation********************************/
+		memcpy(m_crc_tmp,(byte*) &retcode,sizeof(retcode));
+		memcpy(m_crc_tmp + sizeof(retcode), m_outputBuffer, output.buffer-m_outputBuffer);
+
+		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, (output.buffer-m_outputBuffer) + sizeof(retcode));
+		/*****************************************************************************/
+
 		count += m_stream->write(SERIALTALKS_MASTER_BYTE);
 		count += m_stream->write( sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte) );
 		count += m_stream->write(opcode);
+
+		count += m_stream->write((byte*)(&crc), sizeof(crc));
 
 		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
 		count += m_stream->write(m_outputBuffer, output.buffer-m_outputBuffer);	
@@ -123,8 +132,18 @@ int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 	int count = 0;
 	if (m_stream != 0 && isConnected())
 	{
+		/*******************************crc computation********************************/ 
+		memcpy(m_crc_tmp,(byte*) &retcode, sizeof(retcode));
+		memcpy(m_crc_tmp + sizeof(retcode), buffer, size);
+		
+		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, size + sizeof(retcode));
+		/*****************************************************************************/
+
 		count += m_stream->write(SERIALTALKS_SLAVE_BYTE);
 		count += m_stream->write(byte(sizeof(retcode) + size));
+
+		count += m_stream->write((byte*)(&crc), sizeof(crc));
+
 		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
 		count += m_stream->write(buffer, size);	
 	}
@@ -193,27 +212,37 @@ bool SerialTalks::execute()
 		byte inc = byte(m_stream->read());
 		m_lastTime = currentTime;
 		
+		
 		// Use a state machine to process the above byte
 		switch (m_state)
 		{
 		// An instruction always begin with the Master byte
 		case SERIALTALKS_WAITING_STATE:
-			if (inc == SERIALTALKS_MASTER_BYTE || inc==SERIALTALKS_SLAVE_BYTE){
+			if (inc == SERIALTALKS_MASTER_BYTE || inc==SERIALTALKS_SLAVE_BYTE)
 				m_state = SERIALTALKS_INSTRUCTION_STARTING_STATE;
 				m_order = (inc == SERIALTALKS_MASTER_BYTE) ?
 					SERIALTALKS_ORDER :
 					SERIALTALKS_RETURN;
-			}
 			continue;
-
 
 		// The second byte is the instruction size (for example: 'R', '\x02', '\x03', '\x31')
 		case SERIALTALKS_INSTRUCTION_STARTING_STATE:
 			m_bytesNumber  = inc;
 			m_bytesCounter = 0;
+			m_crcBytesCounter = 0;
 			m_state = (m_bytesNumber <= SERIALTALKS_INPUT_BUFFER_SIZE) ?
-				SERIALTALKS_INSTRUCTION_RECEIVING_STATE :
+				SERIALTALKS_CRC_RECIEVING_STATE :
 				SERIALTALKS_WAITING_STATE;
+			continue;
+		
+		case SERIALTALKS_CRC_RECIEVING_STATE : 
+			m_crc_tab[m_crcBytesCounter++] = inc;
+			if(m_crcBytesCounter >= SERIALTALKS_CRC_SIZE)
+			{
+				Deserializer incrc(m_crc_tab);
+			 	received_crc_value = incrc.read<uint16_t>();
+			 	m_state = SERIALTALKS_INSTRUCTION_RECEIVING_STATE;
+			}
 			continue;
 
 		// The first instruction byte is the opcode and the others the parameters
@@ -221,11 +250,21 @@ bool SerialTalks::execute()
 			m_inputBuffer[m_bytesCounter++] = inc;
 			if (m_bytesCounter >= m_bytesNumber)
 			{
-				m_connected = true;
-				if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
-				else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
-				m_state = SERIALTALKS_WAITING_STATE;
+				//Checking frame integrity(CRC)
+				if(m_crc.CRCcheck(m_inputBuffer,m_bytesNumber,received_crc_value))
+				{
+        			m_connected = true;
+					if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
+					else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
+					m_state = SERIALTALKS_WAITING_STATE;
+				}
+				else
+				{
+					LAUNCHWARNING("message corrupted !!");
+					m_state = SERIALTALKS_WAITING_STATE;
+				}	
 			}
+			continue;
 		}
 	}
 	return ret;
