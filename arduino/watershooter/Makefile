@@ -11,6 +11,7 @@ LOCAL_CPP_SRCS = \
 	BallsShaker.cpp \
     instructions.cpp \
     $(COMMON)/SerialTalks.cpp \
+    $(COMMON)/CRC16.cpp \
     $(COMMON)/BrushlessMotor.cpp \
 	$(COMMON)/Adafruit_TCS34725.cpp \
 	$(COMMON)/Wire.cpp \

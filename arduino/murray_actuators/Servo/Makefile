@@ -7,6 +7,7 @@ COMMON = ../../common
 LOCAL_INO_SRCS = main.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/SerialTalks.cpp
 
 # Sketch libraries
