@@ -4,6 +4,7 @@
 #include "../common/tcptalks.h"
 #include "../common/Pickle.h"
 
+#define PING_OPCODE      0x10
 
 #define SET_BAR_OPCODE	 0X11
 #define GET_BAR_OPCODE	 0X12
@@ -15,6 +16,9 @@
 #define GET_ENGR_OPCODE	 0X16
 
 #define IS_CONNECTED_OPCODE 0X17	
+
+
+void PING(TCPTalks &inst, UnPickler& input, Pickler& output);
 
 void SET_BAR(TCPTalks &inst, UnPickler& input, Pickler& output);
 

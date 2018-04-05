@@ -2,6 +2,7 @@
 
 #include "../common/UltrasonicSensor.h"
 #include "../common/SensorListener.h"
+#include "../common/EndStop.h"
 #include "../common/SerialTalks.h"
 #include "instructions.h"
 #include "PIN.h"
@@ -13,12 +14,17 @@ UltrasonicSensor SensorAv;
 UltrasonicSensor SensorAr;
 SensorListener   ListenerAv;
 SensorListener   ListenerAr;
+EndStop          LeftSwitch;
+EndStop          RightSwitch;
+
 
 void setup() {
     Serial.begin(SERIALTALKS_BAUDRATE);
     talks.begin(Serial);
     talks.bind(GET_MESURE_OPCODE, GET_MESURE);
     talks.bind(GET_NORMAL_OPCODE,GET_NORMAL);
+    talks.bind(GET_LEFT_SWITCH_OPCODE,GET_LEFT_SWITCH);
+    talks.bind(GET_RIGHT_SWITCH_OPCODE,GET_RIGHT_SWITCH);
     SensorAv.attach(TRIGGPIN7, ECHOPIN2);
     SensorAr.attach(TRIGGPIN8, ECHOPIN3);
     SensorAv.trig();
@@ -29,6 +35,8 @@ void setup() {
     ListenerAr.attach(&SensorAr,1000);
     ListenerAr.enable();
     ListenerAv.enable();
+    LeftSwitch.attach(LEFT_SWITCH_PIN);
+    RightSwitch.attach(RIGHT_SWITCH_PIN);
 
 }
 

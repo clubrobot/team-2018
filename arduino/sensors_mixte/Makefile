@@ -1,4 +1,4 @@
-BOARD_UUID = sensors
+BOARD_UUID = sensorsLat
 BOARD_TAG  = nano
 BOARD_SUB  = atmega328
 
@@ -10,6 +10,7 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/SerialTalks.cpp \
 	$(COMMON)/Clock.cpp \
 	$(COMMON)/PeriodicProcess.cpp \
+	$(COMMON)/EndStop.cpp \
 	$(COMMON)/UltrasonicSensor.cpp \
 	$(COMMON)/SensorListener.cpp
 
