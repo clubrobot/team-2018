@@ -28,14 +28,6 @@ byte currentBeaconNumber = 3;
 
 void newRange()
 {
-  //Serial.print("from: ");
-  //Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
-  //Serial.print("\t Range: ");
-  //Serial.print(DW1000Ranging.getDistantDevice()->getRange());
-  //Serial.print(" m");
-  //Serial.print("\t RX power: ");
-  //Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
-  //Serial.println(" dBm");
 
   display.clear();
   float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
@@ -50,18 +42,23 @@ void newRange()
   digitalWrite(PIN_LED_FAIL, LOW);
 }
 
+void calibration(int realDistance, int mesure){
+  String toDisplay = "target : ";
+  toDisplay += realDistance;
+  toDisplay += "mm\n mesure : ";
+  toDisplay += mesure;
+  toDisplay += "mm";
+  display.drawString(64, 0, toDisplay);
+  display.display();
+}
+
 void newBlink(DW1000Device *device)
 {
-  //Serial.print("blink; 1 device added ! -> ");
-  //Serial.print(" short:");
-  //Serial.println(device->getShortAddress(), HEX);
+
 }
 
 void inactiveDevice(DW1000Device *device)
 {
-  //Serial.print("delete inactive device: ");
-  //Serial.println(device->getShortAddress(), HEX);
-
   display.clear();
   display.drawString(64, 0, "INACTIVE");
   display.display();
@@ -95,6 +92,8 @@ void setup() {
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachAutoCalibration(calibration);
+
   unsigned int replyTime;
   switch (currentBeaconNumber){
     case 0 :

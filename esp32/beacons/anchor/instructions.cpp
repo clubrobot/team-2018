@@ -1,6 +1,7 @@
 #include "instructions.h"
 #include "configuration.h"
 #include "EEPROM.h"
+#include "DW1000Ranging.h"
 
 void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "update anchor number\n";
@@ -28,5 +29,6 @@ void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &o
 void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "calibration routine\n";
     int realDistance = input.read<int>();
-    // TODO autocalibration
+    unsigned long timeoutDelay = input.read<long>();
+    DW1000Ranging.startAutoCalibration(realDistance, timeoutDelay);
 }
