@@ -5,12 +5,18 @@
  *  - fix deprecated convertation form string to char* startAsTag
  *  - give example description
  */
+#include "pin.h"
+#include <EEPROM.h>
+
 #include <SPI.h>
 #include "DW1000Ranging.h"
-#include "pin.h"
+
 #include "SSD1306.h"
 #include <Wire.h>
 #include "MatrixMath.h"
+
+#include "../../common/SerialTalks.h"
+#include "instructions.h"
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
@@ -22,6 +28,8 @@ bool a1Connected = false;
 bool a2Connected = false;
 bool a3Connected = false;
 bool a4Connected = false;
+
+float p[2] = {-1,-1}; // Target point
 
 void newRange()
 {
@@ -39,16 +47,15 @@ void newRange()
 
   static String toDisplay;
 
-  float p[2]; // Target point
 
-  Serial.print("from: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
-  Serial.print("\t Range: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getRange());
-  Serial.print(" m");
-  Serial.print("\t RX power: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
-  Serial.println(" dBm");
+  //Serial.print("from: ");
+  //Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
+  //Serial.print("\t Range: ");
+  //Serial.print(DW1000Ranging.getDistantDevice()->getRange());
+  //Serial.print(" m");
+  //Serial.print("\t RX power: ");
+  //Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
+  //Serial.println(" dBm");
 
   byte id = DW1000Ranging.getDistantDevice()->getShortAddress();
 
@@ -77,6 +84,8 @@ void newRange()
       toDisplay = "(0)";
       display.drawString(64, 0, toDisplay);
       display.display();
+      p[0] = -1;
+      p[1] = -1;
      }
       break;
     case 1:
@@ -84,6 +93,8 @@ void newRange()
       toDisplay = "(1)";
       display.drawString(64, 0, toDisplay);
       display.display();
+      p[0] = -1;
+      p[1] = -1;
       }
       break;
     case 2:
@@ -91,6 +102,8 @@ void newRange()
       toDisplay = "(2)";
       display.drawString(64, 0, toDisplay);
       display.display();
+      p[0] = -1;
+      p[1] = -1;
     }
       break;
     case 3:
@@ -182,9 +195,9 @@ void newRange()
 
 void newDevice(DW1000Device *device)
 {
-  Serial.print("ranging init; 1 device added ! -> ");
-  Serial.print(" short:");
-  Serial.println(device->getShortAddress(), HEX);
+  //Serial.print("ranging init; 1 device added ! -> ");
+  //Serial.print(" short:");
+  //Serial.println(device->getShortAddress(), HEX);
   byte id = device->getShortAddress();
   switch (id)
   {
@@ -204,8 +217,8 @@ void newDevice(DW1000Device *device)
 
 void inactiveDevice(DW1000Device *device)
 {
-  Serial.print("delete inactive device: ");
-  Serial.println(device->getShortAddress(), HEX);
+  //Serial.print("delete inactive device: ");
+  //Serial.println(device->getShortAddress(), HEX);
   byte id = device->getShortAddress();
   switch (id)
   {
@@ -228,12 +241,17 @@ void inactiveDevice(DW1000Device *device)
     display.display();
     digitalWrite(PIN_LED_OK, LOW);
     digitalWrite(PIN_LED_FAIL, HIGH);
+    p[0] = -1;
+    p[1] = -1;
   }
 }
 
 void setup() {
-  Serial.begin(115200);
-  delay(1000);
+  Serial.begin(SERIALTALKS_BAUDRATE);
+  talks.begin(Serial);
+
+  talks.bind(GET_POSITION_OPCODE, GET_POSITION);
+
   //init the configuration
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   //define the sketch as anchor. It will be great to dynamically change the type of module
@@ -241,7 +259,7 @@ void setup() {
   DW1000Ranging.attachNewDevice(newDevice);
   DW1000Ranging.attachInactiveDevice(inactiveDevice);
   //Enable the filter to smooth the distance
-  DW1000Ranging.useRangeFilter(false);
+  DW1000Ranging.useRangeFilter(true);
   
   //we start the module as a tag
   DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
@@ -263,6 +281,7 @@ void setup() {
 
 void loop() {
   DW1000Ranging.loop();
+  talks.execute();
 }
 
 

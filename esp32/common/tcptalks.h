@@ -34,7 +34,7 @@ class TCPTalks
 {
 	public: // Public API
 
-	TCPTalks();
+	TCPTalks(char* network_ssid, char* network_password,char* server_ip, int server_port);
 
 	typedef void (*Instruction)(TCPTalks& inst, UnPickler& input, Pickler& output);
 
@@ -76,7 +76,7 @@ class TCPTalks
 	bool m_connected;
 	bool m_authentificated;
 
-	char* ssid     = "";
+	char* ssid = "";
 	char* pass = "";
 
 	WiFiClient client;

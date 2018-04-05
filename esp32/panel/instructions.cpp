@@ -5,6 +5,12 @@
 extern PannelEffects Animation;
 extern TCPTalks talk;
 
+void PING(TCPTalks &inst, UnPickler& input, Pickler& output)
+{
+	output.dump<bool>(1);
+}
+
+
 void SET_BAR(TCPTalks &inst, UnPickler& input, Pickler& output)
 {
 	Animation.set_bar_animation((int)input.load<long>());

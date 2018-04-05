@@ -11,7 +11,7 @@
 #include "../common/PositionController.h"
 #include "../common/PurePursuit.h"
 #include "../common/TurnOnTheSpot.h"
-
+#include "../common/mathutils.h"
 #include <math.h>
 
 // Global variables
@@ -105,9 +105,19 @@ void ADD_PUREPURSUIT_WAYPOINT(SerialTalks& talks, Deserializer& input, Serialize
 void START_TURNONTHESPOT(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
 	Position posSetpoint = odometry.getPosition();
+	float initTheta = posSetpoint.theta;
 	posSetpoint.theta = input.read<float>();
+	float angPosSetpoint = inrange((posSetpoint.theta - initTheta), -M_PI, M_PI);
 	velocityControl.enable();
 	positionControl.setPosSetpoint(posSetpoint);
+	if(input.read<byte>()){
+		if(angPosSetpoint>0) turnOnTheSpot.setDirection(TurnOnTheSpot::TRIG);
+		else                 turnOnTheSpot.setDirection(TurnOnTheSpot::CLOCK);
+	}
+	else{
+		if(angPosSetpoint>0) turnOnTheSpot.setDirection(TurnOnTheSpot::CLOCK);
+		else                 turnOnTheSpot.setDirection(TurnOnTheSpot::TRIG);
+	}
 	positionControl.setMoveStrategy(turnOnTheSpot);
 	positionControl.enable();
 }

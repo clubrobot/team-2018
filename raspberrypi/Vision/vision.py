@@ -91,13 +91,12 @@ class vision():
 		  if names == 'all':
 			  self.piles_showing = [True , True, True, True, True, True]
 		  else: 
-			  for n in names : 
-				  self.piles_showing[self.piles.index(n)] = True
+			  #for n in names : 
+			  self.piles_showing[self.piles_names.index(names)] = True
 		  if colors == 'all':
 			  self.colors_showing = [True , True, True, True, True, True]
 		  else:
-			  for c in colors : 
-				  self.colors_showing[self.piles.index(c)] = True 
+			  self.colors_showing[self.color.index(colors)] = True 
 		  
 	  def display_selection(self):
 		  for i in range(6):
@@ -124,15 +123,28 @@ class vision():
 	 
 	  def calibration(self):
 		  self.refresh_image()
-		  for p in self.piles:
-			  p.init(self.raw_image)
+		#  for p in self.piles:
+		#	  p.init(self.raw_image)
+		  self.ld_pile.init(self.raw_image)
 	
 	  def check_position(self): 
-		  for p in self.piles: 
-			  p.update_pile_position()
+		 # for p in self.piles: 
+
+			#  p.update_pile_position()
+		  self.ld_pile.update_pile_position()
 	
 	  def process(self):
-			  self.check_position()
+		  self.check_position()
+		  if self.debug :
+			  self.debug_printing()	  					   
+								   				   					   				  											   			   
+		  if(self.display):   	            
+			  self.display_selection()
+			  self.ld_pile.display_corner()
+			  key = cv2.waitKey(100) & 0xFF 
+			  if key == ord("q"):
+				  self.clear_selection()
+				  cv2.destroyAllWindows()  
 	
 	  def enable(self):
 		  self.enabled = True
@@ -153,19 +165,9 @@ class vision():
 
 	  def update(self):
 		  self.refresh_image()
-		  if (self.enabled and time.monotonic() - self.precedentTime > self.timestep):
+		  if (self.enabled and (time.monotonic() - self.precedentTime )> self.timestep):
 			  self.precedentTime = time.monotonic()
 			  self.process()
-			  
-		  if self.debug :
-			  self.debug_printing()	  					   
-								   				   					   				  											   			   
-		  if(self.display):   	            
-			  self.display_selection()
-			  key = cv2.waitKey(100) & 0xFF 
-			  if key == ord("q"):
-				  self.clear_selection()
-				  cv2.destroyAllWindows()  
 				  
 	  def debug_printing(self):
 		   for i in range(6):

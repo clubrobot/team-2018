@@ -4,7 +4,7 @@
 #include "../common/PannelEffects.h"
 #include "instructions.h"
 
-TCPTalks talk;
+TCPTalks talk("CLUB_ROBOT","zigouigoui","192.168.1.17",26656);
 
 PannelEffects Animation;
 
@@ -13,10 +13,9 @@ long last_time = 0;
 
 void setup()
 {
-    Serial.begin(115200);
-
+    //Serial.begin(115200);
     talk.connect(500);
-
+    talk.bind(PING_OPCODE, PING);
     talk.bind(SET_BAR_OPCODE, SET_BAR);
     talk.bind(GET_BAR_OPCODE, GET_BAR);
 
@@ -38,7 +37,7 @@ void loop()
     current_time = millis();
     if((talk.is_connected() == false) && ((current_time - last_time)) > 500)
     {
-        talk.connect(200);
+        talk.connect(500);
         last_time = millis();
     }
 }

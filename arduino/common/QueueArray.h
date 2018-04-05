@@ -52,7 +52,7 @@
 // header defining the interface of the source.
 #ifndef _QUEUEARRAY_H
 #define _QUEUEARRAY_H
-#define MAX_SIZE 5
+#define MAX_SIZE 40
 
 // include Arduino basic header.
 #include <Arduino.h>
