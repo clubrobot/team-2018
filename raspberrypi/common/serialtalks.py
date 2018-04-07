@@ -48,6 +48,9 @@ INT    = SHORT
 UINT   = USHORT
 DOUBLE = FLOAT
 
+SERIALTALKS_CRC_SIZE   = 2
+
+SERIALTALKS_CRC_ENABLE = 1 #Set 0 to diable
 
 # Exceptions
 
@@ -147,8 +150,11 @@ class SerialTalks:
 		retcode = random.randint(0, 0xFFFFFFFF)
 		content = BYTE(opcode) + ULONG(retcode) + bytes().join(args)
 		#crc calculation
-		crc = CRCprocessBuffer(content)
-		prefix  = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
+		if(SERIALTALKS_CRC_ENABLE):
+			crc = CRCprocessBuffer(content)
+			prefix  = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
+		else :
+			prefix  = MASTER_BYTE + BYTE(len(content))
 		self.rawsend(prefix + content)
 		return retcode
 
@@ -294,12 +300,16 @@ class SerialListener(Thread):
 			
 			elif state == 'starting' and inc:
 				msglen = inc[0]
-				state  = 'crc'
+				if(SERIALTALKS_CRC_ENABLE):
+					state  = 'crc'
+				else :
+					state  = 'receiving'
+					crc_val = 0
 				continue
 
 			elif state == 'crc':
 				crc_buf += inc
-				if (len(crc_buf) >= 2):
+				if (len(crc_buf) >= SERIALTALKS_CRC_SIZE):
 					crc_val = (crc_buf[1] << 8) | crc_buf[0]
 					state  = 'receiving'
 				continue
@@ -315,6 +325,9 @@ class SerialListener(Thread):
 			# Process the above message
 			try:
 					if(CRCcheck(buffer,crc_val)):
+						if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
+						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
+					elif(not SERIALTALKS_CRC_ENABLE):
 						if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
 						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
 					else:
