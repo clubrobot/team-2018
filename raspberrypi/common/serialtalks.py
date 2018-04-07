@@ -50,8 +50,6 @@ DOUBLE = FLOAT
 
 SERIALTALKS_CRC_SIZE   = 2
 
-SERIALTALKS_CRC_ENABLE = 1 #Set 0 to diable
-
 # Exceptions
 
 class AlreadyConnectedError(ConnectionError): pass
@@ -150,11 +148,9 @@ class SerialTalks:
 		retcode = random.randint(0, 0xFFFFFFFF)
 		content = BYTE(opcode) + ULONG(retcode) + bytes().join(args)
 		#crc calculation
-		if(SERIALTALKS_CRC_ENABLE):
-			crc = CRCprocessBuffer(content)
-			prefix  = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
-		else :
-			prefix  = MASTER_BYTE + BYTE(len(content))
+		crc = CRCprocessBuffer(content)
+		prefix  = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
+
 		self.rawsend(prefix + content)
 		return retcode
 
@@ -300,11 +296,7 @@ class SerialListener(Thread):
 			
 			elif state == 'starting' and inc:
 				msglen = inc[0]
-				if(SERIALTALKS_CRC_ENABLE):
-					state  = 'crc'
-				else :
-					state  = 'receiving'
-					crc_val = 0
+				state  = 'crc'
 				continue
 
 			elif state == 'crc':
@@ -327,11 +319,8 @@ class SerialListener(Thread):
 					if(CRCcheck(buffer,crc_val)):
 						if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
 						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
-					elif(not SERIALTALKS_CRC_ENABLE):
-						if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
-						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
 					else:
-						print('error') #replace by warning
+						#print('error') #TODO: replace by warning
 						state = 'waiting'
 				
 			except NotConnectedError:

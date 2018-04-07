@@ -58,8 +58,6 @@
 
 #define SERIALTALKS_CRC_SIZE 2
 
-#define SERIALTALKS_CRC_ENABLE 0 // set 0 to diable and 1 to enable
-
 class SerialTalks
 {
 public: // Public API

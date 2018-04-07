@@ -114,16 +114,13 @@ int SerialTalks::send(byte opcode,Serializer output)
 		count += m_stream->write( sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte) );
 
 		/*******************************crc computation********************************/
-		if(SERIALTALKS_CRC_ENABLE)
-		{
-			memcpy(m_crc_tmp,(byte*)&opcode, sizeof(opcode));
-			memcpy(m_crc_tmp + sizeof(opcode), (byte*) &retcode, sizeof(retcode));
-			memcpy(m_crc_tmp + sizeof(retcode) + sizeof(opcode) , m_outputBuffer, output.buffer-m_outputBuffer);
+		memcpy(m_crc_tmp,(byte*)&opcode, sizeof(opcode));
+		memcpy(m_crc_tmp + sizeof(opcode), (byte*) &retcode, sizeof(retcode));
+		memcpy(m_crc_tmp + sizeof(retcode) + sizeof(opcode) , m_outputBuffer, output.buffer-m_outputBuffer);
 
-			uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, (output.buffer-m_outputBuffer) + sizeof(retcode) + sizeof(opcode));
+		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, (output.buffer-m_outputBuffer) + sizeof(retcode) + sizeof(opcode));
 
-			count += m_stream->write((byte*)(&crc), sizeof(crc));
-		}
+		count += m_stream->write((byte*)(&crc), sizeof(crc));
 		/*****************************************************************************/
 
 		count += m_stream->write(opcode);
@@ -142,8 +139,6 @@ int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 		count += m_stream->write(SERIALTALKS_SLAVE_BYTE);
 		count += m_stream->write(byte(sizeof(retcode) + size));
 
-		if(SERIALTALKS_CRC_ENABLE)
-		{
 		/*******************************crc computation********************************/ 
 		memcpy(m_crc_tmp,(byte*) &retcode, sizeof(retcode));
 		memcpy(m_crc_tmp + sizeof(retcode), buffer, size);
@@ -151,8 +146,6 @@ int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, size + sizeof(retcode));
 
 		count += m_stream->write((byte*)(&crc), sizeof(crc));
-		
-		}	
 		/*****************************************************************************/
 
 		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
@@ -243,8 +236,6 @@ bool SerialTalks::execute()
 			m_state = (m_bytesNumber <= SERIALTALKS_INPUT_BUFFER_SIZE) ?
 				SERIALTALKS_CRC_RECIEVING_STATE :
 				SERIALTALKS_WAITING_STATE;
-			if(m_state == SERIALTALKS_CRC_RECIEVING_STATE && !SERIALTALKS_CRC_ENABLE)
-				m_state = SERIALTALKS_INSTRUCTION_RECEIVING_STATE;
 			continue;
 		
 		case SERIALTALKS_CRC_RECIEVING_STATE : 
@@ -266,13 +257,6 @@ bool SerialTalks::execute()
 				if(m_crc.CRCcheck(m_inputBuffer,m_bytesNumber,received_crc_value))
 				{
         			m_connected = true;
-					if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
-					else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
-					m_state = SERIALTALKS_WAITING_STATE;
-				}
-				else if(!SERIALTALKS_CRC_ENABLE)
-				{
-					m_connected = true;
 					if(m_order==SERIALTALKS_ORDER) ret |= execinstruction(m_inputBuffer);
 					else if (m_order==SERIALTALKS_RETURN) ret |= receive(m_inputBuffer);
 					m_state = SERIALTALKS_WAITING_STATE;
