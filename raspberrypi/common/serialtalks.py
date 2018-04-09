@@ -48,6 +48,7 @@ INT    = SHORT
 UINT   = USHORT
 DOUBLE = FLOAT
 
+SERIALTALKS_CRC_SIZE   = 2
 
 # Exceptions
 
@@ -149,6 +150,7 @@ class SerialTalks:
 		#crc calculation
 		crc = CRCprocessBuffer(content)
 		prefix  = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
+
 		self.rawsend(prefix + content)
 		return retcode
 
@@ -299,7 +301,7 @@ class SerialListener(Thread):
 
 			elif state == 'crc':
 				crc_buf += inc
-				if (len(crc_buf) >= 2):
+				if (len(crc_buf) >= SERIALTALKS_CRC_SIZE):
 					crc_val = (crc_buf[1] << 8) | crc_buf[0]
 					state  = 'receiving'
 				continue
@@ -318,7 +320,8 @@ class SerialListener(Thread):
 						if type_packet == SLAVE_BYTE : self.parent.process(Deserializer(buffer))
 						if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
 					else:
-						print('error') #replace by warning
+						#print('error') #TODO: replace by warning
+						state = 'waiting'
 				
 			except NotConnectedError:
 				self.disconnect()

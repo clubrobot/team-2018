@@ -105,11 +105,13 @@ public:
 	static void attachBlinkDevice(void (* handleBlinkDevice)(DW1000Device*)) { _handleBlinkDevice = handleBlinkDevice; };
 	static void attachNewDevice(void (* handleNewDevice)(DW1000Device*)) { _handleNewDevice = handleNewDevice; };
 	static void attachInactiveDevice(void (* handleInactiveDevice)(DW1000Device*)) { _handleInactiveDevice = handleInactiveDevice; };
-	
+	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
+
 	// Auto calibration
-	static void startAutoCalibration(int realDistance);
-	
-	
+	static void startAutoCalibration(int realDistance, unsigned long timeOut);
+	static void stopCalibration();
+
+
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);
 	
@@ -134,6 +136,7 @@ private:
 	static void (* _handleBlinkDevice)(DW1000Device*);
 	static void (* _handleNewDevice)(DW1000Device*);
 	static void (* _handleInactiveDevice)(DW1000Device*);
+	static void (* _handleCalibration)(int,int);	// real distance (INT), mesure (INT)
 	
 	//sketch type (tag or anchor)
 	static int16_t          _type; //0 for tag and 1 for anchor
@@ -169,9 +172,10 @@ private:
 	static char  _bias_PRF_64[17]; // TODO remove or use
 	// for auto calibration
 	static boolean _calibrate;
-	static int _realDistance;
-	
-	
+	static int _realDistance;	// mm
+	static unsigned long _startCalibrationTime;	//ms
+	static unsigned long _calibrationTimeOut;	//ms
+
 	//methods
 	static void handleSent();
 	static void handleReceived();

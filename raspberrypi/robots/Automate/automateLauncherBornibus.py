@@ -132,11 +132,11 @@ class Bornibus:
         # Generate order list
 
         self.action_list[Bornibus.GREEN] = [
-            self.d1.getAction()[0],
-            self.shot.getAction()[0],
+            #self.d1.getAction()[0],
+            #self.shot.getAction()[0],
             #self.panel.getAction()[0],
-            #self.d3.getAction()[0],
-            #self.shot.getAction()[1],
+            self.d3.getAction()[0],
+            self.shot.getAction()[1],
             #self.treatment.getAction()[0],
             ]
         

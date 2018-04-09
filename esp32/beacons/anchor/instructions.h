@@ -11,6 +11,13 @@
 
 void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &output);
 void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &output);
+
+/**
+ * Purpose : Start the auto calibration algorithm
+ * args : 
+ *          - real distance in mm (INT)
+ *          - timeout autocalibration delay in ms (UNSIGNED LONG)
+ */ 
 void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &output);
 
 #endif //INSTRUCTIONS_H

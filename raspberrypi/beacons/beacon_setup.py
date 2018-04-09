@@ -41,6 +41,7 @@ from wheeledbase        import *
 #from display            import *
 #from sensors            import *
 from tag		import *
+from anchor		import *
 
 # Define temporary modules
 
@@ -64,5 +65,10 @@ try:
 	t = Tag(m)
 except:
 	print('\'tag\' not connected')
+
+try:
+	a = Anchor(m)
+except:
+	print('\'Anchor\' not connected')
 
 
