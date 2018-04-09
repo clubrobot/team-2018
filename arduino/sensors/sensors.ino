@@ -25,8 +25,8 @@ void setup() {
     SensorAr.trig();
     ListenerAr.setTimestep(0.025);
     ListenerAv.setTimestep(0.025);
-    ListenerAv.attach(&SensorAv,1000);
-    ListenerAr.attach(&SensorAr,1000);
+    ListenerAv.attach(&SensorAv,500);
+    ListenerAr.attach(&SensorAr,500);
     ListenerAr.enable();
     ListenerAv.enable();
 
