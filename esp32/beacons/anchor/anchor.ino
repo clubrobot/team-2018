@@ -24,7 +24,7 @@
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
-byte currentBeaconNumber = 0;
+byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
 
 void newRange()
@@ -32,7 +32,7 @@ void newRange()
 
   DW1000Ranging.setRangeFilterValue(5);
   float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
-  distance = sqrt(distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG))); // projection dans le plan des tags
+  distance = sqrt(distance * distance - ((Z_HEIGHT[currentBeaconNumber]/10 - Z_TAG/10) * (Z_HEIGHT[currentBeaconNumber]/10 - Z_TAG/10))); // projection dans le plan des tags
 
   display.clear();
   display.setFont(ArialMT_Plain_24);
@@ -71,7 +71,7 @@ void calibration(int realDistance, int mesure){
     errorIndex = 0;
     int meanError = (lastErrors[0] + lastErrors[1] + lastErrors[2]) / 3;
 
-    if (abs(meanError) < 5)
+    if (abs(meanError) < 1)
     { // end of calibration
       DW1000Ranging.stopCalibration();
       calibrationRunning = false;
