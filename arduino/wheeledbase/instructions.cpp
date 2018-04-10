@@ -111,12 +111,12 @@ void START_TURNONTHESPOT(SerialTalks& talks, Deserializer& input, Serializer& ou
 	velocityControl.enable();
 	positionControl.setPosSetpoint(posSetpoint);
 	if(input.read<byte>()){
-		if(angPosSetpoint>0) turnOnTheSpot.setDirection(TurnOnTheSpot::TRIG);
-		else                 turnOnTheSpot.setDirection(TurnOnTheSpot::CLOCK);
-	}
-	else{
 		if(angPosSetpoint>0) turnOnTheSpot.setDirection(TurnOnTheSpot::CLOCK);
 		else                 turnOnTheSpot.setDirection(TurnOnTheSpot::TRIG);
+	}
+	else{
+		if(angPosSetpoint>0) turnOnTheSpot.setDirection(TurnOnTheSpot::TRIG);
+		else                 turnOnTheSpot.setDirection(TurnOnTheSpot::CLOCK);
 	}
 	positionControl.setMoveStrategy(turnOnTheSpot);
 	positionControl.enable();
