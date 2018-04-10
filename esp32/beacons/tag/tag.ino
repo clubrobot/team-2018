@@ -165,7 +165,7 @@ void newRange()
     case 4:
     {
       // 4D Trilateration algorithm
-      /*
+      
       float A[3][2] = {{-2 * (x_1 - x_4), -2 * (y_1 - y_4)},
                        {-2 * (x_2 - x_4), -2 * (y_2 - y_4)},
                        {-2 * (x_3 - x_4), -2 * (y_3 - y_4)}};
@@ -186,11 +186,11 @@ void newRange()
       toDisplay += ")\n(4)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      */
+      
 
      // 3D Trilateration algorithm without the nearest anchor distance
 
-    }
+    }/*
       int count = 0;
       float x[3];
       float y[3];
@@ -250,7 +250,7 @@ void newRange()
       toDisplay += nAnch;
       toDisplay += ")";
       display.drawString(64, 0, toDisplay);
-      display.display();
+      display.display();*/
       break;
   }
   

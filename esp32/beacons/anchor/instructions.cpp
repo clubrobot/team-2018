@@ -22,7 +22,7 @@ void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &o
     EEPROM.commit();
     // Restart to update current configuration
     talks.out << "restarting to update configuration\n";
-    ESP.restart();
+    //ESP.restart();
 }
 
  

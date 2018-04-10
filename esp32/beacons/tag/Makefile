@@ -16,6 +16,7 @@ LIBS = 	$(ESP_LIBS)/SPI \
 	    $(COMMON)/SerialTalks.cpp \
 		$(COMMON)/mathutils.cpp \
 		$(COMMON)/MatrixMath.cpp \
+		$(COMMON)/CRC16.cpp\
 		$(DWM1000_LIB)/DW1000Device.cpp\
 		$(DWM1000_LIB)/DW1000.cpp\
 		$(DWM1000_LIB)/DW1000Ranging.cpp\
