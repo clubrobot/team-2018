@@ -126,6 +126,11 @@ class vision():
 		#  for p in self.piles:
 		#	  p.init(self.raw_image)
 		  self.ld_pile.init(self.raw_image)
+		  print(self.ld_pile.hsv_blue)
+		  print(self.ld_pile.hsv_orange)
+		  print(self.ld_pile.hsv_yellow)
+		  print(self.ld_pile.hsv_black)
+		  print(self.ld_pile.hsv_green)
 	
 	  def check_position(self): 
 		 # for p in self.piles: 
@@ -140,7 +145,6 @@ class vision():
 								   				   					   				  											   			   
 		  if(self.display):   	            
 			  self.display_selection()
-			  self.ld_pile.display_corner()
 			  key = cv2.waitKey(100) & 0xFF 
 			  if key == ord("q"):
 				  self.clear_selection()

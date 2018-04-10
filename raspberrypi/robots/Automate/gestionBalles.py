@@ -117,10 +117,11 @@ class Shot(Actionnable):
         self.watersorter = watersorter
         self.waterlauncher = waterlauncher
         self.shootCastlePoint=geo.get('ShootCastle'+str(self.side))
+        self.shootCastlePointLong=geo.get('ShootCastleLong'+str(self.side))
         self.castlePoint=geo.get('Castle'+str(self.side))
         
         
-    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher,timeout=5):
+    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher,global_timeout=30):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         wheeledbase.turnonthespot(theta)
@@ -128,40 +129,71 @@ class Shot(Actionnable):
         wheeledbase.angpos_threshold.set(0.1)
        
         time.sleep(0.2)
-        waterlauncher.set_motor_velocity(9)#9
-        time.sleep(1) # Wait the motor running
         watersorter.enable_shaker()
-        watersorter.write_trash(128)
+        watersorter.write_trash(126)
         watersorter.open_indoor()
-        watersorter.close_outdoor()
-        timeout_reached = False
-        nb_ball = 0
-        while not timeout_reached and nb_ball<8:
-            #watersorter.open_indoor()
-            watersorter.close_outdoor()
-            open_time = time.time()
-            while time.time()-open_time<timeout and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
-                time.sleep(0.3)
-                print(watersorter.get_water_color())
-            if time.time()-open_time>(timeout):
-                print("TIMEOUT")
-                break
-            #watersorter.close_indoor()
+        watersorter.open_outdoor()
+        nb_balls = 0
+        begin = time.time()
+        accu = 0
+        motor_base = 75
+        waterlauncher.set_motor_pulsewidth(1000+motor_base)
+        time.sleep(4) # Wait the motor running 
+        new_ball = 1
+        last_time = begin - 10
+        while nb_balls < 8 and time.time() - begin < global_timeout:
+            if(watersorter.get_water_color()[0]>120 or watersorter.get_water_color()[1]>120) and new_ball:
+                new_ball = 0
+                nb_balls += 1
+                print("+1 balle")
             
-            print("New ball geted ! {}".format(nb_ball))
-            #Verification de la sortie dans le canon
+            else:
+                if(new_ball == 0):
+                    accu += 8/(time.time() - last_time)
+                    print("Speed += ", 8/(time.time() - last_time))
+                last_time = time.time()
+                new_ball =1
 
-            time.sleep(0.5)
-            nb_ball+=1
-            print("New ball geted ! {}".format(nb_ball))
-            
-            watersorter.open_outdoor()
-            while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
-                time.sleep(0.05)
-                print("En attente de la sortie")
+            time.sleep(0.05)
+            accu = max(accu -6, 0)
+            speed = int(motor_base+accu)
+            speed = max(speed, motor_base)
+            speed = min(speed, motor_base+25)
+            waterlauncher.set_motor_pulsewidth(1000+speed)
+            #waterlauncher.set_motor_velocity(speed)
+            print("accu : ", accu, "    speed : ", speed)
+        time.sleep(3)
+
+#        while nb_balls<8:
+#            print("Salve")
+#            open_time = time.time()
+#            watersorter.open_indoor()
+#            while not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100 or time.time() - open_time > timeout):
+#                time.sleep(0.05)
+#            print("Balle 1")
+#
+#            open_time = time.time()
+#            while not (watersorter.get_water_color()[0]<100 or watersorter.get_water_color()[1]<100 or time.time() - open_time > timeout):
+#                time.sleep(0.05)
+#
+#            time.sleep(0.3)
+#            watersorter.close_indoor()
+#            open_time = time.time()
+#            while not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100 or time.time() - open_time > timeout):
+#                time.sleep(0.05)
+#            print("Balle 2")
+#
+#            
+#            while (time.time() - open_time < 3):
+#                time.sleep(0.1)
+#            
+#            nb_balls +=2
+
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
         waterlauncher.set_motor_velocity(0)
+        watersorter.close_outdoor()
+        watersorter.open_indoor()
             
     def realize_with_sort(self,wheeledbase, watersorter, waterlauncher,timeout=5):
         currentPosXY=wheeledbase.get_position()[:2]
@@ -170,35 +202,36 @@ class Shot(Actionnable):
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
        
-        time.sleep(0.2)
-        waterlauncher.set_motor_velocity(9)#9
-        time.sleep(1) # Wait the motor running
+        time.sleep(0.2) 
+        motor_base = 102
+        waterlauncher.set_motor_pulsewidth(1000+motor_base)
+        time.sleep(2) # Wait the motor running
         watersorter.enable_shaker()
-        watersorter.write_trash(128)
+        watersorter.write_trash(126)
         watersorter.close_indoor()
         watersorter.write_trash_unloader(100)
         watersorter.close_outdoor()
         timeout_reached = False
         nb_ball = 0
         while not timeout_reached and nb_ball<8:
+            waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.open_indoor()
-            watersorter.close_trash()
+            watersorter.write_trash(126)
             watersorter.close_outdoor()
             open_time = time.time()
             while time.time()-open_time<timeout and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
                 time.sleep(0.3)
-                print(watersorter.get_water_color())
+                #print(watersorter.get_water_color())
+
             if time.time()-open_time>(timeout):
                 print("TIMEOUT")
-                break
-            watersorter.close_indoor()
-            
-            print("New ball geted ! {}".format(nb_ball))
             #Verification de la sortie dans le canon
 
-            time.sleep(0.7)
+            waterlauncher.set_motor_pulsewidth(1000+motor_base)
+            watersorter.close_indoor()
+            time.sleep(0.4)
             nb_ball+=1
-            print("New ball geted ! {}".format(nb_ball))
+            print("New ball gotten ! {}".format(nb_ball))
             # On verifie si la code couleur est bon
             if(watersorter.get_water_color()[0]<watersorter.get_water_color()[1]):
                 watersorter.open_outdoor()
@@ -206,23 +239,26 @@ class Shot(Actionnable):
                 watersorter.open_trash()
 
             while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
-                time.sleep(0.4)
+                time.sleep(0.3)
                 print("En attente de la sortie")
-            time.sleep(1.3)
+                waterlauncher.set_motor_pulsewidth(1000+motor_base)
+
+            waterlauncher.set_motor_pulsewidth(1000+motor_base)
+            time.sleep(0.5)
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
         waterlauncher.set_motor_velocity(0)
+        watersorter.open_indoor()
 
 
     def getAction(self):
-        
         act_without_sort =Action(
                 self.shootCastlePoint,
                 lambda  :self.realize_without_sort(self.wheeledbase,self.watersorter,self.waterlauncher) ,
                 Shot.typ
                 )
         act_with_sort =Action(
-                self.shootCastlePoint,
+                self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher) ,
                 Shot.typ
                 )   
@@ -264,3 +300,7 @@ class Treatment(Actionnable):
                 Treatment.typ
             )
         return [act]
+from geogebra import GeoGebra
+
+import math
+import time
