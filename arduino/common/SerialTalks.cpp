@@ -107,19 +107,20 @@ int SerialTalks::send(byte opcode,Serializer output)
 	unsigned long retcode = opcode;
 	if (m_stream != 0 && isConnected())
 	{
-		/*******************************crc computation********************************/
-		memcpy(m_crc_tmp,(byte*) &retcode,sizeof(retcode));
-		memcpy(m_crc_tmp + sizeof(retcode), m_outputBuffer, output.buffer-m_outputBuffer);
-
-		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, (output.buffer-m_outputBuffer) + sizeof(retcode));
-		/*****************************************************************************/
-
 		count += m_stream->write(SERIALTALKS_MASTER_BYTE);
 		count += m_stream->write( sizeof(retcode) + output.buffer-m_outputBuffer+sizeof(byte) );
-		count += m_stream->write(opcode);
+
+		/*******************************crc computation********************************/
+		memcpy(m_crc_tmp,(byte*)&opcode, sizeof(opcode));
+		memcpy(m_crc_tmp + sizeof(opcode), (byte*) &retcode, sizeof(retcode));
+		memcpy(m_crc_tmp + sizeof(retcode) + sizeof(opcode) , m_outputBuffer, output.buffer-m_outputBuffer);
+
+		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, (output.buffer-m_outputBuffer) + sizeof(retcode) + sizeof(opcode));
 
 		count += m_stream->write((byte*)(&crc), sizeof(crc));
+		/*****************************************************************************/
 
+		count += m_stream->write(opcode);
 		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
 		count += m_stream->write(m_outputBuffer, output.buffer-m_outputBuffer);	
 	}
@@ -132,17 +133,17 @@ int SerialTalks::sendback(long retcode, const byte* buffer, int size)
 	int count = 0;
 	if (m_stream != 0 && isConnected())
 	{
+		count += m_stream->write(SERIALTALKS_SLAVE_BYTE);
+		count += m_stream->write(byte(sizeof(retcode) + size));
+
 		/*******************************crc computation********************************/ 
 		memcpy(m_crc_tmp,(byte*) &retcode, sizeof(retcode));
 		memcpy(m_crc_tmp + sizeof(retcode), buffer, size);
 		
 		uint16_t crc = m_crc.CRCprocessBuffer(m_crc_tmp, size + sizeof(retcode));
-		/*****************************************************************************/
-
-		count += m_stream->write(SERIALTALKS_SLAVE_BYTE);
-		count += m_stream->write(byte(sizeof(retcode) + size));
 
 		count += m_stream->write((byte*)(&crc), sizeof(crc));
+		/*****************************************************************************/
 
 		count += m_stream->write((byte*)(&retcode), sizeof(retcode));
 		count += m_stream->write(buffer, size);	
