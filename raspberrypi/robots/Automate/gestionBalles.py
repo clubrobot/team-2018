@@ -231,7 +231,7 @@ class Shot(Actionnable):
             watersorter.close_indoor()
             time.sleep(0.4)
             nb_ball+=1
-            print("New ball geted ! {}".format(nb_ball))
+            print("New ball gotten ! {}".format(nb_ball))
             # On verifie si la code couleur est bon
             if(watersorter.get_water_color()[0]<watersorter.get_water_color()[1]):
                 watersorter.open_outdoor()
