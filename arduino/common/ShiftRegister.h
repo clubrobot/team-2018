@@ -17,7 +17,7 @@ class ShiftRegister
 		int m_CLOCK;
 		int m_DATA;
 
-		int m_register;
+		uint8_t m_register;
 };
 
 
