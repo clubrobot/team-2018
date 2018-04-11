@@ -132,12 +132,12 @@ class Bornibus:
         # Generate order list
 
         self.action_list[Bornibus.GREEN] = [
-            #self.d1.getAction()[0],
-            #self.shot.getAction()[0],
-            #self.panel.getAction()[0],
+            self.d1.getAction()[0],
+            self.shot.getAction()[0],
+            self.panel.getAction()[0],
             self.d3.getAction()[0],
-            self.shot.getAction()[1],
-            #self.treatment.getAction()[0],
+            self.shot.getAction()[2],
+            self.treatment.getAction()[0],
             ]
         
 
@@ -197,5 +197,12 @@ class Bornibus:
 
 
 automate = Bornibus(Bornibus.GREEN, rm, b, l, d)
-automate.run()
+try:
+    automate.run()
+except:
+    d.close_outdoor()
+    d.open_indoor()
+    d.disable_shaker()
+    d.write_trash(126)
+    l.set_motor_velocity(0)
 b.stop()
