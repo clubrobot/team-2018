@@ -60,19 +60,36 @@ void newRange()
   byte id = DW1000Ranging.getDistantDevice()->getShortAddress();
 
   float distance = DW1000Ranging.getDistantDevice()->getRange() * 1000;
+  float projection;
 
   switch(id){
     case 35:    //TODO : should be 0
-      d1 = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
+      projection = distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag));
+      if(projection > 0)
+        d1 = sqrt(projection); // projection dans le plan des tags
+      else
+        d1 = 0;
       break;
     case 36: //TODO : should be 1
-      d2 = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
+      projection = distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag));
+      if (projection > 0)
+        d2 = sqrt(projection); // projection dans le plan des tags
+      else
+        d2 = 0;
       break;
     case 37: //TODO : should be 2
-      d3 = sqrt(distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag))); // projection dans le plan des tags
+      projection = distance * distance - ((z_anchor - z_tag) * (z_anchor - z_tag));
+      if (projection > 0)
+        d3 = sqrt(projection); // projection dans le plan des tags
+      else
+        d3 = 0;
       break;
     case 38: //TODO : should be 3
-      d4 = sqrt(distance * distance - ((z_central - z_tag) * (z_central - z_tag))); // projection dans le plan des tags
+      projection = distance * distance - ((z_central - z_tag) * (z_central - z_tag));
+      if(projection > 0)
+        d4 = sqrt(projection); // projection dans le plan des tags
+      else
+        d4 = 0;
       break;
   }
 
