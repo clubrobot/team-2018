@@ -115,6 +115,8 @@ public:
 	// Trilateration
 	static float getPosX();
 	static float getPosY();
+	static void setPosX(float &x);
+	static void setPosY(float &y);
 	static void transmitTrilaterationReport();
 
 	static DW1000Device* getDistantDevice();

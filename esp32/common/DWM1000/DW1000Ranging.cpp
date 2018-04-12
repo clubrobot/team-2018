@@ -1025,6 +1025,16 @@ float DW1000RangingClass::getPosY(){
 	return _pos_y;
 }
 
+void DW1000RangingClass::setPosX(float &x)
+{
+	_pos_x = x;
+}
+
+void DW1000RangingClass::setPosY(float &y)
+{
+	_pos_y = y;
+}
+
 void DW1000RangingClass::transmitTrilaterationReport()
 {
 
