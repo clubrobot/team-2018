@@ -3,9 +3,9 @@
 import sys
 sys.path.append("../common/")
 
-import os
+import os, time
 from types import MethodType
-
+from threading import Thread
 from tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
@@ -22,7 +22,7 @@ SET_COMPONENT_ATTRIBUTE_OPCODE      = 0x22
 UPDATE_MANAGER_PICAMERA_OPCODE      = 0x30
 MAKE_MANAGER_REPLY_OPCODE           = 0x40
 MAKE_MANAGER_EXECUTE_OPCODE         = 0x50
-
+MAKE_MATCH_TIMER_OPCODE             = 0x60
 
 class Component():
 
@@ -148,6 +148,7 @@ class Server(TCPTalksServer):
 		self.bind(MAKE_COMPONENT_EXECUTE_OPCODE,       self.MAKE_COMPONENT_EXECUTE)
 		self.bind(GET_COMPONENT_ATTRIBUTE_OPCODE,      self.GET_COMPONENT_ATTRIBUTE)
 		self.bind(SET_COMPONENT_ATTRIBUTE_OPCODE,      self.SET_COMPONENT_ATTRIBUTE)
+		self.bind(MAKE_MATCH_TIMER_OPCODE,             self.START_MATCH)
 		self.components = {}
 	
 	def disconnect(self,id=None):
@@ -158,6 +159,14 @@ class Server(TCPTalksServer):
 		for comp in self.components.values():
 			comp._cleanup()
 		self.components = {}
+
+	def START_MATCH(self,*args):
+		def core():
+			time.sleep(100)
+			self.disconnect()
+			self.cleanup()
+		Thread(target=core).start()
+
 
 	def addcomponent(self, comp, compid):
 		if not compid in self.components:
@@ -226,6 +235,9 @@ class Manager(TCPTalks):
 		# SerialTalks
 		self.bind(MAKE_MANAGER_REPLY_OPCODE,    self.MAKE_MANAGER_REPLY)
 		self.serial_instructions = {}
+
+	def start_match(self):
+		self.send(MAKE_MATCH_TIMER_OPCODE)
 
 	def UPDATE_MANAGER_PICAMERA(self, compid, streamvalue):
 		cvimageflags = 1
