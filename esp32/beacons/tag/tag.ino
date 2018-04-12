@@ -101,8 +101,8 @@ void newRange()
       toDisplay = "(0)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      p[0] = -1;
-      p[1] = -1;
+      p[0] = -1000;
+      p[1] = -1000;
      }
       break;
     case 1:
@@ -110,8 +110,8 @@ void newRange()
       toDisplay = "(1)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      p[0] = -1;
-      p[1] = -1;
+      p[0] = -1000;
+      p[1] = -1000;
       }
       break;
     case 2:
@@ -119,8 +119,8 @@ void newRange()
       toDisplay = "(2)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      p[0] = -1;
-      p[1] = -1;
+      p[0] = -1000;
+      p[1] = -1000;
     }
       break;
     case 3:
@@ -271,6 +271,9 @@ void newRange()
       break;
   }
   
+  DW1000Ranging.setPosX(p[0]);
+  DW1000Ranging.setPosY(p[1]);
+
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
 }
@@ -363,8 +366,13 @@ void setup() {
 }
 
 void loop() {
+  static unsigned long trilaterationReportTime = millis();
   DW1000Ranging.loop();
   talks.execute();
+  if (millis() - trilaterationReportTime > 1000){
+    trilaterationReportTime = millis();
+    DW1000Ranging.transmitTrilaterationReport();
+  }
 }
 
 

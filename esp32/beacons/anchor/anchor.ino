@@ -46,12 +46,21 @@ void newRange()
   display.drawString(64, 0, toDisplay);
  
   if(calibrationRunning==true){
+    display.setFont(ArialMT_Plain_16);
     toDisplay = "timeOut";
   } else {
-    int antennaDelay = DW1000.getAntennaDelay();
-    toDisplay = antennaDelay;
+    /*int antennaDelay = DW1000.getAntennaDelay();
+    toDisplay = antennaDelay;*/
+    display.setFont(ArialMT_Plain_24);
+    float x = DW1000Ranging.getPosX() / 10;
+    float y = DW1000Ranging.getPosY() / 10;
+    toDisplay = "(";
+    toDisplay += (int)x;
+    toDisplay += ", ";
+    toDisplay += (int)y;
+    toDisplay += ")";
   }
-  display.setFont(ArialMT_Plain_16);
+  
   display.drawString(64, 30, toDisplay);
   display.display();
   digitalWrite(PIN_LED_OK, HIGH);

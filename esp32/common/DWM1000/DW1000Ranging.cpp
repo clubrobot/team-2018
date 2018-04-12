@@ -520,9 +520,9 @@ void DW1000RangingClass::loop() {
 							_pos_x = x;
 							_pos_y = y;
 						}
-					} else {
+					} else 
 						_protocolFailed = true;
-					}
+					
 				}
 				if(messageType == POLL) {
 					//we receive a POLL which is a broacast message
