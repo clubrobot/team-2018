@@ -112,6 +112,10 @@ public:
 	static void startAutoCalibration(int realDistance, unsigned long timeOut);
 	static void stopCalibration();
 
+	// Trilateration
+	static float getPosX();
+	static float getPosY();
+	static void transmitTrilaterationReport();
 
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);

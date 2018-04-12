@@ -1012,3 +1012,29 @@ void DW1000RangingClass::startAutoCalibration(int realDistance, unsigned long ti
 void DW1000RangingClass::stopCalibration(){
 	_calibrate = false;
 }
+
+/* ###########################################################################
+ * #### trilateration  ######################################################
+ * ######################################################################### */
+
+float DW1000RangingClass::getPosX(){
+	return _pos_x;
+}
+
+float DW1000RangingClass::getPosY(){
+	return _pos_y;
+}
+
+void DW1000RangingClass::transmitTrilaterationReport()
+{
+
+	transmitInit();
+	byte shortBroadcast[2] = {0xFF, 0xFF};
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
+	data[SHORT_MAC_LEN] = TRILATERATION_REPORT;
+	memcpy(data + SHORT_MAC_LEN + 1, &_pos_x, 4);
+	memcpy(data + SHORT_MAC_LEN + 5, &_pos_y, 4);
+
+	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
+	transmit(data);
+}
