@@ -12,13 +12,13 @@ from components import SerialTalksProxy
 _WRITE_BEEACTIVATOR_OPCODE		=   0x27
 
 class BeeActuator(SerialTalksProxy):	
-    def __init__(self,parent, uuid='watershooter'):
-        SerialTalksProxy.__init__(self,parent, uuid)
-		self.closed_position = 10
+	def __init__(self,parent, uuid='watershooter'):
+		SerialTalksProxy.__init__(self,parent, uuid)
+		self.closed_position = 170
 		self.open_position = 90
 	
-	 def write(self, value):
-        self.send(_WRITE_BEEACTIVATOR_OPCODE,INT(value))
+	def write(self, value):
+		self.send(_WRITE_BEEACTIVATOR_OPCODE,INT(value))
 	
 	def open(self):
 		self.write(self.open_position)
