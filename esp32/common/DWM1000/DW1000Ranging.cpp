@@ -69,6 +69,10 @@ int DW1000RangingClass::_realDistance = 0;
 unsigned long DW1000RangingClass::_startCalibrationTime = 0;
 unsigned long DW1000RangingClass::_calibrationTimeOut = 0;
 
+// trilateration
+float DW1000RangingClass::_pos_x = -1000;
+float DW1000RangingClass::_pos_y = -1000;
+
 // data buffer
 byte          DW1000RangingClass::data[LEN_DATA];
 // reset line to the chip
@@ -505,7 +509,20 @@ void DW1000RangingClass::loop() {
 			if(_type == ANCHOR) {
 				if(messageType != _expectedMsgId) {
 					// unexpected message, start over again (except if already POLL)
-					_protocolFailed = true;
+					if(messageType == TRILATERATION_REPORT){
+						float x,y;
+						memcpy(&x, data + SHORT_MAC_LEN + 1, 4);
+						memcpy(&y, data + SHORT_MAC_LEN + 5, 4);
+						if(isnan(x) || isnan(y)){
+							_pos_x = -1000;
+							_pos_y = -1000;
+						} else {
+							_pos_x = x;
+							_pos_y = y;
+						}
+					} else {
+						_protocolFailed = true;
+					}
 				}
 				if(messageType == POLL) {
 					//we receive a POLL which is a broacast message

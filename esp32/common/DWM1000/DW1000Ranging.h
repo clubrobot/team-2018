@@ -39,6 +39,7 @@
 #define RANGE_FAILED 255
 #define BLINK 4
 #define RANGING_INIT 5
+#define TRILATERATION_REPORT 6
 
 #define LEN_DATA 90
 
@@ -175,6 +176,9 @@ private:
 	static int _realDistance;	// mm
 	static unsigned long _startCalibrationTime;	//ms
 	static unsigned long _calibrationTimeOut;	//ms
+	// for trilateration
+	static float _pos_x;
+	static float _pos_y;
 
 	//methods
 	static void handleSent();
