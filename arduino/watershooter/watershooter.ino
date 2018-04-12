@@ -15,6 +15,7 @@ Servo outdoor;
 Servo trash;
 Servo trashUnloader;
 BallsShaker shaker;
+Servo beeActivator; 
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
@@ -24,6 +25,7 @@ Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 #define SHAKER_SIDE_HORIZONTAL 60
 #define SHAKER_SIDE_VERTICAL 100
 #define TRASH_UNLOADER_CLOSED 80
+#define BEE_CLOSED 10
 
 
 void resetVelocity();
@@ -53,6 +55,7 @@ void setup(){
 	talks.bind(_FORCE_PULSEWIDTH_OPCODE, FORCE_PULSEWIDTH);
 	talks.bind(_ENABLE_SHAKING_OPCODE, ENABLE_SHAKING);
 	talks.bind(_DISABLE_SHAKING_OPCODE, DISABLE_SHAKING);
+	talks.bind(_WRITE_BEEACTIVATOR_OPCODE, WRITE_BEEACTIVATOR);
 
 
 	pinMode(SERVO1, OUTPUT);
@@ -61,6 +64,7 @@ void setup(){
 	pinMode(SERVO4, OUTPUT);
 	pinMode(SERVO5, OUTPUT);
 	pinMode(SERVO6, OUTPUT);
+	pinMode(SWITCH2, OUTPUT);
 	pinMode(BRUSHLESS, OUTPUT);
 	pinMode(SWITCH1, INPUT_PULLUP);
 
@@ -76,7 +80,10 @@ void setup(){
 	shaker.attachHorizontal(SERVO5);
 	outdoor.attach(SERVO2);
 	trash.attach(SERVO3);
+	beeActivator.attach(SWITCH2);
 
+
+	beeActivator.write(BEE_CLOSED);
 	trash.write(TRASH_CLOSED);
 	outdoor.write(OUTDOOR_DOOR_CLOSED);
 	indoor.write(INDOOR_DOOR_CLOSED);
