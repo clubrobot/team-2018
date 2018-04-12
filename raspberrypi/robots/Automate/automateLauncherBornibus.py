@@ -2,7 +2,6 @@
 #-*- coding: utf-8 -*-
 import sys
 #sys.path.append("../Simulator/controle")
-import pygame
 import time
 from pygame.locals import *
 from setup_bornibus import *
@@ -21,21 +20,8 @@ RAD=0.0174533
 
 # Setup and launch the user interface
 
-pygame.init()
-fenetre = pygame.display.set_mode((150,80), RESIZABLE)
-printer = TextPrint()
-text="""
-Automate
-v0.9
 
-"""
-fenetre.fill(WHITE)
-printer.reset()
-
-[printer.print(fenetre,t) for t in text.split("\n")]
-pygame.display.flip()
-
-rm = RoadMap.load('murray.ggb')
+rm = RoadMap.load('bornibus.ggb')
 
 
 
