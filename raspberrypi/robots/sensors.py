@@ -32,6 +32,12 @@ class Sensors(SerialTalksProxy):
 		ar,av=output.read(INT,INT)
 		return ar,av
 
+	def wait(self,threshold,timeout=2):
+		init_time = time.time()
+		while (self.get_mesure()[0]<threshold or self.get_mesure()[1]<threshold ) \
+			and time.time()-init_time<timeout:
+			time.sleep(0.2)
+
 	def activate(self):
 		self.send(_ACTIVATE_SENSORS_OPCODE, BYTE(1))
 

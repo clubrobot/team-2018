@@ -33,6 +33,6 @@ void ShiftRegister::SetLow(int pos)
 void ShiftRegister::update()
 {
 	digitalWrite(m_LATCH, LOW);
-    shiftOut(m_DATA, m_DATA, LSBFIRST, m_register);
+    shiftOut(m_DATA, m_DATA, m_register);
     digitalWrite(m_LATCH, HIGH);
 }

@@ -6,12 +6,11 @@
 #define MAX_ANCHORS 4   // nombre maximum de balises fixes
 
 const byte ANCHOR_SHORT_ADDRESS[MAX_ANCHORS] = {35, 36, 37, 38};
-const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16530, 16530, 16530, 16530};
+const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16547, 16545, 16537, 16556};
 const float Z_ANCHOR = 438.3;
 const float Z_CENTRAL = 1016.3;
 const float Z_TAG = 483.3;
 const float Z_HEIGHT[MAX_ANCHORS] = {Z_ANCHOR, Z_ANCHOR, Z_ANCHOR, Z_CENTRAL};
-
 
 /**
  * EEPROM addresses

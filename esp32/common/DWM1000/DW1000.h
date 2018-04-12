@@ -314,6 +314,7 @@ public:
 	static void newConfiguration();
 	static void commitConfiguration();
 	static void setAntennaDelay(int delay);
+	static int getAntennaDelay();
 	
 	// reception state
 	static void newReceive();
@@ -465,6 +466,7 @@ public:
 	static byte       _dataRate;
 	static byte       _pacSize;
 	static DW1000Time _antennaDelay;
+	static int 		  _antennaDelayInt;
 	
 	/* internal helper to remember how to properly act. */
 	static boolean _permanentReceive;
