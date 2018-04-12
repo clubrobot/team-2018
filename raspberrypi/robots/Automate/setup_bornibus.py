@@ -69,7 +69,7 @@ except:
 	print('\'display\' not connected')
 
 try:
-	s = Sensors(m)
+	s = Sensors(m,"sensorsLat")
 except :
 	print('\'sensors\' not connected')
 

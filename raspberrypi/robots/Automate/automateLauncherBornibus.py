@@ -140,6 +140,17 @@ class Bornibus:
             self.treatment.getAction()[0],
             ]
         
+        self.action_list[Bornibus.ORANGE] = [
+            self.d4.getAction()[0],
+            self.shot.getAction()[0],
+            self.panel.getAction()[0],
+            self.d2.getAction()[0],
+            self.shot.getAction()[2],
+            self.treatment.getAction()[0],
+            ]
+
+        
+        
 
 
 
@@ -179,6 +190,7 @@ class Bornibus:
     #     #       TIME*TIME_STEA           B
 
         self.wheeledbase.set_position(592, 290,0)
+        self.wheeledbase.set_position(592,2710,0)
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)
@@ -189,14 +201,14 @@ class Bornibus:
                 path = self.roadmap.get_shortest_path( currentPosXY , act.actionPoint )
                 print(path)
                 AutomateTools.myPurepursuite(self.wheeledbase,path)
-                print("Make action")
+                print("Make action {}".format(act.typ))
                 act()
                 self.wheeledbase.max_linvel.set(500)
                 self.wheeledbase.max_angvel.set(6)
 
 
 
-automate = Bornibus(Bornibus.GREEN, rm, b, l, d)
+automate = Bornibus(Bornibus.ORANGE, rm, b, l, d)
 try:
     automate.run()
 except:
