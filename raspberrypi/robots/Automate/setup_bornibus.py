@@ -32,6 +32,7 @@ from wheeledbase        import *
 from waterlauncher      import *
 from watersorter        import *
 from display            import *
+from bee                import *
 from sensors            import *
 
 # Define temporary modules
@@ -55,8 +56,9 @@ except :
 	print('\'wheeledbase\' not connected')
 
 try:
-    d = WaterSorter(m)
-    l = WaterLauncher(m)
+	d = WaterSorter(m)
+	l = WaterLauncher(m)
+	a = BeeActuator(m)
 except :
 	print('\'wattershooter\' not connected')
 
@@ -67,7 +69,6 @@ try:
 	led2 = LEDMatrix(m, 2)
 except:
 	print('\'display\' not connected')
-
 try:
 	s = Sensors(m,"sensorsLat")
 except :
