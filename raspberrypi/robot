@@ -11,7 +11,7 @@ sys.path.append("{}/robots/".format(sys.path[0]))
 from serialtalks import SerialTalks
 from buttons import ButtonCard
 from wheeledbase import WheeledBase
-from buttons_gesture import ButtonGesture
+from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
 from display import SevenSegments
 from components  import Server, Manager
 #from bornibus    import Bornibus
@@ -123,13 +123,15 @@ def buttons():
 		screen      = SevenSegments(m)
 		wheeledbase = WheeledBase(m)
 	except:
+		print("error")
 		m.disconnect()
 		return 
 	if DEV_MODE:
 		button_gesture = ButtonGestureDemo(button_card,screen,m)
 		while not button_gesture.exiting : time.sleep(0.2)
 	if MATCH_MODE:
-		button_gesture = ButtonGestureMatch(button_card,display,wheelebase,m)
+		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
+		print("ATT")
 		button_gesture.run()
 		print("MATCH")
 	button_card.disconnect()
@@ -188,7 +190,8 @@ def getlogs(args):
 
 def server(args):
 	srv = Server(password=args.password,size=args.size)
-	if DEV_MODE : Thread(target=buttons,daemon=True).start()
+	if DEV_MODE or MATCH_MODE : Thread(target=buttons,daemon=True).start()
+	
 	while True:
 		try:
 			while not srv.full():
