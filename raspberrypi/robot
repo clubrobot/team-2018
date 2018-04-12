@@ -10,14 +10,15 @@ sys.path.append("{}/robots/".format(sys.path[0]))
 
 from serialtalks import SerialTalks
 from buttons import ButtonCard
-from devmode import ButtonGesture
+from wheeledbase import WheeledBase
+from buttons_gesture import ButtonGesture
 from display import SevenSegments
 from components  import Server, Manager
 #from bornibus    import Bornibus
 #from murray      import Murray
 
-DEV_MODE = True
-
+DEV_MODE = False
+MATCH_MODE = True
 
 arduino_list=['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'watershooter']
 
@@ -113,19 +114,29 @@ class Starter(Thread):
 
 
 def buttons():
-	if not DEV_MODE : return
+	if not DEV_MODE and not MATCH_MODE: return
+
 	m = Manager()
 	m.connect()
 	try:
 		button_card = ButtonCard(m)
 		screen      = SevenSegments(m)
+		wheeledbase = WheeledBase(m)
 	except:
 		m.disconnect()
 		return 
-	button_gesture = ButtonGesture(button_card,screen,m)
-	while not button_gesture.exiting : time.sleep(0.2)
+	if DEV_MODE:
+		button_gesture = ButtonGestureDemo(button_card,screen,m)
+		while not button_gesture.exiting : time.sleep(0.2)
+	if MATCH_MODE:
+		button_gesture = ButtonGestureMatch(button_card,display,wheelebase,m)
+		button_gesture.run()
+		print("MATCH")
 	button_card.disconnect()
 	screen.disconnect()
+	wheeledbase.disconnect()
+	m.disconnect()
+
 
 
 def getuuid(args):
