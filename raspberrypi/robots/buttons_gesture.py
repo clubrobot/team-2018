@@ -13,6 +13,7 @@ _BLUE   = 2
 _ORANGE = 3
 
 
+
 class ButtonGestureMatch():
     WAITING_TEAM     = 0
     WAITING_ODOMETRY = 1
@@ -25,12 +26,13 @@ class ButtonGestureMatch():
         self.server  = server
         self.wheelebase = wheelebase
         #TODO make network verification 
-        self.display.show("Select")
+        self.display.set_message("Select")
         self.status = ButtonGestureMatch.WAITING_TEAM
-        self.buttons.affect(_RED,self.button_back)
-        self.buttons.affect(_GREEN, self.button_valid)
-        self.buttons.affect(_BLUE, self.button_select)
+        self.buttons.affect(_RED,self.button_red)
+        self.buttons.affect(_GREEN, self.button_green)
+        self.buttons.affect(_BLUE, self.button_blue)
         self.buttons.affect(_ORANGE, self.button_orange)
+        self.buttons.bind(3,self.tirret)
         self.buttons.setLedOn(_GREEN)
         self.buttons.setLedOn(_ORANGE)
         self.side = None
@@ -38,12 +40,11 @@ class ButtonGestureMatch():
         self.last_tirret_update = 0
         self.tirret_status = Event()
         self.tirret_lock   = RLock()
-        self.launch_flag   = Event()
-        self.launch_flag.clear()
+
 
     def run(self):
-        while not self.launch_flag.is_set():
-            time.sleep(0.1)
+        while not self.tirret_status.is_set() or self.status != ButtonGestureMatch.WAITING_MATCH:
+            sleep(0.1)
 
     def button_red(self):
         Thread(target=self._red).start()
@@ -56,8 +57,13 @@ class ButtonGestureMatch():
             self.buttons.setLedOn(_GREEN)
             self.buttons.setLedOn(_ORANGE)
             self.buttons.setLedOff(_RED)
-            self.button
-        self.lock_release()
+            self.buttons.setLedOff(_BLUE)
+            self.display.set_message("Select")
+        if(self.status == ButtonGestureMatch.WAITING_MATCH):
+            self.status =  ButtonGestureMatch.WAITING_ODOMETRY 
+            self.display.set_message("ODOMETRIE")
+
+        self.lock_stat.release()
 
         
     def button_blue(self):
@@ -65,6 +71,27 @@ class ButtonGestureMatch():
     
     def _blue(self):
         if not self.lock_stat.acquire(blocking=False): return
+
+
+        if(self.status == ButtonGestureMatch.WAITING_ODOMETRY):
+            #self.wheeledbase.set_position()
+            if self.tirret_status.is_set():
+                for k in range(3):
+                    for i in range(3):
+                        self.buttons.setLedOn(i)
+                    sleep(0.2)
+                    for i in range(3):
+                        self.buttons.setLedOff(i)
+                    sleep(0.2)
+            else:
+                for i in range(3):
+                    self.buttons.setLedOn(i)
+                self.status = ButtonGestureMatch.WAITING_MATCH
+                self.display.set_message("WAIT")
+
+
+
+
         if(self.status == ButtonGestureMatch.WAITING_TEAM and not self.side is None ):
             self.status  = ButtonGestureMatch.WAITING_ODOMETRY
             self.buttons.setLedOn(_BLUE)
@@ -75,25 +102,11 @@ class ButtonGestureMatch():
                 self.buttons.setLedOn(_GREEN)
             if(self.side ==1):
                 self.buttons.setLedOn(_ORANGE)
-            self.display.show("ODOMETRIE")
+            self.display.set_message("ODOMETRIE")
             sleep(0.5)
 
 
-        if(self.status == ButtonGestureMatch.WAITING_ODOMETRY):
-            #self.wheeledbase.set_position()
-            if self.tirret_status.is_set():
-                ButtonGestureMatch.WAITING_ODOMETRY
-                for k in range(3):
-                    for i in range(3):
-                        self.buttons.setLedOn(i)
-                    sleep(0.2)
-                    for i in range(3):
-                        self.buttons.setLedOff(i)
-                    sleep(0.2)
-            else:
-                self.status = ButtonGestureMatch.WAITING_MATCH
-
-        self.lock_release()
+        self.lock_stat.release()
 
 
     def button_green(self):
@@ -104,11 +117,11 @@ class ButtonGestureMatch():
     def _green(self):
         self.lock_stat.acquire()
         if(self.status == ButtonGestureMatch.WAITING_TEAM):
-            self.display.show("GREEN")
+            self.display.set_message("GREEN")
             self.buttons.setLedOff(_ORANGE)
             self.buttons.setLedOn(_GREEN)
             self.side = 0
-        self.lock_release()
+        self.lock_stat.release()
     
     def button_orange(self):
         Thread(target=self._orange).start()
@@ -116,27 +129,24 @@ class ButtonGestureMatch():
     def _orange(self):
         self.lock_stat.acquire()
         if(self.status == ButtonGestureMatch.WAITING_TEAM):
-            self.display.show("ORANGE")
+            self.display.set_message("ORANGE")
             self.buttons.setLedOn(_ORANGE)
             self.buttons.setLedOff(_GREEN)
             self.side = 1
-        self.lock_release()
+        self.lock_stat.release()
 
-    def tirret(self):
+    def tirret(self,*args):
         Thread(target=self._tirret).start()
 
     def _tirret(self):
-        self.lock_stat.acquire()
-        if self.status== ButtonGestureMatch.WAITING_MATCH:
-            self.launch_flag.set()
-        self.lock_stat.release()
+        
         self.tirret_lock.acquire()
         self.tirret_status.set()
-        time = time.time()
-        self.last_tirret_update = time
+        times = time()
+        self.last_tirret_update = times
         self.tirret_lock.release()
         sleep(0.8)
-        if time == self.last_tirret_update:
+        if times == self.last_tirret_update:
             self.tirret_status.clear()
 
 
