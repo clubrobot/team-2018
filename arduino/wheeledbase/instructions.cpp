@@ -37,6 +37,16 @@ extern TurnOnTheSpot turnOnTheSpot;
 
 // Instructions
 
+
+void DISABLE(SerialTalks& talks, Deserializer& input, Serializer& output)
+{
+	velocityControl.disable();
+	positionControl.disable();
+	leftWheel .setVelocity(0);
+	rightWheel.setVelocity(0);	
+}
+
+
 void SET_OPENLOOP_VELOCITIES(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
 	float leftWheelVel  = input.read<float>();

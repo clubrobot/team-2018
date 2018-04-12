@@ -68,6 +68,7 @@
 #define PUREPURSUIT_LOOKAHEADBIS_ID     0xE2
 
 // Instructions prototypes
+void DISABLE(SerialTalks& talks, Deserializer& input, Serializer& output);
 
 void SET_OPENLOOP_VELOCITIES(SerialTalks& talks, Deserializer& input, Serializer& output);
 
