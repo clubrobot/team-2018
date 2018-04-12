@@ -31,13 +31,17 @@ void newRange()
 {
 
   DW1000Ranging.setRangeFilterValue(5);
-  float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
-  distance = sqrt(distance * distance - ((Z_HEIGHT[currentBeaconNumber]/10 - Z_TAG/10) * (Z_HEIGHT[currentBeaconNumber]/10 - Z_TAG/10))); // projection dans le plan des tags
+  float distance = DW1000Ranging.getDistantDevice()->getRange()*1000;
+  float projection = distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG));
+  if(projection > 0)
+    distance = round(sqrt(projection)/10); // projection dans le plan des tags
+  else 
+    distance = 0;
 
   display.clear();
   display.setFont(ArialMT_Plain_24);
   String toDisplay = "";
-  toDisplay += distance;
+  toDisplay += (int)distance;
   toDisplay += "cm";
   display.drawString(64, 0, toDisplay);
  

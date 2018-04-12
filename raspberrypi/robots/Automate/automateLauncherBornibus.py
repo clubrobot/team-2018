@@ -3,11 +3,9 @@
 import sys
 #sys.path.append("../Simulator/controle")
 import time
-from pygame.locals import *
 from setup_bornibus import *
 from random import randint
 from random import shuffle
-from TextPrint import *
 from roadmap import RoadMap
 
     
