@@ -56,7 +56,7 @@ class pilesOfCubes():
 		self.hsv_image = np.zeros((608,800,3), np.uint8)
 		self.first_cube_corners = ((x,y) ,(x,y) ,(x,y) ,(x,y))
 
-		self.square_ker_op = cv2.getStructuringElement(cv2.MORPH_RECT,(4,4))
+		self.square_ker_op = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
 		self.square_ker_cls  = cv2.getStructuringElement(cv2.MORPH_RECT,(13,13))
 		
 		self.color = ['blue', 'black', 'orange', 'green', 'yellow']
@@ -96,14 +96,7 @@ class pilesOfCubes():
 		elif(color == 'orange'):
 			cube_min = (self.init_orange_cube[0] - 4 , self.init_orange_cube[1] - 4 )
 			cube_max = (self.init_orange_cube[0] + 4 , self.init_orange_cube[1] + 4 )
-			#image2 = np.copy(self.image)
-			#cv2.circle(image2, cube_min ,3,255,-1)
-			#cv2.circle(image2, cube_max ,3,255,-1)
-			#cv2.imshow('image', image2)
-			#while( cv2.waitKey(100) != ord("q")):
-			 #   i=0
-			#cv2.destroyAllWindows()    
-	  
+
 		hsv_min = [180,255,255]
 		hsv_max = [0,0,0]
    
@@ -126,11 +119,11 @@ class pilesOfCubes():
 				if v < hsv_min[2]:
 					hsv_min[2] = v
 				 
-		hsv_min[2] -= 50
-		hsv_max[2] += 50
-   
-		hsv_min[1] -= 50
-		hsv_max[1] += 50
+		hsv_min[2] -= 40
+		hsv_max[2] += 40
+  
+		hsv_min[1] -= 40
+		hsv_max[1] += 40
    
 		hsv_min[0] -= 2
 		hsv_max[0] += 2
@@ -186,7 +179,7 @@ class pilesOfCubes():
 		min_array = np.array([hsv_min[0],hsv_min[1],hsv_min[2]])
 		max_array = np.array([hsv_max[0],hsv_max[1],hsv_max[2]])
 		gray =  cv2.inRange(self.hsv_image, min_array, max_array)
-		#gray = self.filtrage(gray)
+		gray = self.filtrage(gray)
 		mask_inv = cv2.bitwise_not(gray)
 
 		res = cv2.bitwise_and(self.image,self.image,mask = mask_inv)
@@ -256,7 +249,6 @@ class pilesOfCubes():
 	def filtrage(self, img):
 		
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, self.square_ker_cls)
-		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, self.square_ker_op)
 		return img
 
 	def gravitycenter_search(self, hsv_min, hsv_max):
@@ -272,7 +264,7 @@ class pilesOfCubes():
 		max_array = np.array([hsv_max[0],hsv_max[1],hsv_max[2]])
 		gray =  cv2.inRange(self.hsv_image, min_array, max_array)
 		
-		#gray = self.filtrage(gray)
+		gray = self.filtrage(gray)
 		
 		for x in range(width):
 			for y in range(height):

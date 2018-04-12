@@ -32,7 +32,7 @@ OUTDOOR_DOOR_OPEN = 50
 OUTDOOR_DOOR_CLOSED = 90
 INDOOR_DOOR_CLOSED = 20
 
-TRASH_CLOSED = 128
+TRASH_CLOSED = 130
 TRASH_OPEN = 150
 
 SHAKER_HORIZONTAL_1 = 0
@@ -80,6 +80,8 @@ class WaterSorter(SerialTalksProxy):
         return bool(indoorAngle == INDOOR_DOOR_CLOSED)
 
     def close_trash(self):
+        self.send(_WRITE_TRASH_OPCODE,INT(60))
+        time.sleep(0.2)
         self.send(_WRITE_TRASH_OPCODE,INT(TRASH_CLOSED))
 
     def open_trash(self):

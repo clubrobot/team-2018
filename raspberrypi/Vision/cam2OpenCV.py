@@ -16,6 +16,8 @@ class camth(Thread):
 		self.camera = PiCamera()
 		self.camera.resolution = res
 		self.camera.framerate = 5
+		self.camera.brightness = 50
+		self.camera.contrast = 100
 		self.rawCapture = PiRGBArray(self.camera, size=res)
 		self.image = np.zeros((res[0],res[1],3), np.uint8)
 

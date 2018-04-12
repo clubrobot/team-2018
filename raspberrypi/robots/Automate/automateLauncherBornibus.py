@@ -2,13 +2,10 @@
 #-*- coding: utf-8 -*-
 import sys
 #sys.path.append("../Simulator/controle")
-import pygame
 import time
-from pygame.locals import *
 from setup_bornibus import *
 from random import randint
 from random import shuffle
-from TextPrint import *
 from roadmap import RoadMap
 
     
@@ -21,21 +18,8 @@ RAD=0.0174533
 
 # Setup and launch the user interface
 
-pygame.init()
-fenetre = pygame.display.set_mode((150,80), RESIZABLE)
-printer = TextPrint()
-text="""
-Automate
-v0.9
 
-"""
-fenetre.fill(WHITE)
-printer.reset()
-
-[printer.print(fenetre,t) for t in text.split("\n")]
-pygame.display.flip()
-
-rm = RoadMap.load('murray.ggb')
+rm = RoadMap.load('bornibus.ggb')
 
 
 
@@ -132,13 +116,24 @@ class Bornibus:
         # Generate order list
 
         self.action_list[Bornibus.GREEN] = [
-            #self.d1.getAction()[0],
-            #self.shot.getAction()[0],
-            #self.panel.getAction()[0],
+            self.d1.getAction()[0],
+            self.shot.getAction()[0],
+            self.panel.getAction()[0],
             self.d3.getAction()[0],
-            self.shot.getAction()[1],
-            #self.treatment.getAction()[0],
+            self.shot.getAction()[2],
+            self.treatment.getAction()[0],
             ]
+        
+        self.action_list[Bornibus.ORANGE] = [
+            self.d4.getAction()[0],
+            self.shot.getAction()[0],
+            self.panel.getAction()[0],
+            self.d2.getAction()[0],
+            self.shot.getAction()[2],
+            self.treatment.getAction()[0],
+            ]
+
+        
         
 
 
@@ -179,6 +174,7 @@ class Bornibus:
     #     #       TIME*TIME_STEA           B
 
         self.wheeledbase.set_position(592, 290,0)
+        self.wheeledbase.set_position(592,2710,0)
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)
@@ -189,13 +185,20 @@ class Bornibus:
                 path = self.roadmap.get_shortest_path( currentPosXY , act.actionPoint )
                 print(path)
                 AutomateTools.myPurepursuite(self.wheeledbase,path)
-                print("Make action")
+                print("Make action {}".format(act.typ))
                 act()
                 self.wheeledbase.max_linvel.set(500)
                 self.wheeledbase.max_angvel.set(6)
 
 
 
-automate = Bornibus(Bornibus.GREEN, rm, b, l, d)
-automate.run()
+automate = Bornibus(Bornibus.ORANGE, rm, b, l, d)
+try:
+    automate.run()
+except:
+    d.close_outdoor()
+    d.open_indoor()
+    d.disable_shaker()
+    d.write_trash(126)
+    l.set_motor_velocity(0)
 b.stop()

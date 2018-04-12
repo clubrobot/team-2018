@@ -46,15 +46,27 @@ class Dispenser(Actionnable):
         except RuntimeError:
             self.watersorter.enable_shaker()
             time.sleep(3)
-            self.watersorter.disable_shaker()
+            
         init_pos = robot.get_position()[:-1]
 
         robot.set_velocities(-200,0)
         pos = robot.get_position()[:-1]
         while math.hypot(pos[0]-init_pos[0],pos[1]-init_pos[1])<300:
-            time.sleep(0.5)
+            try:
+                robot.isarrived()
+                time.sleep(0.2)
+            except RuntimeError:
+                robot.stop()
+                robot.set_velocities(100,0)
+                time.sleep(1)
+                robot.stop()
+                time.sleep(0.2)
+                robot.set_velocities(-200,0)
+                time.sleep(0.2)
+                
+            time.sleep(1)
             pos = robot.get_position()[:-1]
-        
+        self.watersorter.disable_shaker()
         robot.stop()
 
     def funForWaitDisp(self,robot,path):
@@ -121,27 +133,29 @@ class Shot(Actionnable):
         self.castlePoint=geo.get('Castle'+str(self.side))
         
         
-    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher,global_timeout=30):
+    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher,global_timeout=15):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         wheeledbase.turnonthespot(theta)
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
-       
+        print("COUCOU")
         time.sleep(0.2)
         watersorter.enable_shaker()
-        watersorter.write_trash(126)
+        watersorter.close_trash()
         watersorter.open_indoor()
-        watersorter.open_outdoor()
+        watersorter.close_outdoor()
         nb_balls = 0
         begin = time.time()
         accu = 0
         motor_base = 75
         waterlauncher.set_motor_pulsewidth(1000+motor_base)
         time.sleep(4) # Wait the motor running 
+        watersorter.open_outdoor()
         new_ball = 1
         last_time = begin - 10
         while nb_balls < 8 and time.time() - begin < global_timeout:
+            print(time.time() - begin)
             if(watersorter.get_water_color()[0]>120 or watersorter.get_water_color()[1]>120) and new_ball:
                 new_ball = 0
                 nb_balls += 1
@@ -162,32 +176,8 @@ class Shot(Actionnable):
             waterlauncher.set_motor_pulsewidth(1000+speed)
             #waterlauncher.set_motor_velocity(speed)
             print("accu : ", accu, "    speed : ", speed)
-        time.sleep(3)
+        time.sleep(1)# Ancien 3
 
-#        while nb_balls<8:
-#            print("Salve")
-#            open_time = time.time()
-#            watersorter.open_indoor()
-#            while not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100 or time.time() - open_time > timeout):
-#                time.sleep(0.05)
-#            print("Balle 1")
-#
-#            open_time = time.time()
-#            while not (watersorter.get_water_color()[0]<100 or watersorter.get_water_color()[1]<100 or time.time() - open_time > timeout):
-#                time.sleep(0.05)
-#
-#            time.sleep(0.3)
-#            watersorter.close_indoor()
-#            open_time = time.time()
-#            while not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100 or time.time() - open_time > timeout):
-#                time.sleep(0.05)
-#            print("Balle 2")
-#
-#            
-#            while (time.time() - open_time < 3):
-#                time.sleep(0.1)
-#            
-#            nb_balls +=2
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
@@ -207,43 +197,52 @@ class Shot(Actionnable):
         waterlauncher.set_motor_pulsewidth(1000+motor_base)
         time.sleep(2) # Wait the motor running
         watersorter.enable_shaker()
-        watersorter.write_trash(126)
         watersorter.close_indoor()
         watersorter.write_trash_unloader(100)
         watersorter.close_outdoor()
         timeout_reached = False
         nb_ball = 0
-        while not timeout_reached and nb_ball<8:
+        global_timeout = 20
+        begin_time = time.time()
+        while not time.time() - begin_time > global_timeout and nb_ball<8:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.open_indoor()
-            watersorter.write_trash(126)
+            watersorter.close_trash()
             watersorter.close_outdoor()
             open_time = time.time()
             while time.time()-open_time<timeout and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
                 time.sleep(0.3)
                 #print(watersorter.get_water_color())
 
-            if time.time()-open_time>(timeout):
+            if time.time()-open_time>timeout:
                 print("TIMEOUT")
             #Verification de la sortie dans le canon
-
+            time.sleep(0.1)
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.close_indoor()
             time.sleep(0.4)
             nb_ball+=1
             print("New ball gotten ! {}".format(nb_ball))
             # On verifie si la code couleur est bon
+            #TODO faire un timeout
             if(watersorter.get_water_color()[0]<watersorter.get_water_color()[1]):
-                watersorter.open_outdoor()
+                if self.side==0:
+                    watersorter.open_outdoor()
+                else:
+                    watersorter.open_trash()
             else:
-                watersorter.open_trash()
+                if self.side==0:
+                    watersorter.open_trash()
+                else:
+                    watersorter.open_outdoor()
 
             while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
                 time.sleep(0.3)
                 print("En attente de la sortie")
                 waterlauncher.set_motor_pulsewidth(1000+motor_base)
-
+            print("at")
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
+            print("z")
             time.sleep(0.5)
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
@@ -258,11 +257,16 @@ class Shot(Actionnable):
                 Shot.typ
                 )
         act_with_sort =Action(
+                self.shootCastlePoint, #self.shootCastlePointLong,
+                lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher) ,
+                Shot.typ
+                )
+        act_with_sort_long =Action(
                 self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher) ,
                 Shot.typ
                 )   
-        return [act_without_sort,act_with_sort]
+        return [act_without_sort,act_with_sort,act_with_sort_long]
 
 
 class Treatment(Actionnable):
@@ -278,10 +282,23 @@ class Treatment(Actionnable):
     def realize(self, shotDirection,robot,waterSorter):
         currentPosXY=robot.get_position()[:2]
         robot.purepursuit([currentPosXY,shotDirection])
-        
-        robot.wait()
+        try:
+            robot.wait()
+        except RuntimeError:
+            pass
+        turn = False
+        print("Turning")
         robot.turnonthespot(3.141592/2)
-        robot.wait()
+        while not turn:
+            try:
+                turn  = robot.isarrived()
+            except RuntimeError:
+                robot.stop()
+                robot.set_velocities(-200,0)
+                time.sleep(0.3)
+                robot.stop()
+                robot.turnonthespot(3.141592/2)
+
         waterSorter.open_trash_unloader()
         time.sleep(2)
         waterSorter.open_trash()
@@ -289,7 +306,19 @@ class Treatment(Actionnable):
         waterSorter.close_trash()
         time.sleep(2)
         waterSorter.close_trash_unloader()
+        
         robot.turnonthespot(0)
+        turn = False
+        while not turn:
+            try:
+                robot.isarrived()
+                turn = True
+            except RuntimeError:
+                robot.set_velocities(-100,0)
+                time.sleep(0.4)
+                robot.stop()
+                robot.turnonthespot(0)
+            
         robot.goto(*currentPosXY)
 
     #override
@@ -300,7 +329,4 @@ class Treatment(Actionnable):
                 Treatment.typ
             )
         return [act]
-from geogebra import GeoGebra
 
-import math
-import time

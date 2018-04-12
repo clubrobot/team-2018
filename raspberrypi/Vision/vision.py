@@ -68,7 +68,7 @@ class vision():
 		  
 		  self.display = False
 		  self.piles_showing = [False , False, False, False, False, False]
-		  self.colors_showing = [False , False, False, False, False, False]
+		  self.colors_showing = [False , False, False, False, False]
 		  self.full_image_showing = False
 		  self.debug = False
 		  
@@ -91,18 +91,17 @@ class vision():
 		  if names == 'all':
 			  self.piles_showing = [True , True, True, True, True, True]
 		  else: 
-			  #for n in names : 
 			  self.piles_showing[self.piles_names.index(names)] = True
 		  if colors == 'all':
-			  self.colors_showing = [True , True, True, True, True, True]
+			  self.colors_showing = [True , True, True, True, True]
 		  else:
 			  self.colors_showing[self.color.index(colors)] = True 
 		  
 	  def display_selection(self):
 		  for i in range(6):
-			  for c in range(6):
-				  if(self.piles_showing[i] and self.colors_showing[i]):
-					  self.piles[i].display_cube(self.color[i], self.piles_names[i])
+			  for c in range(5):
+				  if(self.piles_showing[i] and self.colors_showing[c]):
+					  self.piles[i].display_cube(self.color[c], self.piles_names[i])
 		  if self.full_image_showing :
 		  	   self.display_image()
 	  
@@ -123,8 +122,8 @@ class vision():
 	 
 	  def calibration(self):
 		  self.refresh_image()
-		#  for p in self.piles:
-		#	  p.init(self.raw_image)
+		  for p in self.piles:
+					p.init(self.raw_image)
 		  self.ld_pile.init(self.raw_image)
 		  print(self.ld_pile.hsv_blue)
 		  print(self.ld_pile.hsv_orange)
@@ -133,9 +132,8 @@ class vision():
 		  print(self.ld_pile.hsv_green)
 	
 	  def check_position(self): 
-		 # for p in self.piles: 
-
-			#  p.update_pile_position()
+		  for p in self.piles: 
+					p.update_pile_position()
 		  self.ld_pile.update_pile_position()
 	
 	  def process(self):
