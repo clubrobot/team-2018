@@ -15,7 +15,7 @@ class BeeActuator(SerialTalksProxy):
 	def __init__(self,parent, uuid='watershooter'):
 		SerialTalksProxy.__init__(self,parent, uuid)
 		self.closed_position = 170
-		self.open_position = 90
+		self.open_position = 75
 	
 	def write(self, value):
 		self.send(_WRITE_BEEACTIVATOR_OPCODE,INT(value))
