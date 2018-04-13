@@ -19,11 +19,8 @@ def getNorm(p1, p2):
   return math.sqrt(math.pow((p1[0] - p2[0]), 2) + math.pow((p1[1] - p2[1]), 2))
 
 class pilesOfCubes():
-	def __init__(self, matPersp, side, coord_min, coord_max):
+	def __init__(self, side):
 		x,y,h,s,v = 0, 0, 0, 0, 0
-		self.coord_min = coord_min
-		self.coord_max = coord_max
-		self.region_shape = ( coord_max[0] - coord_min[0], coord_max[1] - coord_min[1] ) 
 		self.side  = side
 
 		self.blue_cube = (x,y)
@@ -43,16 +40,23 @@ class pilesOfCubes():
 		self.green_moved = False
 		self.orange_moved = False
 		self.yellow_moved = False
+   
+		self.error = False
+   
+		self.coord_min = (200,200)
+		self.coord_max = (200,200)
 		
 		self.hsv_blue = ( (h,s,v ), (h,s,v ))
 		self.hsv_black = ( (h,s,v), (h,s,v ))
 		self.hsv_yellow = ( (h,s,v), (h,s,v ))
 		self.hsv_orange = ((7, 175, 200),(9, 187, 210))
 		self.hsv_green = ( (h,s,v), (h,s,v ))
-
-		self.mat = np.copy(matPersp)
-		
-		self.image = np.zeros((608,800,3), np.uint8)
+			
+		self.mat = np.float32([[  6.34119160e-01 , 1.78735109e-02 , -1.61388226e+00], \
+ 					                [ -2.48795277e-02 , 9.66831621e-01, -3.04253049e+01], \
+ 					                [ -1.26940623e-03 , 4.06277788e-03,  1.00000000e+00]]) 
+      
+		self.image = np.zeros((200,200,3), np.uint8)
 		self.hsv_image = np.zeros((608,800,3), np.uint8)
 		self.first_cube_corners = ((x,y) ,(x,y) ,(x,y) ,(x,y))
 
@@ -64,11 +68,12 @@ class pilesOfCubes():
 	def init(self, img):
 		self.refresh_image(img)
 		self.find_corner()
-		self.sort_corner()
-		self.init_cube_center_arbitrary()
-		self.init_hsv_tresh()
-		for c in self.color: 
-			self.init_cube_center(c)
+		if not self.error :
+			self.sort_corner()
+			self.init_cube_center_arbitrary()
+			self.init_hsv_tresh()
+			for c in self.color: 
+				self.init_cube_center(c)
 		
 		
 	def convert2hsv(self):
@@ -78,8 +83,10 @@ class pilesOfCubes():
 		for c in self.color: 
 			hsv_min, hsv_max = self.hsv_treshold_finder(c)
 			self.set_hsv_tresh(c, hsv_min, hsv_max)
-		
-		
+   
+	def set_mat(self, m):
+		self.mat = np.copy(m)
+   		
 	def hsv_treshold_finder(self, color):
 		if(color == 'blue'):
 			cube_min = (self.init_blue_cube[0] - 4 , self.init_blue_cube[1] - 4 )
@@ -186,7 +193,7 @@ class pilesOfCubes():
 		cv2.imshow(window_name + "  "+color, res )
 		cv2.waitKey(1)		
 
-	def set_coord(self, min, max):
+	def set_coords(self, min, max):
 		
 		self.coord_min = min
 		self.coord_max = max
@@ -195,7 +202,7 @@ class pilesOfCubes():
 	def get_coord(self):
 		return (self.coord_min, self.coord_max)
 
-	def perspective_remover(self): 
+	def perspective_remover(self):
 		self.image = cv2.warpPerspective(self.image, self.mat,(100,100))
 		self.set_region(100, 100)
 		
@@ -323,32 +330,36 @@ class pilesOfCubes():
 
 	def find_corner(self):
 		gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-	  
+   
 		corners = cv2.goodFeaturesToTrack(gray,20,0.01,10)
-		corners = np.int0(corners)
+		try:
+			corners = np.int0(corners)
 
-		center = (round(self.region_shape[0] / 2) , round(self.region_shape[1] /2) )
-		a = self.region_shape[0]*self.region_shape[1]
-		best = []
-		norm_min = a
-		x = (a,a)
-		c = []
-		for i in corners: 
-			x,y = i.ravel()
-			c.append((x,y))
-
-		for b in range(4):
-			for i in c : 
-				x,y = i
-				norm_i = math.pow((x - center[0]), 2) + math.pow((y - center[1]), 2)
-				if norm_i < norm_min : 
-					norm_min = norm_i
-					z = i
-			best.append(z)
-			del(c[c.index(z)])
+			center = (round(self.region_shape[0] / 2) , round(self.region_shape[1] /2) )
+			a = self.region_shape[0]*self.region_shape[1]
+			best = []
 			norm_min = a
-
-		self.first_cube_corners = tuple(best)
+			x = (a,a)
+			c = []
+			for i in corners: 
+				x,y = i.ravel()
+				c.append((x,y))
+  
+			for b in range(4):
+				for i in c : 
+					x,y = i
+					norm_i = math.pow((x - center[0]), 2) + math.pow((y - center[1]), 2)
+					if norm_i < norm_min : 
+					  norm_min = norm_i
+					  z = i
+				best.append(z)
+				del(c[c.index(z)])
+				norm_min = a
+  
+			self.first_cube_corners = tuple(best)
+	
+		except TypeError:
+			self.error = True
 
 	
 	def set_cube_position(self, color, pos_xy):
