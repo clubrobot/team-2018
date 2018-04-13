@@ -20,12 +20,13 @@ class Bornibus:
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
-    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, beeActioner):
         # Save arduinos
         self.wheeledbase   = wheeledbase
         self.waterlauncher = waterlauncher
         self.watersorter   = watersorter
         self.display       = display
+        self.beeActioner   = beeActioner
 
         # Save annexes inf
         self.side     = side
@@ -45,7 +46,7 @@ class Bornibus:
         self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
         self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
         # Generate buttons
-        #self.bie   = Abeille(self.side, self.geogebra, self.wheeledbase)
+        self.bee   = Abeille(self.side, self.geogebra, self.wheeledbase, self.displayManager, self.beeActioner)
         self.panel = Interrupteur(self.side, self.geogebra, self.wheeledbase, self.displayManager)
 
         # Generate balls manipulate
@@ -55,6 +56,7 @@ class Bornibus:
 
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
+            #self.bee.getAction()[0],
             self.d1.getAction()[0],
             self.shot.getAction()[0],
             self.panel.getAction()[0],
@@ -70,6 +72,7 @@ class Bornibus:
             self.d2.getAction()[0],
             self.shot.getAction()[2],
             self.treatment.getAction()[0],
+            self.bee.getAction()[0],
             ]
             
     def run(self):
@@ -80,6 +83,7 @@ class Bornibus:
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)
+        self.beeActioner.close()
         while len(self.action_list[self.side])!=0:
             act = self.action_list[self.side].pop(0)
             
@@ -95,7 +99,7 @@ class Bornibus:
 
 
 
-automate = Bornibus(Bornibus.ORANGE, rm, geo, b, l, d, ssd)
+automate = Bornibus(Bornibus.GREEN, rm, geo, b, l, d, ssd, a)
 #try:
 automate.run()
 #except:
