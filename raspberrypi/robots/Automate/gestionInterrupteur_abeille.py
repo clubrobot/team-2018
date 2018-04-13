@@ -9,13 +9,15 @@ from action import *
 
 class Interrupteur(Actionnable):
     typ="Interrupteur"
-    def __init__(self,side, geo, wheeledbase):
+    POINTS = 25
+    def __init__(self,side, geo, wheeledbase, display):
         self.side=side
         self.wheeledbase = wheeledbase
+        self.display = display
         self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
         self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
 
-    def realize(self,robot):
+    def realize(self,robot, display):
         #print("Realisation")
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
         AutomateTools.myTurnonthespot(robot,theta)
@@ -28,31 +30,28 @@ class Interrupteur(Actionnable):
             robot.wait()
         except:
             pass
+        display.addPoints(Interrupteur.POINTS)
 
         #override Actionnable
     def getAction(self):
-            return [Action(self.preparation,lambda : self.realize(self.wheeledbase),Interrupteur.typ) ]
+            return [Action(self.preparation,lambda : self.realize(self.wheeledbase, self.display),Interrupteur.typ) ]
 
 class Abeille(Actionnable):
     typ="Abeille"
-    def __init__(self, side, geo, wheeledbase):
+    POINTS = 50
+    def __init__(self, side, geo, wheeledbase, display):
         self.side=side
         self.wheeledbase = wheeledbase
+        self.display = display
         self.preparation=geo.get('Abeille'+str(self.side)+'_{0}')
         self.interrupteur=geo.get('Abeille'+str(self.side)+'_{1}')
 
-    def realize(self,robot):
-        #print("Realisation")
-        theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
-        AutomateTools.myTurnonthespot(robot,theta)
-        path = [ self.preparation, self.interrupteur]
-        robot.purepursuit(path)
-            #si on patine alors on stop l'action
-        AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
+    def realize(self,robot, display):
+        display.addPoints(Abeille.POINTS)
 
         #override Actionnable
     def getAction(self):
-            return [Action(self.preparation,lambda : self.realize(self.wheeledbase),Interrupteur.typ) ]
+            return [Action(self.preparation,lambda : self.realize(self.wheeledbase, self.display),Interrupteur.typ) ]
 
 class Odometrie(Actionnable):
     typ="Odometrie"

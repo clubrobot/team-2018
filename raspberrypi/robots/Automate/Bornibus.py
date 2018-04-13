@@ -7,7 +7,9 @@ from random import randint
 from random import shuffle
 from gestionCubes import *
 from gestionBalles import *
+from gestionAffichage import *
 from gestionInterrupteur_abeille import *
+
 
 
 # Setup and launch the user interface
@@ -18,11 +20,12 @@ class Bornibus:
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
-    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display):
         # Save arduinos
         self.wheeledbase   = wheeledbase
         self.waterlauncher = waterlauncher
         self.watersorter   = watersorter
+        self.display       = display
 
         # Save annexes inf
         self.side     = side
@@ -34,19 +37,21 @@ class Bornibus:
 
         self.action_list = [list(),list()]
         
+        self.displayManager = DisplayPoints(self.display)
+
         # Generate Dispenser
-        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter)
-        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter)
-        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter)
-        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter)
-            
+        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
+        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
+        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
+        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
         # Generate buttons
         #self.bie   = Abeille(self.side, self.geogebra, self.wheeledbase)
-        self.panel = Interrupteur(self.side, self.geogebra, self.wheeledbase)
+        self.panel = Interrupteur(self.side, self.geogebra, self.wheeledbase, self.displayManager)
 
         # Generate balls manipulate
         self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter)
-        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher)
+        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher, self.displayManager)
+
 
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
@@ -68,14 +73,16 @@ class Bornibus:
             ]
             
     def run(self):
-        self.wheeledbase.set_position(592, 290,0)
-        #self.wheeledbase.set_position(592,2710,0)
+        if self.side == Bornibus.GREEN:
+            self.wheeledbase.set_position(592, 290,0)
+        else:
+            self.wheeledbase.set_position(592,2710,0)
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)
         while len(self.action_list[self.side])!=0:
             act = self.action_list[self.side].pop(0)
-
+            
             currentPosXY=self.wheeledbase.get_position()[:2]
             path = self.roadmap.get_shortest_path( currentPosXY , act.actionPoint )
             print(path)
@@ -87,7 +94,8 @@ class Bornibus:
 
 
 
-automate = Bornibus(Bornibus.GREEN, rm, geo, b, l, d)
+
+automate = Bornibus(Bornibus.ORANGE, rm, geo, b, l, d, ssd)
 #try:
 automate.run()
 #except:
