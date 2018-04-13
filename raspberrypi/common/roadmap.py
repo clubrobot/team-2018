@@ -73,7 +73,8 @@ class ObstacleTemp(Obstacle):
 
 
 class RoadMap:
-
+	LEFT  =  1
+	RIGHT = -1
 	def __init__(self, vertices=list(), edges=set()):
 		self.graph = igraph.Graph()
 		self.graph.add_vertices(len(vertices))
@@ -172,6 +173,15 @@ class RoadMap:
 		for target in neighbors:
 			self.graph.add_edge(vid, target, weight=self.get_vertex_distance(target, vertex))
 		return vid
+
+	def best_side(self,x,y,theta):
+		result = 0
+		for (a,b) in self.graph.vs['coords']:
+			a-=x
+			b-=y
+			result += math.copysign(1,-math.sin(theta)*a+math.cos(theta)*b)
+		return math.copysign(1,result)
+
 
 	def get_shortest_path(self, source, target):
 		v = self.add_vertex(source)
