@@ -369,10 +369,10 @@ void loop() {
   static unsigned long trilaterationReportTime = millis();
   DW1000Ranging.loop();
   talks.execute();
-  if (millis() - trilaterationReportTime > 1000){
+ /* if (millis() - trilaterationReportTime > 1000){
     trilaterationReportTime = millis();
     DW1000Ranging.transmitTrilaterationReport();
-  }
+  }*/
 }
 
 
