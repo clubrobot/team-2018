@@ -36,7 +36,7 @@ class Bornibus:
         self.side     = side
         self.roadmap  = roadmap
         self.geogebra = geogebra
-        self.mover    = Mover(roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back))
+        self.mover    = Mover(roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back)
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
@@ -94,7 +94,7 @@ class Bornibus:
             currentPosXY=self.wheeledbase.get_position()[:2]
             path = self.roadmap.get_shortest_path( currentPosXY ,act.actionPoint )
             print(path)
-            self.mover.goto( act.actionPoint)
+            self.mover.goto(*act.actionPoint)
             print("Make action {}".format(act.typ))
             act()
             self.wheeledbase.max_linvel.set(500)
