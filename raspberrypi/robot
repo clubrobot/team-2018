@@ -8,6 +8,7 @@ from threading import Thread
 sys.path.append("{}/common/".format(sys.path[0]))
 sys.path.append("{}/robots/".format(sys.path[0]))
 sys.path.append("{}/robots/Automate/".format(sys.path[0]))
+sys.path.append("{}/robots/Mover/".format(sys.path[0]))
 from serialtalks import SerialTalks
 from buttons import ButtonCard
 from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
