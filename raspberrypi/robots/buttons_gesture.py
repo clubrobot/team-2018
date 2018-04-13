@@ -45,6 +45,7 @@ class ButtonGestureMatch():
     def run(self):
         while not self.tirret_status.is_set() or self.status != ButtonGestureMatch.WAITING_MATCH:
             sleep(0.1)
+        return self.side
 
     def button_red(self):
         Thread(target=self._red).start()
