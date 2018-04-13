@@ -32,3 +32,18 @@ void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &ou
     unsigned long timeoutDelay = input.read<unsigned int>();
     DW1000Ranging.startAutoCalibration(realDistance, timeoutDelay);
 }
+
+void UPDATE_COLOR(SerialTalks &talks, Deserializer &input, Serializer &output)
+{
+    talks.out << "changed color\n";
+    int color = input.read<uint16_t>();
+    DW1000Ranging.transmitColor((uint8_t)color);
+}
+
+void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
+{
+    int x = DW1000Ranging.getPosX();
+    int y = DW1000Ranging.getPosY();
+    output.write<uint16_t>(x);
+    output.write<uint16_t>(y);
+}

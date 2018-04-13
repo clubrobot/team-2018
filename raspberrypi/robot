@@ -121,7 +121,7 @@ def server(args):
 	while True:
 		try:
 			while not srv.full():
-				srv.connect(None)
+				srv.coargsnnect(None)
 			srv.sleep_until_one_disconnected()
 
 		except KeyboardInterrupt:

@@ -5,7 +5,9 @@
 
 #define UPDATE_ANCHOR_NUMBER_OPCODE 0x10
 #define UPDATE_ANTENNA_DELAY_OPCODE 0x11
-#define CALIBRATION_ROUTINE_OPCODE 0x12
+#define CALIBRATION_ROUTINE_OPCODE  0x12
+#define UPDATE_COLOR_OPCODE         0x13
+#define GET_COORDINATE_OPCODE       0x14
 
 // Instructions prototypes
 
@@ -19,5 +21,7 @@ void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &o
  *          - timeout autocalibration delay in ms (UNSIGNED LONG)
  */ 
 void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &output);
+void UPDATE_COLOR(SerialTalks &talks, Deserializer &input, Serializer &output);
+void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output);
 
 #endif //INSTRUCTIONS_H
