@@ -62,10 +62,10 @@ class Dispenser(Actionnable):
                 time.sleep(1)
                 robot.stop()
                 time.sleep(0.2)
-                robot.set_velocities(-200,0)
+                robot.purepursuit([pos,self.preparationPoint], direction="backward")
                 time.sleep(0.2)
                 
-            time.sleep(1)
+            time.sleep(0.5)
             pos = robot.get_position()[:-1]
 
         self.watersorter.disable_shaker()
@@ -100,7 +100,7 @@ class Shot(Actionnable):
         self.castlePoint=self.geo.get('Castle'+str(self.side))
         
         
-    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=15):
+    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=20):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         wheeledbase.turnonthespot(theta)
@@ -115,7 +115,7 @@ class Shot(Actionnable):
         nb_balls = 0
         begin_time = time.time()
         accu = 0
-        motor_base = 75
+        motor_base = 72
         waterlauncher.set_motor_pulsewidth(1000+motor_base)
         time.sleep(4) # Wait the motor running 
         watersorter.open_outdoor()
@@ -133,7 +133,8 @@ class Shot(Actionnable):
                 if time.time() - open_time > timeout_per_ball:
                     watersorter.close_trash()
                     open_time = time.time()
-                
+            
+            time.sleep(0.5)
             
             watersorter.close_indoor()
             watersorter.open_outdoor()

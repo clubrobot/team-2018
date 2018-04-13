@@ -39,14 +39,27 @@ class Interrupteur(Actionnable):
 class Abeille(Actionnable):
     typ="Abeille"
     POINTS = 50
-    def __init__(self, side, geo, wheeledbase, display):
+    def __init__(self, side, geo, wheeledbase, display, beeActioner):
         self.side=side
         self.wheeledbase = wheeledbase
         self.display = display
-        self.preparation=geo.get('Abeille'+str(self.side)+'_{0}')
-        self.interrupteur=geo.get('Abeille'+str(self.side)+'_{1}')
+        self.beeActioner = beeActioner
+        self.preparation=geo.get('Abeille'+str(self.side)+'_0')
+        self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
 
     def realize(self,robot, display):
+        self.beeActioner.open()
+        robot.turnonthespot(math.pi)
+        robot.wait()
+        robot.purepursuit([self.preparation, self.interrupteur], direction="backward")
+        robot.wait()
+        robot.turnonthespot(math.pi+(self.side*2-1)*math.pi/8)
+        robot.wait()
+        robot.set_velocities(0, -(self.side*2-1)*9)
+        time.sleep(0.5)
+        robot.goto(*self.preparation)
+        robot.wait()
+        self.beeActioner.close()
         display.addPoints(Abeille.POINTS)
 
         #override Actionnable
