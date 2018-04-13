@@ -73,6 +73,9 @@ unsigned long DW1000RangingClass::_calibrationTimeOut = 0;
 float DW1000RangingClass::_pos_x = -1000;
 float DW1000RangingClass::_pos_y = -1000;
 
+// others
+uint8_t DW1000RangingClass::_color = 0;
+
 // data buffer
 byte          DW1000RangingClass::data[LEN_DATA];
 // reset line to the chip
@@ -641,9 +644,13 @@ void DW1000RangingClass::loop() {
 				if(messageType != _expectedMsgId) {
 					// unexpected message, start over again
 					//not needed ?
-					return;
-					_expectedMsgId = POLL_ACK;
-					return;
+					if(messageType == CHANGE_COLOR){
+						memcpy(&_color,  data + 1 + SHORT_MAC_LEN, 1);
+					} else {
+						return;
+						_expectedMsgId = POLL_ACK;
+						return;
+					}
 				}
 				if(messageType == POLL_ACK) {
 					DW1000.getReceiveTimestamp(myDistantDevice->timePollAckReceived);
@@ -1039,7 +1046,7 @@ void DW1000RangingClass::setPosY(float &y)
 	_pos_y = y;
 }
 
-void DW1000RangingClass::transmitTrilaterationReport()
+void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
 {
 
 	transmitInit();
@@ -1051,4 +1058,19 @@ void DW1000RangingClass::transmitTrilaterationReport()
 
 	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
 	transmit(data);
+}
+
+void DW1000RangingClass::transmitColor(uint8_t color)
+{
+	DW1000Device *myDistantDevice = getDistantDevice();
+	transmitInit();
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
+	data[SHORT_MAC_LEN] = CHANGE_COLOR;
+	memcpy(data + 1 + SHORT_MAC_LEN, &color, 1);
+	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
+	transmit(data, DW1000Time(_replyDelayTimeUS, DW1000Time::MICROSECONDS));
+}
+
+uint8_t DW1000RangingClass::getColor(){
+	return _color;
 }

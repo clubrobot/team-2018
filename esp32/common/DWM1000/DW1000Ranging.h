@@ -32,14 +32,15 @@
 #include "DW1000Mac.h"
 
 // messages used in the ranging protocol
-#define POLL 0
-#define POLL_ACK 1
-#define RANGE 2
-#define RANGE_REPORT 3
-#define RANGE_FAILED 255
-#define BLINK 4
-#define RANGING_INIT 5
-#define TRILATERATION_REPORT 6
+#define POLL 					0
+#define POLL_ACK 				1
+#define RANGE 					2
+#define RANGE_REPORT 			3
+#define RANGE_FAILED 			255
+#define BLINK 					4
+#define RANGING_INIT 			5
+#define TRILATERATION_REPORT 	6
+#define CHANGE_COLOR 			7
 
 #define LEN_DATA 90
 
@@ -119,6 +120,10 @@ public:
 	static void setPosY(float &y);
 	static void transmitTrilaterationReport();
 
+	// Others
+	static void transmitColor(uint8_t color);
+	static uint8_t getColor();
+
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);
 	
@@ -185,6 +190,8 @@ private:
 	// for trilateration
 	static float _pos_x;
 	static float _pos_y;
+	// others
+	static uint8_t _color;	// 0 = green, 1 = orange
 
 	//methods
 	static void handleSent();
