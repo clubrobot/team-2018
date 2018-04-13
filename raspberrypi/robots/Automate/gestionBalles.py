@@ -8,9 +8,10 @@ from action import *
 class Dispenser(Actionnable):
     typ="Dispenser"
     POINTS_DISPENSER = 10
-    def __init__(self,numberDispenser, rm, geo, wheeledbase, watersorter, display):
+    def __init__(self,numberDispenser, rm, geo, wheeledbase, watersorter, display, mover):
         self.rm  = rm
         self.geo = geo
+        self.mover = mover
         self.display = display
         self.numberDispenser=numberDispenser
         self.watersorter = watersorter
@@ -87,10 +88,11 @@ class Shot(Actionnable):
     typ="shot"
     POINTS_PER_BALL_CASTLE = 5
     POINTS_PER_BALL_EPURATION = 10
-    def __init__(self, side, rm, geo, wheeledbase, watersorter, waterlauncher, display):
+    def __init__(self, side, rm, geo, wheeledbase, watersorter, waterlauncher, display, mover):
         self.side=side
         self.rm  = rm
         self.geo = geo
+        self.mover  = mover
         self.wheeledbase = wheeledbase
         self.watersorter = watersorter
         self.waterlauncher = waterlauncher
@@ -274,9 +276,10 @@ class Shot(Actionnable):
 
 class Treatment(Actionnable):
     typ="treatement"
-    def __init__(self, side, rm, geo, wheeledbase, watersorter):
+    def __init__(self, side, rm, geo, wheeledbase, watersorter, mover):
         self.side=side
         self.rm=rm
+        self.mover = mover
         self.geo = geo
         self.wheeledbase = wheeledbase
         self.watersorter = watersorter

@@ -10,8 +10,9 @@ from action import *
 class Interrupteur(Actionnable):
     typ="Interrupteur"
     POINTS = 25
-    def __init__(self,side, geo, wheeledbase, display):
+    def __init__(self,side, geo, wheeledbase, display, mover):
         self.side=side
+        self.mover = mover
         self.wheeledbase = wheeledbase
         self.display = display
         self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
@@ -39,8 +40,9 @@ class Interrupteur(Actionnable):
 class Abeille(Actionnable):
     typ="Abeille"
     POINTS = 50
-    def __init__(self, side, geo, wheeledbase, display, beeActioner):
+    def __init__(self, side, geo, wheeledbase, display, beeActioner,mover):
         self.side=side
+        self.mover = mover
         self.wheeledbase = wheeledbase
         self.display = display
         self.beeActioner = beeActioner

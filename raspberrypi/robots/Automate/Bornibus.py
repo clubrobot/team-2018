@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 import sys
+
+
+sys.path.append("../Mover/")
 import time
 from setup_bornibus import *
 from random import randint
@@ -9,6 +12,7 @@ from gestionCubes import *
 from gestionBalles import *
 from gestionAffichage import *
 from gestionInterrupteur_abeille import *
+from mover import Mover
 
 
 
@@ -20,7 +24,7 @@ class Bornibus:
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
-    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, beeActioner):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, beeActioner,sensors_front, sensors_lat, sensors_back):
         # Save arduinos
         self.wheeledbase   = wheeledbase
         self.waterlauncher = waterlauncher
@@ -32,6 +36,7 @@ class Bornibus:
         self.side     = side
         self.roadmap  = roadmap
         self.geogebra = geogebra
+        self.mover    = Mover(roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back))
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
@@ -41,17 +46,17 @@ class Bornibus:
         self.displayManager = DisplayPoints(self.display)
 
         # Generate Dispenser
-        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
-        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
-        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
-        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager)
+        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
+        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
+        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
+        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
         # Generate buttons
-        self.bee   = Abeille(self.side, self.geogebra, self.wheeledbase, self.displayManager, self.beeActioner)
-        self.panel = Interrupteur(self.side, self.geogebra, self.wheeledbase, self.displayManager)
+        self.bee   = Abeille(self.side, self.geogebra, self.wheeledbase, self.displayManager, self.beeActioner, self.mover)
+        self.panel = Interrupteur(self.side, self.geogebra, self.wheeledbase, self.displayManager, self.mover)
 
         # Generate balls manipulate
-        self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter)
-        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher, self.displayManager)
+        self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.mover)
+        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher, self.displayManager,self.mover)
 
 
         # Generate order list
@@ -86,11 +91,10 @@ class Bornibus:
         self.beeActioner.close()
         while len(self.action_list[self.side])!=0:
             act = self.action_list[self.side].pop(0)
-            
             currentPosXY=self.wheeledbase.get_position()[:2]
-            path = self.roadmap.get_shortest_path( currentPosXY , act.actionPoint )
+            path = self.roadmap.get_shortest_path( currentPosXY ,act.actionPoint )
             print(path)
-            AutomateTools.myPurepursuite(self.wheeledbase,path)
+            self.mover.goto( act.actionPoint)
             print("Make action {}".format(act.typ))
             act()
             self.wheeledbase.max_linvel.set(500)
@@ -99,7 +103,7 @@ class Bornibus:
 
 
 
-automate = Bornibus(Bornibus.GREEN, rm, geo, b, l, d, ssd, a)
+automate = Bornibus(Bornibus.GREEN, rm, geo, b, l, d, ssd, a, s_front, s_lat, s_back)
 #try:
 automate.run()
 #except:
