@@ -7,7 +7,7 @@ from threading import Thread
 
 sys.path.append("{}/common/".format(sys.path[0]))
 sys.path.append("{}/robots/".format(sys.path[0]))
-
+sys.path.append("{}/robots/Automate/".format(sys.path[0]))
 from serialtalks import SerialTalks
 from buttons import ButtonCard
 from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
@@ -18,7 +18,7 @@ from watersorter        import *
 from display            import *
 from bee                import *
 from sensors            import *
-
+from Bornibus import Bornibus
 DEV_MODE = False
 MATCH_MODE = True
 
@@ -57,7 +57,8 @@ def buttons():
 		print("ATT")
 		side = button_gesture.run()
 		m.start_match()
-		launch_automate(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
+		Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
+		Bornibus.run()
 	button_card.disconnect()
 	screen.disconnect()
 	wheeledbase.disconnect()
