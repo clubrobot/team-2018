@@ -5,13 +5,23 @@ import time
 from argparse  import ArgumentParser
 from threading import Thread
 
+sys.path.append("{}/supervisors/".format(sys.path[0]))
 sys.path.append("{}/common/".format(sys.path[0]))
+sys.path.append("{}/Vision/".format(sys.path[0]))
 
-from serialtalks import SerialTalks
-from tcptalks import Server
+from server import Server
+from cube_detector import * 
+    
+
+def server(args):
+    srv = Server()
+    srv.start()
+
+    
 
 
-
+parser = ArgumentParser()
+subparsers = parser.add_subparsers()
 
 
 server_parser = subparsers.add_parser('server')
