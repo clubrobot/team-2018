@@ -33,17 +33,26 @@ float p[2] = {-1,-1}; // Target point
 
 void newRange()
 {
+  uint8_t color = DW1000Ranging.getColor();
   const float x_1 = 5;
-  const float y_1 = -49;
+  float y_1 = -49;
   const float x_2 = 1000;
-  const float y_2 = 3049;
+  float y_2 = 3049;
   const float x_3 = 1950;
-  const float y_3 = -49;
+  float y_3 = -49;
   const float x_4 = 21.18;
-  const float y_4 = 1326;
+  float y_4 = 1326;
   const float z_tag = 484.3;
   const float z_anchor = 438.3;
   const float z_central = 1016.3;
+
+  if(color == 1){ // ORANGE
+    y_1 = 3049;
+    y_2 = -49;
+    y_3 = 3049;
+    y_4 = 1674;
+  } 
+  
 
   static String toDisplay;
 
@@ -101,8 +110,8 @@ void newRange()
       toDisplay = "(0)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      p[0] = -1;
-      p[1] = -1;
+      p[0] = -1000;
+      p[1] = -1000;
      }
       break;
     case 1:
@@ -110,8 +119,8 @@ void newRange()
       toDisplay = "(1)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      p[0] = -1;
-      p[1] = -1;
+      p[0] = -1000;
+      p[1] = -1000;
       }
       break;
     case 2:
@@ -119,8 +128,8 @@ void newRange()
       toDisplay = "(2)";
       display.drawString(64, 0, toDisplay);
       display.display();
-      p[0] = -1;
-      p[1] = -1;
+      p[0] = -1000;
+      p[1] = -1000;
     }
       break;
     case 3:
@@ -271,6 +280,9 @@ void newRange()
       break;
   }
   
+  DW1000Ranging.setPosX(p[0]);
+  DW1000Ranging.setPosY(p[1]);
+
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
 }
@@ -363,8 +375,13 @@ void setup() {
 }
 
 void loop() {
+  static unsigned long trilaterationReportTime = millis();
   DW1000Ranging.loop();
   talks.execute();
+ /* if (millis() - trilaterationReportTime > 1000){
+    trilaterationReportTime = millis();
+    DW1000Ranging.transmitTrilaterationReport();
+  }*/
 }
 
 
