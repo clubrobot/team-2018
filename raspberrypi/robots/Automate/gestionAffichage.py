@@ -27,4 +27,4 @@ class DisplayPoints:
             self.locker.acquire()
             self.updateDisplay()
             self.locker.release()
-            time.sleep(1)
+            time.sleep(0.5)
