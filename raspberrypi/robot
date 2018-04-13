@@ -18,6 +18,8 @@ from waterlauncher      import *
 from watersorter        import *
 from display            import *
 from bee                import *
+from geogebra           import *
+from roadmap            import *
 from sensors            import *
 from Bornibus import Bornibus
 DEV_MODE = False
@@ -31,25 +33,23 @@ def buttons():
 
 	m = Manager()
 	m.connect()
-	try:
-		button_card = ButtonCard(m)
-		screen      = SevenSegments(m)
-		wheeledbase = WheeledBase(m)
 
-		if MATCH_MODE:
-			d = WaterSorter(m)
-			l = WaterLauncher(m)
-			a = BeeActuator(m)
-			s_lat = Sensors(m,"sensorsLat")
-			s_front = Sensors(m,"sensorsAv")
-			s_back = Sensors(m,"sensorsAr")
-			geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
-			rm = RoadMap.load(geo)
+	button_card = ButtonCard(m)
+	screen      = SevenSegments(m)
+	wheeledbase = WheeledBase(m)
+
+	if MATCH_MODE:
+		d = WaterSorter(m)
+		l = WaterLauncher(m)
+		a = BeeActuator(m)
+		s_lat = Sensors(m,"sensorsLat")
+		s_front = Sensors(m,"sensorsAv")
+		s_back = Sensors(m,"sensorsAr")
+		geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
+		rm = RoadMap.load(geo)
 		
-	except:
-		print("error")
-		m.disconnect()
-		return 
+		
+		 
 	if DEV_MODE:
 		button_gesture = ButtonGestureDemo(button_card,screen,m)
 		while not button_gesture.exiting : time.sleep(0.2)
