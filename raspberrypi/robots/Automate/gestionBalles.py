@@ -113,6 +113,7 @@ class Shot(Actionnable):
         watersorter.open_outdoor()
         new_ball = 1
         last_time = begin - 10
+        timeout_per_ball = 4
         while nb_balls < 8 and time.time() - begin < global_timeout:
             print(time.time() - begin)
             if(watersorter.get_water_color()[0]>120 or watersorter.get_water_color()[1]>120) and new_ball:
@@ -126,6 +127,11 @@ class Shot(Actionnable):
                     print("Speed += ", 8/(time.time() - last_time))
                 last_time = time.time()
                 new_ball =1
+            
+            if time.time() - last_time > timeout_per_ball:
+                watersorter.close_trash()
+                last_time = time.time()
+                
 
             time.sleep(0.05)
             accu = max(accu -6, 0)
