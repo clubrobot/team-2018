@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../Mover/")
 import time
-from setup_bornibus import *
+
 from random import randint
 from random import shuffle
 from gestionCubes import *
