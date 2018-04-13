@@ -33,17 +33,26 @@ float p[2] = {-1,-1}; // Target point
 
 void newRange()
 {
+  uint8_t color = DW1000Ranging.getColor();
   const float x_1 = 5;
-  const float y_1 = -49;
+  float y_1 = -49;
   const float x_2 = 1000;
-  const float y_2 = 3049;
+  float y_2 = 3049;
   const float x_3 = 1950;
-  const float y_3 = -49;
+  float y_3 = -49;
   const float x_4 = 21.18;
-  const float y_4 = 1326;
+  float y_4 = 1326;
   const float z_tag = 484.3;
   const float z_anchor = 438.3;
   const float z_central = 1016.3;
+
+  if(color == 1){ // ORANGE
+    y_1 = 3049;
+    y_2 = -49;
+    y_3 = 3049;
+    y_4 = 1674;
+  } 
+  
 
   static String toDisplay;
 
