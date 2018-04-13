@@ -10,12 +10,14 @@ sys.path.append("{}/robots/".format(sys.path[0]))
 
 from serialtalks import SerialTalks
 from buttons import ButtonCard
-from wheeledbase import WheeledBase
 from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
-from display import SevenSegments
 from components  import Server, Manager
-#from bornibus    import Bornibus
-#from murray      import Murray
+from wheeledbase        import *
+from waterlauncher      import *
+from watersorter        import *
+from display            import *
+from bee                import *
+from sensors            import *
 
 DEV_MODE = False
 MATCH_MODE = True
@@ -32,6 +34,17 @@ def buttons():
 		button_card = ButtonCard(m)
 		screen      = SevenSegments(m)
 		wheeledbase = WheeledBase(m)
+
+		if MATCH_MODE:
+			d = WaterSorter(m)
+			l = WaterLauncher(m)
+			a = BeeActuator(m)
+			s_lat = Sensors(m,"sensorsLat")
+			s_front = Sensors(m,"sensorsAv")
+			s_back = Sensors(m,"sensorsAr")
+			geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
+			rm = RoadMap.load(geo)
+		
 	except:
 		print("error")
 		m.disconnect()
@@ -42,12 +55,15 @@ def buttons():
 	if MATCH_MODE:
 		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
 		print("ATT")
-		button_gesture.run()
-		print("MATCH")
+		side = button_gesture.run()
+		m.start_match()
+		launch_automate(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
 	button_card.disconnect()
 	screen.disconnect()
 	wheeledbase.disconnect()
 	m.disconnect()
+
+
 
 
 
