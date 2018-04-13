@@ -11,7 +11,8 @@ from math import pi
 import os, sys
 sys.path.append("../../common/")
 sys.path.append("..")
-
+from roadmap import RoadMap
+from geogebra import GeoGebra
 # Check for the Rapsberry Pi address
 # It looks for a file in the current directory, whose name is
 # a valid IP address
@@ -70,19 +71,24 @@ try:
 except:
 	print('\'display\' not connected')
 try:
-	s = Sensors(m,"sensorsLat")
+	s_lat = Sensors(m,"sensorsLat")
 except :
-	print('\'sensors\' not connected')
+	print('\'sensors lat\' not connected')
+
+try:
+	s_front = Sensors(m,"sensorsAv")
+except:
+	print('\'sensors front\' not connected')
+
+try:
+	s_back = Sensors(m,"sensorsAr")
+except:
+	print('\'sensors back\' not connected')
+
+	
 
 
-#rb = LightButtonModule(m, 15, 16)
-#bb = LightButtonModule(m, 23, 24)
-#yb = LightButtonModule(m, 35, 36)
-#gb = LightButtonModule(m, 21, 22)
-#sw = SwitchModule(m, 29)
-#b.set_position(592, 290,0)
+geo = GeoGebra('bornibus.ggb')
+rm = RoadMap.load(geo)
 
-#b.purepursuit(((592.0, 290.0), (550.361579875327, 522.9456982944794), (396.51542602917317, 611.768816631345), (242.66927218301936, 700.5919349682105), (242.66927218301936, 878.2381716419414), (242.66927218301936, 1055.8844083156723), (351.6070411096273, 1219.2644750469503)))
-#b.wait()
-#b.goto(592.0, 290.0)
 

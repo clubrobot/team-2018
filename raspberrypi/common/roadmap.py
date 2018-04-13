@@ -25,6 +25,7 @@ class Obstacle:
 		self.shape    = shape
 		self.theta    = 0
 		self.position = (-1000,-1000)
+		self.edges = list()
 
 	def get_shape(self):
 		return [(math.cos(self.theta)*a-math.sin(self.theta)*b+self.position[0],
@@ -134,6 +135,8 @@ class RoadMap:
 					edge['weight'] = math.inf
 					if not obstacle in edge['cuted_by']:
 						edge['cuted_by'].append(obstacle)
+						obstacle.edges.append(edge)
+
 
 	def reset_obstacle(self, obstacle):
 		for edge in obstacle.edges:
@@ -145,6 +148,7 @@ class RoadMap:
 			if len(edge['cuted_by'])==0:
 				vertex = self.graph.vs[edge.target]['coords']
 				edge['weight'] = self.get_vertex_distance(edge.source, vertex)
+		obstacle.edges = list()
 
 	def get_vertex_distance(self, vid, vertex):
 		x0, y0 = self.graph.vs[vid]['coords']

@@ -4,18 +4,17 @@ import math
 import time
 from automateTools import AutomateTools
 from action import *
-#Ouverture du ficher
-geo = GeoGebra('bornibus.ggb')
 
 class Dispenser(Actionnable):
     typ="Dispenser"
-    def __init__(self,numberDispenser, rm, wheeledbase, watersorter):
-        self.rm=rm
+    def __init__(self,numberDispenser, rm, geo, wheeledbase, watersorter):
+        self.rm  = rm
+        self.geo = geo
         self.numberDispenser=numberDispenser
         self.watersorter = watersorter
         self.wheeledbase = wheeledbase
-        self.targetPoint=geo.get('Dispenser'+str(self.numberDispenser)+'_1')
-        self.preparationPoint=geo.get('Dispenser'+str(self.numberDispenser)+'_0')
+        self.targetPoint=self.geo.get('Dispenser'+str(self.numberDispenser)+'_1')
+        self.preparationPoint=self.geo.get('Dispenser'+str(self.numberDispenser)+'_0')
 
     def realize(self,robot,watersorter):
         theta = math.atan2(self.preparationPoint[1]-self.targetPoint[1],self.preparationPoint[0]-self.targetPoint[0])+3.141592
@@ -79,58 +78,18 @@ class Dispenser(Actionnable):
         return [Action(self.preparationPoint,lambda : self.realize(self.wheeledbase,self.watersorter ),Dispenser.typ)]
 
 
-
-
-
-class ShootGestion():
-    fullA="fullA"
-    fullB="fullB"
-    alternateA="alternateA"
-    alternateB="alternateB"
-
-    sideOfDispenser = {
-        1 : fullB,
-        2 : alternateA,
-        3 : alternateB,
-        4 : fullA
-    }
-    
-    emptyTyp="emptyTyp"
-
-    numberTotalBalls=8#not used
-
-    @staticmethod
-    def getIfTheActionYouHaveToShotOrToTreat(side,robot,id):
-        #First boolis for Shot (you have to shot something), 
-        #second bool is for treatment(you have to treat something)
-        whatActionHaveIToDo = {
-            'A' : {
-                ShootGestion.fullA : (True,False),
-                ShootGestion.alternateB : (True,True), 
-                ShootGestion.alternateA : (True,True),
-                ShootGestion.fullB : (False,True)
-            },
-            'B' : {
-                 ShootGestion.fullA : (False,True),
-                ShootGestion.alternateB : (True,True),
-                ShootGestion.alternateA : (True,True),
-                ShootGestion.fullB : (True,False)
-            }
-        }
-        listShotCall = whatActionHaveIToDo[side][ShootGestion.sideOfDispenser[id]]
-        return listShotCall
-
 class Shot(Actionnable):
     typ="shot"
-    def __init__(self,side,rm,wheeledbase,watersorter,waterlauncher):
+    def __init__(self, side, rm, geo, wheeledbase, watersorter, waterlauncher):
         self.side=side
-        self.rm=rm
+        self.rm  = rm
+        self.geo = geo
         self.wheeledbase = wheeledbase
         self.watersorter = watersorter
         self.waterlauncher = waterlauncher
-        self.shootCastlePoint=geo.get('ShootCastle'+str(self.side))
-        self.shootCastlePointLong=geo.get('ShootCastleLong'+str(self.side))
-        self.castlePoint=geo.get('Castle'+str(self.side))
+        self.shootCastlePoint=self.geo.get('ShootCastle'+str(self.side))
+        self.shootCastlePointLong=self.geo.get('ShootCastleLong'+str(self.side))
+        self.castlePoint=self.geo.get('Castle'+str(self.side))
         
         
     def realize_without_sort(self,wheeledbase, watersorter, waterlauncher,global_timeout=15):
@@ -271,13 +230,14 @@ class Shot(Actionnable):
 
 class Treatment(Actionnable):
     typ="treatement"
-    def __init__(self,side,rm,wheeledbase,watersorter):
+    def __init__(self, side, rm, geo, wheeledbase, watersorter):
         self.side=side
         self.rm=rm
+        self.geo = geo
         self.wheeledbase = wheeledbase
         self.watersorter = watersorter
-        self.shootTreatmentPoint=geo.get('ShootTreatment'+str(self.side))
-        self.treatmentPoint=geo.get('Treatment'+str(self.side))
+        self.shootTreatmentPoint=self.geo.get('ShootTreatment'+str(self.side))
+        self.treatmentPoint=self.geo.get('Treatment'+str(self.side))
         
     def realize(self, shotDirection,robot,waterSorter):
         currentPosXY=robot.get_position()[:2]
