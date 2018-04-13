@@ -103,13 +103,4 @@ class Bornibus:
 
 
 
-automate = Bornibus(Bornibus.GREEN, rm, geo, b, l, d, ssd, a, s_front, s_lat, s_back)
-#try:
-automate.run()
-#except:
-#    d.close_outdoor()
-#    d.open_indoor()
-#    d.disable_shaker()
-#    d.write_trash(126)
-#    l.set_motor_velocity(0)
-b.stop()
+
