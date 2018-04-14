@@ -24,7 +24,7 @@ class ButtonGestureMatch():
         self.buttons = buttons
         self.display = display
         self.server  = server
-        self.wheelebase = wheelebase
+        self.wheeledbase = wheelebase
         #TODO make network verification 
         self.display.set_message("Select")
         self.status = ButtonGestureMatch.WAITING_TEAM

@@ -73,7 +73,7 @@ class Mover:
         
         #Objet qui sont en relation avec les sensors
         self.sensors_front_listener = SensorListener(self.sensors_front.get_mesure)
-        self.sensors_back_listener = SensorListener(self.sensors_back.get_mesure)
+        #self.sensors_back_listener = SensorListener(self.sensors_back.get_mesure)
         #Flags relier a des fonctions interne pour tout bien gérer
 
         self.front_flag = Flag(self.front_obstacle)
@@ -388,8 +388,14 @@ class Mover:
         # RoadMap.LEFT
         # RoadMap.RIGHT
         
+
         print("INTERUPT")
         if not self.interupted_lock.acquire(blocking=True, timeout=1):
+            return
+        x, y, theta = self.wheeledbase.get_position()
+        if(hypot(y-self.goal[1],x-self.goal[0])<300):
+            self.interupted_status.clear()
+            self.interupted_lock.release()
             return
         self.interupted_status.set()
         lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted()
@@ -402,7 +408,7 @@ class Mover:
 
 
         self.wheeledbase.stop()
-        x, y, theta = self.wheeledbase.get_position()
+        
 
         side = self.roadmap.best_side(x, y, theta)
         print("Je tourne a {}".format("gauche" if side==1 else "droite"))
