@@ -179,8 +179,8 @@ class vision():
 				   if number_of_color >=4 : 
 						       state.append(True)
 				   else :
-                  state.append(False)
-      return tuple(state)
+					 	       state.append(False)
+		  return tuple(state)
 	
 
 def edge_finder(gravitycenter, n=1):

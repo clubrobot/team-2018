@@ -34,7 +34,8 @@ class Server(Thread, TCPTalksServer):
 				continue
 
 
-	def getPosition(self, client, id):
+	def getPosition(self, id):
+		print(id)
 		if id ==0 :
 			try:
 				return	self.beacon.get_position()
