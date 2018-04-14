@@ -75,7 +75,12 @@ class ButtonGestureMatch():
 
 
         if(self.status == ButtonGestureMatch.WAITING_ODOMETRY):
-            #self.wheeledbase.set_position()
+            if self.side == 0:
+                self.wheeledbase.set_position(592, 290,0)
+            else:
+                self.wheeledbase.set_position(592,2710,0)
+        
+
             if self.tirret_status.is_set():
                 for k in range(3):
                     for i in range(3):

@@ -81,10 +81,6 @@ class Bornibus:
             ]
             
     def run(self):
-        if self.side == Bornibus.GREEN:
-            self.wheeledbase.set_position(592, 290,0)
-        else:
-            self.wheeledbase.set_position(592,2710,0)
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)

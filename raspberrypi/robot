@@ -54,11 +54,11 @@ def buttons():
 		button_gesture = ButtonGestureDemo(button_card,screen,m)
 		while not button_gesture.exiting : time.sleep(0.2)
 	if MATCH_MODE:
+		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
 		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
 		print("ATT")
 		side = button_gesture.run()
 		m.start_match()
-		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
 		automate.run()
 	button_card.disconnect()
 	screen.disconnect()
