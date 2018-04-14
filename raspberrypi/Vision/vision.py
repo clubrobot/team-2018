@@ -165,6 +165,22 @@ class vision():
 
 	  def getTimestep(self): 
 		  return self.timestep
+        
+	  def get_piles_state(self):
+		  state = []
+		  for i in range(6):
+			   if( not self.piles[i].is_moved()):
+				   state.append(True)
+			   else:
+				   number_of_cube = 0
+				   for c in self.color:
+						   if not self.piles[i].is_color_moved(c):
+						       number_of_color+=1
+				   if number_of_color >=4 : 
+						       state.append(True)
+				   else :
+                  state.append(False)
+      return tuple(state)
 	
 
 def edge_finder(gravitycenter, n=1):

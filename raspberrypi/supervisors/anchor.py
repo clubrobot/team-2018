@@ -2,12 +2,12 @@
 #-*- coding: utf-8 -*-
 import sys
 sys.path.append("../common/")
-
+sys.path.append("../robots/")
 import time
 import math
 
 from serialtalks import *
-from components import SerialTalksProxy
+
 
 # Instructions
 
@@ -18,10 +18,10 @@ UPDATE_COLOR_OPCODE = 0x13
 GET_POSITION_OPCODE = 0x14
 
 
-class Anchor(SerialTalksProxy):
+class Anchor(SerialTalks):
 
-	def __init__(self, parent, uuid='anchor'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+	def __init__(self, uuid='anchor'):
+		SerialTalks.__init__(self, "/dev/arduino/{}".format(uuid))
 
 	def update_beacon_number(self, number):
 		self.send(UPDATE_ANCHOR_NUMBER_OPCODE,BYTE(number))
@@ -37,10 +37,10 @@ class Anchor(SerialTalksProxy):
 		print(self.getout(timeout=1))
 
 #green : 0, orange : 1
-	def update_color(self,real_distance, color):
+	def update_color(self, color):
 		self.send(UPDATE_COLOR_OPCODE,INT(color))
 
-	def get_potision(self,real_distance):
+	def get_position(self):
 		output = self.execute(GET_POSITION_OPCODE)
 		x, y = output.read(INT, INT)
 		return x, y		

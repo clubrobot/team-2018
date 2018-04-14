@@ -11,9 +11,12 @@ sys.path.append("{}/Vision/".format(sys.path[0]))
 
 from server import Server
 from cube_detector import * 
+from anchor import *
+
     
 
 def server(args):
+
     srv = Server()
     srv.start()
 
