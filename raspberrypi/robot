@@ -46,17 +46,18 @@ def buttons():
 			s_front = Sensors(m,"sensorsAv")
 			geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
 			rm = RoadMap.load(geo)
-		
+	except:
+		pass		
 		
 		 
 	if DEV_MODE:
 		button_gesture = ButtonGestureDemo(button_card,screen,m)
 		while not button_gesture.exiting : time.sleep(0.2)
 	if MATCH_MODE:
-		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, None)
 		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
 		print("ATT")
 		side = button_gesture.run()
+		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, None)
 		m.start_match()
 		automate.run()
 	button_card.disconnect()
