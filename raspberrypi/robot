@@ -7,16 +7,21 @@ from threading import Thread
 
 sys.path.append("{}/common/".format(sys.path[0]))
 sys.path.append("{}/robots/".format(sys.path[0]))
-
+sys.path.append("{}/robots/Automate/".format(sys.path[0]))
+sys.path.append("{}/robots/Mover/".format(sys.path[0]))
 from serialtalks import SerialTalks
 from buttons import ButtonCard
-from wheeledbase import WheeledBase
 from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
-from display import SevenSegments
 from components  import Server, Manager
-#from bornibus    import Bornibus
-#from murray      import Murray
-
+from wheeledbase        import *
+from waterlauncher      import *
+from watersorter        import *
+from display            import *
+from bee                import *
+from geogebra           import *
+from roadmap            import *
+from sensors            import *
+from Bornibus import Bornibus
 DEV_MODE = False
 MATCH_MODE = True
 
@@ -28,26 +33,39 @@ def buttons():
 
 	m = Manager()
 	m.connect()
-	try:
-		button_card = ButtonCard(m)
-		screen      = SevenSegments(m)
-		wheeledbase = WheeledBase(m)
-	except:
-		print("error")
-		m.disconnect()
-		return 
+
+	button_card = ButtonCard(m)
+	screen      = SevenSegments(m)
+	wheeledbase = WheeledBase(m)
+
+	if MATCH_MODE:
+		d = WaterSorter(m)
+		l = WaterLauncher(m)
+		a = BeeActuator(m)
+		s_lat = Sensors(m,"sensorsLat")
+		s_front = Sensors(m,"sensorsAv")
+		s_back = Sensors(m,"sensorsAr")
+		geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
+		rm = RoadMap.load(geo)
+		
+		
+		 
 	if DEV_MODE:
 		button_gesture = ButtonGestureDemo(button_card,screen,m)
 		while not button_gesture.exiting : time.sleep(0.2)
 	if MATCH_MODE:
 		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
 		print("ATT")
-		button_gesture.run()
-		print("MATCH")
+		side = button_gesture.run()
+		m.start_match()
+		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
+		automate.run()
 	button_card.disconnect()
 	screen.disconnect()
 	wheeledbase.disconnect()
 	m.disconnect()
+
+
 
 
 
@@ -105,7 +123,7 @@ def server(args):
 	while True:
 		try:
 			while not srv.full():
-				srv.coargsnnect(None)
+				srv.connect(None)
 			srv.sleep_until_one_disconnected()
 
 		except KeyboardInterrupt:

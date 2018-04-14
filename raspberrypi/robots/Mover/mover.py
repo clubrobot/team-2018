@@ -349,7 +349,9 @@ class Mover:
         #self.obstacle_little.set_position(*self.balise.get_position(LITTLE_ROBOT))
 
         self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2],self.goal)
+        print(self.path)
         self.wheeledbase.purepursuit(self.path)
+        self.isarrived = False
         while not self.isarrived or  self.interupted_status.is_set():
             try:
                 self.isarrived = self.wheeledbase.isarrived()
@@ -376,6 +378,10 @@ class Mover:
                 self.interupted_lock.release()
             except TimeoutError:
                 pass
+
+        print(type(self.on_path_flag))
+        self.on_path_flag.clear()
+        self.front_flag.clear()
 
             
     def front_obstacle(self):

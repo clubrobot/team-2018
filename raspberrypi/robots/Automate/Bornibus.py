@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../Mover/")
 import time
-from setup_bornibus import *
+
 from random import randint
 from random import shuffle
 from gestionCubes import *
@@ -36,7 +36,7 @@ class Bornibus:
         self.side     = side
         self.roadmap  = roadmap
         self.geogebra = geogebra
-        self.mover    = Mover(roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back))
+        self.mover    = Mover(roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back)
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
@@ -94,7 +94,7 @@ class Bornibus:
             currentPosXY=self.wheeledbase.get_position()[:2]
             path = self.roadmap.get_shortest_path( currentPosXY ,act.actionPoint )
             print(path)
-            self.mover.goto( act.actionPoint)
+            self.mover.goto(*act.actionPoint)
             print("Make action {}".format(act.typ))
             act()
             self.wheeledbase.max_linvel.set(500)
@@ -103,13 +103,4 @@ class Bornibus:
 
 
 
-automate = Bornibus(Bornibus.GREEN, rm, geo, b, l, d, ssd, a, s_front, s_lat, s_back)
-#try:
-automate.run()
-#except:
-#    d.close_outdoor()
-#    d.open_indoor()
-#    d.disable_shaker()
-#    d.write_trash(126)
-#    l.set_motor_velocity(0)
-b.stop()
+
