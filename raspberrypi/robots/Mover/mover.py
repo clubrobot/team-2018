@@ -44,7 +44,7 @@ class Mover:
     QUICK = 3
     SAFE  = 4
     FAST  = 5
-    def __init__(self, roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back):#, balise_receiver):
+    def __init__(self, side, roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back):#, balise_receiver):
 
         #RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
@@ -65,7 +65,12 @@ class Mover:
         self.sensors_front = sensors_front
         self.sensors_lat   = sensors_lat
         self.sensors_back  = sensors_back
-        #self.balise  = balise_receiver
+        self.balise  = BaliseReceiver("192.168.12.3")
+        try : 
+            self.balise.connect()
+            self.balise.set_color(self.side)
+        except:
+            pass
 
         #Object qui tcheck la position des robots adverse 
         self.big_listener  = PositionListener(lambda : self.balise.get_position(BIG_ROBOT))
@@ -485,7 +490,7 @@ class Mover:
 
 
     def on_path_obstacle(self):
-        
+        print("OBSTACLE")
         self.obstacle_big.set_position(*self.balise.get_position(BIG_ROBOT))
         self.obstacle_little.set_position(*self.balise.get_position(LITTLE_ROBOT))
         if not self.interupted_lock.acquire():

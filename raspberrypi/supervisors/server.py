@@ -8,6 +8,7 @@ from panel import *
 from anchor import *
 PORT_BALISE = 26657
 GET_POSITION_OPCODE = 0x14
+SET_COLOR_OPCODE    = 0x15
 BIG_ROBOT = 0
 LITTLE_ROBOT = 1
 
@@ -33,6 +34,11 @@ class Server(Thread, TCPTalksServer):
 				sys.stderr.write('{}: {}\n'.format(type(e).__name__, e))
 				continue
 
+	def  setSide(self,side):
+		try:
+			self.beacon.update_color(side)
+		except:
+			pass
 
 	def getPosition(self, id):
 		print(id)

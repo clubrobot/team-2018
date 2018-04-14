@@ -36,7 +36,7 @@ class Bornibus:
         self.side     = side
         self.roadmap  = roadmap
         self.geogebra = geogebra
-        self.mover    = Mover(roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back)
+        self.mover    = Mover(side, roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back)
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
