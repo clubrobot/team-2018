@@ -42,7 +42,6 @@ def buttons():
 			a = BeeActuator(m)
 			s_lat = Sensors(m,"sensorsLat")
 			s_front = Sensors(m,"sensorsAv")
-			s_back = Sensors(m,"sensorsAr")
 			geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
 			rm = RoadMap.load(geo)
 		
@@ -54,7 +53,7 @@ def buttons():
 		button_gesture = ButtonGestureDemo(button_card,screen,m)
 		while not button_gesture.exiting : time.sleep(0.2)
 	if MATCH_MODE:
-		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, s_back)
+		automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, None)
 		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
 		print("ATT")
 		side = button_gesture.run()
