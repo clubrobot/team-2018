@@ -13,9 +13,17 @@ from serialtalks import SerialTalks
 from buttons import ButtonCard
 from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
 from components  import Server, Manager
-
+from wheeledbase import *
+from display import *
+from watersorter import *
+from sensors import *
+from geogebra import *
+from roadmap import *
+from waterlauncher import * 
+from Bornibus import *
+from bee import *  
 DEV_MODE = False
-MATCH_MODE = False
+MATCH_MODE = True
 
 arduino_list=['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'watershooter']
 
@@ -25,21 +33,19 @@ def buttons():
 
 	m = Manager()
 	m.connect()
-	try:
-		button_card = ButtonCard(m)
-		screen      = SevenSegments(m)
-		wheeledbase = WheeledBase(m)
+	button_card = ButtonCard(m)
+	screen      = SevenSegments(m)
+	wheeledbase = WheeledBase(m)
 
-		if MATCH_MODE:
-			d = WaterSorter(m)
-			l = WaterLauncher(m)
-			a = BeeActuator(m)
-			s_lat = Sensors(m,"sensorsLat")
-			s_front = Sensors(m,"sensorsAv")
-			geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
-			rm = RoadMap.load(geo)
-	except:
-		pass		
+	if MATCH_MODE:
+		d = WaterSorter(m)
+		l = WaterLauncher(m)
+		a = BeeActuator(m)
+		s_lat = Sensors(m,"sensorsLat")
+		s_front = Sensors(m,"sensorsAv")
+		geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
+		rm = RoadMap.load(geo)
+		
 		
 		 
 	if DEV_MODE:

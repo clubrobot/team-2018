@@ -50,16 +50,24 @@ class Abeille(Actionnable):
         self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
 
     def realize(self,robot, display):
-        self.beeActioner.open()
         robot.turnonthespot(math.pi)
         robot.wait()
         robot.purepursuit([self.preparation, self.interrupteur], direction="backward")
         robot.wait()
-        robot.turnonthespot(math.pi+(self.side*2-1)*math.pi/8)
+        robot.turnonthespot(math.pi+(self.side*2-1)*math.pi/4)
         robot.wait()
+        self.beeActioner.open()
+        time.sleep(0.3)
         robot.set_velocities(0, -(self.side*2-1)*9)
-        time.sleep(0.5)
-        robot.goto(*self.preparation)
+        time.sleep(0.7)
+        while not robot.isarrived():
+            try:
+                robot.goto(*self.preparation)
+            except:
+                robot.stop()
+                robot.set_velocities(-100, 0)
+                time.sleep(0.5)
+
         robot.wait()
         self.beeActioner.close()
         display.addPoints(Abeille.POINTS)

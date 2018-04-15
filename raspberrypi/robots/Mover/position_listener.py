@@ -17,7 +17,7 @@ class PositionListener(Thread):
         self.threadhold = threadhold
         self.error    = 0
         self.position = (-1000,-1000)# self.getter()
-        #self.start()
+        self.start()
 
     def run(self):
         while not self.stop.is_set():

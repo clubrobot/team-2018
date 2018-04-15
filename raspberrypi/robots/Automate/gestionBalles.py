@@ -39,7 +39,7 @@ class Dispenser(Actionnable):
         robot.purepursuit(path,direction='forward')
         robot.max_linvel.set(500)
         robot.max_angvel.set(6)
-
+        display.addPoints(Dispenser.POINTS_DISPENSER)
         #AutomateTools.myPurepursuite(robot,path)
         #AutomateTools.myTurnonthespot(robot,robot.get_position()[-1] +3.141592)
 
@@ -72,7 +72,7 @@ class Dispenser(Actionnable):
         self.watersorter.disable_shaker()
         robot.stop()
         
-        display.addPoints(Dispenser.POINTS_DISPENSER)
+        
 
     def funForWaitDisp(self,robot,path):
         if True:
@@ -108,8 +108,6 @@ class Shot(Actionnable):
         wheeledbase.turnonthespot(theta)
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
-        print("COUCOU")
-        time.sleep(0.2)
         watersorter.enable_shaker()
         watersorter.close_trash()
         watersorter.open_indoor()
@@ -117,9 +115,9 @@ class Shot(Actionnable):
         nb_balls = 0
         begin_time = time.time()
         accu = 0
-        motor_base = 72
+        motor_base = 76
         waterlauncher.set_motor_pulsewidth(1000+motor_base)
-        time.sleep(4) # Wait the motor running 
+        time.sleep(3)# Wait the motor running 
         watersorter.open_outdoor()
         new_ball = 1
         last_time = begin_time - 10
@@ -136,7 +134,7 @@ class Shot(Actionnable):
                     watersorter.close_trash()
                     open_time = time.time()
             
-            time.sleep(0.5)
+            time.sleep(0.3)
             
             watersorter.close_indoor()
             watersorter.open_outdoor()
@@ -208,7 +206,7 @@ class Shot(Actionnable):
         watersorter.write_trash_unloader(100)
         watersorter.close_outdoor()
         nb_ball = 0
-        global_timeout = 15
+        global_timeout = 14
         begin_time = time.time()
         while not (time.time() - begin_time > global_timeout) and nb_ball<8:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
@@ -221,6 +219,7 @@ class Shot(Actionnable):
                 time.sleep(0.2)
                 #print(watersorter.get_water_color())
 
+            time.sleep(0.3)
             #Verification de la sortie dans le canon
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.close_indoor()

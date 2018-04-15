@@ -7,7 +7,7 @@ sys.path.append("../../common/")
 from sync_flag_signal import Flag
 from position_listener import *
 from sensor_listener   import *
-from balise_receiver   import BIG_ROBOT,LITTLE_ROBOT
+from balise_receiver   import *
 from serialtalks       import FLOAT
 from roadmap import RoadMap
 from math import cos,sin,pi,atan2,hypot,copysign
@@ -65,16 +65,17 @@ class Mover:
         self.sensors_front = sensors_front
         self.sensors_lat   = sensors_lat
         self.sensors_back  = sensors_back
-        self.balise  = BaliseReceiver("192.168.12.3")
-        try : 
-            self.balise.connect()
-            self.balise.set_color(self.side)
-        except:
-            pass
+        self.side = side
+        #self.balise  = BaliseReceiver("192.168.12.3")
+        #try : 
+        #    self.balise.connect()
+        #    self.balise.set_color(self.side)
+        #except:
+        #    pass
 
         #Object qui tcheck la position des robots adverse 
-        self.big_listener  = PositionListener(lambda : self.balise.get_position(BIG_ROBOT))
-        self.little_listener  = PositionListener(lambda : self.balise.get_position(LITTLE_ROBOT))
+        #self.big_listener  = PositionListener(lambda : self.balise.get_position(BIG_ROBOT),0.5)
+        #self.little_listener  = PositionListener(lambda : self.balise.get_position(LITTLE_ROBOT),0.5)
         
         #Objet qui sont en relation avec les sensors
         self.sensors_front_listener = SensorListener(self.sensors_front.get_mesure)
@@ -99,9 +100,10 @@ class Mover:
 
 
     def get_enemy_status(self):
-        if( hypot(self.big_listener.position[0]-self.goal[0],self.big_listener.position[1]-self.goal[1])<ENEMY_RANGE):
-            return True
-        return ( hypot(self.little_listener.position[0]-self.goal[0],self.little_listener.position[1]-self.goal[1])<ENEMY_RANGE)
+        return False
+	#if( hypot(self.big_listener.position[0]-self.goal[0],self.big_listener.position[1]-self.goal[1])<ENEMY_RANGE):
+        #    return True
+        #return ( hypot(self.little_listener.position[0]-self.goal[0],self.little_listener.position[1]-self.goal[1])<ENEMY_RANGE)
             
     def get_wall_status(self,x,y):
         return ( x<WALL_RANGE or (2000-x)<WALL_RANGE or y<WALL_RANGE or (3000-y)<WALL_RANGE)
@@ -346,8 +348,8 @@ class Mover:
     def goto(self,x,y):
         self.goal = (x,y)
 
-        self.on_path_flag.bind(self.big_listener.signal)
-        self.on_path_flag.bind(self.little_listener.signal)
+        #self.on_path_flag.bind(self.big_listener.signal)
+        #self.on_path_flag.bind(self.little_listener.signal)
         self.front_flag.bind(self.sensors_front_listener.signal)
 
         #self.obstacle_big.set_position(*self.balise.get_position(BIG_ROBOT))
@@ -385,7 +387,7 @@ class Mover:
                 pass
 
         print(type(self.on_path_flag))
-        self.on_path_flag.clear()
+        #self.on_path_flag.clear()
         self.front_flag.clear()
 
             

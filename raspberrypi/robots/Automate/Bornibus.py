@@ -61,30 +61,35 @@ class Bornibus:
 
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
-            #self.bee.getAction()[0],
+            self.bee.getAction()[0],
+            self.panel.getAction()[0],
             self.d1.getAction()[0],
             self.shot.getAction()[0],
-            self.panel.getAction()[0],
             self.d3.getAction()[0],
             self.shot.getAction()[2],
             self.treatment.getAction()[0],
             ]
         
         self.action_list[Bornibus.ORANGE] = [
+            self.bee.getAction()[0],
+            self.panel.getAction()[0],
             self.d4.getAction()[0],
             self.shot.getAction()[0],
-            self.panel.getAction()[0],
             self.d2.getAction()[0],
             self.shot.getAction()[2],
             self.treatment.getAction()[0],
-            self.bee.getAction()[0],
             ]
             
     def run(self):
+        if self.side == Bornibus.GREEN:
+            self.wheeledbase.set_position(592, 290,0)
+        else:
+            self.wheeledbase.set_position(592,2710,0)
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)
         self.beeActioner.close()
+        self.watersorter.close_trash_unloader()
         while len(self.action_list[self.side])!=0:
             act = self.action_list[self.side].pop(0)
             currentPosXY=self.wheeledbase.get_position()[:2]

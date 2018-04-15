@@ -162,7 +162,7 @@ class Server(TCPTalksServer):
 
 	def START_MATCH(self,*args):
 		def core():
-			time.sleep(100)
+			time.sleep(98)
 			self.disconnect()
 			self.cleanup()
 		Thread(target=core).start()
