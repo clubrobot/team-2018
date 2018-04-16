@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
 
-
-sys.path.append("../Mover/")
 import time
 
-from random import randint
-from random import shuffle
-from gestionCubes import *
-from gestionBalles import *
-from gestionAffichage import *
-from gestionInterrupteur_abeille import *
-from mover import Mover
+
+from robots.cubes_manager        import CubeManagement
+from robots.balls_manager        import Dispenser, Treatment, Shot
+from robots.display_manager      import DisplayPoints
+from robots.switch_manager       import Interrupteur, Abeille
+from robots.mover                import Mover
 
 
 

@@ -1,4 +1,4 @@
-from setup_bornibus import *
+from robots.setup_bornibus import *
 
 d.close_outdoor()
 d.open_indoor()

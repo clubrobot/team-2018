@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
-sys.path.append("../common/")
 
 import os, time
 from types import MethodType
 from threading import Thread
-from tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
+from common.tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
 

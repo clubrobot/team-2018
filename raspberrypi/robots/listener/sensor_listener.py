@@ -3,7 +3,7 @@
 
 
 from threading        import Thread, Event
-from sync_flag_signal import Signal
+from common.sync_flag_signal import Signal
 from time import sleep
 from math import hypot
 

@@ -7,11 +7,11 @@ from serial.serialutil import SerialException
 import time
 import random
 import warnings
-from CRC16 import *
+from common.CRC16 import *
 from queue		import Queue, Empty
 from threading	import Thread, RLock, Event, current_thread
 
-from serialutils import Deserializer, IntegerType, FloatType, StringType
+from common.serialutils import Deserializer, IntegerType, FloatType, StringType
 
 BAUDRATE = 115200
 

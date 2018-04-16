@@ -1,27 +1,23 @@
 #!/usr/bin/env python3
+#-*- coding: utf-8 -*-
 
-import os, sys
-import time
+import sys
+
 from argparse  import ArgumentParser
-from threading import Thread
 
-sys.path.append("{}/common/".format(sys.path[0]))
-sys.path.append("{}/robots/".format(sys.path[0]))
-sys.path.append("{}/robots/Automate/".format(sys.path[0]))
-sys.path.append("{}/robots/Mover/".format(sys.path[0]))
-from serialtalks import SerialTalks
-from buttons import ButtonCard
-from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
-from components  import Server, Manager
-from wheeledbase import *
-from display import *
-from watersorter import *
-from sensors import *
-from geogebra import *
-from roadmap import *
-from waterlauncher import * 
-from Bornibus import *
-from bee import *  
+from arduino.buttons import ButtonCard
+from robots.buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
+from arduino.components  import Server, Manager
+from arduino.wheeledbase import *
+from arduino.display import *
+from arduino.watersorter import *
+from arduino.sensors import *
+from common.geogebra import *
+from common.roadmap import *
+from arduino.waterlauncher import *
+from arduino.Bornibus import Bornibus
+from arduino.bee import *
+
 DEV_MODE = False
 MATCH_MODE = True
 
@@ -43,7 +39,7 @@ def buttons():
 		a = BeeActuator(m)
 		s_lat = Sensors(m,"sensorsLat")
 		s_front = Sensors(m,"sensorsAv")
-		geo = GeoGebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
+		geo = Geogebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
 		rm = RoadMap.load(geo)
 		
 		
@@ -88,7 +84,7 @@ def showip(args):
 		ssg = SerialTalks(os.path.join('/dev/arduino', 'display'))
 		ssg.connect()
 		import subprocess
-		from serialtalks import STRING
+		from common.serialtalks import STRING
 		ip = ''
 		while not ip:
 			proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)

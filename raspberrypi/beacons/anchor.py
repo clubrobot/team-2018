@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
-sys.path.append("../common/")
-sys.path.append("../robots/")
 import time
 import math
 
-from serialtalks import *
+from common.serialtalks import *
 
 
 # Instructions

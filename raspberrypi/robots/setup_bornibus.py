@@ -1,40 +1,22 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-# Common import
-
-import time
-from math import pi
-
-# Add the robot directory to the import path
-
-import os, sys
-sys.path.append("../../common/")
-sys.path.append("..")
-from roadmap import RoadMap
-from geogebra import GeoGebra
+from common.roadmap import RoadMap
+from common.geogebra import GeoGebra
 # Check for the Rapsberry Pi address
 # It looks for a file in the current directory, whose name is
 # a valid IP address
 
-hostname = ""
-if hostname=="":
-	print ("IP adress :  ")
-	hostname=input()
-	if(len(hostname.split("."))==1):
-		hostname="192.168.1."+hostname
-	print ("Try reaching raspberry at IP "+hostname+"...")
+
 # Import robot stuff
-#from common.modulesrouter      import *
-from components         import *
-#from common.serialtalks        import *
-#from secondaryrobot.modules    import *
-from wheeledbase        import *
-from waterlauncher      import *
-from watersorter        import *
-from display            import *
-from bee                import *
-from sensors            import *
+
+from arduino.components         import *
+from arduino.wheeledbase        import *
+from arduino.waterlauncher      import *
+from arduino.watersorter        import *
+from arduino.display            import *
+from arduino.bee                import *
+from arduino.sensors            import *
 
 # Define temporary modules
 

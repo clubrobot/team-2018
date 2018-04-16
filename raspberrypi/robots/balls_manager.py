@@ -1,9 +1,11 @@
-from geogebra import GeoGebra
+#!/usr/bin/env python3
+# coding: utf-8
 
 import math
 import time
-from automateTools import AutomateTools
-from action import *
+
+from robots.automateTools import AutomateTools
+from robots.action import Action, Actionnable
 
 class Dispenser(Actionnable):
     typ="Dispenser"
@@ -19,7 +21,7 @@ class Dispenser(Actionnable):
         self.targetPoint=self.geo.get('Dispenser'+str(self.numberDispenser)+'_1')
         self.preparationPoint=self.geo.get('Dispenser'+str(self.numberDispenser)+'_0')
 
-    def realize(self,robot,watersorter, display):
+    def realize(self,robot ,watersorter ,display):
         theta = math.atan2(self.preparationPoint[1]-self.targetPoint[1],self.preparationPoint[0]-self.targetPoint[0])+3.141592
         robot.max_linvel.set(300)
         robot.max_angvel.set(1)

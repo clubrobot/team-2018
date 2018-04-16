@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from threading import Thread, RLock
-from sys import exc_info
+
 
 class Flag:
     def __init__(self, function):

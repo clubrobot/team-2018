@@ -1,6 +1,8 @@
-import sys
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+
 import time
-from threading import Thread, RLock, Event
+from threading import Thread, RLock
 
 MATCH_DURATION = 100
 class DisplayPoints:

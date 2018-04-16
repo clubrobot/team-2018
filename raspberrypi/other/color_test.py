@@ -1,6 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from setup_bornibus import *
+from robots.setup_bornibus import *
 from time           import sleep
 TIME = 20
 TIME_STEP = 0.01

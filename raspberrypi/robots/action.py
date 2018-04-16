@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# coding: utf-8
+
 class Action():
     def __init__(self,actionPoint,actionFunction,typ):
         self.actionPoint=actionPoint

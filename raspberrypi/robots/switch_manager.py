@@ -1,9 +1,11 @@
-from geogebra import GeoGebra
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
 
 import math
 import time
-from automateTools import AutomateTools
-from action import *
+
+from robots.automateTools import AutomateTools
+from robots.action import *
 
 
 

@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import sys
-sys.path.append("../../common/")
-
-from sync_flag_signal import Flag
-from position_listener import *
-from sensor_listener   import *
-from balise_receiver   import *
-from serialtalks       import FLOAT
-from roadmap import RoadMap
-from math import cos,sin,pi,atan2,hypot,copysign
+from math import cos,sin,pi,hypot,copysign
 from threading import *
 import time
+
+
+from common.sync_flag_signal import Flag
+from robots.listener.position_listener import *
+from robots.listener.sensor_listener   import *
+from beacons.balise_receiver   import *
+from common.roadmap import RoadMap
+
+
 
 DELTA = 100
 PUREPURSUIT_LOOKAHEAD_ID = 0xE0

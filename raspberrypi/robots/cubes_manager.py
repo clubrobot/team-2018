@@ -1,9 +1,5 @@
-from geogebra import GeoGebra
-
-import math
-from automateTools import AutomateTools
-from action import *
-
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
 
 class CubeManagement():
     def __init__(self, rm, geo):

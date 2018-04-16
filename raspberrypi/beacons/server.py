@@ -1,11 +1,15 @@
-import sys
-sys.path.append("../common/")
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
 
-from tcptalks import TCPTalksServer
 from threading import Thread, Event
 from time import sleep
-from panel import *
-from anchor import *
+import sys
+
+from common.tcptalks import TCPTalksServer
+from beacons.panel import *
+from beacons.anchor import *
+
+
 PORT_BALISE = 26657
 GET_POSITION_OPCODE = 0x14
 SET_COLOR_OPCODE    = 0x15

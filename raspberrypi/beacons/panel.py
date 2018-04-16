@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
-sys.path.append("../common/")
 
-from tcptalks import TCPTalks, TCPListener, AlreadyConnectedError
+from common.tcptalks import TCPTalks, TCPListener, AlreadyConnectedError
 from threading import Thread, Event
 from time import sleep
 PING_OPCODE = 0x10

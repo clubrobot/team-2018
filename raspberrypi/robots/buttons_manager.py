@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-from buttons import LED_ON_OPCODE, LED_OFF_OPCODE, ButtonCard
-from components import MAKE_COMPONENT_EXECUTE_OPCODE
+
 from time    import sleep, time
 from threading import Thread, RLock, Event
 import subprocess
 import os
 import sys
+
+
+from arduino.components import MAKE_COMPONENT_EXECUTE_OPCODE
+
 _RED    = 1
 _GREEN  = 0
 _BLUE   = 2
