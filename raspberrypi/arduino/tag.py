@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
-sys.path.append("../common/")
 
 import time
 import math
 
-from serialtalks import *
-from components import SerialTalksProxy
+from common.serialtalks import INT
+from common.components import SerialTalksProxy
 
 # Instructions
 

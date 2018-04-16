@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
-import sys
-sys.path.append("../common/")
 
 import time
 import math
 
-from serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
-from components import SerialTalksProxy
+from common.serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
+from common.components import SerialTalksProxy
 
 
 _SET_MOTOR_VELOCITY_OPCODE		= 0x17

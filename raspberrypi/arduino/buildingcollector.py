@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-import sys
-sys.path.append("../common/")
-
 import time
 import math
 
-from serialtalks import BYTE, INT, LONG, FLOAT
-from components import SerialTalksProxy
+from common.serialtalks import BYTE, INT, LONG, FLOAT
+from common.components import SerialTalksProxy
 
 _GRAB_LEFT_SIDE_OPCODE   = 0x10
 _GRAB_RIGHT_SIDE_OPCODE   = 0x20
