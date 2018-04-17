@@ -58,9 +58,9 @@ class Bornibus:
         beeAct = self.bee.getAction()[0]
         panelAct = self.panel.getAction()[0]
         d1Act = self.d1.getAction()[0]
-        d2Act = self.d3.getAction()[0]
+        d2Act = self.d2.getAction()[0]
         d3Act = self.d3.getAction()[0]
-        d4Act = self.d3.getAction()[0]
+        d4Act = self.d4.getAction()[0]
         shortShot = self.shot.getAction()[0]
         longShot = self.shot.getAction()[2]
         treatmentAct = self.treatment.getAction()[0]
@@ -108,15 +108,13 @@ class Bornibus:
         self.beeActioner.close()
         self.watersorter.close_trash_unloader()
         while len(self.action_list[self.side])!=0:
-            act = self.action_list[self.side].pop(0)
-            currentPosXY=self.wheeledbase.get_position()[:2]
-            path = self.roadmap.get_shortest_path( currentPosXY ,act.actionPoint )
-            print(path)
-            self.mover.goto(*act.actionPoint)
-            print("Make action {}".format(act.typ))
-            act()
-            act.done = True
-            act
+            h = Heuristics(self.action_list[self.side])
+            act = h.getBest()
+            while act is not None:
+                print("Make action {}".format(act.name))
+                # act()
+                act.done = True
+                act = h.getBest()
             self.wheeledbase.max_linvel.set(500)
             self.wheeledbase.max_angvel.set(6)
 
