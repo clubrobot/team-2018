@@ -1,49 +1,45 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-from time    import sleep, time
+from time import sleep, time
 from threading import Thread, RLock, Event
 import subprocess
 import os
 import sys
 
-
 from common.components import MAKE_COMPONENT_EXECUTE_OPCODE
 
-_RED    = 1
-_GREEN  = 0
-_BLUE   = 2
+_RED = 1
+_GREEN = 0
+_BLUE = 2
 _ORANGE = 3
 
 
-
 class ButtonGestureMatch():
-    WAITING_TEAM     = 0
+    WAITING_TEAM = 0
     WAITING_ODOMETRY = 1
-    WAITING_MATCH    = 2
+    WAITING_MATCH = 2
 
-
-    def __init__(self,buttons, display, wheelebase, server):
+    def __init__(self, buttons, display, wheelebase, server):
         self.buttons = buttons
         self.display = display
-        self.server  = server
+        self.server = server
         self.wheeledbase = wheelebase
-        #TODO make network verification 
+        # TODO make network verification
         self.display.set_message("Select")
         self.status = ButtonGestureMatch.WAITING_TEAM
-        self.buttons.affect(_RED,self.button_red)
+        self.buttons.affect(_RED, self.button_red)
         self.buttons.affect(_GREEN, self.button_green)
         self.buttons.affect(_BLUE, self.button_blue)
         self.buttons.affect(_ORANGE, self.button_orange)
-        self.buttons.bind(3,self.tirret)
-        self.buttons.setLedOn(_GREEN)
-        self.buttons.setLedOn(_ORANGE)
+        self.buttons.bind(3, self.tirret)
+        self.buttons.on(_GREEN)
+        self.buttons.on(_ORANGE)
         self.side = None
         self.lock_stat = RLock()
         self.last_tirret_update = 0
         self.tirret_status = Event()
-        self.tirret_lock   = RLock()
-
+        self.tirret_lock = RLock()
 
     def run(self):
         while not self.tirret_status.is_set() or self.status != ButtonGestureMatch.WAITING_MATCH:
@@ -55,100 +51,89 @@ class ButtonGestureMatch():
 
     def _red(self):
         self.lock_stat.acquire()
-        if(self.status == ButtonGestureMatch.WAITING_ODOMETRY):
+        if (self.status == ButtonGestureMatch.WAITING_ODOMETRY):
             self.side = None
-            self.status =  ButtonGestureMatch.WAITING_TEAM 
-            self.buttons.setLedOn(_GREEN)
-            self.buttons.setLedOn(_ORANGE)
-            self.buttons.setLedOff(_RED)
-            self.buttons.setLedOff(_BLUE)
+            self.status = ButtonGestureMatch.WAITING_TEAM
+            self.buttons.on(_GREEN)
+            self.buttons.on(_ORANGE)
+            self.buttons.off(_RED)
+            self.buttons.off(_BLUE)
             self.display.set_message("Select")
-        if(self.status == ButtonGestureMatch.WAITING_MATCH):
-            self.status =  ButtonGestureMatch.WAITING_ODOMETRY 
+        if (self.status == ButtonGestureMatch.WAITING_MATCH):
+            self.status = ButtonGestureMatch.WAITING_ODOMETRY
             self.display.set_message("ODOMETRIE")
 
         self.lock_stat.release()
 
-        
     def button_blue(self):
         Thread(target=self._blue).start()
-    
+
     def _blue(self):
         if not self.lock_stat.acquire(blocking=False): return
-
-
-        if(self.status == ButtonGestureMatch.WAITING_ODOMETRY):
+        if self.status == ButtonGestureMatch.WAITING_ODOMETRY:
             if self.side == 0:
-                self.wheeledbase.set_position(592, 290,0)
+                self.wheeledbase.set_position(592, 290, 0)
             else:
-                self.wheeledbase.set_position(592,2710,0)
-        
+                self.wheeledbase.set_position(592, 2710, 0)
 
             if self.tirret_status.is_set():
                 for k in range(3):
                     for i in range(3):
-                        self.buttons.setLedOn(i)
+                        self.buttons.on(i)
                     sleep(0.2)
                     for i in range(3):
-                        self.buttons.setLedOff(i)
+                        self.buttons.off(i)
                     sleep(0.2)
             else:
                 for i in range(3):
-                    self.buttons.setLedOn(i)
+                    self.buttons.on(i)
                 self.status = ButtonGestureMatch.WAITING_MATCH
                 self.display.set_message("WAIT")
 
-
-
-
-        if(self.status == ButtonGestureMatch.WAITING_TEAM and not self.side is None ):
-            self.status  = ButtonGestureMatch.WAITING_ODOMETRY
-            self.buttons.setLedOn(_BLUE)
-            self.buttons.setLedOff(_GREEN)
-            self.buttons.setLedOff(_ORANGE)
-            self.buttons.setLedOff(_RED)
-            if(self.side ==0):
-                self.buttons.setLedOn(_GREEN)
-            if(self.side ==1):
-                self.buttons.setLedOn(_ORANGE)
+        if (self.status == ButtonGestureMatch.WAITING_TEAM and not self.side is None):
+            self.status = ButtonGestureMatch.WAITING_ODOMETRY
+            self.buttons.off(_BLUE)
+            self.buttons.off(_GREEN)
+            self.buttons.off(_ORANGE)
+            self.buttons.off(_RED)
+            if self.side == 0:
+                self.buttons.on(_GREEN)
+            if self.side == 1:
+                self.buttons.on(_ORANGE)
             self.display.set_message("ODOMETRIE")
             sleep(0.5)
 
-
         self.lock_stat.release()
-
 
     def button_green(self):
         Thread(target=self._green).start()
 
-
-
     def _green(self):
         self.lock_stat.acquire()
-        if(self.status == ButtonGestureMatch.WAITING_TEAM):
+        if self.status == ButtonGestureMatch.WAITING_TEAM:
             self.display.set_message("GREEN")
-            self.buttons.setLedOff(_ORANGE)
-            self.buttons.setLedOn(_GREEN)
+            self.buttons.off(_ORANGE)
+            self.buttons.on(_GREEN)
             self.side = 0
         self.lock_stat.release()
-    
+
     def button_orange(self):
         Thread(target=self._orange).start()
-    
+
     def _orange(self):
         self.lock_stat.acquire()
-        if(self.status == ButtonGestureMatch.WAITING_TEAM):
+        if self.status == ButtonGestureMatch.WAITING_TEAM:
             self.display.set_message("ORANGE")
-            self.buttons.setLedOn(_ORANGE)
-            self.buttons.setLedOff(_GREEN)
+            self.buttons.on(_ORANGE)
+            self.buttons.off(_GREEN)
             self.side = 1
         self.lock_stat.release()
 
-    def tirret(self,*args):
+    def tirret(self, *args):
         Thread(target=self._tirret).start()
 
     def _tirret(self):
-        
+
         self.tirret_lock.acquire()
         self.tirret_status.set()
         times = time()
@@ -157,8 +142,6 @@ class ButtonGestureMatch():
         sleep(0.8)
         if times == self.last_tirret_update:
             self.tirret_status.clear()
-
-
 
 
 class ButtonGestureDemo():
@@ -170,29 +153,30 @@ class ButtonGestureDemo():
         self.item_selected = 0
         self.display = display
         self.exiting = False
-        self.menus_dict = {"Menu": ["Make", "IP", "Git pull","Reboot", "Shutdown", "Exit"],
+        self.menus_dict = {"Menu": ["Make", "IP", "Git pull", "Reboot", "Shutdown", "Exit"],
                            "Make": ["WheeledBase", "WaterShooter", "Display", "Sensors"]}
-        self.prog_dict  = {"IP" : self.ip_funct,
-                           "Reboot": self.reboot_funct,
-                           "Shutdown": self.shutdown_funct,
-                           "Git pull": self.pull_funct,
-                           "Exit": self.exit_funct,
-                           "WheeledBase": lambda : self.make_funct("WheeledBase"),
-                           "WaterShooter": lambda : self.make_funct("WaterShooter"),
-                           "Display":     lambda : self.make_funct("Display"),
-                           "Sensors":     lambda : self.make_funct("Sensors")
-                           }
+        self.prog_dict = {"IP": self.ip_funct,
+                          "Reboot": self.reboot_funct,
+                          "Shutdown": self.shutdown_funct,
+                          "Git pull": self.pull_funct,
+                          "Exit": self.exit_funct,
+                          "WheeledBase": lambda: self.make_funct("WheeledBase"),
+                          "WaterShooter": lambda: self.make_funct("WaterShooter"),
+                          "Display": lambda: self.make_funct("Display"),
+                          "Sensors": lambda: self.make_funct("Sensors")
+                          }
         for i in range(5):
-            self.buttons.setLedOn(i)
+            self.buttons.on(i)
             sleep(0.1)
         for i in reversed(range(5)):
-            self.buttons.setLedOff(i)
+            self.buttons.off(i)
             sleep(0.1)
 
-        self.buttons.affect(1,self.button_back)
+        self.buttons.affect(1, self.button_back)
         self.buttons.affect(0, self.button_valid)
         self.buttons.affect(2, self.button_select)
         self.display.set_message("Menu")
+
     def ip_funct(self):
         ip = ''
         while not ip:
@@ -204,16 +188,15 @@ class ButtonGestureDemo():
         self.display.set_message("Lets restart")
         os.system("reboot")
 
-
     def shutdown_funct(self):
         self.display.set_message("Good bye !")
         os.system('shutdown now')
 
-    def make_funct(self,arduino):
+    def make_funct(self, arduino):
         arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../../arduino/' + arduino.lower()
         self.display.set_message("updating...")
         try:
-            self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect",list(),dict())
+            self.server.execute(MAKE_COMPONENT_EXECUTE_OPCODE, arduino.lower(), "disconnect", list(), dict())
         except KeyError:
             pass
         subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
@@ -246,7 +229,6 @@ class ButtonGestureDemo():
         str_to_show = self.menus_dict[self.menu_selected][self.item_selected]
         self.display.set_message(str_to_show)
 
-
     def _back(self):
         for menu, menu_item in self.menus_dict.items():
             if self.menu_selected in menu_item:
@@ -254,7 +236,7 @@ class ButtonGestureDemo():
                 self.item_selected = 0
 
     def _valid(self):
-        if time()-self.last_call<0.3 : return
+        if time() - self.last_call < 0.3: return
         self.last_call = time()
         if self.menus_dict[self.menu_selected][self.item_selected] in self.menus_dict:
             self.menu_selected = self.menus_dict[self.menu_selected][self.item_selected]
@@ -262,10 +244,9 @@ class ButtonGestureDemo():
             self._show()
         else:
             self.prog_dict[self.menus_dict[self.menu_selected][self.item_selected]]()
-        
-    
+
     def _select(self):
-        self.item_selected+=1
-        if self.item_selected>= len(self.menus_dict[self.menu_selected]):
-            self.item_selected=0
+        self.item_selected += 1
+        if self.item_selected >= len(self.menus_dict[self.menu_selected]):
+            self.item_selected = 0
         self._show()
