@@ -38,7 +38,7 @@ def buttons():
         a = BeeActuator(m)
         s_lat = Sensors(m, "sensorsLat")
         s_front = Sensors(m, "sensorsAv")
-        geo = Geogebra('{}/robots/Automate/bornibus.ggb'.format(sys.path[0]))
+        geo = Geogebra('{}/robots/bornibus.ggb'.format(sys.path[0]))
         rm = RoadMap.load(geo)
 
     if DEV_MODE:
