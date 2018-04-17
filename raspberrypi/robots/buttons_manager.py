@@ -8,7 +8,7 @@ import os
 import sys
 
 
-from arduino.components import MAKE_COMPONENT_EXECUTE_OPCODE
+from common.components import MAKE_COMPONENT_EXECUTE_OPCODE
 
 _RED    = 1
 _GREEN  = 0
