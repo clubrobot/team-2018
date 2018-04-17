@@ -37,7 +37,10 @@ class Interrupteur(Actionnable):
 
         #override Actionnable
     def getAction(self):
-            return [Action(self.preparation,lambda : self.realize(self.wheeledbase, self.display),Interrupteur.typ) ]
+            return [Action( self.preparation,
+                            lambda : self.realize(self.wheeledbase, self.display),
+                            Interrupteur.typ,
+                            "INTERRUPTEUR")  ]
 
 class Abeille(Actionnable):
     typ="Abeille"
@@ -76,7 +79,10 @@ class Abeille(Actionnable):
 
         #override Actionnable
     def getAction(self):
-            return [Action(self.preparation,lambda : self.realize(self.wheeledbase, self.display),Interrupteur.typ) ]
+            return [Action( self.preparation,
+                            lambda : self.realize(self.wheeledbase, self.display),
+                            Interrupteur.typ,
+                            "ABEILLE")]
 
 class Odometrie(Actionnable):
     typ="Odometrie"
@@ -96,4 +102,7 @@ class Odometrie(Actionnable):
 
         #override Actionnable
     def getAction(self,robot,builerCollector,waterDispenser):
-            return [Action(self.preparation,lambda : self.realize(robot),Odometrie.typ) ]
+            return [Action(self.preparation,
+                    lambda : self.realize(robot),
+                    Odometrie.typ, 
+                    "ODOMETRIE") ]
