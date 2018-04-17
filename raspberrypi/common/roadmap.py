@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import igraph
-from geogebra import GeoGebra
+from geogebra import Geogebra
 from threading import Thread, Event
 from time import sleep, time
 import math
@@ -200,7 +200,7 @@ class RoadMap:
     def load(geogebra, pattern='roadmap_{\s*\d+\s*,\s*\d+\s*}'):
         # `geogebra` may be a GeoGebra file or a .ggb filename
         if isinstance(geogebra, str):
-            geogebra = GeoGebra(geogebra)
+            geogebra = Geogebra(geogebra)
             geogebra.close()
 
         # Parse the geogebra file to get a list of segments which match the `pattern` regular expression
