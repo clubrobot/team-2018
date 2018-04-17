@@ -1,9 +1,12 @@
+import sys
+sys.path.append("..")
 from geogebra import GeoGebra
 
 import math
 import time
 from automateTools import AutomateTools
 from action import *
+
 
 class Dispenser(Actionnable):
     typ="Dispenser"
@@ -81,7 +84,10 @@ class Dispenser(Actionnable):
             return AutomateTools.stopThisAction
         
     def getAction(self):
-        return [Action(self.preparationPoint,lambda : self.realize(self.wheeledbase,self.watersorter, self.display),Dispenser.typ)]
+        return [Action( self.preparationPoint,
+                        lambda : self.realize(self.wheeledbase,self.watersorter, self.display),
+                        Dispenser.typ, 
+                        "DISPENSER"+str(self.numberDispenser))]
 
 
 class Shot(Actionnable):
@@ -102,7 +108,7 @@ class Shot(Actionnable):
         self.castlePoint=self.geo.get('Castle'+str(self.side))
         
         
-    def realize_without_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=20):
+    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=20):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         wheeledbase.turnonthespot(theta)
@@ -258,17 +264,20 @@ class Shot(Actionnable):
         act_without_sort =Action(
                 self.shootCastlePoint,
                 lambda  :self.realize_without_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
-                Shot.typ
+                Shot.typ,
+                "SHORTSHOOTNOSORT"
                 )
         act_with_sort =Action(
                 self.shootCastlePoint, #self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
-                Shot.typ
+                Shot.typ,
+                "SHORTSHOOTSORT"
                 )
         act_with_sort_long =Action(
                 self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
-                Shot.typ
+                Shot.typ,
+                "LONGSHOOTSORT"
                 )   
         return [act_without_sort,act_with_sort,act_with_sort_long]
 
@@ -332,7 +341,8 @@ class Treatment(Actionnable):
         act =Action(
                 self.treatmentPoint,
                 lambda  :self.realize(self.shootTreatmentPoint,self.wheeledbase ,self.watersorter) ,
-                Treatment.typ
+                Treatment.typ,
+                "TREATMENT"
             )
         return [act]
 

@@ -15,7 +15,6 @@ from gestionInterrupteur_abeille import *
 from mover import Mover
 
 
-
 # Setup and launch the user interface
 class Bornibus:
 
@@ -59,25 +58,47 @@ class Bornibus:
         self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher, self.displayManager,self.mover)
 
 
+        #Generate predecessors list
+        beeAct = self.bee.getAction()[0]
+        panelAct = self.panel.getAction()[0]
+        d1Act = self.d1.getAction()[0]
+        d2Act = self.d3.getAction()[0]
+        d3Act = self.d3.getAction()[0]
+        d4Act = self.d3.getAction()[0]
+        shortShot = self.shot.getAction()[0]
+        longShot = self.shot.getAction()[2]
+        treatmentAct = self.treatment.getAction()[0]
+
+        if(self.side == Bornibus.GREEN):
+            shortShot.set_predecessors([d1Act])   
+            longShot.set_predecessors([d3Act])
+
+        if(self.side == Bornibus.ORANGE):
+            shortShot.set_predecessors([d4Act])
+            longShot.set_predecessors([d2Act])
+        
+        treatmentAct.set_predecessors([longShot])
+        
+        
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
-            self.bee.getAction()[0],
-            self.panel.getAction()[0],
-            self.d1.getAction()[0],
-            self.shot.getAction()[0],
-            self.d3.getAction()[0],
-            self.shot.getAction()[2],
-            self.treatment.getAction()[0],
+            beeAct,
+            panelAct,
+            d1Act,
+            shortShot,
+            d3Act,
+            longShot,
+            treatmentAct,
             ]
         
         self.action_list[Bornibus.ORANGE] = [
-            self.bee.getAction()[0],
-            self.panel.getAction()[0],
-            self.d4.getAction()[0],
-            self.shot.getAction()[0],
-            self.d2.getAction()[0],
-            self.shot.getAction()[2],
-            self.treatment.getAction()[0],
+            beeAct,
+            panelAct,
+            d4Act,
+            shortShot,
+            d2Act,
+            longShot,
+            treatmentAct,
             ]
             
     def run(self):
@@ -98,6 +119,8 @@ class Bornibus:
             self.mover.goto(*act.actionPoint)
             print("Make action {}".format(act.typ))
             act()
+            act.done = True
+            act
             self.wheeledbase.max_linvel.set(500)
             self.wheeledbase.max_angvel.set(6)
 
