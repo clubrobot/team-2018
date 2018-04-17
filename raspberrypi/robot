@@ -1,199 +1,205 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-import os, sys
-import time
-from argparse  import ArgumentParser
-from threading import Thread
+from argparse import ArgumentParser
 
-sys.path.append("{}/common/".format(sys.path[0]))
-sys.path.append("{}/robots/".format(sys.path[0]))
-
-from serialtalks import SerialTalks
-from buttons import ButtonCard
-from wheeledbase import WheeledBase
-from buttons_gesture import ButtonGestureDemo, ButtonGestureMatch
-from display import SevenSegments
-from components  import Server, Manager
-#from bornibus    import Bornibus
-#from murray      import Murray
+from arduino.buttons import ButtonCard
+from robots.buttons_manager import ButtonGestureDemo, ButtonGestureMatch
+from common.components import Server, Manager
+from arduino.wheeledbase import *
+from arduino.display import *
+from arduino.watersorter import *
+from arduino.sensors import *
+from common.geogebra import *
+from common.roadmap import *
+from common.serialtalks import *
+from arduino.waterlauncher import *
+from robots.Bornibus import Bornibus
+from arduino.bee import *
 
 DEV_MODE = False
 MATCH_MODE = True
 
-arduino_list=['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'watershooter']
+arduino_list = ['sensors', 'wheeledbase', 'power', 'display', 'modulescollector', 'mineralscollector', 'watershooter']
 
 
 def buttons():
-	if not DEV_MODE and not MATCH_MODE: return
+    if not DEV_MODE and not MATCH_MODE: return
 
-	m = Manager()
-	m.connect()
-	try:
-		button_card = ButtonCard(m)
-		screen      = SevenSegments(m)
-		wheeledbase = WheeledBase(m)
-	except:
-		print("error")
-		m.disconnect()
-		return 
-	if DEV_MODE:
-		button_gesture = ButtonGestureDemo(button_card,screen,m)
-		while not button_gesture.exiting : time.sleep(0.2)
-	if MATCH_MODE:
-		button_gesture = ButtonGestureMatch(button_card,screen,wheeledbase,m)
-		print("ATT")
-		button_gesture.run()
-		print("MATCH")
-	button_card.disconnect()
-	screen.disconnect()
-	wheeledbase.disconnect()
-	m.disconnect()
+    m = Manager()
+    m.connect()
+    button_card = ButtonCard(m)
+    screen = SevenSegments(m)
+    wheeledbase = WheeledBase(m)
 
+    if MATCH_MODE:
+        d = WaterSorter(m)
+        l = WaterLauncher(m)
+        a = BeeActuator(m)
+        s_lat = Sensors(m, "sensorsLat")
+        s_front = Sensors(m, "sensorsAv")
+        geo = Geogebra('{}/robots/bornibus.ggb'.format(sys.path[0]))
+        rm = RoadMap.load(geo)
+
+    if DEV_MODE:
+        button_gesture = ButtonGestureDemo(button_card, screen, m)
+        while not button_gesture.exiting: time.sleep(0.2)
+    if MATCH_MODE:
+        button_gesture = ButtonGestureMatch(button_card, screen, wheeledbase, m)
+        print("ATT")
+        side = button_gesture.run()
+        automate = Bornibus(side, rm, geo, wheeledbase, l, d, screen, a, s_front, s_lat, None)
+        m.start_match()
+        automate.run()
+    button_card.disconnect()
+    screen.disconnect()
+    wheeledbase.disconnect()
+    m.disconnect()
 
 
 def getuuid(args):
-	talks = SerialTalks(args.port)
-	try:
-		talks.connect(args.timeout)
-		uuid = talks.getuuid(args.timeout)
-		if isinstance(uuid, str):
-			print(uuid)
-		else:
-			raise ValueError('\'{}\' object is not a valid UUID'.format(type(uuid)))
-	except KeyboardInterrupt:
-		pass
-	finally:
-		talks.disconnect()
+    talks = SerialTalks(args.port)
+    try:
+        talks.connect(args.timeout)
+        uuid = talks.getuuid(args.timeout)
+        if isinstance(uuid, str):
+            print(uuid)
+        else:
+            raise ValueError('\'{}\' object is not a valid UUID'.format(type(uuid)))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        talks.disconnect()
 
 
 def showip(args):
+    try:
+        ssg = SerialTalks(os.path.join('/dev/arduino', 'display'))
+        ssg.connect()
+        import subprocess
+        ip = ''
+        while not ip:
+            proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
+            ip = proc.stdout.strip().decode('utf8')
+        ssg.send(0x0E, STRING(ip))
 
-	try: 
-		ssg = SerialTalks(os.path.join('/dev/arduino', 'display'))
-		ssg.connect()
-		import subprocess
-		from serialtalks import STRING
-		ip = ''
-		while not ip:
-			proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
-			ip = proc.stdout.strip().decode('utf8')
-		ssg.send(0x0E, STRING(ip))
-
-		ssg.disconnect()
-	except:
-		pass
-		
+        ssg.disconnect()
+    except:
+        pass
 
 
 def getlogs(args):
-	talks = SerialTalks(args.port)
-	try:
-		talks.connect(args.timeout)
-		while True:
-			sys.stdout.write(talks.getout())
-			sys.stderr.write(talks.geterr())
-	except KeyboardInterrupt:
-		pass
-	finally:
-		talks.disconnect()
+    talks = SerialTalks(args.port)
+    try:
+        talks.connect(args.timeout)
+        while True:
+            sys.stdout.write(talks.getout())
+            sys.stderr.write(talks.geterr())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        talks.disconnect()
 
 
 def server(args):
-	srv = Server(password=args.password,size=args.size)
-	if DEV_MODE or MATCH_MODE : Thread(target=buttons,daemon=True).start()
-	
-	while True:
-		try:
-			while not srv.full():
-				srv.connect(None)
-			srv.sleep_until_one_disconnected()
+    srv = Server(password=args.password, size=args.size)
+    if DEV_MODE or MATCH_MODE: Thread(target=buttons, daemon=True).start()
 
-		except KeyboardInterrupt:
-			srv.disconnect()
-			break
-		except Exception as e:
-			sys.stderr.write('{}: {}\n'.format(type(e).__name__, e))
-			continue
+    while True:
+        try:
+            while not srv.full():
+                srv.connect(None)
+            srv.sleep_until_one_disconnected()
+
+        except KeyboardInterrupt:
+            srv.disconnect()
+            break
+        except Exception as e:
+            sys.stderr.write('{}: {}\n'.format(type(e).__name__, e))
+            continue
 
 
 def start(args):
-	global robot
-	if args.name == 'bornibus':
-		robot = Bornibus(args.ip, timelimit=args.timelimit)
-		robot.log('hi there, this is Bornibus!')
-	elif args.name == 'murray':
-		robot = Murray(args.ip, timelimit=args.timelimit)
-		robot.log('hello everyone, I am Murray!')
-	
-	# Connect to the components server
-	robot.log('connect to server')
-	robot.connect(timeout=args.timeout)
-	robot.log('connected')
-	
-	# Load the roadmap
-	if args.roadmap is not None:
-		robot.log('load roadmap: {}'.format(args.roadmap))
-		robot.load_roadmap(args.roadmap)
-		robot.log('loaded')
+    global robot
+    if args.name == 'bornibus':
+        robot = Bornibus(args.ip, timelimit=args.timelimit)
+        robot.log('hi there, this is Bornibus!')
+    elif args.name == 'murray':
+        robot = Murray(args.ip, timelimit=args.timelimit)
+        robot.log('hello everyone, I am Murray!')
 
-	# Bluetooth connection
-	robot.connect_to_brother(macaddress=args.bluetooth)
+    # Connect to the components server
+    robot.log('connect to server')
+    robot.connect(timeout=args.timeout)
+    robot.log('connected')
 
-	# Initialization procedure
-	robot.log("let's get ready to rumble")
-	starter = Starter(robot.geogebra, robot.wheeledbase, robot.greenbutton, robot.redbutton, robot.bluebutton, robot.yellowbutton, robot.pullswitch)
-	starter.join()
-	if (starter.state=="Exiting"):
-		robot.log('thank you!')
-		sys.exit(0)
-	
-	# Start match
-	if starter.team == "Yellow":
-		robot.side = 0
-	elif starter.team == "Blue":
-		robot.side = 1
-	robot.start()
+    # Load the roadmap
+    if args.roadmap is not None:
+        robot.log('load roadmap: {}'.format(args.roadmap))
+        robot.load_roadmap(args.roadmap)
+        robot.log('loaded')
+
+    # Bluetooth connection
+    robot.connect_to_brother(macaddress=args.bluetooth)
+
+    # Initialization procedure
+    robot.log("let's get ready to rumble")
+    starter = Starter(robot.geogebra, robot.wheeledbase, robot.greenbutton, robot.redbutton, robot.bluebutton,
+                      robot.yellowbutton, robot.pullswitch)
+    starter.join()
+    if (starter.state == "Exiting"):
+        robot.log('thank you!')
+        sys.exit(0)
+
+    # Start match
+    if starter.team == "Yellow":
+        robot.side = 0
+    elif starter.team == "Blue":
+        robot.side = 1
+    robot.start()
+
 
 # Update arduino programs
 def update(args):
-	import subprocess
+    import subprocess
 
-	# List all the arduino which should be updated
-	if args.arduino != "all":
-		arduinos_to_verify=[args.arduino]
-	else:
-		arduinos_to_verify=arduino_list
+    # List all the arduino which should be updated
+    if args.arduino != "all":
+        arduinos_to_verify = [args.arduino]
+    else:
+        arduinos_to_verify = arduino_list
 
-	arduinos_to_update = []
-	
-	# Verify if the code of the arduino changed since last update (can be forced)
-	if not args.force:
-		for arduino in arduinos_to_verify:
-			arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
-			gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '--exit-code', arduino_path])
-			if gitdiff.returncode == 0:
-				print(arduino + " up to date")
-			else:
-				arduinos_to_update += [arduino]
+    arduinos_to_update = []
 
-	else:
-		arduinos_to_update = arduinos_to_verify
+    # Verify if the code of the arduino changed since last update (can be forced)
+    if not args.force:
+        for arduino in arduinos_to_verify:
+            arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
+            gitdiff = subprocess.run(['/usr/bin/git', 'diff', '--quiet', '--exit-code', arduino_path])
+            if gitdiff.returncode == 0:
+                print(arduino + " up to date")
+            else:
+                arduinos_to_update += [arduino]
 
-	# Git pull
-	subprocess.run(['/usr/bin/git', 'pull', '-f'], stdout=subprocess.PIPE)
+    else:
+        arduinos_to_update = arduinos_to_verify
 
-	# Execute make upload for the selected arduinos 
-	for arduino in arduinos_to_update:
-		arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
-		print("updating " + arduino)
-		subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
+    # Git pull
+    subprocess.run(['/usr/bin/git', 'pull', '-f'], stdout=subprocess.PIPE)
+
+    # Execute make upload for the selected arduinos
+    for arduino in arduinos_to_update:
+        arduino_path = os.path.dirname(os.path.realpath(__file__)) + '/../arduino/' + arduino
+        print("updating " + arduino)
+        subprocess.run(['/usr/bin/make', 'upload_safe', '-C', arduino_path])
+
 
 parser = ArgumentParser()
 subparsers = parser.add_subparsers()
 
 getuuid_parser = subparsers.add_parser('getuuid')
 getuuid_parser.add_argument('port', type=str)
-getuuid_parser.add_argument('-t', '--timeout', type=float, default=5)
+getuuid_parser.add_argument('-t', '--timeout', type=float, default=10)
 getuuid_parser.set_defaults(func=getuuid)
 
 getlogs_parser = subparsers.add_parser('getlogs')
@@ -203,12 +209,11 @@ getlogs_parser.set_defaults(func=getlogs)
 
 server_parser = subparsers.add_parser('server')
 server_parser.add_argument('-p', '--password', type=str, default=None)
-server_parser.add_argument('-s', '--size'    , type=int, default=4   )
+server_parser.add_argument('-s', '--size', type=int, default=4)
 server_parser.set_defaults(func=server)
 
 showip_parser = subparsers.add_parser('showip')
 showip_parser.set_defaults(func=showip)
-
 
 start_parser = subparsers.add_parser('start')
 start_parser.add_argument('name', type=str, choices=('bornibus', 'murray'))
@@ -224,8 +229,5 @@ update_parser.add_argument('arduino', type=str, default='all', choices=arduino_l
 update_parser.add_argument('-f', '--force', action="store_true", required=False, default=False)
 update_parser.set_defaults(func=update)
 
-
-
 args = parser.parse_args()
 args.func(args)
-

@@ -13,27 +13,39 @@ from cam2OpenCV import *
 from cubes import *
 from gpiodevices import *
 
-side = 0
+side ='not'
 
  
 
-def calibrate(vision, side):
-	  vision.calibration()
-	  vision.enable()
-	  vision.enable_debug()
+def calibrate(vision):
+
+	  if vision.calibration(side):
+	      vision.enable()
+	      vision.enable_debug()
  
 def set_side(s):
+	  global side
+	  print(s)
 	  side = s
+     
+def record(camera):
+    if camera.record :
+        print(" Rec Off")
+        camera.record == False
+    elif not camera.record : 
+        print(" Rec On")
+        camera.record == True
+    
   
 
 c = camth()
 v = vision(c)
 time.sleep(1)
-v.refresh_image()
 
-cal_button = Switch(3, calibrate, v, side)
-left_button = Switch(5, set_side, LEFT)
-right_button = Switch(7, set_side, RIGHT)
+cal_button = Switch(3, calibrate, v)
+left_button = Switch(5, set_side, 'orange')
+right_button = Switch(7, set_side, 'green')
+rec_button = Switch(11, record, c)
 
 
 
@@ -44,3 +56,4 @@ v.quit()
 cal_button.close()
 left_button.close()
 right_button.close()
+out.release()
