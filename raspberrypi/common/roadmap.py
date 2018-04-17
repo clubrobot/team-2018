@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import igraph
-from geogebra import Geogebra
+from common.geogebra import Geogebra
 from threading import Thread, Event
 from time import sleep, time
 import math
