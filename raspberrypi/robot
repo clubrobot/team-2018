@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-from threading import Thread
 from argparse import ArgumentParser
 
 from arduino.buttons import ButtonCard
@@ -14,6 +12,7 @@ from arduino.watersorter import *
 from arduino.sensors import *
 from common.geogebra import *
 from common.roadmap import *
+from common.serialtalks import *
 from arduino.waterlauncher import *
 from robots.Bornibus import Bornibus
 from arduino.bee import *
@@ -78,7 +77,6 @@ def showip(args):
         ssg = SerialTalks(os.path.join('/dev/arduino', 'display'))
         ssg.connect()
         import subprocess
-        from common.serialtalks import STRING
         ip = ''
         while not ip:
             proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
