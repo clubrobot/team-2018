@@ -39,7 +39,7 @@ void newRange()
     distance = 0;
 
   display.clear();
-  display.setFont(ArialMT_Plain_24);
+  display.setFont(ArialMT_Plain_16);
   String toDisplay = "";
   toDisplay += (int)distance;
   toDisplay += "cm";
@@ -51,7 +51,7 @@ void newRange()
   } else {
     /*int antennaDelay = DW1000.getAntennaDelay();
     toDisplay = antennaDelay;*/
-    display.setFont(ArialMT_Plain_24);
+    display.setFont(ArialMT_Plain_16);
     float x = DW1000Ranging.getPosX() / 10;
     float y = DW1000Ranging.getPosY() / 10;
     toDisplay = "(";
@@ -61,7 +61,11 @@ void newRange()
     toDisplay += ")";
   }
   
-  display.drawString(64, 30, toDisplay);
+  display.drawString(64, 20, toDisplay);
+  uint8_t c = DW1000Ranging.getColor();
+  toDisplay = c;
+  toDisplay += c==0?" : green":" : orange";
+  display.drawString(64,40,toDisplay);
   display.display();
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);

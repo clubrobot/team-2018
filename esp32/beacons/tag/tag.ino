@@ -109,7 +109,7 @@ void newRange()
      {
       toDisplay = "(0)";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
       p[0] = -1000;
       p[1] = -1000;
      }
@@ -118,7 +118,7 @@ void newRange()
       {
       toDisplay = "(1)";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
       p[0] = -1000;
       p[1] = -1000;
       }
@@ -127,7 +127,7 @@ void newRange()
     {
       toDisplay = "(2)";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
       p[0] = -1000;
       p[1] = -1000;
     }
@@ -185,7 +185,7 @@ void newRange()
       toDisplay += round(p[1]/10);
       toDisplay += ")\n(3)";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
     }
       break;
     case 4:
@@ -211,7 +211,7 @@ void newRange()
       toDisplay += round(p[1] / 10);
       toDisplay += ")\n(4)";
       display.drawString(64, 0, toDisplay);
-      display.display();
+      //display.display();
       
 
      // 3D Trilateration algorithm without the nearest anchor distance
@@ -282,6 +282,13 @@ void newRange()
   
   DW1000Ranging.setPosX(p[0]);
   DW1000Ranging.setPosY(p[1]);
+
+  uint8_t c = DW1000Ranging.getColor();
+  toDisplay = c;
+  toDisplay += c==0?" : green":" : orange";
+  display.drawString(64,40,toDisplay);
+  display.display();
+
 
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -371,7 +378,7 @@ void setup() {
   display.drawString(64, 24, "SYNCHRONISATION\n(tag)");
   display.display();
 
-  display.setFont(ArialMT_Plain_24);
+  display.setFont(ArialMT_Plain_16);
 }
 
 void loop() {
