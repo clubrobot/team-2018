@@ -199,7 +199,7 @@ subparsers = parser.add_subparsers()
 
 getuuid_parser = subparsers.add_parser('getuuid')
 getuuid_parser.add_argument('port', type=str)
-getuuid_parser.add_argument('-t', '--timeout', type=float, default=5)
+getuuid_parser.add_argument('-t', '--timeout', type=float, default=10)
 getuuid_parser.set_defaults(func=getuuid)
 
 getlogs_parser = subparsers.add_parser('getlogs')
