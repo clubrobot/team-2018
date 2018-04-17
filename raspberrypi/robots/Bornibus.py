@@ -9,16 +9,18 @@ from robots.balls_manager        import Dispenser, Treatment, Shot
 from robots.display_manager      import DisplayPoints
 from robots.switch_manager       import Interrupteur, Abeille
 from robots.mover                import Mover
+from robots.heuristics           import Heuristics
 
 
 # Setup and launch the user interface
 class Bornibus:
 
-    cube="cube"
+    cube ="cube"
     dispenser = "disp"
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
+
     def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, beeActioner,sensors_front, sensors_lat, sensors_back):
         # Save arduinos
         self.wheeledbase   = wheeledbase
@@ -37,7 +39,7 @@ class Bornibus:
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
         self.action_list = [list(),list()]
-        
+
         self.displayManager = DisplayPoints(self.display)
 
         # Generate Dispenser
@@ -53,6 +55,7 @@ class Bornibus:
         self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.mover)
         self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher, self.displayManager,self.mover)
 
+        self.heuristics = Heuristics(self.action_list[self.side])
 
         #Generate predecessors list
         beeAct = self.bee.getAction()[0]
@@ -65,17 +68,17 @@ class Bornibus:
         longShot = self.shot.getAction()[2]
         treatmentAct = self.treatment.getAction()[0]
 
-        if(self.side == Bornibus.GREEN):
-            shortShot.set_predecessors([d1Act])   
+        if self.side == Bornibus.GREEN:
+            shortShot.set_predecessors([d1Act])
             longShot.set_predecessors([d3Act])
 
-        if(self.side == Bornibus.ORANGE):
+        if self.side == Bornibus.ORANGE:
             shortShot.set_predecessors([d4Act])
             longShot.set_predecessors([d2Act])
-        
+
         treatmentAct.set_predecessors([longShot])
-        
-        
+
+
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
             beeAct,
@@ -85,8 +88,8 @@ class Bornibus:
             d3Act,
             longShot,
             treatmentAct,
-            ]
-        
+        ]
+
         self.action_list[Bornibus.ORANGE] = [
             beeAct,
             panelAct,
@@ -95,26 +98,24 @@ class Bornibus:
             d2Act,
             longShot,
             treatmentAct,
-            ]
-            
+        ]
+
     def run(self):
         if self.side == Bornibus.GREEN:
-            self.wheeledbase.set_position(592, 290,0)
+            self.wheeledbase.set_position(592, 290, 0)
         else:
-            self.wheeledbase.set_position(592,2710,0)
+            self.wheeledbase.set_position(592, 2710, 0)
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6)
         self.beeActioner.close()
         self.watersorter.close_trash_unloader()
-        while len(self.action_list[self.side])!=0:
-            h = Heuristics(self.action_list[self.side])
+        act = self.heuristics.getBest()
+        while act is not None:
+            print("Make action {}".format(act.name))
+            # act()
+            act.done = True
             act = h.getBest()
-            while act is not None:
-                print("Make action {}".format(act.name))
-                # act()
-                act.done = True
-                act = h.getBest()
             self.wheeledbase.max_linvel.set(500)
             self.wheeledbase.max_angvel.set(6)
 
