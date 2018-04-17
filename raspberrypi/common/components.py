@@ -28,7 +28,7 @@ class Component():
 	def _cleanup(self): pass
 
 try:
-	from serialtalks import *
+	from common.serialtalks import *
 	
 	class SerialTalksComponent(SerialTalks, Component):
 
@@ -69,7 +69,7 @@ except ImportError:
 	pass
 
 try:
-	from gpiodevices import Switch, LightButton, Device
+	from common.gpiodevices import Switch, LightButton, Device
 
 	class SwitchComponent(Switch, Component):
 
