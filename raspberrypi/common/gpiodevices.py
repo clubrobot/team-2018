@@ -15,7 +15,7 @@ class Switch(Device):
             self.state = False
             Device.list_pin[input_pin] = 1
             self.args = args
-			self.kwargs = kwargs
+            self.kwargs = kwargs
             self.input_pin = input_pin
             if (GPIO.getmode() != 10):
                 GPIO.setmode(GPIO.BOARD)
