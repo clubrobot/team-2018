@@ -10,7 +10,7 @@ from common.geogebra import Geogebra
 
 # Import robot stuff
 
-from arduino.components import *
+from common.components import *
 from arduino.wheeledbase import *
 from arduino.waterlauncher import *
 from arduino.watersorter import *
@@ -18,7 +18,13 @@ from arduino.display import *
 from arduino.bee import *
 from arduino.sensors import *
 
-# Define temporary modules
+hostname = ""
+if hostname == "":
+    print("IP adress :  ")
+    hostname = input()
+    if (len(hostname.split(".")) == 1):
+        hostname = "192.168.1." + hostname
+    print("Try reaching raspberry at IP " + hostname + "...")
 
 # Connect to the Raspberry Pi and the different modules
 MAX_VEL = 500
@@ -66,5 +72,5 @@ try:
 except:
     print('\'sensors back\' not connected')
 
-geo = Geogebra('bornibus.ggb')
-rm = RoadMap.load(geo)
+#geo = Geogebra('bornibus.ggb')
+#rm = RoadMap.load(geo)
