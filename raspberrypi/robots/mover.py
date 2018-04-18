@@ -44,7 +44,7 @@ class Mover:
     QUICK = 3
     SAFE  = 4
     FAST  = 5
-    def __init__(self, side, roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back):#, balise_receiver):
+    def __init__(self, side, roadmap, arduinos):#, balise_receiver):
 
         #RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
@@ -61,10 +61,10 @@ class Mover:
         # self.obstacles_right.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
 
         #Arduino et autre
-        self.wheeledbase = wheeledbase
-        self.sensors_front = sensors_front
-        self.sensors_lat   = sensors_lat
-        self.sensors_back  = sensors_back
+        self.wheeledbase = arduinos("wheeledbase")
+        self.sensors_front = arduinos("sensors_front")
+        self.sensors_lat   = arduinos("sensors_lat")
+        self.sensors_back  = arduinos("sensors_back")
         self.side = side
         #self.balise  = BaliseReceiver("192.168.12.3")
         #try : 

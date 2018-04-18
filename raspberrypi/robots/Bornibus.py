@@ -23,37 +23,42 @@ class Bornibus:
 
     def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, beeActioner,sensors_front, sensors_lat, sensors_back):
         # Save arduinos
-        self.wheeledbase   = wheeledbase
-        self.waterlauncher = waterlauncher
-        self.watersorter   = watersorter
-        self.display       = display
-        self.beeActioner   = beeActioner
+        self.arduinos = dict(wheeledbase=wheeledbase,
+                             waterlauncher=waterlauncher,
+                             watersorter=watersorter,
+                             display=display,
+                             beeActioner=beeActioner,
+                             sensors_front=sensors_front,
+                             sensors_lat=sensors_lat,
+                             sensors_back=sensors_back
+                             )
+
 
         # Save annexes inf
         self.side     = side
         self.roadmap  = roadmap
         self.geogebra = geogebra
-        self.mover    = Mover(side, roadmap, wheeledbase, sensors_front, sensors_lat, sensors_back)
+        self.mover    = Mover(side, roadmap, self.arduinos)
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
         self.action_list = [list(),list()]
 
-        self.displayManager = DisplayPoints(self.display)
+        self.displayManager = DisplayPoints(display)
 
         # Generate Dispenser
-        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
-        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
-        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
-        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.displayManager, self.mover)
+        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover)
+        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover)
+        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover)
+        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover)
         # Generate buttons
-        self.bee   = Abeille(self.side, self.geogebra, self.wheeledbase, self.displayManager, self.beeActioner, self.mover)
-        self.panel = Interrupteur(self.side, self.geogebra, self.wheeledbase, self.displayManager, self.mover)
+        self.bee   = Abeille(self.side, self.geogebra,  self.arduinos, self.displayManager, self.mover)
+        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover)
 
         # Generate balls manipulate
-        self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.mover)
-        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.wheeledbase, self.watersorter, self.waterlauncher, self.displayManager,self.mover)
+        self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.arduinos, self.mover)
+        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager,self.mover)
 
         self.heuristics = Heuristics(self.action_list[self.side])
 
@@ -101,23 +106,19 @@ class Bornibus:
         ]
 
     def run(self):
-        if self.side == Bornibus.GREEN:
-            self.wheeledbase.set_position(592, 290, 0)
-        else:
-            self.wheeledbase.set_position(592, 2710, 0)
-        self.wheeledbase.lookahead.set(200)
-        self.wheeledbase.max_linvel.set(500)
-        self.wheeledbase.max_angvel.set(6)
-        self.beeActioner.close()
-        self.watersorter.close_trash_unloader()
+        self.arduinos["wheeledbase"].lookahead.set(200)
+        self.arduinos["wheeledbase"].max_linvel.set(500)
+        self.arduinos["wheeledbase"].max_angvel.set(6)
+        self.arduinos["beeActioner"].close()
+        self.arduinos["watersorter"].close_trash_unloader()
         act = self.heuristics.getBest()
         while act is not None:
             print("Make action {}".format(act.name))
             # act()
             act.done = True
             act = h.getBest()
-            self.wheeledbase.max_linvel.set(500)
-            self.wheeledbase.max_angvel.set(6)
+            self.arduinos["wheeledbase"].max_linvel.set(500)
+            self.arduinos["wheeledbase"].max_angvel.set(6)
 
 
 
