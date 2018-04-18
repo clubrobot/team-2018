@@ -87,13 +87,13 @@ class Dispenser(Actionnable):
         return [Action( self.preparationPoint,
                         lambda : self.realize(self.wheeledbase,self.watersorter, self.display),
                         Dispenser.typ, 
-                        "DISPENSER"+str(self.numberDispenser))]
+                        "DISPENSER"+str(self.numberDispenser),
+                        Dispenser.POINTS_DISPENSER)]
 
 
 class Shot(Actionnable):
     typ="shot"
     POINTS_PER_BALL_CASTLE = 5
-    POINTS_PER_BALL_EPURATION = 10
     def __init__(self, side, rm, geo, wheeledbase, watersorter, waterlauncher, display, mover):
         self.side=side
         self.rm  = rm
@@ -261,29 +261,33 @@ class Shot(Actionnable):
 
 
     def getAction(self):
-        act_without_sort =Action(
+        act_without_sort = Action(
                 self.shootCastlePoint,
                 lambda  :self.realize_without_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
                 Shot.typ,
-                "SHORTSHOOTNOSORT"
+                "SHORTSHOOTNOSORT",
+                8 * Shot.POINTS_PER_BALL_CASTLE
                 )
         act_with_sort =Action(
                 self.shootCastlePoint, #self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
                 Shot.typ,
-                "SHORTSHOOTSORT"
+                "SHORTSHOOTSORT",
+                4 * Shot.POINTS_PER_BALL_CASTLE
                 )
         act_with_sort_long =Action(
                 self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
                 Shot.typ,
-                "LONGSHOOTSORT"
+                "LONGSHOOTSORT",
+                4 * Treatment.POINTS_PER_BALL_CASTLE
                 )   
         return [act_without_sort,act_with_sort,act_with_sort_long]
 
 
 class Treatment(Actionnable):
     typ="treatement"
+    POINTS_PER_BALL_EPURATION = 10
     def __init__(self, side, rm, geo, wheeledbase, watersorter, mover):
         self.side=side
         self.rm=rm
@@ -338,11 +342,12 @@ class Treatment(Actionnable):
 
     #override
     def getAction(self):
-        act =Action(
+        act = Action(
                 self.treatmentPoint,
                 lambda  :self.realize(self.shootTreatmentPoint,self.wheeledbase ,self.watersorter) ,
                 Treatment.typ,
-                "TREATMENT"
+                "TREATMENT",
+                4*Treatment.POINTS_PER_BALL_EPURATION
             )
         return [act]
 

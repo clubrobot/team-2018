@@ -78,7 +78,6 @@ class Bornibus:
 
         treatmentAct.set_predecessors([longShot])
 
-
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
             beeAct,
@@ -110,12 +109,12 @@ class Bornibus:
         self.wheeledbase.max_angvel.set(6)
         self.beeActioner.close()
         self.watersorter.close_trash_unloader()
-        act = self.heuristics.getBest()
+        act = self.heuristics.get_best()
         while act is not None:
             print("Make action {}".format(act.name))
             # act()
             act.done = True
-            act = h.getBest()
+            act = self.heuristics.get_best()
             self.wheeledbase.max_linvel.set(500)
             self.wheeledbase.max_angvel.set(6)
 
