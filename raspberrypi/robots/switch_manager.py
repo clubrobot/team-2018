@@ -12,10 +12,11 @@ from robots.action import *
 class Interrupteur(Actionnable):
     typ="Interrupteur"
     POINTS = 25
-    def __init__(self,side, geo, wheeledbase, display, mover):
+    def __init__(self,side, geo, arduinos, display, mover, logger):
         self.side=side
         self.mover = mover
-        self.wheeledbase = wheeledbase
+        self.logger = logger
+        self.wheeledbase = arduinos["wheeledbase"]
         self.display = display
         self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
         self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
@@ -45,12 +46,13 @@ class Interrupteur(Actionnable):
 class Abeille(Actionnable):
     typ="Abeille"
     POINTS = 50
-    def __init__(self, side, geo, wheeledbase, display, beeActioner,mover):
+    def __init__(self, side, geo, arduinos, display, mover, logger):
         self.side=side
+        self.logger = logger
         self.mover = mover
-        self.wheeledbase = wheeledbase
+        self.wheeledbase =arduinos["wheeledbase"]
         self.display = display
-        self.beeActioner = beeActioner
+        self.beeActioner = arduinos["beeActioner"]
         self.preparation=geo.get('Abeille'+str(self.side)+'_0')
         self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
 

@@ -11,10 +11,11 @@ from robots.action import Action, Actionnable
 class Dispenser(Actionnable):
     typ="Dispenser"
     POINTS_DISPENSER = 10
-    def __init__(self,numberDispenser, rm, geo, arduinos, display, mover):
+    def __init__(self,numberDispenser, rm, geo, arduinos, display, mover, logger):
         self.rm  = rm
         self.geo = geo
         self.mover = mover
+        self.logger = logger
         self.display = display
         self.numberDispenser=numberDispenser
         self.watersorter = arduinos["watersorter"]
@@ -29,6 +30,8 @@ class Dispenser(Actionnable):
         watersorter.close_trash()
         watersorter.close_outdoor()
         watersorter.open_indoor()
+        self.logger("DISPENSER : ", " Aim the dispenser !")
+        self.display.sleep()
         robot.turnonthespot(theta)
         while True:
             try:
@@ -39,21 +42,25 @@ class Dispenser(Actionnable):
                 robot.turnonthespot(theta)
 
         path = [self.preparationPoint,self.targetPoint]
+        self.logger("DISPENSER : "," Let's go to the rumble !")
+        self.display.angry(1)
         robot.purepursuit(path,direction='forward')
         robot.max_linvel.set(500)
         robot.max_angvel.set(6)
         display.addPoints(Dispenser.POINTS_DISPENSER)
         #AutomateTools.myPurepursuite(robot,path)
         #AutomateTools.myTurnonthespot(robot,robot.get_position()[-1] +3.141592)
-
+        init_pos = (0,0)
         try:
             robot.wait()
         except RuntimeError:
+            init_pos = robot.get_position()[:-1]
+            self.display.sick(3)
+            self.logger("DISPENSER : ", "CONTACT !! Just try to take balls here {},{}", *init_pos)
             self.watersorter.enable_shaker()
             time.sleep(3)
-            
-        init_pos = robot.get_position()[:-1]
 
+        self.logger("DISPENSER : ", "Trying to go backward ")
         robot.set_velocities(-200,0)
         pos = robot.get_position()[:-1]
         while math.hypot(pos[0]-init_pos[0],pos[1]-init_pos[1])<250:
@@ -74,14 +81,9 @@ class Dispenser(Actionnable):
 
         self.watersorter.disable_shaker()
         robot.stop()
-        
+        self.display.happy(2)
         
 
-    def funForWaitDisp(self,robot,path):
-        if True:
-            robot.purepursuit(path)
-        else :
-            return AutomateTools.stopThisAction
         
     def getAction(self):
         return [Action( self.preparationPoint,
@@ -94,11 +96,12 @@ class Shot(Actionnable):
     typ="shot"
     POINTS_PER_BALL_CASTLE = 5
     POINTS_PER_BALL_EPURATION = 10
-    def __init__(self, side, rm, geo, arduinos, display, mover):
+    def __init__(self, side, rm, geo, arduinos, display, mover, logger):
         self.side=side
         self.rm  = rm
         self.geo = geo
         self.mover  = mover
+        self.logger = logger
         self.wheeledbase = arduinos["wheeledbase"]
         self.watersorter = arduinos["watersorter"]
         self.waterlauncher = arduinos["waterlauncher"]
@@ -159,6 +162,7 @@ class Shot(Actionnable):
             if time.time() - begin_time < global_timeout:
                 nb_balls +=1
                 display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
+                display.happy(1)
             #
             #print(time.time() - begin)
             #if(watersorter.get_water_color()[0]>120 or watersorter.get_water_color()[1]>120) and new_ball:
@@ -230,21 +234,26 @@ class Shot(Actionnable):
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.close_indoor()
             nb_ball+=1
-            print("New ball gotten ! {}".format(nb_ball))
             # On verifie si la code couleur est bon
             #TODO faire un timeout
             if(watersorter.get_water_color()[0]<watersorter.get_water_color()[1]) and not (time.time() - begin_time > global_timeout):
                 if self.side==0:
                     watersorter.open_outdoor()
                     display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
+                    display.happy(1)
                 else:
                     watersorter.open_trash()
                     display.addPoints(Shot.POINTS_PER_BALL_EPURATION)
+                    display.sleep(1)
             else:
                 if self.side==0:
                     watersorter.open_trash()
+                    display.addPoints(Shot.POINTS_PER_BALL_EPURATION)
+                    display.sleep(1)
                 else:
                     watersorter.open_outdoor()
+                    display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
+                    display.happy(1)
 
             while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100) and not (time.time() - begin_time > global_timeout):
                 time.sleep(0.1)
@@ -284,25 +293,29 @@ class Shot(Actionnable):
 
 class Treatment(Actionnable):
     typ="treatement"
-    def __init__(self, side, rm, geo, arduinos, mover):
+    def __init__(self, side, rm, geo, arduinos, display, mover, logger):
         self.side=side
         self.rm=rm
         self.mover = mover
         self.geo = geo
+        self.logger = logger
+        self.display = display
         self.wheeledbase = arduinos["wheeledbase"]
         self.watersorter = arduinos["watersorter"]
         self.shootTreatmentPoint=self.geo.get('ShootTreatment'+str(self.side))
         self.treatmentPoint=self.geo.get('Treatment'+str(self.side))
         
     def realize(self, shotDirection,robot,waterSorter):
+        self.logger("TREATMENT :", "Go to the drop point !")
         currentPosXY=robot.get_position()[:2]
+        self.display.angry(1)
         robot.purepursuit([currentPosXY,shotDirection])
         try:
             robot.wait()
         except RuntimeError:
             pass
         turn = False
-        print("Turning")
+        self.logger("TREATMENT :", "Turning !")
         robot.turnonthespot(3.141592/2)
         while not turn:
             try:
@@ -314,6 +327,8 @@ class Treatment(Actionnable):
                 robot.stop()
                 robot.turnonthespot(3.141592/2)
 
+        self.display.happy(2)
+        self.logger("TREATMENT :", "Droping !")
         waterSorter.open_trash_unloader()
         time.sleep(2)
         waterSorter.open_trash()

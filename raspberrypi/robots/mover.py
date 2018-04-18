@@ -44,10 +44,11 @@ class Mover:
     QUICK = 3
     SAFE  = 4
     FAST  = 5
-    def __init__(self, side, roadmap, arduinos):#, balise_receiver):
+    def __init__(self, side, roadmap, arduinos, logger):#, balise_receiver):
 
         #RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
+        self.logger = logger
         self.obstacle_big = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,120),(-200,200)   ))
         self.obstacle_little = self.roadmap.create_obstacle(( (-90,-90),(90,-90),(90,90),(-90,90)   ))
         self.obstacles_front = self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE)
@@ -61,10 +62,10 @@ class Mover:
         # self.obstacles_right.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
 
         #Arduino et autre
-        self.wheeledbase = arduinos("wheeledbase")
-        self.sensors_front = arduinos("sensors_front")
-        self.sensors_lat   = arduinos("sensors_lat")
-        self.sensors_back  = arduinos("sensors_back")
+        self.wheeledbase = arduinos["wheeledbase"]
+        self.sensors_front = arduinos["sensors_front"]
+        self.sensors_lat   = arduinos["sensors_lat"]
+        self.sensors_back  = arduinos["sensors_back"]
         self.side = side
         #self.balise  = BaliseReceiver("192.168.12.3")
         #try : 
@@ -101,7 +102,7 @@ class Mover:
 
     def get_enemy_status(self):
         return False
-	#if( hypot(self.big_listener.position[0]-self.goal[0],self.big_listener.position[1]-self.goal[1])<ENEMY_RANGE):
+    #if( hypot(self.big_listener.position[0]-self.goal[0],self.big_listener.position[1]-self.goal[1])<ENEMY_RANGE):
         #    return True
         #return ( hypot(self.little_listener.position[0]-self.goal[0],self.little_listener.position[1]-self.goal[1])<ENEMY_RANGE)
             
@@ -356,7 +357,7 @@ class Mover:
         #self.obstacle_little.set_position(*self.balise.get_position(LITTLE_ROBOT))
 
         self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2],self.goal)
-        print(self.path)
+        self.logger("MOVER : ",path=self.path)
         self.wheeledbase.purepursuit(self.path)
         self.isarrived = False
         while not self.isarrived or  self.interupted_status.is_set():
@@ -386,7 +387,6 @@ class Mover:
             except TimeoutError:
                 pass
 
-        print(type(self.on_path_flag))
         #self.on_path_flag.clear()
         self.front_flag.clear()
 
@@ -395,8 +395,7 @@ class Mover:
         # RoadMap.LEFT
         # RoadMap.RIGHT
         
-
-        print("INTERUPT")
+        self.logger("MOVER : ", "Object in the front detected !")
         if not self.interupted_lock.acquire(blocking=True, timeout=1):
             return
         x, y, theta = self.wheeledbase.get_position()
@@ -418,15 +417,13 @@ class Mover:
         
 
         side = self.roadmap.best_side(x, y, theta)
-        print("Je tourne a {}".format("gauche" if side==1 else "droite"))
         time.sleep(0.4)
         (left,_ ), (right,_) = self.sensors_front.get_normal(0)
-        print(left, right)
         if left>800:
             side = RoadMap.LEFT
         if right>800:
             side = RoadMap.RIGHT
-        print("Je tourne a {}".format("gauche" if side==1 else "droite"))
+        self.logger("MOVER : ", "I'm decided to turn {} at {},{}".format("left" if side==1 else "right", x, y))
         while(True):
             try:
                 self.wheeledbase.turnonthespot(theta-pi/2)
@@ -441,7 +438,6 @@ class Mover:
                 self.wheeledbase.stop()
                 continue
 
-        print("J'avance lentement")
         blocking = True
         time.sleep(1)
         # Wait varience  pour attendre des variables stable
@@ -452,8 +448,6 @@ class Mover:
         #print(self.sensors_lat.get_normal(0))
         while self.sensors_lat.get_normal(0)[0][0]<200  :
             try:
-                print(self.sensors_lat.get_normal(0))
-
                 self.wheeledbase.isarrived()
                 if self.sensors_lat.get_normal(0)[0][0]<35:
                     self.wheeledbase.set_velocities(-100*side,0.2*side)
@@ -477,11 +471,8 @@ class Mover:
         height = hypot(x-x_p,y-y_p)
         x_obs += cos(theta)*200
         y_obs += sin(theta)*200
-        print("coodrs : {} , {}".format(x_p,y_p))
         obs = self.roadmap.create_temp_obstacle(((-100,height/2),(-100,-height/2),(100,-height/2),(100,height/2)),timeout = TIMEOUT_OBSTACLE)
         obs.set_position(x_obs,y_obs,theta)
-
-        print(obs.get_shape())
         self.path = self.roadmap.get_shortest_path( (x_p, y_p),self.goal )
         try:
             self.wheeledbase.purepursuit(self.path)
@@ -492,7 +483,6 @@ class Mover:
 
 
     def on_path_obstacle(self):
-        print("OBSTACLE")
         self.obstacle_big.set_position(*self.balise.get_position(BIG_ROBOT))
         self.obstacle_little.set_position(*self.balise.get_position(LITTLE_ROBOT))
         if not self.interupted_lock.acquire():
