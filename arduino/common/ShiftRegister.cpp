@@ -33,6 +33,14 @@ void ShiftRegister::SetLow(int pos)
 void ShiftRegister::update()
 {
 	digitalWrite(m_LATCH, LOW);
-    shiftOut(m_DATA, m_DATA, m_register);
+    shiftOut(m_DATA, m_CLOCK, MSBFIRST, m_register);
     digitalWrite(m_LATCH, HIGH);
+}
+
+void ShiftRegister::write(int pos, int state)
+{
+	if(state)
+		SetHigh(pos);
+	else
+		SetLow(pos);
 }

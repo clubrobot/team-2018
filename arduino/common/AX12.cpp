@@ -2,8 +2,13 @@
 #include <Arduino.h>
 #include "SoftwareSerial.h"
 #include "../common/SerialTalks.h"
+#include "../common/ShiftRegister.h"
 
-extern SoftwareSerial SoftSerial; 
+extern SoftwareSerial SoftSerial;
+
+#ifdef USE_SHIFTREG
+extern ShiftRegister shift;
+#endif
 
 // Macro for the selection of the Serial Port
 
@@ -24,7 +29,14 @@ extern SoftwareSerial SoftSerial;
 // Macro for Comunication Flow Control
 
 #define setDPin(DirPin,Mode)   (pinMode(DirPin,Mode))       // Select the Switch to TX/RX Mode Pin
-#define switchCom(DirPin,Mode) (digitalWrite(DirPin,Mode))  // Switch to TX/RX Mode
+
+
+
+#ifdef USE_SHIFTREG
+	#define switchCom(DirPin,Mode) (shift.write(DirPin,Mode))  // Switch to TX/RX Mode
+#else
+	#define switchCom(DirPin,Mode) (digitalWrite(DirPin,Mode))  // Switch to TX/RX Mode
+#endif
 
 
 // Private Methods //////////////////////////////////////////////////////////////
@@ -61,18 +73,29 @@ void DynamixelClass::begin(long baud,unsigned char Rx, unsigned char Tx)
 	beginCom(baud);
 	
 }
-
-void DynamixelClass::begin(long baud,unsigned char Rx, unsigned char Tx, unsigned char D_Pin)
-{	
-	DTx = Tx;
-	DRx = Rx;
-	setRXPin(DRx);
-	setTXPin(DTx);
-	beginCom(baud);
-	pinMode(D_Pin,OUTPUT);
-	Direction_Pin = D_Pin;
-	
-}
+#ifdef USE_SHIFTREG
+	void DynamixelClass::begin(long baud,unsigned char Rx, unsigned char Tx, unsigned char D_Pin)
+	{	
+		DTx = Tx;
+		DRx = Rx;
+		setRXPin(DRx);
+		setTXPin(DTx);
+		beginCom(baud);
+		Direction_Pin = D_Pin;
+	}
+#else
+	void DynamixelClass::begin(long baud,unsigned char Rx, unsigned char Tx, unsigned char D_Pin)
+	{	
+		DTx = Tx;
+		DRx = Rx;
+		setRXPin(DRx);
+		setTXPin(DTx);
+		beginCom(baud);
+		pinMode(D_Pin,OUTPUT);
+		Direction_Pin = D_Pin;
+		
+	}
+#endif
 
 void DynamixelClass::end()
 {
@@ -939,10 +962,6 @@ int DynamixelClass::readLoad(unsigned char ID)
 }
 
 DynamixelClass Dynamixel;
-
-
-
-
 
 
 

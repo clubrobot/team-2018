@@ -9,8 +9,9 @@ class ShiftRegister
 		void attach(int latchpin, int clockpin, int datapin);
 		void SetHigh(int pos);
 		void SetLow (int pos);
+		void write(int pos, int state);
 
-	protected:
+	//protected:
 		void update();
 
 		int m_LATCH;

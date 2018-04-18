@@ -115,6 +115,7 @@
 
 #include <inttypes.h>
 #include <Arduino.h>
+#include "../common/ShiftRegister.h"
 
 class DynamixelClass {
 private:
@@ -197,8 +198,7 @@ class AX12 {
 private: 
 	unsigned char m_id;
 	bool m_endlessMode;
-	bool m_holding; 
-
+	bool m_holding;
 
 public:
 	static void SerialBegin(long baud, unsigned char rx, unsigned char tx, unsigned char control);
