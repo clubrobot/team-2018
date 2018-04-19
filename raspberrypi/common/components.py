@@ -3,7 +3,8 @@
 
 import os, time
 from types import MethodType
-from threading import Thread
+from threading import RLock
+import warnings
 from common.tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
 
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
@@ -276,7 +277,7 @@ class Proxy():
             object.__setattr__(self, methodname, MethodType(method, self))
 
     def __getattr__(self, attrname, tcptimeout=10):
-        if attrname in self._attrlist:
+        if attrname in object.__getattribute__(self, "_attrlist"):
             return self._manager.execute(GET_COMPONENT_ATTRIBUTE_OPCODE, self._compid, attrname, timeout=tcptimeout)
         else:
             object.__getattribute__(self, attrname)
@@ -304,6 +305,103 @@ class SerialTalksProxy(Proxy):
         else:
             raise KeyError("Opcode already use")
 
+class TimeoutWarning(UserWarning): pass
+class NotConnectedWarning(UserWarning): pass
+class MuteWarning(UserWarning): pass
+
+class SecureSerialTalksProxy(Proxy):
+    def __init__(self, manager, uuid, default_result):
+        attrlist = ['port', 'is_connected']
+        methlist = ['connect', 'disconnect', 'send', 'poll', 'flush', 'execute', 'getuuid', 'setuuid', 'getout',
+                    'geterr']
+        object.__setattr__(self, '_attrlist', attrlist)
+        if not hasattr(self,"lock") : object.__setattr__(self, 'lock', RLock())
+        if not hasattr(self, "default_result"): object.__setattr__(self, 'default_result', default_result)
+        object.__setattr__(self, 'initialized', False)
+        try:
+            compid = manager.execute(CREATE_SERIALTALKS_COMPONENT_OPCODE, uuid)
+            Proxy.__init__(self, manager, compid, attrlist, methlist)
+            self.initialized = True
+            connect_addr = self.connect
+            execute_addr = self.execute
+            send_addr = self.send
+        except ConnectionFailedError:
+            warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
+            def trash_none(*args,**kwargs) : return None
+            def trash_return(opcode, *args, **kwargs):
+                if opcode in default_result.keys():
+                    return default_result[opcode].__copy__()
+                else:
+                    return None
+            connect_addr = trash_none
+            execute_addr = trash_return
+            send_addr = trash_none
+
+        self.default_result = default_result
+
+        def connect(self, with_lock=True, **kwargs):
+            if with_lock : object.__getattribute__(self, "lock").acquire()
+            if self.initialized == False:
+                try:
+                    SecureSerialTalksProxy.__init__(self,manager, uuid, default_result)
+                except:
+                    pass
+            try:
+                connect_addr(**kwargs)
+            except AlreadyConnectedError:
+                pass
+            except (NotConnectedError, ConnectionFailedError):
+                warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
+            except MuteError:
+                warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
+            if with_lock: object.__getattribute__(self, "lock").release()
+
+        def execute(self, opcode, *args, **kwargs):
+            object.__getattribute__(self, "lock").acquire()
+            if self.initialized == False:
+                try:
+                    SecureSerialTalksProxy.__init__(self,manager, uuid, default_result)
+                except:
+                    pass
+            try:
+                result = execute_addr(opcode, *args, **kwargs)
+            except (NotConnectedError, ConnectionFailedError):
+                self.connect(with_lock=False)
+                if opcode in self.default_result.keys():
+                    object.__getattribute__(self, "lock").release()
+                    return self.default_result[opcode].__copy__()
+                else:
+                    object.__getattribute__(self, "lock").release()
+                    return None
+            except TimeoutError:
+                warnings.warn("Timeout Error with {}".format(uuid), TimeoutWarning)
+                object.__getattribute__(self, "lock").release()
+                return None
+            object.__getattribute__(self, "lock").release()
+            return result
+
+        def send(self, opcode, *args):
+            object.__getattribute__(self, "lock").acquire()
+            if self.initialized == False:
+                try:
+                    SecureSerialTalksProxy.__init__(self,manager, uuid, default_result)
+                except RuntimeError as e:
+                    raise e
+                except:
+                    pass
+            try:
+                send_addr(opcode, *args)
+            except NotConnectedError:
+                self.connect(with_lock=False)
+            except ConnectionFailedError:
+                self.connect(with_lock=False)
+            except TimeoutError:
+                warnings.warn("Timeout Error with {}".format(uuid), TimeoutWarning)
+            object.__getattribute__(self, "lock").release()
+
+        object.__setattr__(self, "connect", MethodType(connect, self))
+        object.__setattr__(self, "execute", MethodType(execute, self))
+        object.__setattr__(self, "send", MethodType(send, self))
 
 class SwitchProxy(Proxy):
 
