@@ -88,11 +88,9 @@ class Bornibus:
         # Generate order list
         self.action_list[Bornibus.GREEN] = [
             d1Act,
+            panelAct,
             shortShot,
             beeAct,
-            panelAct,
-
-
             d3Act,
             longShot,
             treatmentAct,

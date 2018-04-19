@@ -6,7 +6,7 @@ import time
 
 from robots.automateTools import AutomateTools
 from robots.action import *
-
+from robots.mover import Mover
 
 
 class Interrupteur(Actionnable):
@@ -22,19 +22,11 @@ class Interrupteur(Actionnable):
         self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
 
     def realize(self,robot, display):
-        #print("Realisation")
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
         AutomateTools.myTurnonthespot(robot,theta)
-        path = [ self.preparation, self.interrupteur]
-        robot.purepursuit(path)
-            #si on patine alors on stop l'action
-        AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
-        robot.goto(self.preparation[0],self.preparation[1])
-        try:
-            robot.wait()
-        except:
-            pass
+        self.mover.gowall(try_limit=2, strategy=Mover.FAST)
         display.addPoints(Interrupteur.POINTS)
+        self.mover.withdraw(*self.preparation,direction="backward")
 
         #override Actionnable
     def getAction(self):

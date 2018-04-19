@@ -63,6 +63,8 @@ class Dispenser(Actionnable):
         self.logger("DISPENSER : ", "Trying to go backward ")
         robot.set_velocities(-200,0)
         pos = robot.get_position()[:-1]
+        self.mover.withdraw(*self.preparationPoint, direction="backward")
+        """
         while math.hypot(pos[0]-init_pos[0],pos[1]-init_pos[1])<250:
             try:
                 robot.isarrived()
@@ -78,7 +80,7 @@ class Dispenser(Actionnable):
                 
             time.sleep(0.5)
             pos = robot.get_position()[:-1]
-
+        """
         self.watersorter.disable_shaker()
         robot.stop()
         self.display.happy(2)
