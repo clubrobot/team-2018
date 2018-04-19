@@ -325,7 +325,7 @@ class SecureSerialTalksProxy(Proxy):
             connect_addr = self.connect
             execute_addr = self.execute
             send_addr = self.send
-        except ConnectionFailedError:
+        except (ConnectionFailedError,TimeoutError):
             warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
             def trash_none(*args,**kwargs) : return None
             def trash_return(opcode, *args, **kwargs):
@@ -376,7 +376,12 @@ class SecureSerialTalksProxy(Proxy):
             except TimeoutError:
                 warnings.warn("Timeout Error with {}".format(uuid), TimeoutWarning)
                 object.__getattribute__(self, "lock").release()
-                return None
+                if opcode in self.default_result.keys():
+                    object.__getattribute__(self, "lock").release()
+                    return self.default_result[opcode].__copy__()
+                else:
+                    object.__getattribute__(self, "lock").release()
+                    return None
             object.__getattribute__(self, "lock").release()
             return result
 
