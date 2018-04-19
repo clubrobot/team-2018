@@ -30,47 +30,34 @@ if hostname == "":
 MAX_VEL = 500
 MAX_ROT = 6
 
-try:
-    m = Manager(hostname)
-    m.connect(10)
-except:
-    raise
-    m = Manager()
-    m.connect(10)
 
-try:
-    b = WheeledBase(m)
-except:
-    print('\'wheeledbase\' not connected')
+m = Manager(hostname)
+m.connect(10)
 
-try:
-    d = WaterSorter(m)
-    l = WaterLauncher(m)
-    a = BeeActuator(m)
-except:
-    print('\'wattershooter\' not connected')
 
-try:
+
+b = WheeledBase(m)
+
+
+d = WaterSorter(m)
+l = WaterLauncher(m)
+a = BeeActuator(m)
+
+
+
     #	l = Module(m, 'display')
-    ssd = SevenSegments(m)
-    led1 = LEDMatrix(m, 1)
-    led2 = LEDMatrix(m, 2)
-except:
-    print('\'display\' not connected')
-try:
-    s_lat = Sensors(m, "sensorsLat")
-except:
-    print('\'sensors lat\' not connected')
+ssd = SevenSegments(m)
+led1 = LEDMatrix(m, 1)
+led2 = LEDMatrix(m, 2)
 
-try:
-    s_front = Sensors(m, "sensorsAv")
-except:
-    print('\'sensors front\' not connected')
 
-try:
-    s_back = Sensors(m, "sensorsAr")
-except:
-    print('\'sensors back\' not connected')
+s_lat = Sensors(m, "sensorsLat")
 
-#geo = Geogebra('bornibus.ggb')
-#rm = RoadMap.load(geo)
+
+
+s_front = Sensors(m, "sensorsAv")
+
+
+s_back = Sensors(m, "sensorsAr")
+
+
