@@ -4,8 +4,9 @@
 import time
 import math
 
+from common.serialutils import Deserializer
 from common.serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
-from common.components import SerialTalksProxy
+from common.components import SecureSerialTalksProxy
 
 
 _SET_MOTOR_VELOCITY_OPCODE		= 0x17
@@ -14,9 +15,15 @@ _SET_MOTOR_PULSEWIDTH_OPCODE	= 0x1A
 _GET_MOTOR_PULSEWIDTH_OPCODE	= 0x1B
 _FORCE_PULSEWIDTH				= 0x1E
 
-class WaterLauncher(SerialTalksProxy):	
+class WaterLauncher(SecureSerialTalksProxy):
+	_DEFAULT = {
+		_SET_MOTOR_VELOCITY_OPCODE : Deserializer(INT(0)),
+		_GET_MOTOR_VELOCITY_OPCODE :  Deserializer(INT(0)),
+		_SET_MOTOR_PULSEWIDTH_OPCODE : Deserializer(INT(0)),
+		_GET_MOTOR_PULSEWIDTH_OPCODE : Deserializer(INT(0)),
+	}
 	def __init__(self,parent, uuid='watershooter'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+		SecureSerialTalksProxy.__init__(self, parent, uuid, WaterLauncher._DEFAULT)
 
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))

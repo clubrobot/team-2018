@@ -4,8 +4,9 @@
 import time
 import math
 
+from common.serialutils import Deserializer
 from common.serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
-from common.components import SerialTalksProxy
+from common.components import SecureSerialTalksProxy
 
 
 _WRITE_INDOOR_OPCODE      =  0x11
@@ -42,9 +43,19 @@ SHAKER_VERTICAL_2 = 155
 TRASH_UNLOADER_OPEN = 140
 TRASH_UNLOADER_CLOSED = 80
 
-class WaterSorter(SerialTalksProxy):	
+class WaterSorter(SecureSerialTalksProxy):
+
+    _DEFAULT = {
+        _GET_SHAKER_HORIZONTAL_OPCODE   : Deserializer(INT(100)),
+        _GET_SHAKER_VERTICAL_OPCODE     : Deserializer(INT(100)),
+        _GET_INDOOR_OPCODE              : Deserializer(INT(100)),
+        _GET_OUTDOOR_OPCODE             : Deserializer(INT(100)),
+        _GET_TRASH_UNLOADER_OPCODE      : Deserializer(INT(100)),
+        _GET_TRASH_OPCODE               : Deserializer(INT(100)),
+        _GET_WATER_COLOR_OPCODE         : Deserializer(INT(100)),
+    }
     def __init__(self,parent, uuid='watershooter'):
-        SerialTalksProxy.__init__(self,parent, uuid)
+        SecureSerialTalksProxy.__init__(self,parent, uuid, WaterSorter._DEFAULT)
 
     def write_outdoor(self, ouverture):
         self.send(_WRITE_OUTDOOR_OPCODE,INT(ouverture))

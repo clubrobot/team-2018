@@ -5,13 +5,13 @@ import time
 import math
 
 from common.serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
-from common.components import SerialTalksProxy
+from common.components import SecureSerialTalksProxy
 
 _WRITE_BEEACTIVATOR_OPCODE		=   0x27
 
-class BeeActuator(SerialTalksProxy):	
+class BeeActuator(SecureSerialTalksProxy):
 	def __init__(self,parent, uuid='watershooter'):
-		SerialTalksProxy.__init__(self,parent, uuid)
+		SecureSerialTalksProxy.__init__(self,parent, uuid, dict())
 		self.closed_position = 165
 		self.open_position = 75
 	
