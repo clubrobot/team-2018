@@ -142,7 +142,8 @@ void POSITION_REACHED(SerialTalks& talks, Deserializer& input, Serializer& outpu
 
 void GET_VELOCITIES_WANTED(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
-	if(velocityControl.isEnabled())
+
+	if(input.read<byte>())
 	{
 		output.write<float>(velocityControl.getLinOutput());
 		output.write<float>(velocityControl.getAngOutput());

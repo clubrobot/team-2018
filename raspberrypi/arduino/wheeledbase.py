@@ -174,8 +174,8 @@ class WheeledBase(SecureSerialTalksProxy):
 		return bool(isarrived)
 
 	
-	def get_velocities_wanted(self):
-		output = self.execute(GET_VELOCITIES_WANTED_OPCODE)
+	def get_velocities_wanted(self,real_output=False):
+		output = self.execute(GET_VELOCITIES_WANTED_OPCODE,BYTE(int(real_output)))
 		return output.read(FLOAT, FLOAT)
 
 	def wait(self, timestep=0.1, **kwargs):
