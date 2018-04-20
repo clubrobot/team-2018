@@ -44,13 +44,16 @@ class Signal:
     def __init__(self):    
         self.linked_flags = list()
         self.lock  = RLock()
+        self.clear_lock = RLock()
 
     def ping(self):
-        self.lock.acquire()
+        if not self.lock.acquire(blocking=False) : return
         thread_list = list()
+        self.clear_lock.acquire()
         for flag in self.linked_flags:
             thread_list.append(Thread(target=flag.ping))
             thread_list[-1].start()
+        self.clear_lock.release()
         status = False
         while status:
             status = False
@@ -60,13 +63,13 @@ class Signal:
         self.lock.release()
 
     def _bind(self, flag):
-        self.lock.acquire()
+        self.clear_lock.acquire()
         self.linked_flags.append(flag)
-        self.lock.release()
+        self.clear_lock.release()
     
     def clear(self, flag):
-        self.lock.acquire()
+        self.clear_lock.acquire()
         self.linked_flags.remove(flag)
-        self.lock.release()
+        self.clear_lock.release()
 
 
