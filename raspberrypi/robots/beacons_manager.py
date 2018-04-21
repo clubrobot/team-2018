@@ -17,9 +17,12 @@ class Area:
 
     def increase(self, x, y):
         for i in range(len(self.points)):
-            ((x_1, y_1), (x_2, y_2)) = (self.points[i], self.points[(i+1)%len(self.points)])
+            ((x_1, y_1), (x_2, y_2)) = (self.points[i], self.points[(i+1)%(len(self.points)+1)])
             vect = (x_2-x_1)*(y-y_1) - (y_2-y_1)*(x-x_1)
             if vect<0:
+
+                print("aie", i, (i+1)%(len(self.points)+1))
+                print(((x_1, y_1), (x_2, y_2)) )
                 return
         self.value = min(self.value+INCREASE_CONSTANT,1)
 
@@ -47,6 +50,12 @@ class BeaconsManagement(Thread):
             return  self.areas[name].value
         except KeyError:
             raise RuntimeError("No area called {}.".format(name))
+
+    def __str__(self):
+        result = ""
+        for key in self.areas.keys():
+            result += "{} : {}\n".format(key, self.areas[key].value)
+        return result
 
     def run(self):
         self.running.set()
