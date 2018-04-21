@@ -106,6 +106,9 @@ class Bornibus:
             treatmentAct,
         ]
 
+    def set_side(self,side):
+        self.side = side
+
     def run(self):
 
         self.arduinos["wheeledbase"].lookahead.set(200)

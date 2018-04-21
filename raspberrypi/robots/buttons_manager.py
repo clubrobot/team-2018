@@ -20,7 +20,7 @@ class ButtonGestureMatch():
     WAITING_ODOMETRY = 1
     WAITING_MATCH = 2
 
-    def __init__(self, buttons, display, wheelebase, server):
+    def __init__(self, buttons, display, wheelebase, server, side_setter):
         self.buttons = buttons
         self.display = display
         self.server = server
@@ -36,6 +36,7 @@ class ButtonGestureMatch():
         self.buttons.on(_GREEN)
         self.buttons.on(_ORANGE)
         self.side = None
+        self.setter = side_setter
         self.lock_stat = RLock()
         self.last_tirret_update = 0
         self.tirret_status = Event()
@@ -71,7 +72,9 @@ class ButtonGestureMatch():
     def _blue(self):
         if not self.lock_stat.acquire(blocking=False): return
         if self.status == ButtonGestureMatch.WAITING_ODOMETRY:
+            self.setter(self.side)
             if self.side == 0:
+
                 self.wheeledbase.set_position(592, 290, 0)
             else:
                 self.wheeledbase.set_position(592, 2710, 0)
