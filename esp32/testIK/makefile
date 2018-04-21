@@ -4,13 +4,13 @@ CHIP = esp32
 #Arduino file
 SKETCH = main.ino
 
-BOARD_UUID = IK
+BOARD_UUID = RobotArm
 COMMON = ../common
 #Setup all libs used !
 LIBS = $(ESP_LIBS)/EEPROM \
 	   $(COMMON)/SerialTalks.cpp \
 	   $(COMMON)/CRC16.cpp \
-	   $(COMMON)/IK.cpp
+	   $(COMMON)/RobotArm.cpp
 
 
 CPPFLAGS = -fexceptions

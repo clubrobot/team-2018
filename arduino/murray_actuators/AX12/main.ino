@@ -7,8 +7,10 @@
 #include "../../common/SerialTalks.h"
 #include "../../common/ShiftRegister.h"
 #include "../../common/AX12.h"
+#include "../../common/RobotArm.h"
 
 #define USE_SHIFTREG 1
+
 
 ShiftRegister shift;
 
@@ -16,32 +18,37 @@ SoftwareSerial SoftSerial(RX_AX12,TX_AX12);
 
 AX12 servoax;
 
+RobotArm arm(0.0, 30.0, 150.0, 90.0);
+
 void setup()
 {
+	// //Starting SerialTalks
 	Serial.begin(SERIALTALKS_BAUDRATE);
-    //talks.begin(Serial);
+    talks.begin(Serial);
+
+    // //bind set pos FUNC
+    talks.bind(BEGIN_OPCODE,BEGIN);
+
+    talks.bind(SET_POS_OPCODE,SET_POSITION);
+
+    talks.bind(SET_X_OPCODE,SET_X);
+    talks.bind(SET_Y_OPCODE,SET_Y);
+    talks.bind(SET_Z_OPCODE,SET_Z);
+
+    talks.bind(GET_POS_OPCODE,GET_POSITION);
+    talks.bind(GET_POS_THEO_OPCODE,GET_POSITION_THEO);
+
+    //initialise ShiftRegister
     shift.attach(LATCHPIN,CLOCKPIN,DATAPIN);
    
+   	//initialise AX14
     servoax.SerialBegin(9600, RX_AX12, TX_AX12, AX12_DATA_CONTROL);
 
-    servoax.attach(254);
-	//servoax.setSRL(1); // Respond only to READ_DATA instructions
-	 //servoax.setLEDAlarm(32); // max torque only
-	 //servoax.setShutdownAlarm(32); // max torque only
-	 //servoax.setMaxTorque(1023);
-	//servoax.setEndlessMode(OFF);
-	//servoax.hold(OFF);
-
-
+	arm.attach(2,1,3);
+	arm.begin();
 }
 
 void loop()
 {
-	//talks.execute();
-	//servoax.setMaxTorqueRAM(1023);
-	servoax.move(150.0);
-
-	//Serial.println(servoax.ping());
-
-	delay(1000);
+	talks.execute();
 }

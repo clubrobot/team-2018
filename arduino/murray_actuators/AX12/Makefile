@@ -1,4 +1,4 @@
-BOARD_UUID = AX12_testu
+BOARD_UUID = RobotArm
 BOARD_TAG  = nano
 BOARD_SUB  = atmega328
 
@@ -11,7 +11,9 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/CRC16.cpp \
 	$(COMMON)/ShiftRegister.cpp \
 	$(COMMON)/SoftwareSerial.cpp \
-	$(COMMON)/AX12.cpp 
+	$(COMMON)/AX12.cpp \
+	$(COMMON)/RobotArm.cpp
+
 
 # Sketch libraries
 ARDUINO_LIBS = EEPROM Servo

@@ -18,7 +18,7 @@
 #define COLOR_ORDER BRG
 #define CHIPSET     WS2811
 
-#define BRIGHTNESS  200
+#define BRIGHTNESS  255
 #define FRAMES_PER_SECOND 30
 
 #define MAX_ANIMATION 10
@@ -76,11 +76,11 @@ class PannelEffects
 
 		Animation m_animations[MAX_ANIMATION];
 
-		int m_id_engr = DEFAULT_CODE;
+		int m_id_engr = CYLON_CODE;
 
-		int m_id_logo = DEFAULT_CODE;
+		int m_id_logo = CYLON_CODE;
 
-		int m_id_bar  = DEFAULT_CODE;
+		int m_id_bar  = CYLON_CODE;
 
 };
 

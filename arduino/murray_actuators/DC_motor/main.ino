@@ -2,16 +2,17 @@
 
 #include "PIN.h"
 #include "instructions.h"
-
+#include "../../common/DCMotor.h"
 #include "../../common/SerialTalks.h"
-#include "../../common/ShiftRegDCMotor.h"
 #include "../../common/ShiftRegister.h"
+#define USE_SHIFTREG 1
 
-ShiftRegDCMotorsDriver driver;
-ShiftRegDCMotor motor_1;
-ShiftRegDCMotor motor_2;
 
-ShiftRegister reg;
+DCMotorsDriver driver;
+DCMotor motor_1;
+DCMotor motor_2;
+
+ShiftRegister shift;
 
 void setup()
 {
@@ -32,7 +33,7 @@ void setup()
     talks.bind(_SET_VELOCITY1_OPCODE, SET_VELOCITY1);
     talks.bind(_SET_VELOCITY2_OPCODE, SET_VELOCITY1);
 
-    reg.attach(LATCHPIN, CLOCKPIN, DATAPIN);
+    shift.attach(LATCHPIN, CLOCKPIN, DATAPIN);
 
 	driver.attach(RST_DRV, 999);
 	driver.reset();

@@ -14,7 +14,7 @@ long last_time = 0;
 void setup()
 {
     //Serial.begin(115200);
-    talk.connect(500);
+    talk.connect(5);
     talk.bind(PING_OPCODE, PING);
     talk.bind(SET_BAR_OPCODE, SET_BAR);
     talk.bind(GET_BAR_OPCODE, GET_BAR);
@@ -37,7 +37,7 @@ void loop()
     current_time = millis();
     if((talk.is_connected() == false) && ((current_time - last_time)) > 500)
     {
-        talk.connect(500);
+        talk.connect(5);
         last_time = millis();
     }
 }

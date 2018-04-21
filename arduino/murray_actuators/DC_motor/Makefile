@@ -9,8 +9,10 @@ LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
 	$(COMMON)/CRC16.cpp \
-	$(COMMON)/ShiftRegDCMotor.cpp \
-	$(COMMON)/ShiftRegister.cpp 
+	$(COMMON)/ShiftRegister.cpp \
+	$(COMMON)/DifferentialController.cpp \
+	$(COMMON)/DCMotor.cpp
+
 
 
 # Sketch libraries

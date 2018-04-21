@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "../common/IK.h"
+#include "../common/RobotArm.h"
 #include "../common/SerialTalks.h"
 
 IK ik;
