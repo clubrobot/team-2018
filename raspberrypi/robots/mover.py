@@ -537,10 +537,10 @@ class Mover:
             ((-100, height / 2), (-100, -height / 2), (100, -height / 2), (100, height / 2)), timeout=TIMEOUT_OBSTACLE)
         obs.set_position(x_obs, y_obs, theta)
         self.path = self.roadmap.get_shortest_path((x_p, y_p), self.goal)
-        try:
-            self.wheeledbase.purepursuit(self.path)
-        except ValueError:
-            pass  # TODO
+        #try:
+        self.wheeledbase.purepursuit(self.path)
+        #except ValueError:
+        #    pass  # TODO
         self.interupted_status.clear()
         self.interupted_lock.release()
 
