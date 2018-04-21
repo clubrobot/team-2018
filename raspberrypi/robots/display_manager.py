@@ -26,8 +26,8 @@ class DisplayPoints:
     def normal(self, **kwargs):
         if not self.eyes_locker.acquire(blocking=False):
             return
-        self.left_eye.set_message("^^^%%^",1)
-        self.right_eye.set_message('___&&_',1)
+        self.left_eye.set_message("^^^^^%^",1)
+        self.right_eye.set_message('_____&_',1)
         self.eyes_locker.release()
 
     def _reset_normal(self, duration):
