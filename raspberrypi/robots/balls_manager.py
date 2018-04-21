@@ -6,7 +6,7 @@ import time
 
 from robots.automateTools import AutomateTools
 from robots.action import Action, Actionnable
-
+from robots.mover import Mover, PositionUnreachable
 
 class Dispenser(Actionnable):
     typ="Dispenser"
@@ -33,54 +33,28 @@ class Dispenser(Actionnable):
         self.logger("DISPENSER : ", " Aim the dispenser !")
         self.display.sleep()
         robot.turnonthespot(theta)
-        while True:
-            try:
-                robot.wait()
-                break
-            except:
-                time.sleep(0.2)
-                robot.turnonthespot(theta)
-
+        self.mover.turnonthespot(theta, 3, Mover.AIM)
         path = [self.preparationPoint,self.targetPoint]
         self.logger("DISPENSER : "," Let's go to the rumble !")
         self.display.angry(1)
         robot.purepursuit(path,direction='forward')
         robot.max_linvel.set(500)
         robot.max_angvel.set(6)
-        display.addPoints(Dispenser.POINTS_DISPENSER)
-        #AutomateTools.myPurepursuite(robot,path)
-        #AutomateTools.myTurnonthespot(robot,robot.get_position()[-1] +3.141592)
+
         init_pos = (0,0)
         try:
             robot.wait()
         except RuntimeError:
             init_pos = robot.get_position()[:-1]
+            display.addPoints(Dispenser.POINTS_DISPENSER)
             self.display.sick(3)
             self.logger("DISPENSER : ", "CONTACT !! Just try to take balls here {},{}", *init_pos)
             self.watersorter.enable_shaker()
             time.sleep(3)
 
         self.logger("DISPENSER : ", "Trying to go backward ")
-        robot.set_velocities(-200,0)
         pos = robot.get_position()[:-1]
-        self.mover.withdraw(*self.preparationPoint, direction="backward")
-        """
-        while math.hypot(pos[0]-init_pos[0],pos[1]-init_pos[1])<250:
-            try:
-                robot.isarrived()
-                time.sleep(0.2)
-            except RuntimeError:
-                robot.stop()
-                robot.set_velocities(100,0)
-                time.sleep(1)
-                robot.stop()
-                time.sleep(0.2)
-                robot.purepursuit([pos,self.preparationPoint], direction="backward")
-                time.sleep(0.2)
-                
-            time.sleep(0.5)
-            pos = robot.get_position()[:-1]
-        """
+        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=5, strategy=Mover.HARD)
         self.watersorter.disable_shaker()
         robot.stop()
         self.display.happy(2)
@@ -116,7 +90,10 @@ class Shot(Actionnable):
     def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=20):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
-        wheeledbase.turnonthespot(theta)
+        try:
+            self.mover.turnonthespot(theta, 3, Mover.AIM)
+        except PositionUnreachable:
+            return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
         watersorter.enable_shaker()
@@ -205,7 +182,10 @@ class Shot(Actionnable):
     def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, timeout=5):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
-        wheeledbase.turnonthespot(theta)
+        try:
+            self.mover.turnonthespot(theta, 3, Mover.AIM)
+        except PositionUnreachable:
+            return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
        
@@ -311,23 +291,16 @@ class Treatment(Actionnable):
         self.logger("TREATMENT :", "Go to the drop point !")
         currentPosXY=robot.get_position()[:2]
         self.display.angry(1)
-        robot.purepursuit([currentPosXY,shotDirection])
         try:
-            robot.wait()
-        except RuntimeError:
+            self.mover.gowall(1)
+        except PositionUnreachable:
             pass
         turn = False
         self.logger("TREATMENT :", "Turning !")
-        robot.turnonthespot(3.141592/2)
-        while not turn:
-            try:
-                turn  = robot.isarrived()
-            except RuntimeError:
-                robot.stop()
-                robot.set_velocities(-200,0)
-                time.sleep(0.3)
-                robot.stop()
-                robot.turnonthespot(3.141592/2)
+        try:
+            self.mover.turnonthespot(math.pi/2, 3, stategy=Mover.AIM)
+        except PositionUnreachable:
+            return
 
         self.display.happy(2)
         self.logger("TREATMENT :", "Droping !")
@@ -339,19 +312,11 @@ class Treatment(Actionnable):
         time.sleep(2)
         waterSorter.close_trash_unloader()
         
-        robot.turnonthespot(0)
-        turn = False
-        while not turn:
-            try:
-                robot.isarrived()
-                turn = True
-            except RuntimeError:
-                robot.set_velocities(-100,0)
-                time.sleep(0.4)
-                robot.stop()
-                robot.turnonthespot(0)
-            
-        robot.goto(*currentPosXY)
+        self.mover.turnonthespot(0, -1, stategy=Mover.AIM)
+        try:
+            robot.goto(*currentPosXY)
+        except RuntimeError:
+            pass
 
     #override
     def getAction(self):

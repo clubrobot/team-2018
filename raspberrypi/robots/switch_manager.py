@@ -6,7 +6,7 @@ import time
 
 from robots.automateTools import AutomateTools
 from robots.action import *
-from robots.mover import Mover
+from robots.mover import Mover, PositionUnreachable
 
 
 class Interrupteur(Actionnable):
@@ -23,8 +23,11 @@ class Interrupteur(Actionnable):
 
     def realize(self,robot, display):
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
-        AutomateTools.myTurnonthespot(robot,theta)
-        self.mover.gowall(try_limit=2, strategy=Mover.FAST)
+        try:
+            self.mover.turnonthespot(theta, try_limit=3, stategy=Mover.AIM)
+            self.mover.gowall(try_limit=5, strategy=Mover.FAST)
+        except PositionUnreachable:
+            return
         display.addPoints(Interrupteur.POINTS)
         self.mover.withdraw(*self.preparation,direction="backward")
 
@@ -49,12 +52,19 @@ class Abeille(Actionnable):
         self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
 
     def realize(self,robot, display):
-        robot.turnonthespot(math.pi)
-        robot.wait()
-        robot.purepursuit([self.preparation, self.interrupteur], direction="backward")
-        robot.wait()
-        robot.turnonthespot(math.pi+(self.side*2-1)*math.pi/4)
-        robot.wait()
+        try:
+            self.mover.turnonthespot(math.pi,try_limit=3,stategy=Mover.AIM)
+        except PositionUnreachable:
+            return
+        try:
+            robot.purepursuit([self.preparation, self.interrupteur], direction="backward")
+            robot.wait()
+        except RuntimeError:
+            return
+        try:
+            self.mover.turnonthespot(math.pi+(self.side*2-1)*math.pi/4, try_limit=3,stategy=Mover.AIM)
+        except PositionUnreachable:
+            return
         self.beeActioner.open()
         time.sleep(0.3)
         robot.set_velocities(0, -(self.side*2-1)*9)
@@ -66,8 +76,6 @@ class Abeille(Actionnable):
                 robot.stop()
                 robot.set_velocities(-100, 0)
                 time.sleep(0.5)
-
-        robot.wait()
         self.beeActioner.close()
         display.addPoints(Abeille.POINTS)
 
