@@ -106,8 +106,6 @@ def getlogs(args):
 
 def server(args):
     srv = Server(password=args.password, size=args.size)
-    if DEV_MODE or MATCH_MODE: Thread(target=buttons, daemon=True).start()
-
     while True:
         try:
             while not srv.full():
@@ -121,45 +119,6 @@ def server(args):
             sys.stderr.write('{}: {}\n'.format(type(e).__name__, e))
             continue
 
-
-def start(args):
-    global robot
-    if args.name == 'bornibus':
-        robot = Bornibus(args.ip, timelimit=args.timelimit)
-        robot.log('hi there, this is Bornibus!')
-    elif args.name == 'murray':
-        robot = Murray(args.ip, timelimit=args.timelimit)
-        robot.log('hello everyone, I am Murray!')
-
-    # Connect to the components server
-    robot.log('connect to server')
-    robot.connect(timeout=args.timeout)
-    robot.log('connected')
-
-    # Load the roadmap
-    if args.roadmap is not None:
-        robot.log('load roadmap: {}'.format(args.roadmap))
-        robot.load_roadmap(args.roadmap)
-        robot.log('loaded')
-
-    # Bluetooth connection
-    robot.connect_to_brother(macaddress=args.bluetooth)
-
-    # Initialization procedure
-    robot.log("let's get ready to rumble")
-    starter = Starter(robot.geogebra, robot.wheeledbase, robot.greenbutton, robot.redbutton, robot.bluebutton,
-                      robot.yellowbutton, robot.pullswitch)
-    starter.join()
-    if (starter.state == "Exiting"):
-        robot.log('thank you!')
-        sys.exit(0)
-
-    # Start match
-    if starter.team == "Yellow":
-        robot.side = 0
-    elif starter.team == "Blue":
-        robot.side = 1
-    robot.start()
 
 
 # Update arduino programs
