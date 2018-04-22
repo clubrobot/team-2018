@@ -350,6 +350,9 @@ class SecureSerialTalksProxy(Proxy):
                 connect_addr(**kwargs)
             except AlreadyConnectedError:
                 pass
+            except KeyError:
+                self.initialized = False
+                warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
             except (NotConnectedError, ConnectionFailedError):
                 warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
             except MuteError:
@@ -365,7 +368,7 @@ class SecureSerialTalksProxy(Proxy):
                     pass
             try:
                 result = execute_addr(opcode, *args, **kwargs)
-            except (NotConnectedError, ConnectionFailedError):
+            except (NotConnectedError, ConnectionFailedError, KeyError):
                 self.connect(with_lock=False)
                 if opcode in self.default_result.keys():
                     object.__getattribute__(self, "lock").release()
@@ -396,7 +399,7 @@ class SecureSerialTalksProxy(Proxy):
                     pass
             try:
                 send_addr(opcode, *args)
-            except NotConnectedError:
+            except (NotConnectedError, KeyError):
                 self.connect(with_lock=False)
             except ConnectionFailedError:
                 self.connect(with_lock=False)
