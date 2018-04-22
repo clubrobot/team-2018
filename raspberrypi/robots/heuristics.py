@@ -1,9 +1,15 @@
-class Heuristics:
-    POINTS_INFLUENCE = 0.5
-    ORDER_INFLUENCE = 1
-    DONE_INFLUENCE=1
+import math
 
-    def __init__(self, actions):
+class Heuristics:
+    POINTS_INFLUENCE = 1
+    ORDER_INFLUENCE = 1
+    DONE_INFLUENCE = 1
+    RELIABILITY_INFLUENCE = 1
+    COMBINATIONS_INFLUENCE = 1
+    TIME_INFLUENCE = 1
+    DISTANCE_INFLUENCE = 1
+
+    def __init__(self, actions, arduinos):
         self.actions = actions
         self.action_names = []
         self.action_dict = dict()
@@ -12,14 +18,28 @@ class Heuristics:
             self.action_dict[action.name] = action
 
         for action in self.action_names:
+            self.init_time_recursive(self.action_dict[action], self.action_dict[action].time)
+            self.init_reliability_recursive(self.action_dict[action], self.action_dict[action].reliability)
             self.init_points_recursive(self.action_dict[action], self.action_dict[action].points)
 
-        self.heuristics = [self.order, self.points, self.done, self.combinations]
+        self.heuristics = [self.order, self.points, self.done, self.combinations, self.reliability, self.time,
+                           self.action_distance]
+        self.wheeledbase = arduinos["wheeledbase"]
 
     def init_points_recursive(self, action, points):
         for pred in action.predecessors:
             pred.points += points
             self.init_points_recursive(pred, points)
+
+    def init_time_recursive(self, action, time):
+        for pred in action.predecessors:
+            pred.points += time
+            self.init_points_recursive(pred, time)
+
+    def init_reliability_recursive(self, action, reliability):
+        for pred in action.predecessors:
+            pred.reliability *= reliability
+            self.init_points_recursive(pred, reliability)
 
     def order(self):
         heuristic = dict()
@@ -55,6 +75,18 @@ class Heuristics:
         print(heuristic)
         return heuristic
 
+    def combinations(self):
+        heuristic = dict()
+        for action in self.action_names:
+            if self.action_dict[action].check_impossible_combinations(self.action_dict) is False:
+                heuristic[action] = 0
+            else:
+                heuristic[action] = 1
+        print(" * COMBINATIONS")
+        heuristic = self.mul_dict(heuristic, Heuristics.COMBINATIONS_INFLUENCE)
+        print(heuristic)
+        return heuristic
+
     def done(self):
         heuristic = dict()
         for action in self.action_names:
@@ -67,15 +99,41 @@ class Heuristics:
         print(heuristic)
         return heuristic
 
-    def combinations(self):
+    def action_distance(self):
         heuristic = dict()
+        max_distance = 0
+        robot_pos = self.wheeledbase.get_position()[:-1]
         for action in self.action_names:
-            if self.action_dict[action].check_impossible_combinations(self.action_dict) is False:
-                heuristic[action] = 0
+            if not self.action_dict[action].done:
+                point = self.action_dict[action].preparationPoint
+                max_distance = max(math.hypot(robot_pos[0] - point[0], robot_pos[1] - point[1]), max_distance)
+
+        for action in self.action_names:
+            if max_distance != 0:
+                heuristic[action] = 1 - self.action_dict[action].points / max_distance
             else:
-                heuristic[action] = 1
-        print(" * COMBINATIONS")
-        heuristic = self.mul_dict(heuristic, Heuristics.DONE_INFLUENCE)
+                heuristic[action] = 0
+
+        print(" * DISTANCE")
+        heuristic = self.mul_dict(heuristic, Heuristics.DISTANCE_INFLUENCE)
+        print(heuristic)
+        return heuristic
+
+
+    def time(self):
+        heuristic = dict()
+        max_time = 0
+        for action in self.action_names:
+            if not self.action_dict[action].done:
+                max_time = max(self.action_dict[action].points, max_time)
+
+        for action in self.action_names:
+            if max_time != 0:
+                heuristic[action] = 1-self.action_dict[action].points / max_time
+            else:
+                heuristic[action] = 0
+        print(" * TIME")
+        heuristic = self.mul_dict(heuristic, Heuristics.TIME_INFLUENCE)
         print(heuristic)
         return heuristic
 
@@ -83,6 +141,15 @@ class Heuristics:
         for action in self.action_names:
             dict[action] *= mul
         return dict
+
+    def reliability(self):
+        heuristic = dict()
+        for action in self.action_names:
+            heuristic[action] = self.action_dict[action].reliability
+        print(" * RELIABILITY")
+        heuristic = self.mul_dict(heuristic, Heuristics.RELIABILITY_INFLUENCE)
+        print(heuristic)
+        return heuristic
 
     def compute_heuristics(self):
         heuristics_values = dict()
@@ -93,7 +160,10 @@ class Heuristics:
             current_values = heuristic()
             for action in self.action_names:
                 tmp = current_values[action]
-                heuristics_values[action] *= tmp
+                heuristics_values[action] += tmp
+
+        for action in self.action_names:
+            heuristics_values[action] /= len(self.heuristics)
 
         print(" * TOTAL")
         print(heuristics_values)

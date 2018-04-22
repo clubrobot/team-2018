@@ -115,7 +115,7 @@ class Bornibus:
             print("Make action {}".format(act.name))
             # act()
             act.done = True
-            act = h.getBest()
+            act = self.heuristics.getBest()
             self.arduinos["wheeledbase"].max_linvel.set(500)
             self.arduinos["wheeledbase"].max_angvel.set(6)
 

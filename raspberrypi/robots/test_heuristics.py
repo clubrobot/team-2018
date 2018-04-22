@@ -2,13 +2,18 @@ from heuristics           import Heuristics
 from action               import Action
 import time
 
-shortshot = Action(None, None, None, "shortshot", 40)
-longshot = Action(None, None, None, "longshot", 20)
-dispMono = Action(None, None, None, "dispMono", 10)
-dispMulti = Action(None, None, None, "dispMulti", 10)
-abeille = Action(None, None, None, "abeille", 50)
-panneau = Action(None, None, None, "Panneau", 25)
-treatment = Action(None, None, None, "traitement", 40)
+shortshot = Action(None, None, None, "shortshot", 40, 20)
+longshot = Action(None, None, None, "longshot", 20, 30)
+dispMono = Action(None, None, None, "dispMono", 10, 10)
+dispMulti = Action(None, None, None, "dispMulti", 10, 10)
+abeille = Action(None, None, None, "abeille", 50, 10)
+panneau = Action(None, None, None, "Panneau", 25, 5)
+treatment = Action(None, None, None, "traitement", 40, 10)
+
+dispMono.set_reliability(0.6)
+dispMulti.set_reliability(0.6)
+shortshot.set_reliability(0.8)
+longshot.set_reliability(0.8)
 
 treatment.set_predecessors([longshot])
 longshot.set_predecessors([dispMulti])
