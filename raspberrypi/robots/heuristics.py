@@ -22,8 +22,8 @@ class Heuristics:
             self.init_reliability_recursive(self.action_dict[action], self.action_dict[action].reliability)
             self.init_points_recursive(self.action_dict[action], self.action_dict[action].points)
 
-        self.heuristics = [self.order, self.points, self.done, self.combinations, self.reliability, self.time,
-                           self.action_distance]
+        self.heuristics_soft = [self.points, self.reliability, self.time, self.action_distance]
+        self.heuristics_hard = [self.order, self.combinations, self.done]
         self.wheeledbase = arduinos["wheeledbase"]
 
     def init_points_recursive(self, action, points):
@@ -119,7 +119,6 @@ class Heuristics:
         print(heuristic)
         return heuristic
 
-
     def time(self):
         heuristic = dict()
         max_time = 0
@@ -156,14 +155,20 @@ class Heuristics:
         for action in self.action_names:
             heuristics_values[action] = 1
 
-        for heuristic in self.heuristics:
+        for heuristic in self.heuristics_soft:
             current_values = heuristic()
             for action in self.action_names:
                 tmp = current_values[action]
                 heuristics_values[action] += tmp
 
         for action in self.action_names:
-            heuristics_values[action] /= len(self.heuristics)
+            heuristics_values[action] /= len(self.heuristics_soft)
+
+        for heuristic in self.heuristics_hard:
+            current_values = heuristic()
+            for action in self.action_names:
+                tmp = current_values[action]
+                heuristics_values[action] *= tmp
 
         print(" * TOTAL")
         print(heuristics_values)
@@ -173,9 +178,7 @@ class Heuristics:
         heuristics_values = self.compute_heuristics()
         name_best = ""
         for action in self.action_names:
-            if (name_best == "" \
-                or heuristics_values[action] > heuristics_values[name_best])\
-                and not self.action_dict[action].done:
+            if name_best == "" or heuristics_values[action] > heuristics_values[name_best]:
                 name_best = action
         if name_best == "":
             return None

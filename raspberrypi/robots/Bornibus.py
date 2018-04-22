@@ -74,35 +74,39 @@ class Bornibus:
         treatmentAct = self.treatment.getAction()[0]
 
         if self.side == Bornibus.GREEN:
-            shortShot.set_predecessors([d1Act])
-            longShot.set_predecessors([d3Act])
+            dispMulti = d3Act
+            dispMono = d1Act
 
-        if self.side == Bornibus.ORANGE:
-            shortShot.set_predecessors([d4Act])
-            longShot.set_predecessors([d2Act])
+        else:
+            dispMulti = d2Act
+            dispMono = d4Act
 
         treatmentAct.set_predecessors([longShot])
 
         # Generate order list
-        self.action_list[Bornibus.GREEN] = [
+        self.action_list = [
             beeAct,
             panelAct,
-            d1Act,
+            dispMono,
             shortShot,
-            d3Act,
+            dispMulti,
             longShot,
             treatmentAct,
         ]
 
-        self.action_list[Bornibus.ORANGE] = [
-            beeAct,
-            panelAct,
-            d4Act,
-            shortShot,
-            d2Act,
-            longShot,
-            treatmentAct,
-        ]
+        dispMono.set_reliability(0.6)
+        dispMulti.set_reliability(0.6)
+        shortShot.set_reliability(0.8)
+        longShot.set_reliability(0.8)
+
+        treatmentAct.set_predecessors([longShot])
+        longShot.set_predecessors([dispMulti])
+        shortShot.set_predecessors([dispMono])
+
+        dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
+        dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
+
+        self.heuristics = Heuristics(self.action_list, self.arduinos)
 
     def run(self):
         self.arduinos["wheeledbase"].lookahead.set(200)

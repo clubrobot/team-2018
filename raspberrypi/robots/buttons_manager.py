@@ -153,7 +153,7 @@ class ButtonGestureDemo():
         self.item_selected = 0
         self.display = display
         self.exiting = False
-        self.menus_dict = {"Menu": ["Make", "IP", "Git pull", "Reboot", "Shutdown", "Exit"],
+        self.menus_dict = {"Menu": ["Make", self.ip_funct(), "Git pull", "Reboot", "Shutdown", "Exit"],
                            "Make": ["WheeledBase", "WaterShooter", "Display", "Sensors"]}
         self.prog_dict = {"IP": self.ip_funct,
                           "Reboot": self.reboot_funct,
@@ -179,10 +179,17 @@ class ButtonGestureDemo():
 
     def ip_funct(self):
         ip = ''
+
         while not ip:
             proc = subprocess.run(['hostname', '-I'], stdout=subprocess.PIPE)
-            ip = proc.stdout.strip().decode('utf8')
+            ips = proc.stdout.strip().decode('utf8').split(" ")
+            if len(ips) == 2:
+                ip = ips[1]
+            else:
+                ip = ips[0]
+        print(ip)
         self.display.set_message(ip)
+        return ip
 
     def reboot_funct(self):
         self.display.set_message("Lets restart")
