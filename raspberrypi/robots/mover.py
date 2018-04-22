@@ -244,7 +244,7 @@ class Mover:
 
     def _withdraw_hard(self, direction):
         self.wheeledbase.max_linvel.set(100)
-
+        self.logger("MOVER : ", "Start withdraw hard")
         self.direction = direction
         if direction =="forward":
             self.withdraw_flag.bind(self.sensors_front_listener.signal)
@@ -258,12 +258,15 @@ class Mover:
                 if  self.interupted_status.is_set() :
                     sleep(0.2)
                 else:
+                    self.logger("MOVER : ", "Launch a goto")
                     self.wheeledbase.goto(*self.goal, direction=direction)
                     self.isarrived = True
 
             except RuntimeError:
+                self.logger("MOVER : ", "Spin detected !")
                 if self.interupted_status.is_set() :
                     continue
+                self.logger("MOVER : ", "Go back a little !")
                 self.wheeledbase.stop()
                 self.wheeledbase.set_velocities( -100 if self.direction =="forward" else 100,0)
                 time.sleep(0.5)
@@ -273,15 +276,18 @@ class Mover:
 
 
     def _withdraw_interrup(self):
+        self.logger("MOVER : ", "Interruption !")
         if self.interupted_timeout.is_set() : return
         if not self.interupted_lock.acquire(blocking=False): return
         self.interupted_status.set()
+        self.logger("MOVER : ", "Stop the wheeledbase")
         self.wheeledbase.stop()
         sensors = self.sensors_front if self.direction == "forward" else self.sensors_back
         try:
+            self.logger("MOVER : ", "Wait sensors")
             sensors.wait(80, timeout= self.timeout)
         except TimeoutError:
-            print("TIME OUT", self.timeout)
+            self.logger("MOVER : ", "Time out ", self.timeout )
             self.interupted_timeout.set()
             self.withdraw_flag.clear()
             self.wheeledbase.max_linvel.set(100)
