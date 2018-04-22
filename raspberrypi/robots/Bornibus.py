@@ -110,7 +110,8 @@ class Bornibus:
         self.side = side
 
     def run(self):
-
+        self.displayManager.start()
+        self.logger.reset_time()
         self.arduinos["wheeledbase"].lookahead.set(200)
         self.arduinos["wheeledbase"].max_linvel.set(500)
         self.arduinos["wheeledbase"].max_angvel.set(6)
