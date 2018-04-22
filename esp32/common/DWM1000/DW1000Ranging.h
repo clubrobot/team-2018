@@ -42,7 +42,7 @@
 #define TRILATERATION_REPORT 	6
 #define CHANGE_COLOR 			7
 
-#define LEN_DATA 90
+#define LEN_DATA 120
 
 //Max devices we put in the networkDevices array ! Each DW1000Device is 74 Bytes in SRAM memory for now.
 #define MAX_DEVICES 4
