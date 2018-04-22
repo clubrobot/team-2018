@@ -13,6 +13,7 @@ class Action():
         self.combinations = []
         self.reliability = 1
         self.time = time
+        self.area = None
         
     def __call__(self):
         self.actionFunction()
@@ -34,6 +35,9 @@ class Action():
 
     def set_reliability(self, rel):
         self.reliability = rel
+
+    def link_area(self, aera_name):
+        self.area = aera_name
 
     def __bool__(self):
         return self.done

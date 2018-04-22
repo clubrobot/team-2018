@@ -14,6 +14,7 @@ class Area:
         self.points = points_list
         self.value = 0
         self.lock = RLock()
+
     def reduce(self):
         self.lock.acquire()
         self.value = max(self.value-REDUCE_CONSTANT,0)
@@ -46,7 +47,6 @@ class BeaconsManagement(Thread):
         self.geogebra = Geogebra(file)
         self.areas = dict()
         self.running = Event()
-
 
     def create_area(self, name,  patern=None):
         points =  self.geogebra.getall(patern)

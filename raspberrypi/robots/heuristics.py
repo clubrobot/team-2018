@@ -8,11 +8,13 @@ class Heuristics:
     COMBINATIONS_INFLUENCE = 1
     TIME_INFLUENCE = 1
     DISTANCE_INFLUENCE = 1
+    OPPONENT_INFLUENCE = 1
 
-    def __init__(self, actions, arduinos):
+    def __init__(self, actions, arduinos, logger, beacon_management):
         self.actions = actions
         self.action_names = []
         self.action_dict = dict()
+        self.logger = logger
         for action in self.actions:
             self.action_names += [action.name] 
             self.action_dict[action.name] = action
@@ -22,9 +24,10 @@ class Heuristics:
             self.init_reliability_recursive(self.action_dict[action], self.action_dict[action].reliability)
             self.init_points_recursive(self.action_dict[action], self.action_dict[action].points)
 
-        self.heuristics_soft = [self.points, self.reliability, self.time, self.action_distance]
+        self.heuristics_soft = [self.points, self.reliability, self.time, self.action_distance, self.opponent_position]
         self.heuristics_hard = [self.order, self.combinations, self.done]
         self.wheeledbase = arduinos["wheeledbase"]
+        self.beacon_management = beacon_management
 
     def init_points_recursive(self, action, points):
         for pred in action.predecessors:
@@ -52,9 +55,8 @@ class Heuristics:
                 heuristic[action] = 1
             else:
                 heuristic[action] = 0
-        print(" * ORDER")
         heuristic = self.mul_dict(heuristic, Heuristics.ORDER_INFLUENCE)
-        print(heuristic)
+        self.logger("HEURISTIC : ", "order", heuristic=heuristic)
         return heuristic
 
     def points(self):
@@ -70,9 +72,8 @@ class Heuristics:
             else:
                 heuristic[action] = 0
 
-        print(" * POINTS")
         heuristic = self.mul_dict(heuristic, Heuristics.POINTS_INFLUENCE)
-        print(heuristic)
+        self.logger("HEURISTIC : ", "points", heuristic=heuristic)
         return heuristic
 
     def combinations(self):
@@ -82,9 +83,9 @@ class Heuristics:
                 heuristic[action] = 0
             else:
                 heuristic[action] = 1
-        print(" * COMBINATIONS")
+
         heuristic = self.mul_dict(heuristic, Heuristics.COMBINATIONS_INFLUENCE)
-        print(heuristic)
+        self.logger("HEURISTIC : ", "combinations", heuristic=heuristic)
         return heuristic
 
     def done(self):
@@ -94,9 +95,8 @@ class Heuristics:
                 heuristic[action] = 0
             else:
                 heuristic[action] = 1
-        print(" * DONE")
         heuristic = self.mul_dict(heuristic, Heuristics.DONE_INFLUENCE)
-        print(heuristic)
+        self.logger("HEURISTIC : ", "done", heuristic=heuristic)
         return heuristic
 
     def action_distance(self):
@@ -109,14 +109,14 @@ class Heuristics:
                 max_distance = max(math.hypot(robot_pos[0] - point[0], robot_pos[1] - point[1]), max_distance)
 
         for action in self.action_names:
+            point = self.action_dict[action].actionPoint
             if max_distance != 0:
-                heuristic[action] = 1 - self.action_dict[action].points / max_distance
+                heuristic[action] = 1 - math.hypot(robot_pos[0] - point[0], robot_pos[1] - point[1]) / max_distance
             else:
                 heuristic[action] = 0
 
-        print(" * DISTANCE")
         heuristic = self.mul_dict(heuristic, Heuristics.DISTANCE_INFLUENCE)
-        print(heuristic)
+        self.logger("HEURISTIC : ", "distance to action", heuristic=heuristic)
         return heuristic
 
     def time(self):
@@ -131,9 +131,20 @@ class Heuristics:
                 heuristic[action] = 1-self.action_dict[action].points / max_time
             else:
                 heuristic[action] = 0
-        print(" * TIME")
         heuristic = self.mul_dict(heuristic, Heuristics.TIME_INFLUENCE)
-        print(heuristic)
+        self.logger("HEURISTIC : ", "time", heuristic=heuristic)
+        return heuristic
+
+    def opponent_position(self):
+        heuristic = dict()
+        for action in self.action_names:
+            if self.action_dict[action].area is not None:
+                heuristic[action] = 1 - self.beacon_management.get_area_value(self.action_dict[action].area)
+            else:
+                heuristic[action] = 1
+
+        heuristic = self.mul_dict(heuristic, Heuristics.OPPONENT_INFLUENCE)
+        self.logger("HEURISTIC : ", "opponent_position", heuristic=heuristic)
         return heuristic
 
     def mul_dict(self, dict, mul):
@@ -158,8 +169,7 @@ class Heuristics:
         for heuristic in self.heuristics_soft:
             current_values = heuristic()
             for action in self.action_names:
-                tmp = current_values[action]
-                heuristics_values[action] += tmp
+                heuristics_values[action] += current_values[action]
 
         for action in self.action_names:
             heuristics_values[action] /= len(self.heuristics_soft)
@@ -170,14 +180,15 @@ class Heuristics:
                 tmp = current_values[action]
                 heuristics_values[action] *= tmp
 
-        print(" * TOTAL")
-        print(heuristics_values)
+        self.logger("HEURISTIC : ", "TOTAL", heuristic=heuristics_values)
         return heuristics_values
 
     def get_best(self):
         heuristics_values = self.compute_heuristics()
         name_best = ""
         for action in self.action_names:
+            if heuristics_values[action] == 0:
+                continue
             if name_best == "" or heuristics_values[action] > heuristics_values[name_best]:
                 name_best = action
         if name_best == "":

@@ -11,6 +11,8 @@ from robots.switch_manager       import Interrupteur, Abeille
 from robots.mover                import Mover
 from robots.heuristics           import Heuristics
 from common.logger               import Logger
+from robots.beacons_manager      import BeaconsManagement
+from beacons.balise_receiver     import BaliseReceiver
 
 # Setup and launch the user interface
 class Bornibus:
@@ -21,7 +23,7 @@ class Bornibus:
     GREEN  = 0
     ORANGE = 1
 
-    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back, bm):
         # Save arduinos
         self.arduinos = dict(wheeledbase=wheeledbase,
                              waterlauncher=waterlauncher,
@@ -102,10 +104,19 @@ class Bornibus:
         longShot.set_predecessors([dispMulti])
         shortShot.set_predecessors([dispMono])
 
+        self.beacons_manager = bm
+        self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
+        self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
+        self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
+
+        treatmentAct.link_area(treatmentAct.name)
+        dispMulti.link_area(dispMulti.name)
+        panelAct.link_area(panelAct.name)
+
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
         dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos)
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager)
 
     def set_side(self,side):
         self.side = side
@@ -140,5 +151,11 @@ if __name__ == '__main__':
 
     geo = Geogebra('bornibus.ggb')
     rm = RoadMap.load(geo)
-    auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back)
+
+    br = BaliseReceiver("192.168.1.11")
+    br.connect()
+    bm = BeaconsManagement(br, "../beacons/area.ggb")
+    bm.start()
+    auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back, bm)
+    time.sleep(5)
     auto.run()
