@@ -11,12 +11,15 @@ class DisplayPoints:
         self.left_eye = left_eye
         self.right_eye = right_eye
         self.points = 10
-        self.start_time = time.time()
         self.locker = RLock()
         self.eyes_locker = RLock()
-        self.left_eye.set_message("^^^%%^",1)
-        self.right_eye.set_message('___&&_',1)
+        self.left_eye.set_message("^^^^^%^",1)
+        self.right_eye.set_message('_____&_',1)
+
+    def start(self):
+        self.start_time = time.time()
         Thread(target=self.run).start()
+
     
     def addPoints(self, points):
         self.locker.acquire()
