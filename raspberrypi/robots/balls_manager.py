@@ -11,6 +11,7 @@ from robots.mover import Mover, PositionUnreachable
 class Dispenser(Actionnable):
     typ="Dispenser"
     POINTS_DISPENSER = 10
+    TIME = 10
     def __init__(self,numberDispenser, rm, geo, arduinos, display, mover, logger):
         self.rm  = rm
         self.geo = geo
@@ -65,13 +66,17 @@ class Dispenser(Actionnable):
         return [Action( self.preparationPoint,
                         lambda : self.realize(self.wheeledbase,self.watersorter, self.display),
                         Dispenser.typ, 
-                        "DISPENSER"+str(self.numberDispenser))]
+                        "DISPENSER"+str(self.numberDispenser),
+                        Dispenser.POINTS_DISPENSER,
+                        Dispenser.TIME)]
 
 
 class Shot(Actionnable):
     typ="shot"
     POINTS_PER_BALL_CASTLE = 5
     POINTS_PER_BALL_EPURATION = 10
+    TIME_SORTED = 30
+    TIME_UNSORTED = 20
     def __init__(self, side, rm, geo, arduinos, display, mover, logger):
         self.side=side
         self.rm  = rm
@@ -256,25 +261,33 @@ class Shot(Actionnable):
                 self.shootCastlePoint,
                 lambda  :self.realize_without_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
                 Shot.typ,
-                "SHORTSHOOTNOSORT"
+                "SHORTSHOOTNOSORT",
+                8*Shot.POINTS_PER_BALL_CASTLE,
+                Shot.TIME_UNSORTED
                 )
         act_with_sort =Action(
                 self.shootCastlePoint, #self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
                 Shot.typ,
-                "SHORTSHOOTSORT"
+                "SHORTSHOOTSORT",
+                4 * Shot.POINTS_PER_BALL_CASTLE,
+                Shot.TIME_SORTED
                 )
         act_with_sort_long =Action(
                 self.shootCastlePointLong,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
                 Shot.typ,
-                "LONGSHOOTSORT"
+                "LONGSHOOTSORT",
+                4 * Shot.POINTS_PER_BALL_CASTLE,
+                Shot.TIME_SORTED
                 )   
         return [act_without_sort,act_with_sort,act_with_sort_long]
 
 
 class Treatment(Actionnable):
     typ="treatement"
+    POINTS = 40
+    TIME = 10
     def __init__(self, side, rm, geo, arduinos, display, mover, logger):
         self.side=side
         self.rm=rm
@@ -324,7 +337,9 @@ class Treatment(Actionnable):
                 self.treatmentPoint,
                 lambda  :self.realize(self.shootTreatmentPoint,self.wheeledbase ,self.watersorter) ,
                 Treatment.typ,
-                "TREATMENT"
+                "TREATMENT",
+                Treatment.POINTS,
+                Treatment.TIME
             )
         return [act]
 

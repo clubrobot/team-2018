@@ -61,8 +61,6 @@ class Bornibus:
         self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger)
         self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager,self.mover, self.logger)
 
-        self.heuristics = Heuristics(self.action_list[self.side])
-
         #Generate predecessors list
         beeAct = self.bee.getAction()[0]
         panelAct = self.panel.getAction()[0]
@@ -118,29 +116,22 @@ class Bornibus:
         self.arduinos["wheeledbase"].lookahead.set(200)
         self.arduinos["wheeledbase"].max_linvel.set(500)
         self.arduinos["wheeledbase"].max_angvel.set(6)
-        #self.arduinos["wheeledbase"].set_position(592, 290, 0)
+        self.arduinos["wheeledbase"].set_position(592, 290, 0)
         self.arduinos["beeActioner"].close()
         self.arduinos["watersorter"].close_trash_unloader()
         self.arduinos["watersorter"].close_trash()
 
-
-
-        act = self.heuristics.getBest()
+        act = self.heuristics.get_best()
         print(act)
         while act is not None:
-            print("Make action {}".format(act.name))
-            act()
-            act.done = True
-            act = self.heuristics.getBest()
-            self.arduinos["wheeledbase"].max_linvel.set(500)
-            self.arduinos["wheeledbase"].max_angvel.set(6)
-        for act in self.action_list[self.side]:
             self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
             self.mover.goto(*act.actionPoint)
             self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
             act()
-
-
+            act.done = True
+            act = self.heuristics.get_best()
+            self.arduinos["wheeledbase"].max_linvel.set(500)
+            self.arduinos["wheeledbase"].max_angvel.set(6)
 
 
 if __name__ == '__main__':

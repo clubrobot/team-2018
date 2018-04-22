@@ -12,6 +12,7 @@ from robots.mover import Mover, PositionUnreachable
 class Interrupteur(Actionnable):
     typ="Interrupteur"
     POINTS = 25
+    TIME = 5
     def __init__(self,side, geo, arduinos, display, mover, logger):
         self.side=side
         self.mover = mover
@@ -36,11 +37,14 @@ class Interrupteur(Actionnable):
             return [Action( self.preparation,
                             lambda : self.realize(self.wheeledbase, self.display),
                             Interrupteur.typ,
-                            "INTERRUPTEUR")  ]
+                            "INTERRUPTEUR",
+                            Interrupteur.POINTS,
+                            Interrupteur.TIME)  ]
 
 class Abeille(Actionnable):
     typ="Abeille"
     POINTS = 50
+    TIME = 10
     def __init__(self, side, geo, arduinos, display, mover, logger):
         self.side=side
         self.logger = logger
@@ -84,7 +88,9 @@ class Abeille(Actionnable):
             return [Action( self.preparation,
                             lambda : self.realize(self.wheeledbase, self.display),
                             Interrupteur.typ,
-                            "ABEILLE")]
+                            "ABEILLE",
+                            Abeille.POINTS,
+                            Abeille.TIME)]
 
 class Odometrie(Actionnable):
     typ="Odometrie"
