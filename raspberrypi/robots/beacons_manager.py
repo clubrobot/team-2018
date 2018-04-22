@@ -29,7 +29,7 @@ class Area:
                 self.lock.release()
                 return
         self.lock.release()
-        self.value = min(self.value+INCREASE_CONSTANT,1)
+        self.value = min(self.value+INCREASE_CONSTANT, 1)
 
     def get_value(self):
         self.lock.acquire()
