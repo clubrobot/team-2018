@@ -115,7 +115,7 @@ class Bornibus:
         self.arduinos["wheeledbase"].lookahead.set(200)
         self.arduinos["wheeledbase"].max_linvel.set(500)
         self.arduinos["wheeledbase"].max_angvel.set(6)
-        self.arduinos["wheeledbase"].set_position(592, 290, 0)
+        #self.arduinos["wheeledbase"].set_position(592, 290, 0)
         self.arduinos["beeActioner"].close()
         self.arduinos["watersorter"].close_trash_unloader()
         self.arduinos["watersorter"].close_trash()
