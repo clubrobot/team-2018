@@ -43,6 +43,7 @@ def start(args):
     automate = Bornibus(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back)
     button_gesture = ButtonGestureMatch(button_card, ssd, b, m, automate.set_side)
     button_gesture.run()
+    button_card.disconnect()
     try:
         automate.run()
     except TimeoutError:
