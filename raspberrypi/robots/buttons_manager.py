@@ -13,7 +13,10 @@ _RED = 1
 _GREEN = 0
 _BLUE = 2
 _ORANGE = 3
-
+_GREEN_COLOR = 1
+_RED_COLOR = 2
+_BLUE_COLOR = 3
+_ORANGE_COLOR = 4
 
 class ButtonGestureMatch():
     WAITING_TEAM = 0
@@ -33,8 +36,8 @@ class ButtonGestureMatch():
         self.buttons.affect(_BLUE, self.button_blue)
         self.buttons.affect(_ORANGE, self.button_orange)
         self.buttons.bind(3, self.tirret)
-        self.buttons.on(_GREEN)
-        self.buttons.on(_ORANGE)
+        self.buttons.on(_GREEN_COLOR)
+        self.buttons.on(_ORANGE_COLOR)
         self.side = None
         self.setter = side_setter
         self.lock_stat = RLock()
@@ -45,6 +48,8 @@ class ButtonGestureMatch():
     def run(self):
         while not self.tirret_status.is_set() or self.status != ButtonGestureMatch.WAITING_MATCH:
             sleep(0.1)
+        print("sortie")
+        print(self.tirret_status.is_set(), self.status)
         return self.side
 
     def button_red(self):
@@ -55,10 +60,10 @@ class ButtonGestureMatch():
         if (self.status == ButtonGestureMatch.WAITING_ODOMETRY):
             self.side = None
             self.status = ButtonGestureMatch.WAITING_TEAM
-            self.buttons.on(_GREEN)
-            self.buttons.on(_ORANGE)
-            self.buttons.off(_RED)
-            self.buttons.off(_BLUE)
+            self.buttons.on(_GREEN_COLOR)
+            self.buttons.on(_ORANGE_COLOR)
+            self.buttons.off(_RED_COLOR)
+            self.buttons.off(_BLUE_COLOR)
             self.display.set_message("Select")
         if (self.status == ButtonGestureMatch.WAITING_MATCH):
             self.status = ButtonGestureMatch.WAITING_ODOMETRY
@@ -81,11 +86,11 @@ class ButtonGestureMatch():
 
             if self.tirret_status.is_set():
                 for k in range(3):
-                    for i in range(3):
-                        self.buttons.on(i)
+                    for i in range(4):
+                        self.buttons.on(i+1)
                     sleep(0.2)
-                    for i in range(3):
-                        self.buttons.off(i)
+                    for i in range(4):
+                        self.buttons.off(i+1)
                     sleep(0.2)
             else:
                 for i in range(3):
@@ -95,14 +100,14 @@ class ButtonGestureMatch():
 
         if (self.status == ButtonGestureMatch.WAITING_TEAM and not self.side is None):
             self.status = ButtonGestureMatch.WAITING_ODOMETRY
-            self.buttons.off(_BLUE)
-            self.buttons.off(_GREEN)
-            self.buttons.off(_ORANGE)
-            self.buttons.off(_RED)
+            self.buttons.off(_BLUE_COLOR)
+            self.buttons.off(_GREEN_COLOR)
+            self.buttons.off(_ORANGE_COLOR)
+            self.buttons.off(_RED_COLOR)
             if self.side == 0:
-                self.buttons.on(_GREEN)
+                self.buttons.on(_GREEN_COLOR)
             if self.side == 1:
-                self.buttons.on(_ORANGE)
+                self.buttons.on(_ORANGE_COLOR)
             self.display.set_message("ODOMETRIE")
             sleep(0.5)
 
@@ -115,8 +120,8 @@ class ButtonGestureMatch():
         self.lock_stat.acquire()
         if self.status == ButtonGestureMatch.WAITING_TEAM:
             self.display.set_message("GREEN")
-            self.buttons.off(_ORANGE)
-            self.buttons.on(_GREEN)
+            self.buttons.off(_ORANGE_COLOR)
+            self.buttons.on(_GREEN_COLOR)
             self.side = 0
         self.lock_stat.release()
 
@@ -127,8 +132,8 @@ class ButtonGestureMatch():
         self.lock_stat.acquire()
         if self.status == ButtonGestureMatch.WAITING_TEAM:
             self.display.set_message("ORANGE")
-            self.buttons.on(_ORANGE)
-            self.buttons.off(_GREEN)
+            self.buttons.on(_ORANGE_COLOR)
+            self.buttons.off(_GREEN_COLOR)
             self.side = 1
         self.lock_stat.release()
 
