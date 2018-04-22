@@ -75,36 +75,39 @@ class Bornibus:
         treatmentAct = self.treatment.getAction()[0]
 
         if self.side == Bornibus.GREEN:
-            shortShot.set_predecessors([d1Act])
-            longShot.set_predecessors([d3Act])
+            dispMulti = d3Act
+            dispMono = d1Act
 
-        if self.side == Bornibus.ORANGE:
-            shortShot.set_predecessors([d4Act])
-            longShot.set_predecessors([d2Act])
+        else:
+            dispMulti = d2Act
+            dispMono = d4Act
 
         treatmentAct.set_predecessors([longShot])
 
-
         # Generate order list
-        self.action_list[Bornibus.GREEN] = [
-            d1Act,
-            panelAct,
-            shortShot,
+        self.action_list = [
             beeAct,
-            d3Act,
+            panelAct,
+            dispMono,
+            shortShot,
+            dispMulti,
             longShot,
             treatmentAct,
         ]
 
-        self.action_list[Bornibus.ORANGE] = [
-            beeAct,
-            panelAct,
-            d4Act,
-            shortShot,
-            d2Act,
-            longShot,
-            treatmentAct,
-        ]
+        dispMono.set_reliability(0.6)
+        dispMulti.set_reliability(0.6)
+        shortShot.set_reliability(0.8)
+        longShot.set_reliability(0.8)
+
+        treatmentAct.set_predecessors([longShot])
+        longShot.set_predecessors([dispMulti])
+        shortShot.set_predecessors([dispMono])
+
+        dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
+        dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
+
+        self.heuristics = Heuristics(self.action_list, self.arduinos)
 
     def set_side(self,side):
         self.side = side
@@ -121,17 +124,16 @@ class Bornibus:
         self.arduinos["watersorter"].close_trash()
 
 
-        """
-                act = self.heuristics.getBest()
+
+        act = self.heuristics.getBest()
         print(act)
         while act is not None:
             print("Make action {}".format(act.name))
             act()
             act.done = True
-            act = h.getBest()
+            act = self.heuristics.getBest()
             self.arduinos["wheeledbase"].max_linvel.set(500)
             self.arduinos["wheeledbase"].max_angvel.set(6)
-        """
         for act in self.action_list[self.side]:
             self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
             self.mover.goto(*act.actionPoint)
