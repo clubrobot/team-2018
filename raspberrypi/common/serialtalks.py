@@ -236,7 +236,7 @@ class SerialTalks:
         return output.read(STRING)
 
     def setuuid(self, uuid):
-        return self.send(SETUUID_OPCODE, STRINSERIALTALKS_WARNING_OPCODEG(uuid))
+        return self.send(SETUUID_OPCODE, STRING(uuid))
 
     def getlog(self, retcode, timeout=0):
         log = str()
@@ -298,7 +298,6 @@ class SerialListener(Thread):
             # Wait until new bytes arrive
             try:
                 inc = self.parent.stream.read()
-                print(inc)
             except serial.serialutil.SerialException:
                 self.parent.disconnect()
                 break

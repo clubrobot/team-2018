@@ -2,9 +2,9 @@
 #-*- coding: utf-8 -*-
 import time
 import math
-
+from common.serialutils import Deserializer
 from common.serialtalks import BYTE, INT, LONG, FLOAT
-from common.components import SerialTalksProxy
+from common.components import SecureSerialTalksProxy
 
 # Instructions
 
@@ -15,9 +15,16 @@ _GET_NORMAL_OPCODE           = 0x13
 _GET_LEFT_SWITCH_OPCODE      = 0x14
 _GET_RIGHT_SWITCH_OPCODE     = 0x15
 
-class Sensors(SerialTalksProxy):
+
+
+class Sensors(SecureSerialTalksProxy):
+	# Default execute result
+	_DEFAULT = {_GET_LEFT_SWITCH_OPCODE : Deserializer(BYTE(0)),
+				_GET_RIGHT_SWITCH_OPCODE: Deserializer(BYTE(0)),
+				_GET_NORMAL_OPCODE      : Deserializer(FLOAT(1000) + FLOAT(0) + FLOAT(1000) + FLOAT(0)),
+				_GET_MESURE_SENSOR_OPCODE: Deserializer(INT(1000) + INT(1000))}
 	def __init__(self, parent, uuid='sensors'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+		SecureSerialTalksProxy.__init__(self, parent, uuid, Sensors._DEFAULT)
 
 	def get_normal(self,delta_time):
 		output = self.execute(_GET_NORMAL_OPCODE,INT(delta_time))

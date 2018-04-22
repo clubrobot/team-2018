@@ -5,7 +5,7 @@ import time
 import math
 
 from common.serialtalks import BYTE, INT, CHAR, STRING
-from common.components import SerialTalksProxy
+from common.components import SecureSerialTalksProxy
 
 # Instructions
 
@@ -23,10 +23,10 @@ LEFT_ROTATION_MODE  = 3
 UPSIDEDOWN_MODE     = 4
 
 
-class LEDMatrix(SerialTalksProxy):
+class LEDMatrix(SecureSerialTalksProxy):
 	
 	def __init__(self, parent, matrix_id, uuid='display'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+		SecureSerialTalksProxy.__init__(self, parent, uuid, dict())
 		self.matrix_id = matrix_id
 
 	def set_message(self, message, mode=None, speed=None):
@@ -87,10 +87,10 @@ class LEDMatrix(SerialTalksProxy):
 			time.sleep(0.1)
 
 
-class SevenSegments(SerialTalksProxy):
+class SevenSegments(SecureSerialTalksProxy):
 	
 	def __init__(self, parent, uuid='display'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+		SecureSerialTalksProxy.__init__(self, parent, uuid, dict())
 
 	def set_message(self, message):
 		if len(message) > 12:

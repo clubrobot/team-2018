@@ -34,9 +34,9 @@ if hostname=="":
 # Import robot stuff
 from common.components         import *
 from common.serialtalks        import *
-from common.wheeledbase        import *
-from common.anchor		import *
-from common.tag			import *
+from arduino.wheeledbase        import *
+from beacons.anchor		import *
+from arduino.tag			import *
 
 # Define temporary modules
 
@@ -62,7 +62,7 @@ except:
 	print('\'tag\' not connected')
 
 try:
-	a = Anchor(m)
+	a = Anchor()
 except:
 	print('\'Anchor\' not connected')
 

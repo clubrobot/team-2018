@@ -5,8 +5,8 @@ import time
 import math
 
 from common.serialtalks import BYTE, INT, LONG, FLOAT
-from common.components import SerialTalksProxy
-
+from common.components import SecureSerialTalksProxy
+from common.serialutils import Deserializer
 # Instructions
 
 SET_OPENLOOP_VELOCITIES_OPCODE  = 0x13
@@ -70,8 +70,17 @@ PUREPURSUIT_LOOKAHEAD_ID        = 0xE0
 PUREPURSUIT_LOOKAHEADBIS_ID     = 0xE2
 
 
-class WheeledBase(SerialTalksProxy):
+class WheeledBase(SecureSerialTalksProxy):
 
+	_DEFAULT = {
+		GET_CODEWHEELS_COUNTERS_OPCODE : Deserializer(LONG(0) + LONG(0)),
+		POSITION_REACHED_OPCODE : Deserializer(BYTE(0) + BYTE(1)),
+		GET_VELOCITIES_WANTED_OPCODE : Deserializer(FLOAT(0) + FLOAT(0)),
+		GET_POSITION_OPCODE : Deserializer(FLOAT(0) + FLOAT(0)+ FLOAT(0)),
+		GET_VELOCITIES_OPCODE :  Deserializer(FLOAT(0) + FLOAT(0)),
+		GET_PARAMETER_VALUE_OPCODE : Deserializer(LONG(0) + LONG(0))
+
+	}
 	class Parameter():
 		def __init__(self, parent, id, type):
 			self.parent = parent
@@ -81,7 +90,7 @@ class WheeledBase(SerialTalksProxy):
 		def set(self, value): self.parent.set_parameter_value(self.id, value, self.type)
 
 	def __init__(self, parent, uuid='wheeledbase'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+		SecureSerialTalksProxy.__init__(self, parent, uuid, WheeledBase._DEFAULT)
 
 		self.left_wheel_radius   = WheeledBase.Parameter(self, LEFTWHEEL_RADIUS_ID, FLOAT)
 		self.left_wheel_constant = WheeledBase.Parameter(self, LEFTWHEEL_CONSTANT_ID, FLOAT)
