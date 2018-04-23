@@ -378,7 +378,6 @@ class SecureSerialTalksProxy(Proxy):
                     return None
             except TimeoutError:
                 warnings.warn("Timeout Error with {}".format(uuid), TimeoutWarning)
-                object.__getattribute__(self, "lock").release()
                 if opcode in self.default_result.keys():
                     object.__getattribute__(self, "lock").release()
                     return self.default_result[opcode].__copy__()
