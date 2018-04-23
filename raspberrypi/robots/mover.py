@@ -32,6 +32,8 @@ BACKWARD_VELOCITY = 150
 WALL_RANGE_TO_MOVE = 100
 SENSORS_RANGE = 200
 
+# -  BEACONS CONSTANT
+ENEMY_THRESHOLD = 200
 
 # <> ERROR <>
 class PositionUnreachable(RuntimeError): pass
@@ -46,22 +48,12 @@ class Mover:
     SIMPLE  = 6
     HARD   = 7
 
-    def __init__(self, side, roadmap, arduinos, logger):  # , balise_receiver):
+    def __init__(self, side, roadmap, arduinos, logger,  becons_receiver):
 
         # RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
         self.logger = logger
-        # self.obstacle_big = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,120),(-200,200)   ))
-        # self.obstacle_little = self.roadmap.create_obstacle(( (-90,-90),(90,-90),(90,90),(-90,90)   ))
-        # self.obstacles_front = self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE)
-        # self.obstacles_right= list()
-        # Shape des obstacles
-        # self.obstacles_left.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
-        # self.obstacles_right.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
-        # self.obstacles_left.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
-        # self.obstacles_right.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
-        # self.obstacles_left.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
-        # self.obstacles_right.append(self.roadmap.create_temp_obstacle(((-100,150),(-100,-150),(100,-150),(100,150)),timeout = TIMEOUT_OBSTACLE))
+        self.becons_receiver = becons_receiver
 
         # Arduino et autre
         self.wheeledbase = arduinos["wheeledbase"]
@@ -69,16 +61,7 @@ class Mover:
         self.sensors_lat = arduinos["sensors_lat"]
         self.sensors_back = arduinos["sensors_back"]
         self.side = side
-        # self.balise  = BaliseReceiver("192.168.12.3")
-        # try :
-        #    self.balise.connect()
-        #    self.balise.set_color(self.side)
-        # except:
-        #    pass
 
-        # Object qui tcheck la position des robots adverse
-        # self.big_listener  = PositionListener(lambda : self.balise.get_position(BIG_ROBOT),0.5)
-        # self.little_listener  = PositionListener(lambda : self.balise.get_position(LITTLE_ROBOT),0.5)
 
         # Objet qui sont en relation avec les sensors
         self.sensors_front_listener = SensorListener(self.sensors_front.get_mesure)
@@ -86,14 +69,9 @@ class Mover:
         # Flags relier a des fonctions interne pour tout bien gérer
 
         self.front_flag = Flag(self.front_obstacle)
-        self.on_path_flag = Flag(self.on_path_obstacle)
         self.withdraw_flag = Flag(self._withdraw_interrup)
 
 
-        # On connect les flags au signaux
-        # self.on_path_flag.bind(self.big_listener.signal)
-        # self.on_path_flag.bind(self.little_listener.signal)
-        # self.front_flag.bind(self.sensors_listener.signal)
 
         self.path = list()
         self.isarrived = False
@@ -109,7 +87,6 @@ class Mover:
     def reset(self):
         self.front_flag.clear()
         self.withdraw_flag.clear()
-        self.on_path_flag.clear()
         self.wheeledbase.lookahead.set(200)
         self.wheeledbase.max_linvel.set(600)
         self.wheeledbase.max_angvel.set(6)
@@ -123,12 +100,14 @@ class Mover:
         self.direction = "forward"
         self.goal = (0, 0, 0)
 
-    def get_enemy_status(self):
+    def get_enemy_status(self, x, y):
+        robot_0 = self.becons_receiver.get_position(0)
+        robot_1 = self.becons_receiver.get_position(1)
+        if hypot(robot_0[0]-x,robot_0[1]-y)<ENEMY_THRESHOLD or robot_0 == (-1000,-1000):
+            return True
+        if hypot(robot_1[0]-x,robot_1[1]-y)<ENEMY_THRESHOLD or robot_1 == (-1000,-1000):
+            return True
         return False
-
-    # if( hypot(self.big_listener.position[0]-self.goal[0],self.big_listener.position[1]-self.goal[1])<ENEMY_RANGE):
-    #    return True
-    # return ( hypot(self.little_listener.position[0]-self.goal[0],self.little_listener.position[1]-self.goal[1])<ENEMY_RANGE)
 
     def get_wall_status(self, x, y):
         return (x < WALL_RANGE or (2000 - x) < WALL_RANGE or y < WALL_RANGE or (3000 - y) < WALL_RANGE)
@@ -388,7 +367,7 @@ class Mover:
         try_number =0
         way = 'forward'
         closed_to_wall = self.get_wall_status(*self.goal[:-1])  # Boolean qui représente la proximité à un cube
-        closed_to_enemy = self.get_enemy_status()  # Boolean qui représente la proximité à un enemie
+        closed_to_enemy = self.get_enemy_status(*self.goal[:-1])  # Boolean qui représente la proximité à un enemie
         x, y = self.goal[:-1]
         self.wheeledbase.left_wheel_maxPWM.set(0.4)
         self.wheeledbase.right_wheel_maxPWM.set(0.4)
@@ -435,11 +414,12 @@ class Mover:
                 self.isarrived = self.wheeledbase.isarrived()
                 sleep(0.1)
             except RuntimeError:
-                if not self.interupted_lock.acquire(blocking=True, timeout=1):
+                if not self.interupted_lock.acquire(blocking=True, timeout=0.5):
                     continue
+                x, y, _ = self.wheeledbase.get_position()
                 # Si tu n'est pas a coté d'un enemie
                 # TODO
-                if not self.get_enemy_status():
+                if not self.get_enemy_status(x, y):
                     vel, ang = self.wheeledbase.get_velocities_wanted()
                     self.wheeledbase.set_velocities(copysign(150, -vel), copysign(1, ang))
                     time.sleep(1)  # 0.5
@@ -455,7 +435,7 @@ class Mover:
                 self.wheeledbase.purepursuit(self.path)
                 self.interupted_lock.release()
             except TimeoutError:
-                pass
+                self.isarrived = False
 
         # self.on_path_flag.clear()
 
@@ -468,12 +448,19 @@ class Mover:
         self.logger("MOVER : ", "Object in the front detected !")
         if not self.interupted_lock.acquire(blocking=True, timeout=1):
             return
+        self.interupted_status.set()
         x, y, theta = self.wheeledbase.get_position()
-        if (hypot(y - self.goal[1], x - self.goal[0]) < 300):
+        if (hypot(y - self.goal[1], x - self.goal[0]) < 300) :
+            self.interupted_status.clear()
+            self.interupted_lock.release()
+            #TODO QUOI FAIRE ?
+            return
+
+        if not self.get_enemy_status(x, y):
             self.interupted_status.clear()
             self.interupted_lock.release()
             return
-        self.interupted_status.set()
+
         lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted()
         if (abs(ang_wanted) > 7):
             self.wheeledbase.set_velocities(copysign(150, -lin_wanted), copysign(1, ang_wanted))
@@ -521,18 +508,18 @@ class Mover:
                     self.wheeledbase.set_velocities(-100 * side, 0.2 * side)
                 else:
                     self.wheeledbase.set_velocities(-100 * side, 0)
-                time.sleep(0.3)
+                time.sleep(0.2)
             except:
                 side *= -1
                 self.wheeledbase.set_velocities(-100 * side, 0)
-        time.sleep(0.5)
+        time.sleep(0.1)
         self.wheeledbase.stop()
         x_p, y_p, theta_p = self.wheeledbase.get_position()
         self.wheeledbase.turnonthespot(theta)
         try:
             self.wheeledbase.wait()
         except:
-            return
+            pass
             # Creation de l'obstacle
         x_obs = (x + x_p) / 2
         y_obs = (y + y_p) / 2
@@ -550,13 +537,3 @@ class Mover:
         self.interupted_status.clear()
         self.interupted_lock.release()
 
-    def on_path_obstacle(self):
-        self.obstacle_big.set_position(*self.balise.get_position(BIG_ROBOT))
-        self.obstacle_little.set_position(*self.balise.get_position(LITTLE_ROBOT))
-        if not self.interupted_lock.acquire():
-            return
-        new_path = self.roadmap.get_shortest_path(self.path[0], self.goal)
-        if (new_path != self.path):
-            self.path = new_path
-            self.wheeledbase.purepursuit(self.path)
-        self.interupted_lock.release()
