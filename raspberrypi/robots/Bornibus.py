@@ -23,7 +23,7 @@ class Bornibus:
     GREEN  = 0
     ORANGE = 1
 
-    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back, bm):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back, br, bm):
         # Save arduinos
         self.arduinos = dict(wheeledbase=wheeledbase,
                              waterlauncher=waterlauncher,
@@ -41,8 +41,7 @@ class Bornibus:
         self.roadmap  = roadmap
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
-        self.mover    = Mover(side, roadmap, self.arduinos, self.logger)
-        self.beacons_manager = bm
+        self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
@@ -105,14 +104,15 @@ class Bornibus:
         longShot.set_predecessors([dispMulti])
         shortShot.set_predecessors([dispMono])
 
-        if self.beacons_manager is not None:
-            self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
-            self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
-            self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
+        self.beacons_receiver = br
+        self.beacons_manager = bm
+        self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
+        self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
+        self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
 
-            treatmentAct.link_area(treatmentAct.name)
-            dispMulti.link_area(dispMulti.name)
-            panelAct.link_area(panelAct.name)
+        treatmentAct.link_area(treatmentAct.name)
+        dispMulti.link_area(dispMulti.name)
+        panelAct.link_area(panelAct.name)
 
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
         dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
@@ -157,10 +157,10 @@ if __name__ == '__main__':
     geo = Geogebra('bornibus.ggb')
     rm = RoadMap.load(geo)
 
-    #br = BaliseReceiver("192.168.1.11")
-    #br.connect()
-    #bm = BeaconsManagement(br, "../beacons/area.ggb")
-    #bm.start()
-    bm = None
-    auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back, bm)
+    br = BaliseReceiver("192.168.1.11")
+    br.connect()
+    bm = BeaconsManagement(br, "../beacons/area.ggb")
+    bm.start()
+    auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back, br, bm)
+    time.sleep(5)
     auto.run()

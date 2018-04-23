@@ -35,7 +35,7 @@ class Sensors(SecureSerialTalksProxy):
 		output = self.execute(_GET_MESURE_SENSOR_OPCODE, **kwargs)
 		ar,av=output.read(INT,INT)
 		if self._compid == "sensorsAr":
-			return 1000, av
+			return ar, av
 		return ar,av
 
 	def wait(self,threshold,timeout=2):
