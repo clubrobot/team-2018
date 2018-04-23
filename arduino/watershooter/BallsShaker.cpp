@@ -39,14 +39,25 @@ int BallsShaker::getHorizontal()
 
 void BallsShaker::shake()
 {
-    if(shaking){
-        shakerVertical.write(SHAKER_VERTICAL_1);
+    if(count_clock_horizontal == FREQ_HORIZONTAL/2){
         shakerHorizontal.write(SHAKER_HORIZONTAL_1);
-    } else {
-        shakerVertical.write(SHAKER_VERTICAL_2);
-        shakerHorizontal.write(SHAKER_HORIZONTAL_2);
     }
-    shaking = !shaking;
+    
+    if(count_clock_horizontal == FREQ_HORIZONTAL){
+        shakerHorizontal.write(SHAKER_HORIZONTAL_2);
+        count_clock_horizontal = 0;
+    }
+
+    if(count_clock_vertical == FREQ_VERTICAL/2)
+    {
+        shakerVertical.write(SHAKER_VERTICAL_1);
+    }
+    if(count_clock_vertical == FREQ_VERTICAL){
+        shakerVertical.write(SHAKER_VERTICAL_2);
+        count_clock_vertical = 0;
+    }
+    count_clock_horizontal++;
+    count_clock_vertical++;
 }
 
 void BallsShaker::enableShaker(){

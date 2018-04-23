@@ -12,11 +12,14 @@
 #define SHAKER_VERTICAL_1 155
 #define SHAKER_VERTICAL_2 60
 
+#define FREQ_VERTICAL       4
+#define FREQ_HORIZONTAL     3
+
 class BallsShaker: public PeriodicProcess {
 
 public:
 	BallsShaker(): shaking(false){
-        setTimestep(0.3);
+        setTimestep(0.1);
     }
 
 	void attachVertical(int PIN);
@@ -35,7 +38,8 @@ public:
 private:
     Servo shakerVertical;
     Servo shakerHorizontal;
-    bool shaking;
+    bool count_clock_horizontal;
+    bool count_clock_vertical;
 
 protected:
     virtual void process(float timestep);
