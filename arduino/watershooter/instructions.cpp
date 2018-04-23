@@ -103,9 +103,14 @@ void SET_LED_OFF(SerialTalks& inst, Deserializer& input, Serializer& output){
 	digitalWrite(LED, LOW);
 }
 
-void ENABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output){
-	shaker.enableShaker();
+void ENABLE_SHAKING_DIFF(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shaker.enableShakerDiffFreq();
 }
+
+void ENABLE_SHAKING_EQUAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shaker.enableShakerEqualFreq();
+}
+
 void DISABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 }

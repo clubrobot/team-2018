@@ -1,7 +1,9 @@
 import math
 
 class Heuristics:
-    def __init__(self, actions, arduinos, logger, beacon_management):
+    MANUAL = 1
+    AUTO = 0
+    def __init__(self, actions, arduinos, logger, beacon_management, mode=AUTO):
         self.actions = actions
         self.action_names = []
         self.action_dict = dict()
@@ -15,9 +17,19 @@ class Heuristics:
             self.init_reliability_recursive(self.action_dict[action], self.action_dict[action].reliability)
             self.init_points_recursive(self.action_dict[action], self.action_dict[action].points)
 
-        self.heuristics_soft = [self.points, self.reliability, self.time, self.action_distance, self.opponent_position]
-        self.influences = {"points":1, "reliability":1, "time":1, "action_distance":1, "opponent_position":1}
-        self.heuristics_hard = [self.order, self.combinations, self.done]
+        if mode is not Heuristics.MANUAL:
+            self.heuristics_soft = [self.points, self.reliability, self.time, self.action_distance]
+            if beacon_management is not None:
+                self.heuristics_soft += [self.opponent_position]
+
+            self.influences = {"points":1, "reliability":1, "time":1, "action_distance":1, "opponent_position": 1}
+            self.heuristics_hard = [self.order, self.combinations, self.done]
+
+        else:
+            self.heuristics_soft = [self.manual]
+            self.influences = {"manual":10000}
+            self.heuristics_hard = [self.done]
+
         self.wheeledbase = arduinos["wheeledbase"]
         self.beacon_management = beacon_management
 
@@ -47,6 +59,16 @@ class Heuristics:
                 heuristic[action] = 1
             else:
                 heuristic[action] = 0
+        return heuristic
+
+    def manual(self):
+        MAX_MANUAL_ORDER = 20
+        heuristic = dict()
+        for action in self.action_names:
+            if self.action_dict[action].manual_order == 0:
+                heuristic[action] = 0
+            else:
+                heuristic[action] = MAX_MANUAL_ORDER - self.action_dict[action].manual_order/MAX_MANUAL_ORDER
         return heuristic
 
     def points(self):
@@ -132,7 +154,7 @@ class Heuristics:
     def compute_heuristics(self):
         heuristics_values = dict()
         for action in self.action_names:
-            heuristics_values[action] = 1
+            heuristics_values[action] = 0
 
         total_influences = 0
         for heuristic in self.heuristics_soft:
@@ -140,7 +162,7 @@ class Heuristics:
             for action in self.action_names:
                 heuristics_values[action] += current_values[action] * self.influences[heuristic.__name__]
             total_influences += self.influences[heuristic.__name__]
-            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=heuristic)
+            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=heuristics_values)
 
         for action in self.action_names:
             heuristics_values[action] /= total_influences

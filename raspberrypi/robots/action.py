@@ -14,6 +14,7 @@ class Action():
         self.reliability = 1
         self.time = time
         self.area = None
+        self.manual_order = 0
         
     def __call__(self):
         self.actionFunction()
@@ -32,6 +33,9 @@ class Action():
 
     def set_impossible_combination(self, lambd):
         self.combinations += [lambd]
+
+    def set_manual_order(self, order):
+        self.manual_order = order
 
     def set_reliability(self, rel):
         self.reliability = rel
