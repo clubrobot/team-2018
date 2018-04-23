@@ -34,6 +34,7 @@ void setup()
     talks.bind(SET_X_OPCODE,SET_X);
     talks.bind(SET_Y_OPCODE,SET_Y);
     talks.bind(SET_Z_OPCODE,SET_Z);
+    talks.bind(SET_THETA_OPCODE,SET_THETA);
 
     talks.bind(GET_POS_OPCODE,GET_POSITION);
     talks.bind(GET_POS_THEO_OPCODE,GET_POSITION_THEO);

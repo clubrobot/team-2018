@@ -1,3 +1,6 @@
+#ifndef __ROBOTARM_H__
+#define __ROBOTARM_H__
+
 #include <Arduino.h>
 #include <math.h>
 
@@ -33,6 +36,7 @@ class RobotArm
 		void set_x(double x);
 		void set_y(double y);
 		void set_z(double z);
+		void set_theta(double theta);
 
 		double get_A1theo();
 		double get_A2theo();
@@ -68,3 +72,4 @@ class RobotArm
 		int m_A2_id;
 		int m_A3_id;
 };
+#endif // __ROBOTARM_H__

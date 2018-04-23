@@ -102,6 +102,12 @@ void RobotArm::set_z(double z)
 	//TODO : add pap 
 }
 
+void RobotArm::set_theta(double theta)
+{
+	m_theta = theta;
+	ReachPosition(m_x, m_y, m_z, m_theta);
+}
+
 double RobotArm::get_A1theo()
 {
 	return m_A1;
