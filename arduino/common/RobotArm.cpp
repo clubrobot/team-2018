@@ -4,12 +4,14 @@
 
 extern AX12 servoax;
 
-RobotArm::RobotArm(double x, double y, double z, double theta)
+RobotArm::RobotArm(double x, double y, double z, double theta, float speed)
 {
 	m_x = x * -1; //revert x
 	m_y = y;
 	m_z = z;
 	m_theta = theta;
+
+	m_speed = speed;
 }
 
 void RobotArm::attach(int A1_id, int A2_id, int A3_id)
@@ -72,17 +74,31 @@ void RobotArm::ReachPosition(double x, double y, double z, double theta)
 
 	// send pos to AX12 servos
 	servoax.attach(m_A1_id);
-	servoax.moveSpeed((float)t1,50);
+	servoax.moveSpeed((float)t1, m_speed);
 
 	servoax.attach(m_A2_id);
-	servoax.moveSpeed((float)t2,50);
+	servoax.moveSpeed((float)t2, m_speed);
 
 	servoax.attach(m_A3_id);
-	servoax.moveSpeed((float)t3,50);
+	servoax.moveSpeed((float)t3, m_speed);
 
 	//TODO : add pap Z axis
 
 }
+
+void RobotArm::set_angles(float A1, float A2, float A3)
+{
+	// send pos to AX12 servos
+	servoax.attach(m_A1_id);
+	servoax.moveSpeed((float)A1, m_speed);
+
+	servoax.attach(m_A2_id);
+	servoax.moveSpeed((float)A2, m_speed);
+
+	servoax.attach(m_A3_id);
+	servoax.moveSpeed((float)A3, m_speed);
+}
+
 
 void RobotArm::set_x(double x)
 {
@@ -106,6 +122,11 @@ void RobotArm::set_theta(double theta)
 {
 	m_theta = theta;
 	ReachPosition(m_x, m_y, m_z, m_theta);
+}
+
+void RobotArm::set_speed(float speed)
+{
+	m_speed = speed;
 }
 
 double RobotArm::get_A1theo()

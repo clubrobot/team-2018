@@ -11,14 +11,13 @@
 
 #define USE_SHIFTREG 1
 
-
 ShiftRegister shift;
 
 SoftwareSerial SoftSerial(RX_AX12,TX_AX12);
 
 AX12 servoax;
 
-RobotArm arm(0.0, 30.0, 150.0, 90.0);
+RobotArm arm(0.0, 30.0, 10.0, 90.0, 50);
 
 void setup()
 {
@@ -47,6 +46,8 @@ void setup()
 
 	arm.attach(2,1,3);
 	arm.begin();
+
+    arm.set_angles(150.0, 150.0, 150.0);
 }
 
 void loop()

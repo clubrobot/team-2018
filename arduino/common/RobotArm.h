@@ -15,7 +15,7 @@ class RobotArm
 {
 	public:
 
-		RobotArm(double x, double y, double z, double theta);
+		RobotArm(double x, double y, double z, double theta, float speed);
 
 		void attach(int A1_id, int A2_id, int A3_id);
 
@@ -31,12 +31,14 @@ class RobotArm
 
 		void open_gripper();
 
-
+		void set_angles(float A1, float A2, float A3);
 
 		void set_x(double x);
 		void set_y(double y);
 		void set_z(double z);
 		void set_theta(double theta);
+
+		void set_speed(float speed);
 
 		double get_A1theo();
 		double get_A2theo();
@@ -54,6 +56,8 @@ class RobotArm
 		double distance(double x, double y);
 
 		double convert_deg(double rad);
+
+		float m_speed;
 
 		double m_x;
 		double m_y;
