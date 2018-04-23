@@ -15,9 +15,10 @@ _SET_X_OPCODE 		 = 0X13
 _SET_Y_OPCODE 		 = 0X14
 _SET_Z_OPCODE 		 = 0X15
 _SET_THETA_OPCODE 	 = 0X16
+_SET_SPEED_OPCODE 	 = 0X17
 
-_GET_POS_OPCODE 	 = 0X17
-_GET_POS_THEO_OPCODE = 0X18
+_GET_POS_OPCODE 	 = 0X18
+_GET_POS_THEO_OPCODE = 0X19
 
 class RobotArm(SerialTalksProxy):	
 	def __init__(self,parent, uuid='RobotArm'):
@@ -40,6 +41,9 @@ class RobotArm(SerialTalksProxy):
 
 	def set_theta(self,theta):
 		self.send(_SET_THETA_OPCODE, FLOAT(theta))
+
+	def set_speed(self,speed):
+		self.send(_SET_THETA_OPCODE, FLOAT(speed))
 
 	def get_pos(self):
 		output = self.execute(_GET_POS_OPCODE)

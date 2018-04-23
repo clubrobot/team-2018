@@ -38,6 +38,11 @@ void SET_THETA(SerialTalks &inst, Deserializer &input, Serializer &output)
 	arm.set_theta(input.read<float>());
 }
 
+void SET_SPEED(SerialTalks &inst, Deserializer &input, Serializer &output)
+{
+	arm.set_speed(input.read<float>());
+}
+
 void GET_POSITION(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
 	output.write<float>(arm.get_A2());
