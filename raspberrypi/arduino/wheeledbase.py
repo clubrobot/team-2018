@@ -31,6 +31,7 @@ RESET_PUREPURSUIT_OPCODE        = 0x1A
 ADD_PUREPURSUIT_WAYPOINT_OPCODE = 0x1B
 
 GET_VELOCITIES_WANTED_OPCODE    = 0x1C
+GOTO_DELTA_OPCODE               = 0x1D
 
 LEFTWHEEL_RADIUS_ID	            = 0x10
 LEFTWHEEL_CONSTANT_ID           = 0x11
@@ -181,6 +182,9 @@ class WheeledBase(SecureSerialTalksProxy):
 	def wait(self, timestep=0.1, **kwargs):
 		while not self.isarrived(**kwargs):
 			time.sleep(timestep)
+
+	def goto_delta(self, x, y):
+		self.send(GOTO_DELTA_OPCODE, FLOAT(x) + FLOAT(y))
 
 	def goto(self, x, y, theta=None, direction=None, **kwargs):
 		# Compute the preferred direction if not set

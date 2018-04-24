@@ -46,6 +46,46 @@ void DISABLE(SerialTalks& talks, Deserializer& input, Serializer& output)
 	rightWheel.setVelocity(0);	
 }
 
+void GOTO_DELTA(SerialTalks& talks, Deserializer& input, Serializer& output)
+{
+	purePursuit.reset();
+	positionControl.disable();
+
+	Position initial_pos =  odometry.getPosition();
+
+	float dx = input.read<float>();
+	float dy = input.read<float>();
+
+	Position target_pos;
+	target_pos.x = initial_pos.x + dx*cos(initial_pos.theta)    + dy*-1*sin(initial_pos.theta);
+	target_pos.y = initial_pos.y + dx*sin(initial_pos.theta) + dy*cos(initial_pos.theta);
+	
+	target_pos.theta = atan2(target_pos.y-initial_pos.y,target_pos.x-initial_pos.x);
+	int direction;
+	
+	initial_pos.theta = inrange(initial_pos.theta,-M_PI,M_PI);
+
+	if (fabs(inrange(target_pos.theta - initial_pos.theta,-M_PI,M_PI))<(M_PI/2))
+	{
+		direction = PurePursuit::FORWARD;
+	}else{
+		direction = PurePursuit::BACKWARD;
+	}
+	
+	purePursuit.setDirection((PurePursuit::Direction) direction);
+	purePursuit.addWaypoint(PurePursuit::Waypoint(initial_pos.x, initial_pos.y));
+	purePursuit.addWaypoint(PurePursuit::Waypoint(target_pos.x, target_pos.y));
+
+	purePursuit.setFinalAngle(target_pos.theta);
+
+	positionControl.setPosSetpoint(Position(target_pos.x, target_pos.y, target_pos.theta + direction * M_PI));
+	
+	// Enable PurePursuit controller
+	velocityControl.enable();
+	positionControl.setMoveStrategy(purePursuit);
+	positionControl.enable();
+
+}
 
 void SET_OPENLOOP_VELOCITIES(SerialTalks& talks, Deserializer& input, Serializer& output)
 {

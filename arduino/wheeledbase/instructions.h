@@ -27,7 +27,7 @@
 #define ADD_PUREPURSUIT_WAYPOINT_OPCODE 0x1B //0x11
 
 #define GET_VELOCITIES_WANTED_OPCODE    0x1C
-
+#define GOTO_DELTA_OPCODE               0x1D
 // Parameters identifiers
 
 #define LEFTWHEEL_RADIUS_ID             0x10
@@ -69,6 +69,8 @@
 
 // Instructions prototypes
 void DISABLE(SerialTalks& talks, Deserializer& input, Serializer& output);
+
+void GOTO_DELTA(SerialTalks& talks, Deserializer& input, Serializer& output);
 
 void SET_OPENLOOP_VELOCITIES(SerialTalks& talks, Deserializer& input, Serializer& output);
 
