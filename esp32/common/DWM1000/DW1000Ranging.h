@@ -47,6 +47,9 @@
 //Max devices we put in the networkDevices array ! Each DW1000Device is 74 Bytes in SRAM memory for now.
 #define MAX_DEVICES 4
 
+// Max tag devices to put in the tagDevices array.
+#define MAX_TAG_DEVICES 3
+
 //Default Pin for module:
 #define DEFAULT_RST_PIN 9
 #define DEFAULT_SPI_SS_PIN 10
@@ -85,7 +88,9 @@ public:
 	static boolean addNetworkDevices(DW1000Device* device, boolean shortAddress);
 	static boolean addNetworkDevices(DW1000Device* device);
 	static void    removeNetworkDevices(int16_t index);
-	
+	static boolean addTagDevices(DW1000Device *device, boolean shortAddress);
+	static boolean addTagDevices(DW1000Device *device);
+
 	//setters
 	static void setReplyTime(uint16_t replyDelayTimeUs);
 	static void setResetPeriod(uint32_t resetPeriod);
@@ -142,7 +147,12 @@ private:
 	static DW1000Mac    _globalMac;
 	static int32_t      timer;
 	static int16_t      counterForBlink;
+
+	// for TAG only : other tags in the network
+	static DW1000Device _tagDevices[MAX_TAG_DEVICES];
+	static volatile uint8_t _tagDevicesNumber;
 	
+
 	//Handlers:
 	static void (* _handleNewRange)(void);
 	static void (* _handleBlinkDevice)(DW1000Device*);

@@ -42,6 +42,10 @@ volatile uint8_t DW1000RangingClass::_networkDevicesNumber = 0; // TODO short, 8
 int16_t      DW1000RangingClass::_lastDistantDevice    = 0; // TODO short, 8bit?
 DW1000Mac    DW1000RangingClass::_globalMac;
 
+//other tags in the network
+DW1000Device DW1000RangingClass::_tagDevices[MAX_TAG_DEVICES];
+volatile uint8_t DW1000RangingClass::_tagDevicesNumber = 0;
+
 //module type (anchor or tag)
 int16_t      DW1000RangingClass::_type; // TODO enum??
 
@@ -283,6 +287,65 @@ boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device) {
 	return false;
 }
 
+boolean DW1000RangingClass::addTagDevices(DW1000Device *device, boolean shortAddress)
+{
+	boolean addDevice = true;
+	//we test our network devices array to check
+	//we don't already have it
+	for (uint8_t i = 0; i < _tagDevicesNumber; i++)
+	{
+		if (_tagDevices[i].isAddressEqual(device) && !shortAddress)
+		{
+			//the device already exists
+			addDevice = false;
+			return false;
+		}
+		else if (_tagDevices[i].isShortAddressEqual(device) && shortAddress)
+		{
+			//the device already exists
+			addDevice = false;
+			return false;
+		}
+	}
+
+	if (addDevice)
+	{
+		device->setRange(0);
+		memcpy(&_tagDevices[_tagDevicesNumber], device, sizeof(DW1000Device));
+		_tagDevices[_tagDevicesNumber].setIndex(_tagDevicesNumber);
+		_tagDevicesNumber++;
+		return true;
+	}
+
+	return false;
+}
+
+boolean DW1000RangingClass::addTagDevices(DW1000Device *device)
+{
+	boolean addDevice = true;
+	//we test our network devices array to check
+	//we don't already have it
+	for (uint8_t i = 0; i < _tagDevicesNumber; i++)
+	{
+		if (_tagDevices[i].isAddressEqual(device) && _tagDevices[i].isShortAddressEqual(device))
+		{
+			//the device already exists
+			addDevice = false;
+			return false;
+		}
+	}
+
+	if (addDevice)
+	{
+		memcpy(&_tagDevices[_tagDevicesNumber], device, sizeof(DW1000Device));
+		_tagDevices[_tagDevicesNumber].setIndex(_tagDevicesNumber);
+		_tagDevicesNumber++;
+		return true;
+	}
+
+	return false;
+}
+
 void DW1000RangingClass::removeNetworkDevices(int16_t index) {
 	//if we have just 1 element
 	if(_networkDevicesNumber == 1) {
@@ -468,6 +531,24 @@ void DW1000RangingClass::loop() {
 				noteActivity();
 			}
 			_expectedMsgId = POLL;
+		}
+		else if (messageType == BLINK && _type == TAG) //we have just received a BLINK message from another tag in the network
+		{
+			byte address[8];
+			byte shortAddress[2];
+			_globalMac.decodeBlinkFrame(data, address, shortAddress);
+			//we crate a new device with th tag
+			DW1000Device myTag(address, shortAddress);
+
+			if (addTagDevices(&myTag))
+			{
+				if (_handleBlinkDevice != 0)
+				{
+					(*_handleBlinkDevice)(&myTag);
+				}
+
+				noteActivity();
+			}
 		}
 		else if(messageType == RANGING_INIT && _type == TAG) {
 			
