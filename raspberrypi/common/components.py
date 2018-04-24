@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, time
+import os, time, sys
 from types import MethodType
 from threading import RLock
 import warnings
@@ -351,12 +351,18 @@ class SecureSerialTalksProxy(Proxy):
             except AlreadyConnectedError:
                 pass
             except KeyError:
+                etype, value, tb = sys.exc_info()
+                print(etype, tb, value)
                 self.initialized = False
-                warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
+                warnings.warn("Arduino {} is unreachable ! (KeyError)".format(uuid), NotConnectedWarning)
             except (NotConnectedError, ConnectionFailedError):
-                warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
+                etype, value, tb = sys.exc_info()
+                print(etype, tb, value)
+                warnings.warn("Arduino {} is unreachable ! (NotConnectedError or ConnectionFailedError)".format(uuid), NotConnectedWarning)
             except MuteError:
-                warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
+                etype, value, tb = sys.exc_info()
+                print(etype, tb, value)
+                warnings.warn("Arduino {} is unreachable (MuteError)!".format(uuid), NotConnectedWarning)
             if with_lock: object.__getattribute__(self, "lock").release()
 
         def execute(self, opcode, *args, **kwargs):
