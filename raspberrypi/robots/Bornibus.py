@@ -164,11 +164,11 @@ if __name__ == '__main__':
     br = BaliseReceiver("192.168.1.11")
     try:
         br.connect()
-        bm = BeaconsManagement(br, "area.ggb")
-        bm.start()
     except:
-        br = None
-        bm = None
+        pass
+
+    bm = BeaconsManagement(br, "area.ggb")
+    bm.start()
 
     auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back, br, bm)
     time.sleep(5)
