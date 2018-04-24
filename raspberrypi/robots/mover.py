@@ -157,12 +157,15 @@ class Mover:
                                 sleep(0.2)
                                 self.wheeledbase.stop()
                         # Go backward
-                        self.wheeledbase.set_velocities(-100, 0)
                         if ang < 0:
-                            sleep(0.5)
+                            self.wheeledbase.goto_delta(-50, 0)
                         else:
-                            sleep(0.4)
-                        self.wheeledbase.stop()
+                            self.wheeledbase.goto_delta(-40, 0)
+                        try:
+                            self.wheeledbase.wait()
+                        except:
+                            pass
+
                         # TURN HARD
                         self.wheeledbase.set_velocities(0, copysign(6, -ang))
                         sleep(0.8)
@@ -172,9 +175,11 @@ class Mover:
                         except RuntimeError:
                             pass
                     else:
-                        self.wheeledbase.set_velocities(200, -0)
-                        sleep(0.2)
-                        self.wheeledbase.stop()
+                        self.wheeledbase.goto_delta(-10, 0)
+                        try:
+                            self.wheeledbase.wait()
+                        except:
+                            pass
                         self.wheeledbase.set_velocities(0, -6)
                         sleep(0.8)
                         self.wheeledbase.stop()
@@ -187,11 +192,11 @@ class Mover:
                                 pass
 
 
-    def withdraw(self,x, y,direction="forward", timeout=5, strategy=SIMPLE):
+    def withdraw(self,x, y,direction="forward", timeout=5, strategy=SIMPLE, last_point_aim=None):
         self.goal = (x,y)
         self.timeout = timeout
         if strategy == Mover.SIMPLE: self._withdraw_simple(direction)
-        if strategy == Mover.HARD: self._withdraw_hard(direction)
+        if strategy == Mover.HARD: self._withdraw_hard(direction, last_point_aim)
         self.reset()
 
     def _withdraw_simple(self, direction):
@@ -224,7 +229,7 @@ class Mover:
         self.reset()
 
 
-    def _withdraw_hard(self, direction):
+    def _withdraw_hard(self, direction, last_point_aim):
         self.wheeledbase.max_linvel.set(100)
         self.logger("MOVER : ", "Start withdraw hard")
         self.direction = direction
@@ -250,7 +255,10 @@ class Mover:
                     continue
                 self.logger("MOVER : ", "Go back a little !")
                 self.wheeledbase.stop()
-                self.wheeledbase.set_velocities( -100 if self.direction =="forward" else 100,0)
+                if last_point_aim is None:
+                    self.wheeledbase.set_velocities( -100 if self.direction =="forward" else 100, 0)
+                else:
+                    self.wheeledbase.goto(*last_point_aim)
                 time.sleep(0.5)
                 self.wheeledbase.stop()
 

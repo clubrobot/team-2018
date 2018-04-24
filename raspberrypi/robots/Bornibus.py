@@ -120,9 +120,11 @@ class Bornibus:
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
         dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
 
-        dispMono.set_manual_order(1)
-        shortShot.set_manual_order(2)
-        panelAct.set_manual_order(3)
+        #dispMono.set_manual_order(1)
+        #shortShot.set_manual_order(2)
+        #dispMulti.set_manual_order(3)
+        #longShot.set_manual_order(4)
+        panelAct.set_manual_order(5)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
                                      mode=Heuristics.MANUAL)
@@ -150,22 +152,22 @@ class Bornibus:
             act()
             act.done = True
             act = self.heuristics.get_best()
-            self.arduinos["wheeledbase"].max_linvel.set(500)
-            self.arduinos["wheeledbase"].max_angvel.set(6)
-
+            self.mover.reset()
 
 if __name__ == '__main__':
     from robots.setup_bornibus import *
     side = 0
 
+    print("DEBUT CHARGEMENT ROADMAP")
     geo = Geogebra('bornibus.ggb')
     rm = RoadMap.load(geo)
+    print("Fin Chargement")
 
     br = BaliseReceiver("192.168.1.11")
-    try:
-        br.connect()
-    except:
-        pass
+    #try:
+    #    br.connect()
+    #except:
+    #    pass
 
     bm = BeaconsManagement(br, "area.ggb")
     bm.start()

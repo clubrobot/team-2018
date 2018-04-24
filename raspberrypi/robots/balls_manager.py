@@ -21,6 +21,7 @@ class Dispenser(Actionnable):
         self.numberDispenser=numberDispenser
         self.watersorter = arduinos["watersorter"]
         self.wheeledbase = arduinos["wheeledbase"]
+        self.waterlauncher = arduinos["waterlauncher"]
         self.targetPoint=self.geo.get('Dispenser'+str(self.numberDispenser)+'_1')
         self.preparationPoint=self.geo.get('Dispenser'+str(self.numberDispenser)+'_0')
 
@@ -52,18 +53,20 @@ class Dispenser(Actionnable):
             self.logger("DISPENSER : ", "CONTACT !! Just try to take balls here {},{}", *init_pos)
             self.watersorter.enable_shaker_diff()
             begin = time.time()
-            while time.time() - begin < 3:
+            while time.time() - begin < 2:
                 self.wheeledbase.set_velocities(-150, 1)
                 time.sleep(0.4)
                 self.wheeledbase.set_velocities(200, -1)
-                time.sleep(0.5)
+                time.sleep(0.4)
 
         self.logger("DISPENSER : ", "Trying to go backward ")
         pos = robot.get_position()[:-1]
-        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=3, strategy=Mover.HARD)
+        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=3, strategy=Mover.HARD,
+                            last_point_aim=self.preparationPoint)
         self.watersorter.disable_shaker()
         robot.stop()
         self.display.happy(2)
+        self.waterlauncher.set_motor_pulsewidth(1080)
         
 
         
@@ -97,7 +100,7 @@ class Shot(Actionnable):
         self.castlePoint=self.geo.get('Castle'+str(self.side))
         
         
-    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=20):
+    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=23):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
@@ -114,7 +117,7 @@ class Shot(Actionnable):
         begin_time = time.time()
         motor_base = 81
         waterlauncher.set_motor_pulsewidth(1000+motor_base)
-        time.sleep(3)# Wait the motor running 
+        time.sleep(0.5)
         watersorter.open_outdoor()
         timeout_per_ball = 1
         while nb_balls < 8 and time.time() - begin_time < global_timeout:
@@ -149,34 +152,7 @@ class Shot(Actionnable):
                 nb_balls +=1
                 display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
                 display.happy(1)
-            #
-            #print(time.time() - begin)
-            #if(watersorter.get_water_color()[0]>120 or watersorter.get_water_color()[1]>120) and new_ball:
-            #    new_ball = 0
-            #    nb_balls += 1
-            #    print("+1 balle")
-            #    display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
-            #
-            #else:
-            #    if(new_ball == 0):
-            #        accu += 6/(time.time() - last_time)
-            #        print("Speed += ", 6/(time.time() - last_time))
-            #    last_time = time.time()
-            #    new_ball =1
-            #
-            #if time.time() - last_time > timeout_per_ball:
-            #    watersorter.close_trash()
-            #    last_time = time.time()
-                
-#
-#            time.sleep(0.05)
-#            accu = max(accu -6, 0)
-#            speed = int(motor_base+accu)
-#            speed = max(speed, motor_base)
-#            speed = min(speed, motor_base+25)
-#            waterlauncher.set_motor_pulsewidth(1000+speed)
-#            #waterlauncher.set_motor_velocity(speed)
-#            print("accu : ", accu, "    speed : ", speed)
+
         time.sleep(1)# Ancien 3
 
         watersorter.disable_shaker()
@@ -185,7 +161,9 @@ class Shot(Actionnable):
         watersorter.close_outdoor()
         watersorter.open_indoor()
             
-    def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, timeout=5):
+    def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=25):
+        motor_base = 102
+        waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
@@ -195,27 +173,28 @@ class Shot(Actionnable):
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
        
-        time.sleep(0.2) 
-        motor_base = 102
-        waterlauncher.set_motor_pulsewidth(1000+motor_base)
-        time.sleep(2) # Wait the motor running
+        time.sleep(1)
         watersorter.enable_shaker_equal()
         watersorter.close_indoor()
-        watersorter.write_trash_unloader(100)
+        watersorter.close_trash_unloader()
         watersorter.close_outdoor()
         nb_ball = 0
-        global_timeout = 14
         begin_time = time.time()
+        timeout_per_ball = 1
         while not (time.time() - begin_time > global_timeout) and nb_ball<8:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.open_indoor()
             watersorter.close_trash()
             watersorter.close_outdoor()
-            open_time = time.time()
 
+            close_time = time.time()
             while not (time.time() - begin_time > global_timeout) and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
                 time.sleep(0.2)
                 #print(watersorter.get_water_color())
+                if time.time() - close_time > timeout_per_ball:
+                    watersorter.close_trash()
+                    close_time = time.time()
+
 
             time.sleep(0.3)
             #Verification de la sortie dans le canon
@@ -243,13 +222,15 @@ class Shot(Actionnable):
                     display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
                     display.happy(1)
 
+            close_time = time.time()
             while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100) and not (time.time() - begin_time > global_timeout):
                 time.sleep(0.1)
-                print("En attente de la sortie")
+                self.logger("SHOT : ", "En attente de la sortie")
                 waterlauncher.set_motor_pulsewidth(1000+motor_base)
 
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             time.sleep(0.3)
+
         time.sleep(1)
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)

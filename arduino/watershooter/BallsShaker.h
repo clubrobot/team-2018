@@ -11,8 +11,8 @@
 #define SHAKER_VERTICAL_1 160
 #define SHAKER_VERTICAL_2 70
 
-#define PER_VERTICAL       (int)(62)
-#define PER_HORIZONTAL     (int)(44)
+#define PER_VERTICAL       (int)(82)
+#define PER_HORIZONTAL     (int)(64)
 #define PER_EQUAL          (int)(100)
 
 class BallsShaker: public PeriodicProcess {
