@@ -90,6 +90,7 @@ public:
 	static void    removeNetworkDevices(int16_t index);
 	static boolean addTagDevices(DW1000Device *device, boolean shortAddress);
 	static boolean addTagDevices(DW1000Device *device);
+	static void removeTagDevices(int16_t index);
 
 	//setters
 	static void setReplyTime(uint16_t replyDelayTimeUs);

@@ -365,6 +365,29 @@ void DW1000RangingClass::removeNetworkDevices(int16_t index) {
 	}
 }
 
+void DW1000RangingClass::removeTagDevices(int16_t index)
+{
+	//if we have just 1 element
+	if (_tagDevicesNumber == 1)
+	{
+		_tagDevicesNumber = 0;
+	}
+	else if (index == _tagDevicesNumber - 1) //if we delete the last element
+	{
+		_tagDevicesNumber--;
+	}
+	else
+	{
+		//we translate all the element wich are after the one we want to delete.
+		for (int16_t i = index; i < _tagDevicesNumber - 1; i++)
+		{ // TODO 8bit?
+			memcpy(&_tagDevices[i], &_tagDevices[i + 1], sizeof(DW1000Device));
+			_tagDevices[i].setIndex(i);
+		}
+		_tagDevicesNumber--;
+	}
+}
+
 /* ###########################################################################
  * #### Setters and Getters ##################################################
  * ######################################################################### */
@@ -418,6 +441,16 @@ void DW1000RangingClass::checkForInactiveDevices() {
 			}
 			//we need to delete the device from the array:
 			removeNetworkDevices(i);
+			
+		}
+	}
+	for(uint8_t i = 0; i < _tagDevicesNumber; i++) {
+		if(_tagDevices[i].isInactive()) {
+			if(_handleInactiveDevice != 0) {
+				(*_handleInactiveDevice)(&_tagDevices[i]);
+			}
+			//we need to delete the device from the array:
+			removeTagDevices(i);
 			
 		}
 	}
@@ -507,7 +540,19 @@ void DW1000RangingClass::loop() {
 	//check for new received message
 	if(_receivedAck) {
 		_receivedAck = false;
-		
+		Serial.print("Network devices : ");
+		Serial.println(_networkDevicesNumber);
+		for(int i = 0; i< _networkDevicesNumber;i++){
+			uint16_t address = _networkDevices[i].getShortAddress();
+			Serial.println(address);
+		}
+		Serial.print("Tag devices : ");
+		Serial.println(_tagDevicesNumber);
+		for (int i = 0; i < _tagDevicesNumber; i++)
+		{
+			uint16_t address = _tagDevices[i].getShortAddress();
+			Serial.println(address);
+		}
 		//we read the datas from the modules:
 		// get message and parse
 		DW1000.getData(data, LEN_DATA);
