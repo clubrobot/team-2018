@@ -114,7 +114,7 @@ class Mover:
 
     def gowall(self, try_limit=3, strategy=FAST):
         #  /\ Determination de la proximité avec un enemies et initialisation des variables /\
-        closed_to_enemy = self.get_enemy_status()
+        #closed_to_enemy = self.get_enemy_status()
         self.goal = self.wheeledbase.get_position()
         if strategy == Mover.FAST: self._gowall_fast(try_limit)
         self.reset()
@@ -216,6 +216,9 @@ class Mover:
             except RuntimeError:
                 if self.interupted_timeout.is_set() :
                     sleep(0.7)
+                    self.wheeledbase.set_velocities(100 if direction=="forward" else -100, 0)
+                    sleep(0.3)
+                    self.wheeledbase.stop()
                 else:
                     pass
         self.reset()

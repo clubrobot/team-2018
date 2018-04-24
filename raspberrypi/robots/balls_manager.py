@@ -51,11 +51,16 @@ class Dispenser(Actionnable):
             self.display.sick(3)
             self.logger("DISPENSER : ", "CONTACT !! Just try to take balls here {},{}", *init_pos)
             self.watersorter.enable_shaker_diff()
-            time.sleep(3)
+            begin = time.time()
+            while time.time() - begin < 3:
+                self.wheeledbase.set_velocities(-150, 1)
+                time.sleep(0.4)
+                self.wheeledbase.set_velocities(200, -1)
+                time.sleep(0.5)
 
         self.logger("DISPENSER : ", "Trying to go backward ")
         pos = robot.get_position()[:-1]
-        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=5, strategy=Mover.HARD)
+        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=3, strategy=Mover.HARD)
         self.watersorter.disable_shaker()
         robot.stop()
         self.display.happy(2)
@@ -88,7 +93,7 @@ class Shot(Actionnable):
         self.waterlauncher = arduinos["waterlauncher"]
         self.display = display
         self.shootCastlePoint=self.geo.get('ShootCastle'+str(self.side))
-        self.shootCastlePointLong=self.geo.get('ShootCastleLong'+str(self.side))
+        self.shootCastlePointLong=self.geo.get('ShootCastleLong'+str(self.side)+'_1')
         self.castlePoint=self.geo.get('Castle'+str(self.side))
         
         
@@ -107,7 +112,7 @@ class Shot(Actionnable):
         watersorter.close_outdoor()
         nb_balls = 0
         begin_time = time.time()
-        motor_base = 82
+        motor_base = 81
         waterlauncher.set_motor_pulsewidth(1000+motor_base)
         time.sleep(3)# Wait the motor running 
         watersorter.open_outdoor()
