@@ -44,7 +44,11 @@ DW1000Mac    DW1000RangingClass::_globalMac;
 
 //other tags in the network
 DW1000Device DW1000RangingClass::_tagDevices[MAX_TAG_DEVICES];
+DW1000Device *DW1000RangingClass::_masterTagDevice = NULL;
 volatile uint8_t DW1000RangingClass::_tagDevicesNumber = 0;
+boolean DW1000RangingClass::_isMasterTag = false;
+boolean DW1000RangingClass::_isEnabled = false;			// is true at start for master tag
+int DW1000RangingClass::_enabledTagNumber = 0;
 
 //module type (anchor or tag)
 int16_t      DW1000RangingClass::_type; // TODO enum??
@@ -404,6 +408,12 @@ DW1000Device* DW1000RangingClass::searchDistantDevice(byte shortAddress[]) {
 		if(memcmp(shortAddress, _networkDevices[i].getByteShortAddress(), 2) == 0) {
 			//we have found our device !
 			return &_networkDevices[i];
+		}
+	}
+	for(uint16_t i = 0; i < _tagDevicesNumber; i++) { // TODO 8bit?
+		if(memcmp(shortAddress, _tagDevices[i].getByteShortAddress(), 2) == 0) {
+			//we have found our device !
+			return &_tagDevices[i];
 		}
 	}
 	
@@ -778,7 +788,25 @@ void DW1000RangingClass::loop() {
 						return;
 					}
 				}
-				if(messageType == POLL_ACK) {
+				if(messageType == TAG_SYNC ){
+					//we have just received a SYNCH message from the master tag
+					_masterTagDevice = myDistantDevice;
+					_isEnabled = true;
+					transmitPoll(NULL);
+					_expectedMsgId = POLL_ACK;
+				}
+				if (messageType == TAG_SYNC_END)
+				{
+					//TODO : get position data from tag
+					_enabledTagNumber++;
+					if (_enabledTagNumber > _tagDevicesNumber)
+					{
+						_tagDevicesNumber = 0;
+						_isEnabled = true;
+					} 
+				}
+				if (_isEnabled && messageType == POLL_ACK)
+				{
 					DW1000.getReceiveTimestamp(myDistantDevice->timePollAckReceived);
 					//we note activity for our device:
 					myDistantDevice->noteActivity();
@@ -790,8 +818,9 @@ void DW1000RangingClass::loop() {
 						transmitRange(NULL);
 					}
 				}
-				else if(messageType == RANGE_REPORT) {
-					
+				else if (_isEnabled && messageType == RANGE_REPORT)
+				{
+
 					float curRange;
 					memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
 					float curRXPower;
@@ -812,6 +841,17 @@ void DW1000RangingClass::loop() {
 					//We can call our handler !
 					//we have finished our range computation. We send the corresponding handler
 					_lastDistantDevice = myDistantDevice->getIndex();
+					if(_lastDistantDevice== _networkDevicesNumber-1){
+						_isEnabled = false;
+						if(_isMasterTag){
+							_enabledTagNumber++;
+							if (_enabledTagNumber > _tagDevicesNumber){
+								_tagDevicesNumber = 0;
+							}
+						} else {
+							transmitTagSyncEnd(_masterTagDevice);
+						}		
+					}
 					if(_handleNewRange != 0) {
 						(*_handleNewRange)();
 					}
@@ -873,9 +913,17 @@ void DW1000RangingClass::resetInactive() {
 void DW1000RangingClass::timerTick() {
 	if(_networkDevicesNumber > 0 && counterForBlink != 0) {
 		if(_type == TAG) {
-			_expectedMsgId = POLL_ACK;
-			//send a prodcast poll
-			transmitPoll(NULL);
+			
+			//send a brodcast poll
+			if(_isEnabled){
+				transmitPoll(NULL);
+				_expectedMsgId = POLL_ACK;
+			} else if (_isMasterTag) {
+				transmitTagSync(&_tagDevices[_enabledTagNumber-1]);
+				_expectedMsgId = TAG_SYNC_END;
+			} else {
+				_expectedMsgId = TAG_SYNC;
+			}
 		}
 	}
 	else if(counterForBlink == 0) {
@@ -1081,6 +1129,25 @@ void DW1000RangingClass::receiver() {
 	DW1000.startReceive();
 }
 
+void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
+{
+	transmitInit();
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
+	data[SHORT_MAC_LEN] = TAG_SYNC;
+	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
+	transmit(data);
+}
+
+void DW1000RangingClass::transmitTagSyncEnd(DW1000Device *myDistantDevice)
+{
+	transmitInit();
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
+	data[SHORT_MAC_LEN] = TAG_SYNC_END;
+	memcpy(data + 1 + SHORT_MAC_LEN, &_pos_x, 4);
+	memcpy(data + 5 + SHORT_MAC_LEN, &_pos_y, 4);
+	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
+	transmit(data);
+}
 
 /* ###########################################################################
  * #### Methods for range computation and corrections  #######################

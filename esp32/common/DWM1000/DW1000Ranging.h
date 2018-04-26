@@ -41,6 +41,9 @@
 #define RANGING_INIT 			5
 #define TRILATERATION_REPORT 	6
 #define CHANGE_COLOR 			7
+#define TAG_SYNC				8
+#define TAG_SYNC_ACK			9
+#define TAG_SYNC_END			10
 
 #define LEN_DATA 90
 
@@ -151,8 +154,11 @@ private:
 
 	// for TAG only : other tags in the network
 	static DW1000Device _tagDevices[MAX_TAG_DEVICES];
-	static volatile uint8_t _tagDevicesNumber;
-	
+	static DW1000Device *_masterTagDevice;		
+	static volatile uint8_t _tagDevicesNumber;	// number of tag devices in the tagDevices array (excluding this)
+	static boolean _isMasterTag;	// is true if this tag is the master tag
+	static boolean _isEnabled;		// is true if this tag is computing ranging
+	static int _enabledTagNumber;	// the number of the tag computing ranging
 
 	//Handlers:
 	static void (* _handleNewRange)(void);
@@ -225,7 +231,9 @@ private:
 	static void transmitRangeReport(DW1000Device* myDistantDevice);
 	static void transmitRangeFailed(DW1000Device* myDistantDevice);
 	static void receiver();
-	
+	static void transmitTagSyncEnd(DW1000Device *myDistantDevice);
+	static void transmitTagSync(DW1000Device *myDistantDevice);
+
 	//for ranging protocole (TAG)
 	static void transmitPoll(DW1000Device* myDistantDevice);
 	static void transmitRange(DW1000Device* myDistantDevice);
