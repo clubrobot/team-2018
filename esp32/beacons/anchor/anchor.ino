@@ -164,6 +164,7 @@ void setup() {
   talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
   talks.bind(UPDATE_COLOR_OPCODE, UPDATE_COLOR);
   talks.bind(GET_COORDINATE_OPCODE,GET_COORDINATE);
+  talks.bind(GET_PANEL_STATUS_OPCODE, GET_PANEL_STATUS);
 
   /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
