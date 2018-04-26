@@ -38,13 +38,13 @@ class MyServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
-    Serial.println("connected");
+  //  Serial.println("connected");
     deviceConnected = true;
   };
 
   void onDisconnect(BLEServer *pServer)
   {
-    Serial.println("disconnected");
+  //  Serial.println("disconnected");
     deviceConnected = false;
   }
 };
@@ -255,7 +255,7 @@ void setup() {
     pService->start();
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->start();
-    Serial.println("Characteristic defined! Now you can read it in your phone!");
+   // Serial.println("Characteristic defined! Now you can read it in your phone!");
   }
 }
 
