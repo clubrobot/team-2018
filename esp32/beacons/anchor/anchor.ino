@@ -242,7 +242,7 @@ void setup() {
   // Start BLE Server only if this is the supervisor anchor
   if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
   {
-    BLEDevice::init("Server");
+    BLEDevice::init("srv");
     BLEServer *pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
     BLEService *pService = pServer->createService(SERVICE_UUID);
@@ -254,6 +254,7 @@ void setup() {
     pCharacteristic->setValue("insa rennes");
     pService->start();
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising->addServiceUUID(pService->getUUID());
     pAdvertising->start();
    // Serial.println("Characteristic defined! Now you can read it in your phone!");
   }

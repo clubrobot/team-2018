@@ -23,11 +23,10 @@ class ClientCallbacks : public BLEClientCallbacks
         ESP.restart(); // TODO : find a better way to handle disconnections
     }
 
-    void onConnect(BLEClient *pClient){}
+    void onConnect(BLEClient *pClient) {}
 };
 
-
-TCPTalks talk("CLUB_ROBOT","zigouigoui","192.168.1.17",26656);
+TCPTalks talk("CLUB_ROBOT", "zigouigoui", "192.168.1.17", 26656);
 
 PannelEffects Animation;
 
@@ -55,7 +54,6 @@ bool connectToServer(BLEAddress pAddress)
     {
         return false;
     }
-   
 }
 /**
  * Scan for BLE servers and find the first one that advertises the service we are looking for.
@@ -68,14 +66,15 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     void onResult(BLEAdvertisedDevice advertisedDevice)
     {
         // We have found a device, let us now see if it contains the service we are looking for.
-        // if (advertisedDevice.haveServiceUUID() && advertisedDevice.getServiceUUID().equals(serviceUUID)) {
+        if (advertisedDevice.haveServiceUUID() && advertisedDevice.getServiceUUID().equals(serviceUUID))
+        {
 
-        //
-        advertisedDevice.getScan()->stop();
+            advertisedDevice.getScan()->stop();
 
-        pServerAddress = new BLEAddress(advertisedDevice.getAddress());
-        doConnect = true;
-       
+            pServerAddress = new BLEAddress(advertisedDevice.getAddress());
+            doConnect = true;
+            Serial.println("Connecting ... ");
+        }
     } // onResult
 };    // MyAdvertisedDeviceCallbacks
 
@@ -96,7 +95,7 @@ void setup()
 
     talk.bind(IS_CONNECTED_OPCODE, IS_CONNECTED);*/
 
-   BLEDevice::init("");
+    BLEDevice::init("");
     Serial.println("init BLE");
     // Retrieve a Scanner and set the callback we want to use to be informed when we
     // have detected a new device.  Specify that we want active scanning and start the
@@ -109,7 +108,7 @@ void setup()
 
 void loop()
 {
-    talk.execute();
+    // talk.execute();
     Animation.execute();
 
     /* Auto re-connect step */
@@ -119,7 +118,7 @@ void loop()
         talk.connect(500);
         last_time = millis();
     }*/
-    // BLE client 
+    // BLE client
     if (doConnect == true)
     {
         connectToServer(*pServerAddress);
