@@ -46,8 +46,8 @@ DW1000Mac    DW1000RangingClass::_globalMac;
 DW1000Device DW1000RangingClass::_tagDevices[MAX_TAG_DEVICES];
 DW1000Device *DW1000RangingClass::_masterTagDevice = NULL;
 volatile uint8_t DW1000RangingClass::_tagDevicesNumber = 0;
-boolean DW1000RangingClass::_isMasterTag = false;
-boolean DW1000RangingClass::_isEnabled = false;			// is true at start for master tag
+boolean DW1000RangingClass::_isMasterTag = true;
+boolean DW1000RangingClass::_isEnabled = _isMasterTag; // is true at start for master tag
 int DW1000RangingClass::_enabledTagNumber = 0;
 
 //module type (anchor or tag)
@@ -801,7 +801,7 @@ void DW1000RangingClass::loop() {
 					_enabledTagNumber++;
 					if (_enabledTagNumber > _tagDevicesNumber)
 					{
-						_tagDevicesNumber = 0;
+						_enabledTagNumber = 0;
 						_isEnabled = true;
 					} 
 				}
@@ -846,7 +846,8 @@ void DW1000RangingClass::loop() {
 						if(_isMasterTag){
 							_enabledTagNumber++;
 							if (_enabledTagNumber > _tagDevicesNumber){
-								_tagDevicesNumber = 0;
+								_enabledTagNumber = 0;
+								_isEnabled = true;
 							}
 						} else {
 							transmitTagSyncEnd(_masterTagDevice);
@@ -911,7 +912,8 @@ void DW1000RangingClass::resetInactive() {
 }
 
 void DW1000RangingClass::timerTick() {
-	if(_networkDevicesNumber > 0 && counterForBlink != 0) {
+	//Serial.println("timerTick");
+	if(_networkDevicesNumber > 0 && counterForBlink != 0) {	//TODO : add _tagDevicesNumber ???
 		if(_type == TAG) {
 			
 			//send a brodcast poll
@@ -968,12 +970,14 @@ void DW1000RangingClass::transmit(byte datas[], DW1000Time time) {
 }
 
 void DW1000RangingClass::transmitBlink() {
+	Serial.println("transmitBlink");
 	transmitInit();
 	_globalMac.generateBlinkFrame(data, _currentAddress, _currentShortAddress);
 	transmit(data);
 }
 
 void DW1000RangingClass::transmitRangingInit(DW1000Device* myDistantDevice) {
+	Serial.println("transmitRangingInit");
 	transmitInit();
 	//we generate the mac frame for a ranging init message
 	_globalMac.generateLongMACFrame(data, _currentShortAddress, myDistantDevice->getByteAddress());
@@ -986,7 +990,7 @@ void DW1000RangingClass::transmitRangingInit(DW1000Device* myDistantDevice) {
 }
 
 void DW1000RangingClass::transmitPoll(DW1000Device* myDistantDevice) {
-	
+	Serial.println("transmitPoll");
 	transmitInit();
 	
 	if(myDistantDevice == NULL) {
@@ -1033,6 +1037,7 @@ void DW1000RangingClass::transmitPoll(DW1000Device* myDistantDevice) {
 
 
 void DW1000RangingClass::transmitPollAck(DW1000Device* myDistantDevice) {
+	Serial.println("transmitPollAck");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
 	data[SHORT_MAC_LEN] = POLL_ACK;
@@ -1043,6 +1048,7 @@ void DW1000RangingClass::transmitPollAck(DW1000Device* myDistantDevice) {
 }
 
 void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
+	Serial.println("transmitRange");
 	//transmit range need to accept broadcast for multiple anchor
 	transmitInit();
 	
@@ -1099,6 +1105,7 @@ void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
 
 
 void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
+	Serial.println("transmitRangeReport");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
 	data[SHORT_MAC_LEN] = RANGE_REPORT;
@@ -1113,6 +1120,7 @@ void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
 }
 
 void DW1000RangingClass::transmitRangeFailed(DW1000Device* myDistantDevice) {
+	Serial.println("transmitRangeFailed");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
 	data[SHORT_MAC_LEN] = RANGE_FAILED;
@@ -1131,6 +1139,7 @@ void DW1000RangingClass::receiver() {
 
 void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
 {
+	Serial.println("transmitTagSync");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
 	data[SHORT_MAC_LEN] = TAG_SYNC;
@@ -1140,6 +1149,7 @@ void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
 
 void DW1000RangingClass::transmitTagSyncEnd(DW1000Device *myDistantDevice)
 {
+	Serial.println("transmitTagSyncEnd");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
 	data[SHORT_MAC_LEN] = TAG_SYNC_END;
