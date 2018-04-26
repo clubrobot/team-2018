@@ -38,18 +38,19 @@ class MyServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
+    Serial.println("connected");
     deviceConnected = true;
   };
 
   void onDisconnect(BLEServer *pServer)
   {
+    Serial.println("disconnected");
     deviceConnected = false;
   }
 };
 
 void newRange()
 {
-
   DW1000Ranging.setRangeFilterValue(5);
   float distance = DW1000Ranging.getDistantDevice()->getRange()*1000;
   float projection = distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG));
@@ -236,9 +237,11 @@ void setup() {
   display.display();
 
   display.setFont(ArialMT_Plain_24);
-
+  Serial.print("init : ");
+  Serial.println(currentBeaconNumber);
   // Start BLE Server only if this is the supervisor anchor
-  if (currentBeaconNumber == BEACON_BLE_ADDRESS){
+  if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
+  {
     BLEDevice::init("Server");
     BLEServer *pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
@@ -248,9 +251,11 @@ void setup() {
         BLECharacteristic::PROPERTY_READ |
             BLECharacteristic::PROPERTY_WRITE |
             BLECharacteristic::PROPERTY_NOTIFY);
+    pCharacteristic->setValue("insa rennes");
     pService->start();
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->start();
+    Serial.println("Characteristic defined! Now you can read it in your phone!");
   }
 }
 
