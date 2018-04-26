@@ -26,8 +26,8 @@
 #define RESET_PUREPURSUIT_OPCODE        0x1A //0x10
 #define ADD_PUREPURSUIT_WAYPOINT_OPCODE 0x1B //0x11
 
-#define GET_VELOCITIES_WANTED_OPCODE    0x1C
-#define GOTO_DELTA_OPCODE               0x1D
+#define GET_VELOCITIES_WANTED_OPCODE    0x1D
+#define GOTO_DELTA_OPCODE               0x1E
 // Parameters identifiers
 
 #define LEFTWHEEL_RADIUS_ID             0x10
