@@ -36,43 +36,26 @@ long last_time = 0;
 
 bool connectToServer(BLEAddress pAddress)
 {
-    Serial.print("Forming a connection to ");
-    Serial.println(pAddress.toString().c_str());
-
     BLEClient *pClient = BLEDevice::createClient();
-    Serial.println(" - Created client");
 
     // Connect to the remote BLE Server.
     pClient->connect(pAddress);
-    Serial.println(" - Connected to server");
     pClient->setClientCallbacks(new ClientCallbacks());
 
     // Obtain a reference to the service we are after in the remote BLE server.
     BLERemoteService *pRemoteService = pClient->getService(serviceUUID);
     if (pRemoteService == nullptr)
     {
-        Serial.print("Failed to find our service UUID: ");
-        Serial.println(serviceUUID.toString().c_str());
         return false;
     }
-    Serial.println(" - Found our service");
 
     // Obtain a reference to the characteristic in the service of the remote BLE server.
     pRemoteCharacteristic = pRemoteService->getCharacteristic(charUUID);
     if (pRemoteCharacteristic == nullptr)
     {
-        Serial.print("Failed to find our characteristic UUID: ");
-        Serial.println(charUUID.toString().c_str());
         return false;
     }
-    Serial.println(" - Found our characteristic");
-
-    // Read the value of the characteristic.
-    std::string value = pRemoteCharacteristic->readValue();
-    Serial.print("The characteristic value was: ");
-    Serial.println(value.c_str());
-
-    //pRemoteCharacteristic->registerForNotify(notifyCallback);
+   
 }
 /**
  * Scan for BLE servers and find the first one that advertises the service we are looking for.
@@ -84,29 +67,22 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
    */
     void onResult(BLEAdvertisedDevice advertisedDevice)
     {
-        Serial.print("BLE Advertised Device found: ");
-        Serial.println(advertisedDevice.toString().c_str());
-
         // We have found a device, let us now see if it contains the service we are looking for.
         // if (advertisedDevice.haveServiceUUID() && advertisedDevice.getServiceUUID().equals(serviceUUID)) {
 
         //
-        Serial.print("Found our device!  address: ");
         advertisedDevice.getScan()->stop();
 
         pServerAddress = new BLEAddress(advertisedDevice.getAddress());
         doConnect = true;
-        Serial.println("Connecting ... ");
-
-        //} else {
-        Serial.println("Characteristic UUID not matching");
-        //}
+       
     } // onResult
 };    // MyAdvertisedDeviceCallbacks
 
 void setup()
 {
     Serial.begin(115200);
+    /*
     talk.connect(500);
     talk.bind(PING_OPCODE, PING);
     talk.bind(SET_BAR_OPCODE, SET_BAR);
@@ -118,7 +94,7 @@ void setup()
     talk.bind(SET_ENGR_OPCODE, SET_ENGR);
     talk.bind(GET_ENGR_OPCODE, GET_ENGR);
 
-    talk.bind(IS_CONNECTED_OPCODE, IS_CONNECTED);
+    talk.bind(IS_CONNECTED_OPCODE, IS_CONNECTED);*/
 
    BLEDevice::init("");
     Serial.println("init BLE");
@@ -146,10 +122,7 @@ void loop()
     // BLE client 
     if (doConnect == true)
     {
-       // Serial.println("connect to server");
         connectToServer(*pServerAddress);
-        //Serial.print("connected :");
-        //Serial.println(connected);
         doConnect = false;
     }
 }
