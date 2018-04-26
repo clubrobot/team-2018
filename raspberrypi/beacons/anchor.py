@@ -43,7 +43,7 @@ class Anchor(SerialTalks):
 		x, y = output.read(INT, INT)
 		return x, y		
 
-	def is_panel_on(self)
+	def is_panel_on(self):
 		output = self.execute(GET_PANEL_STATUS_OPCODE)
 		ret = output.read(BYTE)
 		return ret
