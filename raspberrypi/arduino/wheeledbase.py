@@ -76,7 +76,7 @@ class WheeledBase(SecureSerialTalksProxy):
 
 	_DEFAULT = {
 		GET_CODEWHEELS_COUNTERS_OPCODE : Deserializer(LONG(0) + LONG(0)),
-		POSITION_REACHED_OPCODE : Deserializer(BYTE(0) + BYTE(1)),
+		POSITION_REACHED_OPCODE : Deserializer(BYTE(0) + BYTE(0)),
 		GET_VELOCITIES_WANTED_OPCODE : Deserializer(FLOAT(0) + FLOAT(0)),
 		GET_POSITION_OPCODE : Deserializer(FLOAT(0) + FLOAT(0)+ FLOAT(0)),
 		GET_VELOCITIES_OPCODE :  Deserializer(FLOAT(0) + FLOAT(0)),
