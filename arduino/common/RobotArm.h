@@ -3,13 +3,25 @@
 
 #include <Arduino.h>
 #include <math.h>
+#include <Servo.h>
+#include "ShiftRegAX12.h" 
+#include "SoftwareSerial.h"
 
 #define ARM_LEN_1 15.0
 #define ARM_LEN_2 15.0
 
 #define ARM1_OFFSET 60
 #define ARM2_OFFSET 30
-#define ARM3_OFFSET 30
+#define ARM3_OFFSET 4
+
+#define GRIPPER_OPEN 50
+#define GRIPPER_CLOSE 110
+
+#define AX1_MAX_ANGLE 250
+#define AX1_MIN_ANGLE 70
+
+#define AX2_MAX_ANGLE 0
+#define AX2_MIN_ANGLE 300
 
 class RobotArm
 {
@@ -17,11 +29,13 @@ class RobotArm
 
 		RobotArm(double x, double y, double z, double theta, float speed);
 
-		void attach(int A1_id, int A2_id, int A3_id);
+		void attach(unsigned char A1_id, unsigned char A2_id, unsigned char A3_id, unsigned char servo);
 
 		void begin();
 
-		void solve_angles(double x, double y);
+		bool solve_angles(double x, double y);
+
+		bool solve_coords(double *x, double*y, double *th);
 
 		void ReachPosition(double x, double y, double z, double theta);
 
@@ -49,9 +63,9 @@ class RobotArm
 		double get_A3();
 
 
-	private :
+	protected :
 
-		double lawOfCosines(double a, double b, double c);
+		bool lawOfCosines(double a, double b, double c, double *A);
 
 		double distance(double x, double y);
 
@@ -63,7 +77,13 @@ class RobotArm
 		double m_y;
 		double m_z;
 
+		double m_x_max;
+		double m_y_max;
+		double m_z_max;
+
+
 		double m_theta;
+		double m_theta_max;
 
 		double m_D1;
 		double m_D2;
@@ -72,8 +92,10 @@ class RobotArm
 		double m_A2;
 		double m_A3;
 
-		int m_A1_id;
-		int m_A2_id;
-		int m_A3_id;
+		unsigned char m_A1_id;
+		unsigned char m_A2_id;
+		unsigned char m_A3_id;
+
+		Servo m_gripper;;
 };
-#endif // __ROBOTARM_H__
+#endif

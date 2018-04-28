@@ -5,7 +5,7 @@ import time
 import math
 
 from common.serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
-from common.components import SerialTalksProxy
+#from common.components import SerialTalksProxy
 
 
 _BEGIN_OPCODE 		 = 0X11
@@ -19,10 +19,14 @@ _SET_SPEED_OPCODE 	 = 0X17
 
 _GET_POS_OPCODE 	 = 0X18
 _GET_POS_THEO_OPCODE = 0X19
+_SET_ANGLES_OPCODE	 = 0X1A
 
-class RobotArm(SerialTalksProxy):	
-	def __init__(self,parent, uuid='RobotArm'):
-		SerialTalksProxy.__init__(self, parent, uuid)
+_OPEN_GRIPPER_OPCODE = 0X1B
+_CLOSE_GRIPPER_OPCODE = 0X1C
+
+class RobotArm(SerialTalks):	
+	def __init__(self, uuid='ttyUSB0'):
+		SerialTalks.__init__(self, "/dev/{}".format(uuid))
 
 	def begin(self):
 		self.send(_BEGIN_OPCODE)
@@ -51,6 +55,15 @@ class RobotArm(SerialTalksProxy):
 		return (x,y,z)
 
 	def get_pos_theo(self):
-		output = self.execute(_GET_POS_OPCODE_THEO)
+		output = self.execute(_GET_POS_THEO_OPCODE)
 		x, y, z = output.read(FLOAT, FLOAT, FLOAT)
 		return (x,y,z)
+
+	def set_angles(self,a,b,c):
+		self.send(_SET_ANGLES_OPCODE, FLOAT(a),FLOAT(b),FLOAT(C))
+
+	def open_gripper(self):
+		self.send(_OPEN_GRIPPER_OPCODE)
+
+	def close_gripper(self):
+		self.send(_CLOSE_GRIPPER_OPCODE)	

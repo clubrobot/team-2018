@@ -1,4 +1,5 @@
 #include "instructions.h"
+#include <Servo.h>
 
 extern Servo servo_1;
 extern Servo servo_2;

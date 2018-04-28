@@ -5,7 +5,7 @@ BOARD_SUB  = atmega328
 GLOBAL_DEFINE += USE_SHIFTREG
 
 # Sketch sources
-COMMON = ../../common
+COMMON = ../common
 LOCAL_INO_SRCS = main.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
@@ -13,8 +13,7 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/CRC16.cpp \
 	$(COMMON)/ShiftRegister.cpp \
 	$(COMMON)/ShiftRegAX12.cpp \
-	$(COMMON)/SoftwareSerial.cpp \
-	$(COMMON)/RobotArm.cpp
+	$(COMMON)/SoftwareSerial.cpp
 
 
 # Sketch libraries
@@ -26,5 +25,5 @@ ARDUINO_LIBS = EEPROM Servo
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
-MODULEMK_DIR = ../..
+MODULEMK_DIR = ..
 include $(MODULEMK_DIR)/Module.mk
