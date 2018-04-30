@@ -631,9 +631,9 @@ void DW1000RangingClass::loop() {
 			
 			//we get the device which correspond to the message which was sent (need to be filtered by MAC address)
 			DW1000Device* myDistantDevice = searchDistantDevice(address);
-			
-			
-			if((_networkDevicesNumber != 0) && (myDistantDevice == NULL)) {
+
+			if (((_networkDevicesNumber != 0) || (_tagDevicesNumber != 0)) && (myDistantDevice == NULL))
+			{
 				//Serial.println("Not found");
 				//we don't have the short address of the device in memory
 				/*
@@ -796,6 +796,7 @@ void DW1000RangingClass::loop() {
 					_isEnabled = true;
 					transmitPoll(NULL);
 					_expectedMsgId = POLL_ACK;
+					myDistantDevice->noteActivity();
 				}
 				if (messageType == TAG_SYNC_END)
 				{
@@ -806,7 +807,8 @@ void DW1000RangingClass::loop() {
 					{
 						_enabledTagNumber = 0;
 						_isEnabled = true;
-					} 
+					}
+					myDistantDevice->noteActivity();
 				}
 				if (_isEnabled && messageType == POLL_ACK)
 				{
@@ -1155,14 +1157,20 @@ void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
 
 void DW1000RangingClass::transmitTagSyncEnd(DW1000Device *myDistantDevice)
 {
-	Serial.println("transmitTagSyncEnd");
-	transmitInit();
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
-	data[SHORT_MAC_LEN] = TAG_SYNC_END;
-	memcpy(data + 1 + SHORT_MAC_LEN, &_pos_x, 4);
-	memcpy(data + 5 + SHORT_MAC_LEN, &_pos_y, 4);
-	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
-	transmit(data);
+	_masterTagDevice = searchDistantDevice(_masterTagDevice->getByteShortAddress());
+	if (_masterTagDevice != NULL){
+		Serial.println("transmitTagSyncEnd");
+		transmitInit();
+		_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
+		data[SHORT_MAC_LEN] = TAG_SYNC_END;
+		memcpy(data + 1 + SHORT_MAC_LEN, &_pos_x, 4);
+		memcpy(data + 5 + SHORT_MAC_LEN, &_pos_y, 4);
+		copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
+		transmit(data);
+	} else {
+		Serial.println("transmitTagSyncEnd failed");
+	}
+	
 }
 
 /* ###########################################################################
