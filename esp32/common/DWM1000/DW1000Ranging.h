@@ -151,10 +151,12 @@ private:
 	static DW1000Mac    _globalMac;
 	static int32_t      timer;
 	static int16_t      counterForBlink;
+	static int16_t		counterForinactivity;
+	static int16_t		counterForSync;
 
 	// for TAG only : other tags in the network
-	static DW1000Device _tagDevices[MAX_TAG_DEVICES];
-	static DW1000Device *_masterTagDevice;		
+	static DW1000Device _tagDevices[MAX_TAG_DEVICES];		
+	static byte _masterTagShortAddress[2];
 	static volatile uint8_t _tagDevicesNumber;	// number of tag devices in the tagDevices array (excluding this)
 	static boolean _isMasterTag;	// is true if this tag is the master tag
 	static boolean _isEnabled;		// is true if this tag is computing ranging
@@ -232,7 +234,7 @@ private:
 	static void transmitRangeReport(DW1000Device* myDistantDevice);
 	static void transmitRangeFailed(DW1000Device* myDistantDevice);
 	static void receiver();
-	static void transmitTagSyncEnd(DW1000Device *myDistantDevice);
+	static void transmitTagSyncEnd();
 	static void transmitTagSync(DW1000Device *myDistantDevice);
 
 	//for ranging protocole (TAG)

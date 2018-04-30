@@ -28,7 +28,6 @@ LIBS = 	$(ESP_LIBS)/SPI \
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x20
 CPPFLAGS += -DPUREPURSUIT_MAX_WAYPOINTS=32
 
-
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
 MODULEMK_DIR = ../..

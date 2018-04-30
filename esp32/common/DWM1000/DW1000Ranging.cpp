@@ -44,9 +44,9 @@ DW1000Mac    DW1000RangingClass::_globalMac;
 
 //other tags in the network
 DW1000Device DW1000RangingClass::_tagDevices[MAX_TAG_DEVICES];
-DW1000Device *DW1000RangingClass::_masterTagDevice = NULL;
+byte DW1000RangingClass::_masterTagShortAddress[2];
 volatile uint8_t DW1000RangingClass::_tagDevicesNumber = 0;
-boolean DW1000RangingClass::_isMasterTag = false;
+boolean DW1000RangingClass::_isMasterTag = true;
 boolean DW1000RangingClass::_isEnabled = _isMasterTag; // is true at start for master tag
 int DW1000RangingClass::_enabledTagNumber = 0;
 boolean DW1000RangingClass::_waitingSyncAck = false;
@@ -71,6 +71,8 @@ boolean          DW1000RangingClass::_protocolFailed = false;
 // timestamps to remember
 int32_t            DW1000RangingClass::timer           = 0;
 int16_t            DW1000RangingClass::counterForBlink = 0; // TODO 8 bit?
+int16_t            DW1000RangingClass::counterForinactivity = 0;
+int16_t			   DW1000RangingClass::counterForSync  = 0;
 
 // for auto calibration
 boolean DW1000RangingClass::_calibrate = false;
@@ -294,6 +296,13 @@ boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device) {
 
 boolean DW1000RangingClass::addTagDevices(DW1000Device *device, boolean shortAddress)
 {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
+	Serial.println("add new tag");
 	boolean addDevice = true;
 	//we test our network devices array to check
 	//we don't already have it
@@ -327,6 +336,13 @@ boolean DW1000RangingClass::addTagDevices(DW1000Device *device, boolean shortAdd
 
 boolean DW1000RangingClass::addTagDevices(DW1000Device *device)
 {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
+	Serial.println("add new tag");
 	boolean addDevice = true;
 	//we test our network devices array to check
 	//we don't already have it
@@ -352,6 +368,13 @@ boolean DW1000RangingClass::addTagDevices(DW1000Device *device)
 }
 
 void DW1000RangingClass::removeNetworkDevices(int16_t index) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
+	Serial.println("Remove tag because of inactivity");
 	//if we have just 1 element
 	if(_networkDevicesNumber == 1) {
 		_networkDevicesNumber = 0;
@@ -372,6 +395,12 @@ void DW1000RangingClass::removeNetworkDevices(int16_t index) {
 
 void DW1000RangingClass::removeTagDevices(int16_t index)
 {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("Remove tag because of inactivity");
 	//if we have just 1 element
 	if (_tagDevicesNumber == 1)
@@ -461,6 +490,8 @@ void DW1000RangingClass::checkForInactiveDevices() {
 			if(_handleInactiveDevice != 0) {
 				(*_handleInactiveDevice)(&_tagDevices[i]);
 			}
+			if (i == _enabledTagNumber - 1)
+				_waitingSyncAck = false;
 			//we need to delete the device from the array:
 			removeTagDevices(i);
 			
@@ -552,7 +583,7 @@ void DW1000RangingClass::loop() {
 	//check for new received message
 	if(_receivedAck) {
 		_receivedAck = false;
-		Serial.print("Network devices : ");
+		/*Serial.print("Network devices : ");
 		Serial.println(_networkDevicesNumber);
 		for(int i = 0; i< _networkDevicesNumber;i++){
 			uint16_t address = _networkDevices[i].getShortAddress();
@@ -564,7 +595,7 @@ void DW1000RangingClass::loop() {
 		{
 			uint16_t address = _tagDevices[i].getShortAddress();
 			Serial.println(address);
-		}
+		}*/
 		//we read the datas from the modules:
 		// get message and parse
 		DW1000.getData(data, LEN_DATA);
@@ -645,6 +676,10 @@ void DW1000RangingClass::loop() {
 				return;
 			}
 			
+			if(myDistantDevice == NULL){
+				Serial.println("NULL ptr instead of device !");
+			}
+				
 			
 			//then we proceed to range protocole
 			if(_type == ANCHOR) {
@@ -781,6 +816,16 @@ void DW1000RangingClass::loop() {
 				// get message and parse
 				if(messageType != _expectedMsgId) {
 					// unexpected message, start over again
+					Serial.print(_isMasterTag);
+					Serial.print(" ");
+					Serial.print(_isEnabled);
+					Serial.print(" ");
+					Serial.print(_waitingSyncAck);
+					Serial.print(" : ");
+					Serial.print("Unexppected msg : ");
+					Serial.print(messageType);
+					Serial.print(" expected : ");
+					Serial.println(_expectedMsgId);
 					//not needed ?
 					if(messageType == CHANGE_COLOR){
 						memcpy(&_color,  data + 1 + SHORT_MAC_LEN, 1);
@@ -791,15 +836,39 @@ void DW1000RangingClass::loop() {
 					}
 				}
 				if(messageType == TAG_SYNC ){
+					Serial.print(_isMasterTag);
+					Serial.print(" ");
+					Serial.print(_isEnabled);
+					Serial.print(" ");
+					Serial.print(_waitingSyncAck);
+					Serial.print(" : ");
+					Serial.println("TAG_SYNC");
 					//we have just received a SYNCH message from the master tag
-					_masterTagDevice = myDistantDevice;
-					_isEnabled = true;
-					transmitPoll(NULL);
-					_expectedMsgId = POLL_ACK;
-					myDistantDevice->noteActivity();
+					if (myDistantDevice != NULL){
+						memcpy(_masterTagShortAddress, myDistantDevice->getByteShortAddress(), 2);
+						_isEnabled = true;
+						Serial.print(_isMasterTag);
+						Serial.print(" ");
+						Serial.print(_isEnabled);
+						Serial.print(" ");
+						Serial.print(_waitingSyncAck);
+						Serial.print(" : ");
+						Serial.println("master tag short address saved");
+					}
+					//transmitPoll(NULL);
+					//_expectedMsgId = POLL_ACK;
+					if (myDistantDevice != NULL)
+						myDistantDevice->noteActivity();
 				}
 				if (messageType == TAG_SYNC_END)
 				{
+					Serial.print(_isMasterTag);
+					Serial.print(" ");
+					Serial.print(_isEnabled);
+					Serial.print(" ");
+					Serial.print(_waitingSyncAck);
+					Serial.print(" : ");
+					Serial.println("TAG_SYNC_END");
 					//TODO : get position data from tag
 					_waitingSyncAck = false;
 					_enabledTagNumber++;
@@ -808,7 +877,8 @@ void DW1000RangingClass::loop() {
 						_enabledTagNumber = 0;
 						_isEnabled = true;
 					}
-					myDistantDevice->noteActivity();
+					if (myDistantDevice != NULL)
+						myDistantDevice->noteActivity();
 				}
 				if (_isEnabled && messageType == POLL_ACK)
 				{
@@ -855,7 +925,7 @@ void DW1000RangingClass::loop() {
 								_isEnabled = true;
 							}
 						} else {
-							transmitTagSyncEnd(_masterTagDevice);
+							transmitTagSyncEnd();
 						}		
 					}
 					if(_handleNewRange != 0) {
@@ -918,7 +988,7 @@ void DW1000RangingClass::resetInactive() {
 
 void DW1000RangingClass::timerTick() {
 	//Serial.println("timerTick");
-	if(_networkDevicesNumber > 0 && counterForBlink != 0) {	//TODO : add _tagDevicesNumber ???
+	if(_networkDevicesNumber > 0 && counterForBlink != 0) {	
 		if(_type == TAG) {
 			
 			//send a brodcast poll
@@ -929,20 +999,68 @@ void DW1000RangingClass::timerTick() {
 				if(!_waitingSyncAck){
 					transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
 					_waitingSyncAck = true;
-				}
-				_expectedMsgId = TAG_SYNC_END;
+					counterForSync = 0;
+					_expectedMsgId = TAG_SYNC_END;
+				}	
 			} else {
 				_expectedMsgId = TAG_SYNC;
 			}
 		}
 	}
+	else if (_tagDevicesNumber > 0 && counterForBlink != 0)
+	{
+		if(_type == TAG) {
+			if(_isMasterTag){
+				if (!_waitingSyncAck)
+				{
+					if(_isEnabled){
+						_isEnabled = false;
+						_enabledTagNumber++;
+						if (_enabledTagNumber > _tagDevicesNumber)
+						{
+							_enabledTagNumber = 0;
+							_isEnabled = true;
+						}
+					}else{
+						transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
+						_waitingSyncAck = true;
+						counterForSync = 0;
+						_expectedMsgId = TAG_SYNC_END;
+					}
+				}
+			}
+			else	// Slave tag
+			{
+				if(_isEnabled){
+					_isEnabled = false;
+					transmitTagSyncEnd();
+					_expectedMsgId = TAG_SYNC;
+				} else {
+					_expectedMsgId = TAG_SYNC;
+				}
+			}
+		}
+	}
 	else if(counterForBlink == 0) {
+		counterForinactivity++;
 		if(_type == TAG) {
 			transmitBlink();
 		}
+		
 		//check for inactive devices if we are a TAG or ANCHOR
-		checkForInactiveDevices();
+		if(counterForinactivity >= 2){
+			checkForInactiveDevices();
+			counterForinactivity = 0;
+		}
 	}
+	if(_waitingSyncAck){
+		counterForSync++;
+	}
+	if(counterForSync>10){
+		_waitingSyncAck = false;
+		counterForSync = 0;
+	}
+
 	counterForBlink++;
 	if(counterForBlink > 20) {
 		counterForBlink = 0;
@@ -978,6 +1096,12 @@ void DW1000RangingClass::transmit(byte datas[], DW1000Time time) {
 }
 
 void DW1000RangingClass::transmitBlink() {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitBlink");
 	transmitInit();
 	_globalMac.generateBlinkFrame(data, _currentAddress, _currentShortAddress);
@@ -985,6 +1109,12 @@ void DW1000RangingClass::transmitBlink() {
 }
 
 void DW1000RangingClass::transmitRangingInit(DW1000Device* myDistantDevice) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitRangingInit");
 	transmitInit();
 	//we generate the mac frame for a ranging init message
@@ -998,6 +1128,12 @@ void DW1000RangingClass::transmitRangingInit(DW1000Device* myDistantDevice) {
 }
 
 void DW1000RangingClass::transmitPoll(DW1000Device* myDistantDevice) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitPoll");
 	transmitInit();
 	
@@ -1045,6 +1181,12 @@ void DW1000RangingClass::transmitPoll(DW1000Device* myDistantDevice) {
 
 
 void DW1000RangingClass::transmitPollAck(DW1000Device* myDistantDevice) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitPollAck");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
@@ -1056,6 +1198,12 @@ void DW1000RangingClass::transmitPollAck(DW1000Device* myDistantDevice) {
 }
 
 void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitRange");
 	//transmit range need to accept broadcast for multiple anchor
 	transmitInit();
@@ -1113,6 +1261,12 @@ void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
 
 
 void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitRangeReport");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
@@ -1128,6 +1282,12 @@ void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
 }
 
 void DW1000RangingClass::transmitRangeFailed(DW1000Device* myDistantDevice) {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitRangeFailed");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
@@ -1147,6 +1307,12 @@ void DW1000RangingClass::receiver() {
 
 void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
 {
+	Serial.print(_isMasterTag);
+	Serial.print(" ");
+	Serial.print(_isEnabled);
+	Serial.print(" ");
+	Serial.print(_waitingSyncAck);
+	Serial.print(" : ");
 	Serial.println("transmitTagSync");
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
@@ -1155,19 +1321,31 @@ void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
 	transmit(data);
 }
 
-void DW1000RangingClass::transmitTagSyncEnd(DW1000Device *myDistantDevice)
+void DW1000RangingClass::transmitTagSyncEnd()
 {
-	_masterTagDevice = searchDistantDevice(_masterTagDevice->getByteShortAddress());
-	if (_masterTagDevice != NULL){
+	DW1000Device *masterTagDevice = searchDistantDevice(_masterTagShortAddress);
+	if (masterTagDevice != NULL){
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" : ");
 		Serial.println("transmitTagSyncEnd");
 		transmitInit();
-		_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
+		_globalMac.generateShortMACFrame(data, _currentShortAddress, masterTagDevice->getByteShortAddress());
 		data[SHORT_MAC_LEN] = TAG_SYNC_END;
 		memcpy(data + 1 + SHORT_MAC_LEN, &_pos_x, 4);
 		memcpy(data + 5 + SHORT_MAC_LEN, &_pos_y, 4);
-		copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
+		copyShortAddress(_lastSentToShortAddress, masterTagDevice->getByteShortAddress());
 		transmit(data);
 	} else {
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" : ");
 		Serial.println("transmitTagSyncEnd failed");
 	}
 	
