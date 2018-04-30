@@ -159,6 +159,7 @@ private:
 	static boolean _isMasterTag;	// is true if this tag is the master tag
 	static boolean _isEnabled;		// is true if this tag is computing ranging
 	static int _enabledTagNumber;	// the number of the tag computing ranging
+	static boolean _waitingSyncAck;	// is true if the master tag sent a sync signal and is waiting for response
 
 	//Handlers:
 	static void (* _handleNewRange)(void);

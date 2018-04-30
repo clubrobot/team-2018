@@ -46,9 +46,10 @@ DW1000Mac    DW1000RangingClass::_globalMac;
 DW1000Device DW1000RangingClass::_tagDevices[MAX_TAG_DEVICES];
 DW1000Device *DW1000RangingClass::_masterTagDevice = NULL;
 volatile uint8_t DW1000RangingClass::_tagDevicesNumber = 0;
-boolean DW1000RangingClass::_isMasterTag = true;
+boolean DW1000RangingClass::_isMasterTag = false;
 boolean DW1000RangingClass::_isEnabled = _isMasterTag; // is true at start for master tag
 int DW1000RangingClass::_enabledTagNumber = 0;
+boolean DW1000RangingClass::_waitingSyncAck = false;
 
 //module type (anchor or tag)
 int16_t      DW1000RangingClass::_type; // TODO enum??
@@ -371,6 +372,7 @@ void DW1000RangingClass::removeNetworkDevices(int16_t index) {
 
 void DW1000RangingClass::removeTagDevices(int16_t index)
 {
+	Serial.println("Remove tag because of inactivity");
 	//if we have just 1 element
 	if (_tagDevicesNumber == 1)
 	{
@@ -798,6 +800,7 @@ void DW1000RangingClass::loop() {
 				if (messageType == TAG_SYNC_END)
 				{
 					//TODO : get position data from tag
+					_waitingSyncAck = false;
 					_enabledTagNumber++;
 					if (_enabledTagNumber > _tagDevicesNumber)
 					{
@@ -921,7 +924,10 @@ void DW1000RangingClass::timerTick() {
 				transmitPoll(NULL);
 				_expectedMsgId = POLL_ACK;
 			} else if (_isMasterTag) {
-				transmitTagSync(&_tagDevices[_enabledTagNumber-1]);
+				if(!_waitingSyncAck){
+					transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
+					_waitingSyncAck = true;
+				}
 				_expectedMsgId = TAG_SYNC_END;
 			} else {
 				_expectedMsgId = TAG_SYNC;
