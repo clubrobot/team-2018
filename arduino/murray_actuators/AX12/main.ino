@@ -17,7 +17,7 @@ ShiftRegister shift;
 
 ShiftRegAX12 servoax;
 //            X |  Y  |  Z  | Th | SPEED
-RobotArm arm(0.0, 30.0, 10.0, 90.0, 100);
+RobotArm arm(0.0, 30.0, 10.0, 90.0, 1000);
 
 void setup()
 {

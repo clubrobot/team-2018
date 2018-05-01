@@ -24,6 +24,32 @@ _SET_ANGLES_OPCODE	 = 0X1A
 _OPEN_GRIPPER_OPCODE = 0X1B
 _CLOSE_GRIPPER_OPCODE = 0X1C
 
+
+CROSS_1 = 0
+CROSS_2 = 1
+CROSS_3 = 2
+CROSS_4 = 3
+CROSS_5 = 4
+CROSS_6 = 51
+
+GREEN_CUBE  = 0
+BLUE_CUBE	= 1
+ORANGE_CUBE = 2
+BLACK_CUBE	= 3
+YELLOW_CUBE = 4
+
+#  		         GREEN     |        BLUE       |       ORANGE      |       BLACK      |      YELLOW   
+CROSS1 = [(540  , 792  , 0),(598  , 850  , -90),(540  , 895  , 180),(482  , 850  , 90),(540  , 850  , 90)]
+CROSS2 = [(1190 , 242  , 0),(1248 , 300  , -90),(1190 , 358  , 180),(1132 , 300  , 90),(1190 , 300  , 90)]
+CROSS3 = [(1500 , 1042 , 0),(1558 , 1100 , -90),(1500 , 1158 , 180),(1442 , 1100 , 90),(1500 , 1100 , 90)]
+
+CROSS4 = [(1500 , 1958 , 0),(1558 , 1900 , -90),(1500 , 1942 , 180),(1442 , 1900 , 90),(1500 , 1900 , 90)]
+CROSS5 = [(1190 , 2758 , 0),(1248 , 2700 , -90),(1190 , 2642 , 180),(1132 , 2700 , 90),(1190 , 2700 , 90)]
+CROSS6 = [(540  , 2208 , 0),(598  , 2150 , -90),(540  , 2092 , 180),(482  , 2150 , 90),(540  , 2150 , 90)]
+
+CROSS_LIST = [CROSS1, CROSS2, CROSS3, CROSS4, CROSS5, CROSS6]
+
+
 class RobotArm(SerialTalks):	
 	def __init__(self, uuid='ttyUSB0'):
 		SerialTalks.__init__(self, "/dev/{}".format(uuid))
@@ -32,19 +58,44 @@ class RobotArm(SerialTalks):
 		self.send(_BEGIN_OPCODE)
 
 	def set_pos(self, x, y ,z ,theta):
-		self.send(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta))
+		output = self.execute(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta))
+		ret = output.read(INT);
+		if(ret):
+			return "Go to ("+str(x)+","+str(y)+","+str(z)+","+str(theta)+")"
+		else:
+			return "Postition unreachable, try new pos"
 
 	def set_x(self,x):
-		self.send(_SET_X_OPCODE, FLOAT(x))
+		output = self.execute(_SET_X_OPCODE, FLOAT(x))
+		ret = output.read(INT);
+		if(ret):
+			return "Move to x = "+str(x)
+		else:
+			return "Postition unreachable, try new pos"
 
 	def set_y(self,y):
-		self.send(_SET_Y_OPCODE, FLOAT(y))
+		output = self.execute(_SET_Y_OPCODE, FLOAT(y))
+		ret = output.read(INT);
+		if(ret):
+			return "Move to y = "+str(y)
+		else:
+			return "Postition unreachable, try new pos"
 
 	def set_z(self,z):
-		self.send(_SET_Z_OPCODE, FLOAT(z))
+		output = self.execute(_SET_Z_OPCODE, FLOAT(z))
+		ret = output.read(INT);
+		if(ret):
+			return "Move to z = "+str(z)
+		else:
+			return "Postition unreachable, try new pos"
 
 	def set_theta(self,theta):
-		self.send(_SET_THETA_OPCODE, FLOAT(theta))
+		output = self.execute(_SET_THETA_OPCODE, FLOAT(theta))
+		ret = output.read(INT);
+		if(ret):
+			return "Move to theta = "+str(theta)
+		else:
+			return "Postition unreachable, try new pos"
 
 	def set_speed(self,speed):
 		self.send(_SET_THETA_OPCODE, FLOAT(speed))

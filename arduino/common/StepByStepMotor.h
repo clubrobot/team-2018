@@ -1,13 +1,13 @@
 #ifndef __STEPBYSTEPMOTOR_H__
 #define __STEPBYSTEPMOTOR_H__
 
-#define STEP_BY_REV 200
+#define STEP_BY_REV (200*16)
 
-#define RAYON	3
+#define P_MM 80L
 
-#define TURN_DIST (2*PI*RAYON)
-
-
+#define ACC  500	/* 1500 p/s² */
+#define PLAT 500	/* 1500 p/s  */
+#define DECC 700	/* 1700 p/s² */
 
 class StepByStepMotor
 {
@@ -22,9 +22,9 @@ class StepByStepMotor
 
 		void update();
 
-		void set_postion(double position){m_pos = position; update();}
+		void set_position(double position){m_pos = position; update();}
 
-		void set_speed(unsigned long speed){m_speed = (60L * 1000L * 1000L)/ STEP_BY_REV / speed;}
+		void set_speed(unsigned long speed){m_speed = speed;}
 
 		float get_position(){return m_pos;}
 
