@@ -1,8 +1,8 @@
 #ifndef __BALLSHAKER_H__
-#define __BALLSHAKER_H__
+#define __BALLSHAKER_H_
 
 #include <Arduino.h>
-#include <Servo.h>
+#include "../common/VelocityServo.h"
 #include "../common/SerialTalks.h"
 #include "../common/PeriodicProcess.h"
 
@@ -24,6 +24,10 @@ public:
         count_clock_vertical = 0;
         mode = 0;
         setTimestep(0.015);
+        shakerVertical.setTimestep(0.0010);
+        shakerVertical.setVelocity(300);
+        shakerHorizontal.setTimestep(0.0010);
+        shakerHorizontal.setVelocity(300);
     }
 
 	void attachVertical(int PIN);
@@ -37,12 +41,13 @@ public:
 	void enableShakerEqualFreq();
 	void enableShakerDiffFreq();
 	void disableShaker();
+    void set_velocity(int vel);
     void updateShaker();
     void shake();
 
 private:
-    Servo shakerVertical;
-    Servo shakerHorizontal;
+    VelocityServo shakerVertical;
+    VelocityServo shakerHorizontal;
     int count_clock_horizontal;
     int count_clock_vertical;
     int mode;

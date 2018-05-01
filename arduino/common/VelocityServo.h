@@ -19,7 +19,7 @@ private :
 
 public : 
 	
-	VelocityServo(){m_velocity = 360;}
+	VelocityServo(){m_velocity = 100;}
 
 	void setVelocity(float vel){m_velocity = vel;}
 	void Velocitywrite(int setpoint);

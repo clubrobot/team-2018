@@ -247,7 +247,10 @@ class Mover:
                 else:
                     self.logger("MOVER : ", "Launch a goto")
                     self.wheeledbase.goto(*self.goal, direction=direction)
-                    self.isarrived = True
+                    try:
+                        self.isarrived = True
+                    except:
+                        pass
 
             except RuntimeError:
                 self.logger("MOVER : ", "Spin detected !")

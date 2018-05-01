@@ -15,6 +15,7 @@ class Action():
         self.time = time
         self.area = None
         self.manual_order = 0
+        self.before_action = lambda: None
         
     def __call__(self):
         self.actionFunction()
@@ -45,6 +46,9 @@ class Action():
 
     def __bool__(self):
         return self.done
+
+    def set_before_action(self, action):
+        self.before_action = action
 
 class Actionnable():
     def getAction(self):
