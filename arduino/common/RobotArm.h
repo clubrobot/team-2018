@@ -7,21 +7,38 @@
 #include "ShiftRegAX12.h" 
 #include "SoftwareSerial.h"
 
+/******** ARM LEN *********/
 #define ARM_LEN_1 15.0
 #define ARM_LEN_2 15.0
 
+/********ARM OFFSETS*******/
 #define ARM1_OFFSET 60
 #define ARM2_OFFSET 30
 #define ARM3_OFFSET 4
 
+/*******GRIPPER POS *******/
 #define GRIPPER_OPEN 50
 #define GRIPPER_CLOSE 110
 
+/****** MIN/MAX ANGLE *****/
 #define AX1_MAX_ANGLE 250
 #define AX1_MIN_ANGLE 70
 
 #define AX2_MAX_ANGLE 0
 #define AX2_MIN_ANGLE 300
+
+/******* DEAD ZONE ********/
+#define X_MAX_UP 30.0
+#define X_MIN_UP -30.0
+
+#define X_MAX_DOWN 5.0
+#define X_MIN_DOWN -5.0
+
+#define RAY_1		((X_MIN_UP + X_MIN_DOWN)/2)
+#define RAY_2		((X_MIN_DOWN + X_MIN_DOWN)/2)
+#define RAY_3		((X_MAX_UP + X_MAX_DOWN)/2)
+
+#define DELTA_POS 0.29
 
 class RobotArm
 {
@@ -35,9 +52,9 @@ class RobotArm
 
 		bool solve_angles(double x, double y);
 
-		bool solve_coords(double *x, double*y, double *th);
+		bool solve_coords(double x, double y);
 
-		void ReachPosition(double x, double y, double z, double theta);
+		bool ReachPosition(double x, double y, double z, double theta);
 
 		void set_gripper_angle(double a);
 
@@ -47,10 +64,10 @@ class RobotArm
 
 		void set_angles(float A1, float A2, float A3);
 
-		void set_x(double x);
-		void set_y(double y);
-		void set_z(double z);
-		void set_theta(double theta);
+		bool set_x(double x);
+		bool set_y(double y);
+		bool set_z(double z);
+		bool set_theta(double theta);
 
 		void set_speed(float speed);
 
@@ -62,6 +79,8 @@ class RobotArm
 		double get_A2();
 		double get_A3();
 
+		bool is_reached();
+
 
 	protected :
 
@@ -70,6 +89,10 @@ class RobotArm
 		double distance(double x, double y);
 
 		double convert_deg(double rad);
+
+		// DEAD ZONE CALCULATION
+		double up(double x);
+		double down(double x);
 
 		float m_speed;
 
