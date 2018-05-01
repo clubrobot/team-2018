@@ -46,7 +46,7 @@ DW1000Mac    DW1000RangingClass::_globalMac;
 DW1000Device DW1000RangingClass::_tagDevices[MAX_TAG_DEVICES];
 byte DW1000RangingClass::_masterTagShortAddress[2];
 volatile uint8_t DW1000RangingClass::_tagDevicesNumber = 0;
-boolean DW1000RangingClass::_isMasterTag = true;
+boolean DW1000RangingClass::_isMasterTag = false;
 boolean DW1000RangingClass::_isEnabled = _isMasterTag; // is true at start for master tag
 int DW1000RangingClass::_enabledTagNumber = 0;
 boolean DW1000RangingClass::_waitingSyncAck = false;
@@ -106,7 +106,8 @@ uint32_t  DW1000RangingClass::_rangingCountPeriod  = 0;
 void (* DW1000RangingClass::_handleNewRange)(void) = 0;
 void (* DW1000RangingClass::_handleBlinkDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleNewDevice)(DW1000Device*) = 0;
-void (* DW1000RangingClass::_handleInactiveDevice)(DW1000Device*) = 0;
+void (* DW1000RangingClass::_handleInactiveAncDevice)(DW1000Device*) = 0;
+void (* DW1000RangingClass::_handleInactiveTagDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
 
 /* ###########################################################################
@@ -374,7 +375,7 @@ void DW1000RangingClass::removeNetworkDevices(int16_t index) {
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
 	Serial.print(" : ");
-	Serial.println("Remove tag because of inactivity");
+	Serial.println("Remove anchor because of inactivity");
 	//if we have just 1 element
 	if(_networkDevicesNumber == 1) {
 		_networkDevicesNumber = 0;
@@ -477,8 +478,8 @@ void DW1000RangingClass::checkForReset() {
 void DW1000RangingClass::checkForInactiveDevices() {
 	for(uint8_t i = 0; i < _networkDevicesNumber; i++) {
 		if(_networkDevices[i].isInactive()) {
-			if(_handleInactiveDevice != 0) {
-				(*_handleInactiveDevice)(&_networkDevices[i]);
+			if(_handleInactiveAncDevice != 0) {
+				(*_handleInactiveAncDevice)(&_networkDevices[i]);
 			}
 			//we need to delete the device from the array:
 			removeNetworkDevices(i);
@@ -487,8 +488,8 @@ void DW1000RangingClass::checkForInactiveDevices() {
 	}
 	for(uint8_t i = 0; i < _tagDevicesNumber; i++) {
 		if(_tagDevices[i].isInactive()) {
-			if(_handleInactiveDevice != 0) {
-				(*_handleInactiveDevice)(&_tagDevices[i]);
+			if(_handleInactiveTagDevice != 0) {
+				(*_handleInactiveTagDevice)(&_tagDevices[i]);
 			}
 			if (i == _enabledTagNumber - 1)
 				_waitingSyncAck = false;
@@ -859,6 +860,8 @@ void DW1000RangingClass::loop() {
 					//_expectedMsgId = POLL_ACK;
 					if (myDistantDevice != NULL)
 						myDistantDevice->noteActivity();
+
+					noteActivity();
 				}
 				if (messageType == TAG_SYNC_END)
 				{
@@ -879,6 +882,8 @@ void DW1000RangingClass::loop() {
 					}
 					if (myDistantDevice != NULL)
 						myDistantDevice->noteActivity();
+
+					noteActivity();
 				}
 				if (_isEnabled && messageType == POLL_ACK)
 				{

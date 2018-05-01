@@ -103,7 +103,8 @@ public:
 	static byte* getCurrentAddress() { return _currentAddress; };
 	static byte* getCurrentShortAddress() { return _currentShortAddress; };
 	static uint8_t getNetworkDevicesNumber() { return _networkDevicesNumber; };
-	
+	static uint8_t getTagDevicesNumber() { return _tagDevicesNumber; };
+
 	//ranging functions
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
@@ -115,7 +116,8 @@ public:
 	static void attachNewRange(void (* handleNewRange)(void)) { _handleNewRange = handleNewRange; };
 	static void attachBlinkDevice(void (* handleBlinkDevice)(DW1000Device*)) { _handleBlinkDevice = handleBlinkDevice; };
 	static void attachNewDevice(void (* handleNewDevice)(DW1000Device*)) { _handleNewDevice = handleNewDevice; };
-	static void attachInactiveDevice(void (* handleInactiveDevice)(DW1000Device*)) { _handleInactiveDevice = handleInactiveDevice; };
+	static void attachInactiveAncDevice(void (*handleInactiveAncDevice)(DW1000Device *)) { _handleInactiveAncDevice = handleInactiveAncDevice; };
+	static void attachInactiveTagDevice(void (*handleInactiveTagDevice)(DW1000Device *)) { _handleInactiveTagDevice = handleInactiveTagDevice; };
 	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
 
 	// Auto calibration
@@ -167,7 +169,8 @@ private:
 	static void (* _handleNewRange)(void);
 	static void (* _handleBlinkDevice)(DW1000Device*);
 	static void (* _handleNewDevice)(DW1000Device*);
-	static void (* _handleInactiveDevice)(DW1000Device*);
+	static void (* _handleInactiveAncDevice)(DW1000Device *);
+	static void (* _handleInactiveTagDevice)(DW1000Device *);
 	static void (* _handleCalibration)(int,int);	// real distance (INT), mesure (INT)
 	
 	//sketch type (tag or anchor)

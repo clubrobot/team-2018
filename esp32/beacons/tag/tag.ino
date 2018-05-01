@@ -289,6 +289,8 @@ void newRange()
 
 void newDevice(DW1000Device *device)
 {
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
   //Serial.print("ranging init; 1 device added ! -> ");
   //Serial.print(" short:");
   //Serial.println(device->getShortAddress(), HEX);
@@ -307,12 +309,24 @@ void newDevice(DW1000Device *device)
   case 38: //TODO : should be 3
     a4Connected = true;
   }
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
-void inactiveDevice(DW1000Device *device)
+void inactiveAncDevice(DW1000Device *device)
 {
-  //Serial.print("delete inactive device: ");
-  //Serial.println(device->getShortAddress(), HEX);
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber() -1;
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+
   byte id = device->getShortAddress();
   switch (id)
   {
@@ -328,16 +342,61 @@ void inactiveDevice(DW1000Device *device)
   case 38: //TODO : should be 3
     a4Connected = false;
   }
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
   if (!(a1Connected || a2Connected || a3Connected || a4Connected))
   {
-    display.clear();
-    display.drawString(64, 0, "INACTIVE");
-    display.display();
-    digitalWrite(PIN_LED_OK, LOW);
-    digitalWrite(PIN_LED_FAIL, HIGH);
     p[0] = -1;
     p[1] = -1;
   }
+
+  if(tagNumber + networkNumber == 0){
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
+}
+
+void inactiveTagDevice(DW1000Device *device)
+{
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber() -1;
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
+  if (tagNumber + networkNumber == 0)
+  {
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
+}
+
+void blinkDevice(DW1000Device *device){
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+ 
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
 void setup() {
@@ -351,7 +410,9 @@ void setup() {
   //define the sketch as anchor. It will be great to dynamically change the type of module
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachNewDevice(newDevice);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachInactiveAncDevice(inactiveAncDevice);
+  DW1000Ranging.attachInactiveTagDevice(inactiveTagDevice);
+  DW1000Ranging.attachBlinkDevice(blinkDevice);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
   DW1000Ranging.setRangeFilterValue(5);
