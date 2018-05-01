@@ -6,6 +6,7 @@
  *  - give example description
  */
 #include "pin.h"
+#include "configuration.h"
 #include <EEPROM.h>
 
 #include <SPI.h>
@@ -19,6 +20,7 @@
 #include "instructions.h"
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
+byte currentBeaconNumber = 1;
 
 static float d1 = 0;
 static float d2 = 0;
@@ -405,6 +407,12 @@ void setup() {
 
   talks.bind(GET_POSITION_OPCODE, GET_POSITION);
 
+#if 0
+  EEPROM.write(EEPROM_NUM_TAG, currentBeaconNumber);
+  EEPROM.commit();
+#endif
+  currentBeaconNumber = EEPROM.read(EEPROM_NUM_TAG);
+
   //init the configuration
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   //define the sketch as anchor. It will be great to dynamically change the type of module
@@ -418,7 +426,7 @@ void setup() {
   DW1000Ranging.setRangeFilterValue(5);
 
   //we start the module as a tag
-  DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+  DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, currentBeaconNumber, MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();

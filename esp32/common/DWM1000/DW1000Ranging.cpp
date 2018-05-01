@@ -209,29 +209,22 @@ void DW1000RangingClass::startAsAnchor(char address[], const byte mode[], const 
 	
 }
 
-void DW1000RangingClass::startAsTag(char address[], const byte mode[], const bool randomShortAddress) {
+void DW1000RangingClass::startAsTag(char address[], const byte mode[], const byte tagAddress, const bool isMasterTag) {
 	//save the address
 	DW1000.convertToByte(address, _currentAddress);
 	//write the address on the DW1000 chip
 	DW1000.setEUI(address);
 	//Serial.print("device address: ");
 	//Serial.println(address);
-	if (randomShortAddress) {
-		//we need to define a random short address:
-		randomSeed(analogRead(0));
-		_currentShortAddress[0] = random(0, 256);
-		_currentShortAddress[1] = random(0, 256);
-	}
-	else {
-		// we use first two bytes in addess for short address
-		_currentShortAddress[0] = _currentAddress[0];
-		_currentShortAddress[1] = _currentAddress[1];
-	}
-	
+	_currentShortAddress[0] = tagAddress;
+	_currentShortAddress[1] = 0;
+
 	//we configur the network for mac filtering
 	//(device Address, network ID, frequency)
 	DW1000Ranging.configureNetwork(_currentShortAddress[0]*256+_currentShortAddress[1], 0xDECA, mode);
 	
+	_isMasterTag = isMasterTag;
+	_isEnabled = _isMasterTag;
 	generalStart();
 	//defined type as tag
 	_type = TAG;
@@ -816,23 +809,34 @@ void DW1000RangingClass::loop() {
 			else if(_type == TAG) {
 				// get message and parse
 				if(messageType != _expectedMsgId) {
-					// unexpected message, start over again
-					Serial.print(_isMasterTag);
-					Serial.print(" ");
-					Serial.print(_isEnabled);
-					Serial.print(" ");
-					Serial.print(_waitingSyncAck);
-					Serial.print(" : ");
-					Serial.print("Unexppected msg : ");
-					Serial.print(messageType);
-					Serial.print(" expected : ");
-					Serial.println(_expectedMsgId);
+					
 					//not needed ?
 					if(messageType == CHANGE_COLOR){
 						memcpy(&_color,  data + 1 + SHORT_MAC_LEN, 1);
-					} else {
+					} else if(!_isEnabled) {
+						Serial.print(_isMasterTag);
+						Serial.print(" ");
+						Serial.print(_isEnabled);
+						Serial.print(" ");
+						Serial.print(_waitingSyncAck);
+						Serial.print(" : ");
+						Serial.print("IGNORED Unexppected msg : ");
+						Serial.print(messageType);
+						Serial.print(" expected : ");
+						Serial.println(_expectedMsgId);
 						return;
-						_expectedMsgId = POLL_ACK;
+					} else {
+						// unexpected message, start over again
+						Serial.print(_isMasterTag);
+						Serial.print(" ");
+						Serial.print(_isEnabled);
+						Serial.print(" ");
+						Serial.print(_waitingSyncAck);
+						Serial.print(" : ");
+						Serial.print("Unexppected msg : ");
+						Serial.print(messageType);
+						Serial.print(" expected : ");
+						Serial.println(_expectedMsgId);
 						return;
 					}
 				}
@@ -887,6 +891,18 @@ void DW1000RangingClass::loop() {
 				}
 				if (_isEnabled && messageType == POLL_ACK)
 				{
+					Serial.print(_isMasterTag);
+					Serial.print(" ");
+					Serial.print(_isEnabled);
+					Serial.print(" ");
+					Serial.print(_waitingSyncAck);
+					Serial.print(" : ");
+					Serial.print("POLL_ACK from");
+					uint16_t addr = 0;
+					if(myDistantDevice != NULL)
+						addr = myDistantDevice->getShortAddress();
+					Serial.println(addr);
+
 					DW1000.getReceiveTimestamp(myDistantDevice->timePollAckReceived);
 					//we note activity for our device:
 					myDistantDevice->noteActivity();

@@ -87,7 +87,7 @@ public:
 	static void    configureNetwork(uint16_t deviceAddress, uint16_t networkId, const byte mode[]);
 	static void    generalStart();
 	static void    startAsAnchor(char address[], const byte mode[], const byte anchorAddress);
-	static void    startAsTag(char address[], const byte mode[], const bool randomShortAddress = true);
+	static void    startAsTag(char address[], const byte mode[], const byte tagAddress, const bool isMasterTag);
 	static boolean addNetworkDevices(DW1000Device* device, boolean shortAddress);
 	static boolean addNetworkDevices(DW1000Device* device);
 	static void    removeNetworkDevices(int16_t index);
