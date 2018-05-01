@@ -251,6 +251,18 @@ boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device, boolean shor
 	}
 	
 	if(addDevice) {
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
+		Serial.print(" : ");
+		Serial.print("add network device : ");
+		Serial.println(device->getShortAddress());
 		device->setRange(0);
 		memcpy(&_networkDevices[_networkDevicesNumber], device, sizeof(DW1000Device));
 		_networkDevices[_networkDevicesNumber].setIndex(_networkDevicesNumber);
@@ -275,10 +287,22 @@ boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device) {
 	}
 	
 	if(addDevice) {
-		if(_type == ANCHOR) //for now let's start with 1 TAG
+		/*if(_type == ANCHOR) //for now let's start with 1 TAG
 		{
 			_networkDevicesNumber = 0;
-		}
+		}*/
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
+		Serial.print(" : ");
+		Serial.print("add network device : ");
+		Serial.println(device->getShortAddress());
 		memcpy(&_networkDevices[_networkDevicesNumber], device, sizeof(DW1000Device));
 		_networkDevices[_networkDevicesNumber].setIndex(_networkDevicesNumber);
 		_networkDevicesNumber++;
@@ -290,13 +314,6 @@ boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device) {
 
 boolean DW1000RangingClass::addTagDevices(DW1000Device *device, boolean shortAddress)
 {
-	Serial.print(_isMasterTag);
-	Serial.print(" ");
-	Serial.print(_isEnabled);
-	Serial.print(" ");
-	Serial.print(_waitingSyncAck);
-	Serial.print(" : ");
-	Serial.println("add new tag");
 	boolean addDevice = true;
 	//we test our network devices array to check
 	//we don't already have it
@@ -318,6 +335,18 @@ boolean DW1000RangingClass::addTagDevices(DW1000Device *device, boolean shortAdd
 
 	if (addDevice)
 	{
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
+		Serial.print(" : ");
+		Serial.print("add new tag : ");
+		Serial.println(device->getShortAddress());
 		device->setRange(0);
 		memcpy(&_tagDevices[_tagDevicesNumber], device, sizeof(DW1000Device));
 		_tagDevices[_tagDevicesNumber].setIndex(_tagDevicesNumber);
@@ -330,13 +359,6 @@ boolean DW1000RangingClass::addTagDevices(DW1000Device *device, boolean shortAdd
 
 boolean DW1000RangingClass::addTagDevices(DW1000Device *device)
 {
-	Serial.print(_isMasterTag);
-	Serial.print(" ");
-	Serial.print(_isEnabled);
-	Serial.print(" ");
-	Serial.print(_waitingSyncAck);
-	Serial.print(" : ");
-	Serial.println("add new tag");
 	boolean addDevice = true;
 	//we test our network devices array to check
 	//we don't already have it
@@ -352,6 +374,18 @@ boolean DW1000RangingClass::addTagDevices(DW1000Device *device)
 
 	if (addDevice)
 	{
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
+		Serial.print(" : ");
+		Serial.print("add new tag : ");
+		Serial.println(device->getShortAddress());
 		memcpy(&_tagDevices[_tagDevicesNumber], device, sizeof(DW1000Device));
 		_tagDevices[_tagDevicesNumber].setIndex(_tagDevicesNumber);
 		_tagDevicesNumber++;
@@ -367,6 +401,10 @@ void DW1000RangingClass::removeNetworkDevices(int16_t index) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("Remove anchor because of inactivity");
 	//if we have just 1 element
@@ -394,6 +432,10 @@ void DW1000RangingClass::removeTagDevices(int16_t index)
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("Remove tag because of inactivity");
 	//if we have just 1 element
@@ -601,7 +643,7 @@ void DW1000RangingClass::loop() {
 			byte address[8];
 			byte shortAddress[2];
 			_globalMac.decodeBlinkFrame(data, address, shortAddress);
-			//we crate a new device with th tag
+			//we create a new device with th tag
 			DW1000Device myTag(address, shortAddress);
 			
 			if(addNetworkDevices(&myTag)) {
@@ -633,7 +675,17 @@ void DW1000RangingClass::loop() {
 			}
 		}
 		else if(messageType == RANGING_INIT && _type == TAG) {
-			
+			Serial.print(_isMasterTag);
+			Serial.print(" ");
+			Serial.print(_isEnabled);
+			Serial.print(" ");
+			Serial.print(_waitingSyncAck);
+			Serial.print(" ");
+			Serial.print(_networkDevicesNumber);
+			Serial.print(" ");
+			Serial.print(_tagDevicesNumber);
+			Serial.print(" : ");
+			Serial.println("RANGING INIT");
 			byte address[2];
 			_globalMac.decodeLongMACFrame(data, address);
 			//we crate a new device with the anchor
@@ -690,11 +742,16 @@ void DW1000RangingClass::loop() {
 							_pos_x = x;
 							_pos_y = y;
 						}
-					} else 
+					} else {
+						Serial.print("IGNORED Unexppected msg : ");
+						Serial.print(messageType);
+						Serial.print(" expected : ");
+						Serial.println(_expectedMsgId);
 						_protocolFailed = true;
-					
+					}
 				}
 				if(messageType == POLL) {
+					Serial.print("POLL : ");
 					//we receive a POLL which is a broacast message
 					//we need to grab info about it
 					int16_t numberDevices = 0;
@@ -724,15 +781,17 @@ void DW1000RangingClass::loop() {
 							_expectedMsgId = RANGE;
 							transmitPollAck(myDistantDevice);
 							noteActivity();
-							
+							Serial.println("success");
 							return;
 						}
 						
 					}
+					Serial.println("fail");
 					
 					
 				}
 				else if(messageType == RANGE) {
+					Serial.println("RANGE");
 					//we receive a RANGE which is a broacast message
 					//we need to grab info about it
 					uint8_t numberDevices = 0;
@@ -819,6 +878,10 @@ void DW1000RangingClass::loop() {
 						Serial.print(_isEnabled);
 						Serial.print(" ");
 						Serial.print(_waitingSyncAck);
+						Serial.print(" ");
+						Serial.print(_networkDevicesNumber);
+						Serial.print(" ");
+						Serial.print(_tagDevicesNumber);
 						Serial.print(" : ");
 						Serial.print("IGNORED Unexppected msg : ");
 						Serial.print(messageType);
@@ -832,6 +895,10 @@ void DW1000RangingClass::loop() {
 						Serial.print(_isEnabled);
 						Serial.print(" ");
 						Serial.print(_waitingSyncAck);
+						Serial.print(" ");
+						Serial.print(_networkDevicesNumber);
+						Serial.print(" ");
+						Serial.print(_tagDevicesNumber);
 						Serial.print(" : ");
 						Serial.print("Unexppected msg : ");
 						Serial.print(messageType);
@@ -846,19 +913,16 @@ void DW1000RangingClass::loop() {
 					Serial.print(_isEnabled);
 					Serial.print(" ");
 					Serial.print(_waitingSyncAck);
+					Serial.print(" ");
+					Serial.print(_networkDevicesNumber);
+					Serial.print(" ");
+					Serial.print(_tagDevicesNumber);
 					Serial.print(" : ");
 					Serial.println("TAG_SYNC");
 					//we have just received a SYNCH message from the master tag
 					if (myDistantDevice != NULL){
 						memcpy(_masterTagShortAddress, myDistantDevice->getByteShortAddress(), 2);
 						_isEnabled = true;
-						Serial.print(_isMasterTag);
-						Serial.print(" ");
-						Serial.print(_isEnabled);
-						Serial.print(" ");
-						Serial.print(_waitingSyncAck);
-						Serial.print(" : ");
-						Serial.println("master tag short address saved");
 					}
 					//transmitPoll(NULL);
 					//_expectedMsgId = POLL_ACK;
@@ -874,6 +938,10 @@ void DW1000RangingClass::loop() {
 					Serial.print(_isEnabled);
 					Serial.print(" ");
 					Serial.print(_waitingSyncAck);
+					Serial.print(" ");
+					Serial.print(_networkDevicesNumber);
+					Serial.print(" ");
+					Serial.print(_tagDevicesNumber);
 					Serial.print(" : ");
 					Serial.println("TAG_SYNC_END");
 					//TODO : get position data from tag
@@ -896,6 +964,10 @@ void DW1000RangingClass::loop() {
 					Serial.print(_isEnabled);
 					Serial.print(" ");
 					Serial.print(_waitingSyncAck);
+					Serial.print(" ");
+					Serial.print(_networkDevicesNumber);
+					Serial.print(" ");
+					Serial.print(_tagDevicesNumber);
 					Serial.print(" : ");
 					Serial.print("POLL_ACK from");
 					uint16_t addr = 0;
@@ -1014,8 +1086,33 @@ void DW1000RangingClass::timerTick() {
 			
 			//send a brodcast poll
 			if(_isEnabled){
-				transmitPoll(NULL);
-				_expectedMsgId = POLL_ACK;
+				if(_expectedMsgId == POLL_ACK){ // timeout : no response to poll msg
+					Serial.print(_isMasterTag);
+					Serial.print(" ");
+					Serial.print(_isEnabled);
+					Serial.print(" ");
+					Serial.print(_waitingSyncAck);
+					Serial.print(" ");
+					Serial.print(_networkDevicesNumber);
+					Serial.print(" ");
+					Serial.print(_tagDevicesNumber);
+					Serial.print(" : ");
+					Serial.println("TIMEOUT : no respond to poll msg");
+					if(_isMasterTag){
+						_isEnabled = false;
+						transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
+						_waitingSyncAck = true;
+						counterForSync = 0;
+						_expectedMsgId = TAG_SYNC_END;
+					}else {	// Slave tag
+						_isEnabled = false;
+						transmitTagSyncEnd();
+						_expectedMsgId = TAG_SYNC;
+					}
+				}else {
+					transmitPoll(NULL);
+					_expectedMsgId = POLL_ACK;
+				}	
 			} else if (_isMasterTag) {
 				if(!_waitingSyncAck){
 					transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
@@ -1080,6 +1177,13 @@ void DW1000RangingClass::timerTick() {
 	if(counterForSync>10){
 		_waitingSyncAck = false;
 		counterForSync = 0;
+		_isEnabled = false;
+		_enabledTagNumber++;
+		if (_enabledTagNumber > _tagDevicesNumber)
+		{
+			_enabledTagNumber = 0;
+			_isEnabled = true;
+		}
 	}
 
 	counterForBlink++;
@@ -1122,6 +1226,10 @@ void DW1000RangingClass::transmitBlink() {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitBlink");
 	transmitInit();
@@ -1135,6 +1243,10 @@ void DW1000RangingClass::transmitRangingInit(DW1000Device* myDistantDevice) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitRangingInit");
 	transmitInit();
@@ -1154,6 +1266,10 @@ void DW1000RangingClass::transmitPoll(DW1000Device* myDistantDevice) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitPoll");
 	transmitInit();
@@ -1207,6 +1323,10 @@ void DW1000RangingClass::transmitPollAck(DW1000Device* myDistantDevice) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitPollAck");
 	transmitInit();
@@ -1224,6 +1344,10 @@ void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitRange");
 	//transmit range need to accept broadcast for multiple anchor
@@ -1287,6 +1411,10 @@ void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitRangeReport");
 	transmitInit();
@@ -1308,6 +1436,10 @@ void DW1000RangingClass::transmitRangeFailed(DW1000Device* myDistantDevice) {
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitRangeFailed");
 	transmitInit();
@@ -1333,6 +1465,10 @@ void DW1000RangingClass::transmitTagSync(DW1000Device *myDistantDevice)
 	Serial.print(_isEnabled);
 	Serial.print(" ");
 	Serial.print(_waitingSyncAck);
+	Serial.print(" ");
+	Serial.print(_networkDevicesNumber);
+	Serial.print(" ");
+	Serial.print(_tagDevicesNumber);
 	Serial.print(" : ");
 	Serial.println("transmitTagSync");
 	transmitInit();
@@ -1351,6 +1487,10 @@ void DW1000RangingClass::transmitTagSyncEnd()
 		Serial.print(_isEnabled);
 		Serial.print(" ");
 		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
 		Serial.print(" : ");
 		Serial.println("transmitTagSyncEnd");
 		transmitInit();
@@ -1366,6 +1506,10 @@ void DW1000RangingClass::transmitTagSyncEnd()
 		Serial.print(_isEnabled);
 		Serial.print(" ");
 		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
 		Serial.print(" : ");
 		Serial.println("transmitTagSyncEnd failed");
 	}
