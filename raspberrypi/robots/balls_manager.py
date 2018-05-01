@@ -149,11 +149,11 @@ class Shot(Actionnable):
             time.sleep(0.4)
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             if time.time() - begin_time < global_timeout:
-                nb_balls +=1
+                nb_balls += 1
                 display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
                 display.happy(1)
-
-        time.sleep(1)# Ancien 3
+            waterlauncher.set_motor_pulsewidth(1200)
+            time.sleep(0.1)
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
