@@ -261,7 +261,10 @@ class Mover:
                 if last_point_aim is None:
                     self.wheeledbase.set_velocities( -100 if self.direction =="forward" else 100, 0)
                 else:
-                    self.wheeledbase.goto(*last_point_aim)
+                    try:
+                        self.wheeledbase.goto(*last_point_aim)
+                    except:
+                        pass
                 time.sleep(0.5)
                 self.wheeledbase.stop()
 

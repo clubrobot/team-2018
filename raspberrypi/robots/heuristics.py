@@ -184,5 +184,6 @@ class Heuristics:
             if name_best == "" or heuristics_values[action] > heuristics_values[name_best]:
                 name_best = action
         if name_best == "":
+            print("NO ACTION")
             return None
         return self.action_dict[name_best]
