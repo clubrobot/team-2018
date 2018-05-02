@@ -109,7 +109,9 @@ void newRange()
   switch(nbDevices){
     case 0:
      {
-      toDisplay = "(0)";
+      toDisplay = "(0) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
       display.display();
       p[0] = -1000;
@@ -118,7 +120,9 @@ void newRange()
       break;
     case 1:
       {
-      toDisplay = "(1)";
+      toDisplay = "(1) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
       display.display();
       p[0] = -1000;
@@ -127,7 +131,9 @@ void newRange()
       break;
     case 2:
     {
-      toDisplay = "(2)";
+      toDisplay = "(2) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
       display.display();
       p[0] = -1000;
@@ -185,7 +191,9 @@ void newRange()
       toDisplay += round(p[0]/10);
       toDisplay += ",";
       toDisplay += round(p[1]/10);
-      toDisplay += ")\n(3)";
+      toDisplay += ")\n(3) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
       display.display();
     }
@@ -211,7 +219,9 @@ void newRange()
       toDisplay += round(p[0] / 10);
       toDisplay += ",";
       toDisplay += round(p[1] / 10);
-      toDisplay += ")\n(4)";
+      toDisplay += ")\n(4) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
       display.display();
       

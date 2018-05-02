@@ -100,8 +100,10 @@ uint16_t  DW1000RangingClass::_replyDelayTimeUS;
 //timer delay
 uint16_t  DW1000RangingClass::_timerDelay;
 // ranging counter (per second)
-uint16_t  DW1000RangingClass::_successRangingCount = 0;
-uint32_t  DW1000RangingClass::_rangingCountPeriod  = 0;
+uint16_t DW1000RangingClass::_rangingFrameRate = 0;
+uint16_t DW1000RangingClass::_successRangingCount = 0;
+uint32_t DW1000RangingClass::_rangingCountPeriod = 1000;
+uint32_t DW1000RangingClass::_frameRateStartTime = millis();
 //Here our handlers
 void (* DW1000RangingClass::_handleNewRange)(void) = 0;
 void (* DW1000RangingClass::_handleBlinkDevice)(DW1000Device*) = 0;
@@ -180,8 +182,6 @@ void DW1000RangingClass::generalStart() {
 	
 	// anchor starts in receiving mode, awaiting a ranging poll message
 	receiver();
-	// for first time ranging frequency computation
-	_rangingCountPeriod = millis();
 }
 
 
@@ -559,6 +559,9 @@ void DW1000RangingClass::loop() {
 		timerTick();
 	}
 	
+	// frameRate update
+	updateRangingCounter();
+
 	if(_sentAck) {
 		_sentAck = false;
 		
@@ -850,6 +853,9 @@ void DW1000RangingClass::loop() {
 								if(_calibrate && (millis() -_startCalibrationTime > _calibrationTimeOut)){
 									_calibrate = false;
 								}
+
+								//update fo the frameRate
+								rangingSuccess();
 								
 							}
 							else {
@@ -1024,6 +1030,7 @@ void DW1000RangingClass::loop() {
 					if(_handleNewRange != 0) {
 						(*_handleNewRange)();
 					}
+					rangingSuccess();
 				}
 				else if(messageType == RANGE_FAILED) {
 					//not needed as we have a timer;
@@ -1567,6 +1574,21 @@ float DW1000RangingClass::filterValue(float value, float previousValue, uint16_t
 	
 	float k = 2.0f / ((float)numberOfElements + 1.0f);
 	return (value * k) + previousValue * (1.0f - k);
+}
+
+void DW1000RangingClass::rangingSuccess(){
+	updateRangingCounter();
+	_successRangingCount++;
+}
+
+void DW1000RangingClass::updateRangingCounter()
+{
+	if (millis() - _frameRateStartTime > _rangingCountPeriod)
+	{
+		_frameRateStartTime = millis();
+		_rangingFrameRate = (uint16_t)((float)_successRangingCount / ((float)_rangingCountPeriod/1000.0f));
+		_successRangingCount = 0;
+	}
 }
 
 /* ###########################################################################

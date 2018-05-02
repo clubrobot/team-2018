@@ -42,7 +42,9 @@ void newRange()
   display.setFont(ArialMT_Plain_24);
   String toDisplay = "";
   toDisplay += (int)distance;
-  toDisplay += "cm";
+  toDisplay += "cm  ";
+  toDisplay += DW1000Ranging.getFrameRate();
+  toDisplay += "Hz";
   display.drawString(64, 0, toDisplay);
  
   if(calibrationRunning==true){

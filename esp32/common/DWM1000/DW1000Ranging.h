@@ -104,6 +104,7 @@ public:
 	static byte* getCurrentShortAddress() { return _currentShortAddress; };
 	static uint8_t getNetworkDevicesNumber() { return _networkDevicesNumber; };
 	static uint8_t getTagDevicesNumber() { return _tagDevicesNumber; };
+	static uint16_t getFrameRate() { return _rangingFrameRate; };
 
 	//ranging functions
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
@@ -194,8 +195,10 @@ private:
 	//timer Tick delay
 	static uint16_t     _timerDelay;
 	// ranging counter (per second)
-	static uint16_t     _successRangingCount;
-	static uint32_t    _rangingCountPeriod;
+	static uint16_t 	_rangingFrameRate;		// the last frameRate
+	static uint16_t     _successRangingCount;	// the current ranging success counter
+	static uint32_t    	_rangingCountPeriod;	// the update period (in ms)
+	static uint32_t		_frameRateStartTime;	// the start time of the framerate calculation process (in ms)
 	//ranging filter
 	static volatile boolean _useRangeFilter;
 	static uint16_t         _rangeFilterValue;
@@ -248,6 +251,10 @@ private:
 	static void computeRangeAsymmetric(DW1000Device* myDistantDevice, DW1000Time* myTOF);
 	
 	static void timerTick();
+
+	// frameRate counter
+	static void rangingSuccess();
+	static void updateRangingCounter();
 	
 	//Utils
 	static float filterValue(float value, float previousValue, uint16_t numberOfElements);
