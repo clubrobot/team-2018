@@ -1107,10 +1107,19 @@ void DW1000RangingClass::timerTick() {
 					Serial.println("TIMEOUT : no respond to poll msg");
 					if(_isMasterTag){
 						_isEnabled = false;
-						transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
-						_waitingSyncAck = true;
-						counterForSync = 0;
-						_expectedMsgId = TAG_SYNC_END;
+						_enabledTagNumber++;
+						if (_enabledTagNumber > _tagDevicesNumber)
+						{
+							_enabledTagNumber = 0;
+							_isEnabled = true;
+							transmitPoll(NULL);
+							_expectedMsgId = POLL_ACK;
+						} else {
+							transmitTagSync(&_tagDevices[_enabledTagNumber - 1]);
+							_waitingSyncAck = true;
+							counterForSync = 0;
+							_expectedMsgId = TAG_SYNC_END;
+						}
 					}else {	// Slave tag
 						_isEnabled = false;
 						transmitTagSyncEnd();
