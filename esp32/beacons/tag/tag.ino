@@ -292,8 +292,8 @@ void newRange()
       break;
   }
   
-  DW1000Ranging.setPosX(p[0]);
-  DW1000Ranging.setPosY(p[1]);
+  DW1000Ranging.setPosX(p[0],0);
+  DW1000Ranging.setPosY(p[1],0);
 
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);

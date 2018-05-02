@@ -126,10 +126,12 @@ public:
 	static void stopCalibration();
 
 	// Trilateration
-	static float getPosX();
-	static float getPosY();
-	static void setPosX(float &x);
-	static void setPosY(float &y);
+	static float getPosX(uint16_t shortAddress);			// get x coordinate of the tag whose short address is "shortAddress"
+	static float getPosX();									// get x coordinate of the first tag connected
+	static float getPosY(uint16_t shortAddress);			// get y coordinate of the tag whose short address is "shortAddress"
+	static float getPosY();									// get y coordinate of the first tag connected
+	static void setPosX(float &x, uint8_t index);   
+	static void setPosY(float &y, uint8_t index);   
 	static void transmitTrilaterationReport();
 
 	// Others
@@ -214,8 +216,8 @@ private:
 	static unsigned long _startCalibrationTime;	//ms
 	static unsigned long _calibrationTimeOut;	//ms
 	// for trilateration
-	static float _pos_x;
-	static float _pos_y;
+	static float _pos_x[MAX_TAG_DEVICES];
+	static float _pos_y[MAX_TAG_DEVICES];
 	// others
 	static uint8_t _color;	// 0 = green, 1 = orange
 

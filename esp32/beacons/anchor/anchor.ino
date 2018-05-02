@@ -31,39 +31,34 @@ void newRange()
 {
 
   DW1000Ranging.setRangeFilterValue(5);
-  float distance = DW1000Ranging.getDistantDevice()->getRange()*1000;
-  float projection = distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG));
-  if(projection > 0)
-    distance = round(sqrt(projection)/10); // projection dans le plan des tags
-  else 
-    distance = 0;
 
-  display.clear();
-  display.setFont(ArialMT_Plain_24);
-  String toDisplay = "";
-  toDisplay += (int)distance;
-  toDisplay += "cm  ";
-  toDisplay += DW1000Ranging.getFrameRate();
-  toDisplay += "Hz";
-  display.drawString(64, 0, toDisplay);
- 
+  String toDisplay;
+
   if(calibrationRunning==true){
     display.setFont(ArialMT_Plain_16);
     toDisplay = "timeOut";
   } else {
-    /*int antennaDelay = DW1000.getAntennaDelay();
-    toDisplay = antennaDelay;*/
     display.setFont(ArialMT_Plain_24);
-    float x = DW1000Ranging.getPosX() / 10;
-    float y = DW1000Ranging.getPosY() / 10;
+    // get master tag coordinates
+    float x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[0]) / 10;
+    float y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[0]) / 10;
     toDisplay = "(";
     toDisplay += (int)x;
     toDisplay += ", ";
     toDisplay += (int)y;
-    toDisplay += ")";
+    toDisplay += ")\n";
+    // get slave tag coordinates
+    x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[1]) / 10;
+    y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[1]) / 10;
+    toDisplay += "(";
+    toDisplay += (int)x;
+    toDisplay += ", ";
+    toDisplay += (int)y;
+    toDisplay += ")\n";
   }
-  
-  display.drawString(64, 30, toDisplay);
+
+  display.clear();
+  display.drawString(64, 0, toDisplay);
   display.display();
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);

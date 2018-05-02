@@ -81,8 +81,8 @@ unsigned long DW1000RangingClass::_startCalibrationTime = 0;
 unsigned long DW1000RangingClass::_calibrationTimeOut = 0;
 
 // trilateration
-float DW1000RangingClass::_pos_x = -1000;
-float DW1000RangingClass::_pos_y = -1000;
+float DW1000RangingClass::_pos_x[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
+float DW1000RangingClass::_pos_y[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 
 // others
 uint8_t DW1000RangingClass::_color = 0;
@@ -735,24 +735,12 @@ void DW1000RangingClass::loop() {
 			if(_type == ANCHOR) {
 				if(messageType != _expectedMsgId) {
 					// unexpected message, start over again (except if already POLL)
-					if(messageType == TRILATERATION_REPORT){	// TODO : include it in the normal process
-						float x,y;
-						memcpy(&x, data + SHORT_MAC_LEN + 1, 4);
-						memcpy(&y, data + SHORT_MAC_LEN + 5, 4);
-						if(isnan(x) || isnan(y)){
-							_pos_x = -1000;
-							_pos_y = -1000;
-						} else {
-							_pos_x = x;
-							_pos_y = y;
-						}
-					} else {
-						Serial.print("IGNORED Unexppected msg : ");
-						Serial.print(messageType);
-						Serial.print(" expected : ");
-						Serial.println(_expectedMsgId);
-						_protocolFailed = true;
-					}
+
+					Serial.print("IGNORED Unexppected msg : ");
+					Serial.print(messageType);
+					Serial.print(" expected : ");
+					Serial.println(_expectedMsgId);
+					_protocolFailed = true;
 				}
 				if(messageType == POLL) {
 					Serial.print("POLL : ");
@@ -820,8 +808,8 @@ void DW1000RangingClass::loop() {
 								myDistantDevice->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4+27*i);
 								myDistantDevice->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9+27*i);
 								myDistantDevice->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14+27*i);
-								memcpy(&_pos_x, data + 19 + 27 * i + SHORT_MAC_LEN, 4);
-								memcpy(&_pos_y, data + 23 + 27 * i + SHORT_MAC_LEN, 4);
+								memcpy(&_pos_x[myDistantDevice->getIndex()], data + 19 + 27 * i + SHORT_MAC_LEN, 4);
+								memcpy(&_pos_y[myDistantDevice->getIndex()], data + 23 + 27 * i + SHORT_MAC_LEN, 4);
 								// (re-)compute range as two-way ranging is done
 								DW1000Time myTOF;
 								computeRangeAsymmetric(myDistantDevice, &myTOF); // CHOSEN RANGING ALGORITHM
@@ -1406,8 +1394,8 @@ void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
 			_networkDevices[i].timePollSent.getTimestamp(data+SHORT_MAC_LEN+4+27*i);
 			_networkDevices[i].timePollAckReceived.getTimestamp(data+SHORT_MAC_LEN+9+27*i);
 			_networkDevices[i].timeRangeSent.getTimestamp(data+SHORT_MAC_LEN+14+27*i);
-			memcpy(data + 19 + 27*i + SHORT_MAC_LEN, &_pos_x, 4);
-			memcpy(data + 23 + 27*i + SHORT_MAC_LEN, &_pos_y, 4);
+			memcpy(data + 19 + 27*i + SHORT_MAC_LEN, &_pos_x[0], 4);
+			memcpy(data + 23 + 27*i + SHORT_MAC_LEN, &_pos_y[0], 4);
 		}
 		
 		copyShortAddress(_lastSentToShortAddress, shortBroadcast);
@@ -1423,8 +1411,8 @@ void DW1000RangingClass::transmitRange(DW1000Device* myDistantDevice) {
 		myDistantDevice->timePollSent.getTimestamp(data+1+SHORT_MAC_LEN);
 		myDistantDevice->timePollAckReceived.getTimestamp(data+6+SHORT_MAC_LEN);
 		myDistantDevice->timeRangeSent.getTimestamp(data+11+SHORT_MAC_LEN);
-		memcpy(data + 16 + SHORT_MAC_LEN, &_pos_x, 4);
-		memcpy(data + 20 + SHORT_MAC_LEN, &_pos_y, 4);
+		memcpy(data + 16 + SHORT_MAC_LEN, &_pos_x[0], 4);
+		memcpy(data + 20 + SHORT_MAC_LEN, &_pos_y[0], 4);
 		copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
 	}
 	
@@ -1524,8 +1512,6 @@ void DW1000RangingClass::transmitTagSyncEnd()
 		transmitInit();
 		_globalMac.generateShortMACFrame(data, _currentShortAddress, masterTagDevice->getByteShortAddress());
 		data[SHORT_MAC_LEN] = TAG_SYNC_END;
-		memcpy(data + 1 + SHORT_MAC_LEN, &_pos_x, 4);
-		memcpy(data + 5 + SHORT_MAC_LEN, &_pos_y, 4);
 		copyShortAddress(_lastSentToShortAddress, masterTagDevice->getByteShortAddress());
 		transmit(data);
 	} else {
@@ -1631,22 +1617,43 @@ void DW1000RangingClass::stopCalibration(){
  * #### trilateration  ######################################################
  * ######################################################################### */
 
+float DW1000RangingClass::getPosX(uint16_t shortAddress)
+{
+	byte byteShortAddress[2];
+	memcpy(byteShortAddress,&shortAddress,2);
+	DW1000Device *tag = searchDistantDevice(byteShortAddress);
+	if(tag == NULL)
+		return -2000;
+	return _pos_x[tag->getIndex()];
+}
+
 float DW1000RangingClass::getPosX(){
-	return _pos_x;
+	return _pos_x[0];
 }
 
-float DW1000RangingClass::getPosY(){
-	return _pos_y;
-}
-
-void DW1000RangingClass::setPosX(float &x)
+float DW1000RangingClass::getPosY()
 {
-	_pos_x = x;
+	return _pos_y[0];
 }
 
-void DW1000RangingClass::setPosY(float &y)
+float DW1000RangingClass::getPosY(uint16_t shortAddress)
 {
-	_pos_y = y;
+	byte byteShortAddress[2];
+	memcpy(byteShortAddress, &shortAddress, 2);
+	DW1000Device *tag = searchDistantDevice(byteShortAddress);
+	if (tag == NULL)
+		return -2000;
+	return _pos_y[tag->getIndex()];
+}
+
+void DW1000RangingClass::setPosX(float &x, uint8_t index)
+{
+	_pos_x[index] = x;
+}
+
+void DW1000RangingClass::setPosY(float &y, uint8_t index)
+{
+	_pos_y[index] = y;
 }
 
 void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
@@ -1656,8 +1663,8 @@ void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
 	byte shortBroadcast[2] = {0xFF, 0xFF};
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
 	data[SHORT_MAC_LEN] = TRILATERATION_REPORT;
-	memcpy(data + SHORT_MAC_LEN + 1, &_pos_x, 4);
-	memcpy(data + SHORT_MAC_LEN + 5, &_pos_y, 4);
+	//memcpy(data + SHORT_MAC_LEN + 1, &_pos_x, 4);
+	//memcpy(data + SHORT_MAC_LEN + 5, &_pos_y, 4);
 
 	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
 	transmit(data);

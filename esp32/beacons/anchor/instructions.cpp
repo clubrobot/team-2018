@@ -40,10 +40,13 @@ void UPDATE_COLOR(SerialTalks &talks, Deserializer &input, Serializer &output)
     DW1000Ranging.transmitColor((uint8_t)color);
 }
 
-void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
+// Send default tag coordinates (/!\ use only when 1 tag connected)
+void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output) 
 {
-    int x = DW1000Ranging.getPosX();
+    int x = DW1000Ranging.getPosX(); 
     int y = DW1000Ranging.getPosY();
     output.write<uint16_t>(x);
     output.write<uint16_t>(y);
 }
+
+// TODO : instruction to get trackers coordinates
