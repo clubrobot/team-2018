@@ -727,6 +727,7 @@ void DW1000RangingClass::loop() {
 			
 			if(myDistantDevice == NULL){
 				Serial.println("NULL ptr instead of device !");
+				return;
 			}
 				
 			
@@ -1080,6 +1081,17 @@ void DW1000RangingClass::noteActivity() {
 void DW1000RangingClass::resetInactive() {
 	//if inactive
 	if(_type == ANCHOR) {
+		Serial.print(_isMasterTag);
+		Serial.print(" ");
+		Serial.print(_isEnabled);
+		Serial.print(" ");
+		Serial.print(_waitingSyncAck);
+		Serial.print(" ");
+		Serial.print(_networkDevicesNumber);
+		Serial.print(" ");
+		Serial.print(_tagDevicesNumber);
+		Serial.print(" : ");
+		Serial.println("RESET INACTIVE");
 		_expectedMsgId = POLL;
 		receiver();
 	}
