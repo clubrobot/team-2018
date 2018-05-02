@@ -49,4 +49,18 @@ void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
     output.write<uint16_t>(y);
 }
 
-// TODO : instruction to get trackers coordinates
+void GET_BOT1_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
+{
+    int x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[0]);
+    int y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[0]);
+    output.write<uint16_t>(x);
+    output.write<uint16_t>(y);
+}
+
+void GET_BOT2_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
+{
+    int x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[1]);
+    int y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[1]);
+    output.write<uint16_t>(x);
+    output.write<uint16_t>(y);
+}
