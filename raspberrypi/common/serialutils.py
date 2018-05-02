@@ -55,6 +55,9 @@ class Deserializer:
 	def __init__(self, rawbytes):
 		self.remaining = rawbytes
 
+	def __copy__(self):
+		return Deserializer(self.remaining)
+
 	def read(self, *types):
 		output = list()
 

@@ -45,7 +45,7 @@
 #define TAG_SYNC_ACK			9
 #define TAG_SYNC_END			10
 
-#define LEN_DATA 90
+#define LEN_DATA 120
 
 //Max devices we put in the networkDevices array ! Each DW1000Device is 74 Bytes in SRAM memory for now.
 #define MAX_DEVICES 4

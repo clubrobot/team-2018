@@ -1672,6 +1672,7 @@ void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
 
 void DW1000RangingClass::transmitColor(uint8_t color)
 {
+	_color = color;
 	DW1000Device *myDistantDevice = getDistantDevice();
 	transmitInit();
 	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());

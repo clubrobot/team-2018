@@ -20,16 +20,37 @@
 #include "../../common/SerialTalks.h"
 #include "instructions.h"
 
-
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <BLE2902.h>
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
 byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
 
+// BLE variables
+BLECharacteristic *pCharacteristic;
+boolean deviceConnected = false;
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+  //  Serial.println("connected");
+    deviceConnected = true;
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+  //  Serial.println("disconnected");
+    deviceConnected = false;
+  }
+};
+
 void newRange()
 {
-
   DW1000Ranging.setRangeFilterValue(5);
 
   String toDisplay;
@@ -137,8 +158,7 @@ void setup() {
   talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
   talks.bind(UPDATE_COLOR_OPCODE, UPDATE_COLOR);
   talks.bind(GET_COORDINATE_OPCODE,GET_COORDINATE);
-  talks.bind(GET_BOT1_COORDINATE_OPCODE, GET_BOT1_COORDINATE);
-  talks.bind(GET_BOT2_COORDINATE_OPCODE, GET_BOT2_COORDINATE);
+  talks.bind(GET_PANEL_STATUS_OPCODE, GET_PANEL_STATUS);
 
   /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
@@ -210,6 +230,27 @@ void setup() {
   display.display();
 
   display.setFont(ArialMT_Plain_24);
+  Serial.print("init : ");
+  Serial.println(currentBeaconNumber);
+  // Start BLE Server only if this is the supervisor anchor
+  if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
+  {
+    BLEDevice::init("srv");
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_READ |
+            BLECharacteristic::PROPERTY_WRITE |
+            BLECharacteristic::PROPERTY_NOTIFY);
+    pCharacteristic->setValue("insa rennes");
+    pService->start();
+    BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising->addServiceUUID(pService->getUUID());
+    pAdvertising->start();
+   // Serial.println("Characteristic defined! Now you can read it in your phone!");
+  }
 }
 
 void loop() {

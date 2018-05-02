@@ -8,8 +8,7 @@
 #define CALIBRATION_ROUTINE_OPCODE  0x12
 #define UPDATE_COLOR_OPCODE         0x13
 #define GET_COORDINATE_OPCODE       0x14
-#define GET_BOT1_COORDINATE_OPCODE  0x15
-#define GET_BOT2_COORDINATE_OPCODE  0x16
+#define GET_PANEL_STATUS_OPCODE     0x17
 
 // Instructions prototypes
 
@@ -25,7 +24,6 @@ void UPDATE_ANTENNA_DELAY(SerialTalks &talks, Deserializer &input, Serializer &o
 void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &output);
 void UPDATE_COLOR(SerialTalks &talks, Deserializer &input, Serializer &output);
 void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output);
-void GET_BOT1_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output);
-void GET_BOT2_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output);
+void GET_PANEL_STATUS(SerialTalks &talks, Deserializer &input, Serializer &output);
 
 #endif //INSTRUCTIONS_H

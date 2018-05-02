@@ -8,7 +8,6 @@ deb = time.monotonic()
 c = camth()
 v = vision(c)
 time.sleep(1)
-v.refresh_image()
 
 v.enable_display()
 v.show_image()
@@ -16,7 +15,7 @@ v.enable_debug()
 v.show_pile('ld', 'all')
 v.enable()
 
-v.calibration()
+v.calibration('green')
 print( "init orange : ")
 print(v.ld_pile.get_init_cube_position('orange'))
 

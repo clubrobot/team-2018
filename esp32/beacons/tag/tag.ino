@@ -37,21 +37,21 @@ void newRange()
 {
   uint8_t color = DW1000Ranging.getColor();
   const float x_1 = 5;
-  float y_1 = -49;
+  float y_1 = -73;
   const float x_2 = 1000;
-  float y_2 = 3049;
+  float y_2 = 3073;
   const float x_3 = 1950;
-  float y_3 = -49;
-  const float x_4 = 21.18;
+  float y_3 = -73;
+  const float x_4 = (21.18-24);
   float y_4 = 1326;
-  const float z_tag = 484.3;
-  const float z_anchor = 438.3;
-  const float z_central = 1016.3;
+  const float z_tag = 503.3;
+  const float z_anchor = 458.3;
+  const float z_central = 1036.3;
 
   if(color == 1){ // ORANGE
-    y_1 = 3049;
-    y_2 = -49;
-    y_3 = 3049;
+    y_1 = 3073;
+    y_2 = -73;
+    y_3 = 3073;
     y_4 = 1674;
   } 
   
@@ -113,7 +113,7 @@ void newRange()
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
       p[0] = -1000;
       p[1] = -1000;
      }
@@ -124,7 +124,7 @@ void newRange()
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
       p[0] = -1000;
       p[1] = -1000;
       }
@@ -135,7 +135,7 @@ void newRange()
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
       p[0] = -1000;
       p[1] = -1000;
     }
@@ -195,7 +195,7 @@ void newRange()
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
-      display.display();
+     // display.display();
     }
       break;
     case 4:
@@ -223,7 +223,7 @@ void newRange()
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
-      display.display();
+      //display.display();
       
 
      // 3D Trilateration algorithm without the nearest anchor distance
@@ -294,6 +294,13 @@ void newRange()
   
   DW1000Ranging.setPosX(p[0],0);
   DW1000Ranging.setPosY(p[1],0);
+
+  uint8_t c = DW1000Ranging.getColor();
+  toDisplay = c;
+  toDisplay += c==0?" : green":" : orange";
+  display.drawString(64,40,toDisplay);
+  display.display();
+
 
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -450,7 +457,7 @@ void setup() {
   display.drawString(64, 24, "SYNCHRONISATION\n(tag)");
   display.display();
 
-  display.setFont(ArialMT_Plain_24);
+  display.setFont(ArialMT_Plain_16);
 }
 
 void loop() {

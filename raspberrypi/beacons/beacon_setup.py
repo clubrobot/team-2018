@@ -17,7 +17,6 @@ for directory in glob.iglob(os.path.join(home, '**/team-2018/raspberrypi'), recu
 	print(directory)
 	print(os.path.join(directory,'robots'))
 	break
-#sys.path.append("/home/william/workspace/ClubRobot/team-2018/raspberrypi")
 
 # Check for the Rapsberry Pi address
 # It looks for a file in the current directory, whose name is
@@ -30,18 +29,14 @@ if hostname=="":
 	if(len(hostname.split("."))==1 and len(hostname)>0):
 		hostname="192.168.1."+hostname
 	print ("Try reaching raspberry at IP "+hostname+"...")
+
+
 # Import robot stuff
-#from common.modulesrouter      import *
-from components         import *
+from common.components         import *
 from common.serialtalks        import *
-#from secondaryrobot.modules    import *
-from wheeledbase        import *
-#from waterlauncher      import *
-#from watersorter        import *
-#from display            import *
-#from sensors            import *
-from tag		import *
-from anchor		import *
+from arduino.wheeledbase        import *
+from beacons.anchor		import *
+from arduino.tag			import *
 
 # Define temporary modules
 
@@ -67,7 +62,7 @@ except:
 	print('\'tag\' not connected')
 
 try:
-	a = Anchor(m)
+	a = Anchor()
 except:
 	print('\'Anchor\' not connected')
 
