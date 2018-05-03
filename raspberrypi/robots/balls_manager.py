@@ -285,10 +285,17 @@ class Treatment(Actionnable):
     def realize(self, shotDirection,robot,waterSorter):
         self.logger("TREATMENT :", "Go to the drop point !")
         currentPosXY=robot.get_position()[:2]
-        self.display.angry(1)
         try:
-            self.mover.gowall(1)
+            self.mover.turnonthespot(math.pi, 3, stategy=Mover.AIM)
         except PositionUnreachable:
+            return
+
+        self.display.angry(1)
+        self.logger("TREATMENT :", "Launch a go wall ")
+        try:
+            self.mover.gowall(1,direction="backward")
+        except PositionUnreachable:
+            self.logger("TREATMENT :", "Position Unreachable ")
             pass
         turn = False
         self.logger("TREATMENT :", "Turning !")
@@ -308,10 +315,8 @@ class Treatment(Actionnable):
         waterSorter.close_trash_unloader()
         
         self.mover.turnonthespot(0, -1, stategy=Mover.AIM)
-        try:
-            robot.goto(*currentPosXY)
-        except RuntimeError:
-            pass
+        self.mover.withdraw(*currentPosXY, direction="backward")
+
 
     #override
     def getAction(self):
