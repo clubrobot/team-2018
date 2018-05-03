@@ -124,6 +124,7 @@ class Bornibus:
             self.beacons_manager.create_area(longShot1.name, "auxLongShot{}1_*".format(self.side))
             self.beacons_manager.create_area(longShot2.name, "auxLongShot{}2_*".format(self.side))
             self.beacons_manager.create_area(shortShot.name, "auxShortShot{}_*".format(self.side))
+            self.beacons_manager.create_area(beeAct.name, "auxBee{}_*".format(self.side))
 
         treatmentAct.link_area(treatmentAct.name)
         dispMulti.link_area(dispMulti.name)
@@ -132,6 +133,7 @@ class Bornibus:
         longShot1.link_area(longShot1.name)
         longShot2.link_area(longShot2.name)
         shortShot.link_area(shortShot.name)
+        beeAct.link_area(beeAct.name)
 
         def longShot():
             return not (longShot0 or longShot1 or longShot2)
@@ -141,7 +143,7 @@ class Bornibus:
 
 
         #dispMono.set_manual_order(1)
-        shortShot.set_manual_order(2)
+    #shortShot.set_manual_order(2)
         #dispMulti.set_manual_order(3)
         #longShot2.set_manual_order(4)
         #longShot0.set_manual_order(4)
@@ -150,7 +152,7 @@ class Bornibus:
         #panelAct.set_manual_order(6)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
-                                     mode=Heuristics.MANUAL)
+                                     mode=Heuristics.AUTO)
 
     def set_side(self,side):
         self.side = side
@@ -182,7 +184,7 @@ class Bornibus:
 if __name__ == '__main__':
     from robots.setup_bornibus import *
     side = 0
-    b.set_position(592, 290, 0)
+    wheeledbase.set_position(592, 290, 0)
 
     print("DEBUT CHARGEMENT ROADMAP")
     geo = Geogebra('bornibus.ggb')
@@ -198,6 +200,6 @@ if __name__ == '__main__':
     bm = BeaconsManagement(br, "area.ggb")
     bm.start()
 
-    auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back, br, bm)
+    auto = Bornibus(side, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
     auto.run()
     exit()

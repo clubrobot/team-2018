@@ -33,35 +33,35 @@ MAX_VEL = 500
 MAX_ROT = 6
 
 
-m = Manager(hostname)
-m.connect(10)
+manager = Manager(hostname)
+manager.connect(10)
 
 
 
-b = WheeledBase(m)
+wheeledbase = WheeledBase(manager)
 
 
-d = WaterSorter(m)
-d.open_indoor()
-d.close_outdoor()
-l = WaterLauncher(m)
-a = BeeActuator(m)
+watersorter = WaterSorter(manager)
+watersorter.open_indoor()
+watersorter.close_outdoor()
+waterlauncher = WaterLauncher(manager)
+beeactuator = BeeActuator(manager)
 
 
 
     #	l = Module(m, 'display')
-ssd = SevenSegments(m)
-led1 = LEDMatrix(m, 1)
-led2 = LEDMatrix(m, 2)
+ssd = SevenSegments(manager)
+led1 = LEDMatrix(manager, 1)
+led2 = LEDMatrix(manager, 2)
 
 
-s_lat = Sensors(m, "sensorsLat")
+s_lat = Sensors(manager, "sensorsLat")
 
 
 
-s_front = Sensors(m, "sensorsAv")
+s_front = Sensors(manager, "sensorsAv")
 
 
-s_back = Sensors(m, "sensorsAr")
+s_back = Sensors(manager, "sensorsAr")
 
 
