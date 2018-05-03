@@ -6,6 +6,7 @@ import math
 
 from common.serialtalks import BYTE, INT, LONG, FLOAT
 from common.components import SecureSerialTalksProxy
+from common.components import SerialTalksProxy
 from common.serialutils import Deserializer
 # Instructions
 
@@ -72,7 +73,7 @@ PUREPURSUIT_LOOKAHEAD_ID        = 0xE0
 PUREPURSUIT_LOOKAHEADBIS_ID     = 0xE2
 
 
-class WheeledBase(SecureSerialTalksProxy):
+class WheeledBase(SerialTalksProxy):
 
     _DEFAULT = {
         GET_CODEWHEELS_COUNTERS_OPCODE : Deserializer(LONG(0) + LONG(0)),
@@ -92,7 +93,7 @@ class WheeledBase(SecureSerialTalksProxy):
         def set(self, value): self.parent.set_parameter_value(self.id, value, self.type)
 
     def __init__(self, parent, uuid='wheeledbase'):
-        SecureSerialTalksProxy.__init__(self, parent, uuid, WheeledBase._DEFAULT)
+        SerialTalksProxy.__init__(self, parent, uuid)#, WheeledBase._DEFAULT)
 
         self.left_wheel_radius   = WheeledBase.Parameter(self, LEFTWHEEL_RADIUS_ID, FLOAT)
         self.left_wheel_constant = WheeledBase.Parameter(self, LEFTWHEEL_CONSTANT_ID, FLOAT)
