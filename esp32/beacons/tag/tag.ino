@@ -11,15 +11,16 @@
 
 #include <SPI.h>
 #include "DW1000Ranging.h"
-
-#include "SSD1306.h"
-#include <Wire.h>
 #include "MatrixMath.h"
 
 #include "../../common/SerialTalks.h"
 #include "instructions.h"
 
-SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
+#include "SSD1306.h"
+#include <Wire.h>
+#include "OLED_display.h"
+
+OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
 byte currentBeaconNumber = 1;
 
 static float d1 = 0;
@@ -58,16 +59,6 @@ void newRange()
 
   static String toDisplay;
 
-
-  //Serial.print("from: ");
-  //Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
-  //Serial.print("\t Range: ");
-  //Serial.print(DW1000Ranging.getDistantDevice()->getRange());
-  //Serial.print(" m");
-  //Serial.print("\t RX power: ");
-  //Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
-  //Serial.println(" dBm");
-
   byte id = DW1000Ranging.getDistantDevice()->getShortAddress();
 
   float distance = DW1000Ranging.getDistantDevice()->getRange() * 1000;
@@ -104,7 +95,6 @@ void newRange()
       break;
   }
 
-  display.clear();
   int nbDevices = a1Connected + a2Connected + a3Connected + a4Connected;
   switch(nbDevices){
     case 0:
@@ -112,8 +102,8 @@ void newRange()
       toDisplay = "(0) ";
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
-      display.drawString(64, 0, toDisplay);
-     // display.display();
+      display.clearMsg(5);
+      // display.display();
       p[0] = -1000;
       p[1] = -1000;
      }
@@ -123,8 +113,8 @@ void newRange()
       toDisplay = "(1) ";
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
-      display.drawString(64, 0, toDisplay);
-     // display.display();
+      display.clearMsg(5);
+      // display.display();
       p[0] = -1000;
       p[1] = -1000;
       }
@@ -134,7 +124,7 @@ void newRange()
       toDisplay = "(2) ";
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
-      display.drawString(64, 0, toDisplay);
+      display.clearMsg(5);
      // display.display();
       p[0] = -1000;
       p[1] = -1000;
@@ -194,8 +184,8 @@ void newRange()
       toDisplay += ")\n(3) ";
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
-      display.drawString(64, 0, toDisplay);
-     // display.display();
+      display.displayMsg(Text(toDisplay, 5, 64, 0));
+      // display.display();
     }
       break;
     case 4:
@@ -222,7 +212,7 @@ void newRange()
       toDisplay += ")\n(4) ";
       toDisplay += DW1000Ranging.getFrameRate();
       toDisplay += "Hz";
-      display.drawString(64, 0, toDisplay);
+      display.displayMsg(Text(toDisplay, 5, 64, 0));
       //display.display();
       
 
@@ -298,8 +288,7 @@ void newRange()
   uint8_t c = DW1000Ranging.getColor();
   toDisplay = c;
   toDisplay += c==0?" : green":" : orange";
-  display.drawString(64,40,toDisplay);
-  display.display();
+  display.log(toDisplay);
 
 
   digitalWrite(PIN_LED_OK, HIGH);
@@ -333,9 +322,7 @@ void newDevice(DW1000Device *device)
   toDisplay += networkNumber;
   toDisplay += "\nTAG : ";
   toDisplay += tagNumber;
-  display.clear();
-  display.drawString(64, 0, toDisplay);
-  display.display();
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
 
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -366,9 +353,7 @@ void inactiveAncDevice(DW1000Device *device)
   toDisplay += networkNumber;
   toDisplay += "\nTAG : ";
   toDisplay += tagNumber;
-  display.clear();
-  display.drawString(64, 0, toDisplay);
-  display.display();
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
 
   if (!(a1Connected || a2Connected || a3Connected || a4Connected))
   {
@@ -391,9 +376,8 @@ void inactiveTagDevice(DW1000Device *device)
   toDisplay += networkNumber;
   toDisplay += "\nTAG : ";
   toDisplay += tagNumber;
-  display.clear();
-  display.drawString(64, 0, toDisplay);
-  display.display();
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
 
   if (tagNumber + networkNumber == 0)
   {
@@ -410,9 +394,8 @@ void blinkDevice(DW1000Device *device){
   toDisplay += networkNumber;
   toDisplay += "\nTAG : ";
   toDisplay += tagNumber;
-  display.clear();
-  display.drawString(64, 0, toDisplay);
-  display.display();
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
 
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -447,27 +430,23 @@ void setup() {
 
   display.init();
   display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER);
 
   pinMode(PIN_LED_FAIL, OUTPUT);
   pinMode(PIN_LED_OK, OUTPUT);
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, HIGH);
-  display.drawString(64, 24, "SYNCHRONISATION\n(tag)");
-  display.display();
-
-  display.setFont(ArialMT_Plain_16);
+  display.displayMsg(Text("SYNC", 3, 64, 0));
+  if (TAG_SHORT_ADDRESS[currentBeaconNumber] == MASTER_TAG_ADDRESS)
+    display.displayMsg(Text("GROS\nROBOT", 4, 64, 0));
+  else
+    display.displayMsg(Text("PETIT\nROBOT", 4, 64, 0));
 }
 
 void loop() {
-  static unsigned long trilaterationReportTime = millis();
   DW1000Ranging.loop();
   talks.execute();
- /* if (millis() - trilaterationReportTime > 1000){
-    trilaterationReportTime = millis();
-    DW1000Ranging.transmitTrilaterationReport();
-  }*/
+  display.update();
 }
 
 
