@@ -10,7 +10,7 @@ import warnings
 from common.CRC16 import *
 from queue import Queue, Empty
 from threading import Thread, RLock, Event, current_thread
-
+import re
 from common.serialutils import Deserializer, IntegerType, FloatType, StringType
 
 BAUDRATE = 115200
@@ -75,6 +75,7 @@ class SerialTalks:
     def __init__(self, port):
         # Serial things
         self.port = port
+        self.logged = True if not re.compile('.*wheeledbase.*').search(port) is None else False
         self.is_connected = False
 
         # Threading things
@@ -84,6 +85,9 @@ class SerialTalks:
         # Instructions
         self.instructions = dict()
         self.instructions[WARNING_OPCODE] = self.launch_warning_
+        if self.logged:
+            self.rec_file = open("/tmp/seriallog/log-{}.txt".format(time.asctime().split(" ")[4]),"w")
+
 
     def __enter__(self):
         self.connect()
@@ -203,6 +207,10 @@ class SerialTalks:
             output = queue.get(block, timeout)
         except Empty:
             if timeout is not None:
+                if hasattr(self, "rec_file"):
+                    self.rec_file.write("END\n")
+                    self.rec_file.close()
+                    delattr(self, "rec_file")
                 raise TimeoutError('timeout exceeded') from None
             else:
                 return None
@@ -298,6 +306,8 @@ class SerialListener(Thread):
             # Wait until new bytes arrive
             try:
                 inc = self.parent.stream.read()
+                if hasattr(self.parent,"rec_file"):
+                    self.parent.rec_file.write(inc)
             except serial.serialutil.SerialException:
                 self.parent.disconnect()
                 break
