@@ -70,7 +70,7 @@ class Bornibus:
         d1Act = self.d1.getAction()[0]
         d2Act = self.d2.getAction()[0]
         d3Act = self.d3.getAction()[0]
-        d4Act = self.d4.getAction()[0]
+        d4Act = self.d4.getAction()[0]1
         shortShot = self.shot.getAction()[0]
         longShot0 = self.shot.getAction()[2]
         longShot1 = self.shot.getAction()[3]
@@ -120,12 +120,21 @@ class Bornibus:
             self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
             self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
             self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
+            self.beacons_manager.create_area(longShot0.name, "auxLongShot{}0_*".format(self.side))
+            self.beacons_manager.create_area(longShot1.name, "auxLongShot{}1_*".format(self.side))
+            self.beacons_manager.create_area(longShot2.name, "auxLongShot{}2_*".format(self.side))
+            self.beacons_manager.create_area(shortShot.name, "auxShortShot{}_*".format(self.side))
 
         treatmentAct.link_area(treatmentAct.name)
         dispMulti.link_area(dispMulti.name)
         panelAct.link_area(panelAct.name)
+        longShot0.link_area(longShot0.name)
+        longShot1.link_area(longShot1.name)
+        longShot2.link_area(longShot2.name)
+        shortShot.link_area(shortShot.name)
 
-        def longShot(): (not (longShot0 or longShot1 or longShot2))
+        def longShot():
+            return not (longShot0 or longShot1 or longShot2)
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
         treatmentAct.set_impossible_combination(lambda: not longShot)
         dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
