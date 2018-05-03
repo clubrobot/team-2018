@@ -26,7 +26,7 @@ class Interrupteur(Actionnable):
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
         try:
             self.mover.turnonthespot(theta, try_limit=3, stategy=Mover.AIM)
-            self.mover.gowall(try_limit=5, strategy=Mover.FAST)
+            self.mover.gowall(try_limit=5, strategy=Mover.FAST, direction="forward")
         except PositionUnreachable:
             return
         display.addPoints(Interrupteur.POINTS)
