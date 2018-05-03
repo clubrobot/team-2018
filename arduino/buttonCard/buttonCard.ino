@@ -49,7 +49,7 @@ if (buttonCard.readMode() != oldreadmode && millis()>timeInverter+10){
     talks.send(4, mode);
     timeInverter = millis();
   }*/
-if(analogRead(EMERGENCY)<700){
+if(analogRead(EMERGENCY)<750){
     if(millis() - savedTime > 250 && millis() - savedTime < 500){
       tone(ALED_3, 1500);
     } else if(millis() - savedTime > 500){
