@@ -112,29 +112,33 @@ class Mover:
     def get_wall_status(self, x, y):
         return (x < WALL_RANGE or (2000 - x) < WALL_RANGE or y < WALL_RANGE or (3000 - y) < WALL_RANGE)
 
-    def gowall(self, try_limit=3, strategy=FAST):
+    def gowall(self, try_limit=3, strategy=FAST, direction="forward"):
         #  /\ Determination de la proximité avec un enemies et initialisation des variables /\
         #closed_to_enemy = self.get_enemy_status()
         self.goal = self.wheeledbase.get_position()
-        if strategy == Mover.FAST: self._gowall_fast(try_limit)
+        if strategy == Mover.FAST: self._gowall_fast(try_limit,direction)
         self.reset()
 
     # Button activation
-    def _gowall_fast(self, try_limit):
+    def _gowall_fast(self, try_limit, direction):
         wall_reached = False
         nb_try = try_limit
+        direction = {"forward" : 1, "backward": -1}[direction]
         while not wall_reached:
             try:
-                self.wheeledbase.set_velocities(250, 0)
+                self.wheeledbase.set_velocities(250*direction, 0)
                 while not self.wheeledbase.isarrived():
                     time.sleep(0.1)
             except RuntimeError:
                 if not nb_try > 0: break
                 nb_try -= 1
-                if mean(self.sensors_front.get_mesure()) < 40:
+                if (direction==1 and  mean(self.sensors_front.get_mesure()) < 45) or (direction==-1 and mean(self.sensors_back.get_mesure()) < 55):
                     wall_reached = True
-                    print(self.sensors_front.get_mesure())
+
                 else:
+                    #TODO maybe increase the threshold 40
+                    print(mean(self.sensors_back.get_mesure()))
+                    print(mean(self.sensors_front.get_mesure()))
                     _, ang = self.wheeledbase.get_velocities_wanted(True)
                     print(ang)
                     print(nb_try)
@@ -153,14 +157,14 @@ class Mover:
                             except RuntimeError:
                                 self.wheeledbase.left_wheel_maxPWM.set(1)
                                 self.wheeledbase.right_wheel_maxPWM.set(1)
-                                self.wheeledbase.set_velocities(-100, 0)
+                                self.wheeledbase.set_velocities(-100*direction, 0)
                                 sleep(0.2)
                                 self.wheeledbase.stop()
                         # Go backward
                         if ang < 0:
-                            self.wheeledbase.goto_delta(-50, 0)
+                            self.wheeledbase.goto_delta(-50*direction, 0)
                         else:
-                            self.wheeledbase.goto_delta(-40, 0)
+                            self.wheeledbase.goto_delta(-40*direction, 0)
                         try:
                             self.wheeledbase.wait()
                         except:
@@ -175,7 +179,7 @@ class Mover:
                         except RuntimeError:
                             pass
                     else:
-                        self.wheeledbase.goto_delta(-10, 0)
+                        self.wheeledbase.goto_delta(-10*direction, 0)
                         try:
                             self.wheeledbase.wait()
                         except:
