@@ -40,6 +40,8 @@ b = WheeledBase(m)
 
 
 d = WaterSorter(m)
+d.open_indoor()
+d.close_outdoor()
 l = WaterLauncher(m)
 a = BeeActuator(m)
 

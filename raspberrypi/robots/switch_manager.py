@@ -13,7 +13,7 @@ class Interrupteur(Actionnable):
     typ="Interrupteur"
     POINTS = 25
     TIME = 5
-    def __init__(self,side, geo, arduinos, display, mover, logger):
+    def __init__(self,side, geo, arduinos, display, mover, logger, data):
         self.side=side
         self.mover = mover
         self.logger = logger
@@ -21,6 +21,7 @@ class Interrupteur(Actionnable):
         self.display = display
         self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
         self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
+        self.data = data
 
     def realize(self,robot, display):
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
@@ -45,7 +46,7 @@ class Abeille(Actionnable):
     typ="Abeille"
     POINTS = 50
     TIME = 10
-    def __init__(self, side, geo, arduinos, display, mover, logger):
+    def __init__(self, side, geo, arduinos, display, mover, logger, data):
         self.side=side
         self.logger = logger
         self.mover = mover
@@ -54,6 +55,7 @@ class Abeille(Actionnable):
         self.beeActioner = arduinos["beeActioner"]
         self.preparation=geo.get('Abeille'+str(self.side)+'_0')
         self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
+        self.data = data
 
     def realize(self,robot, display):
         try:
