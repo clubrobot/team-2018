@@ -70,7 +70,7 @@ class Bornibus:
         d1Act = self.d1.getAction()[0]
         d2Act = self.d2.getAction()[0]
         d3Act = self.d3.getAction()[0]
-        d4Act = self.d4.getAction()[0]1
+        d4Act = self.d4.getAction()[0]
         shortShot = self.shot.getAction()[0]
         longShot0 = self.shot.getAction()[2]
         longShot1 = self.shot.getAction()[3]
@@ -141,10 +141,10 @@ class Bornibus:
 
 
         #dispMono.set_manual_order(1)
-        #shortShot.set_manual_order(2)
+        shortShot.set_manual_order(2)
         #dispMulti.set_manual_order(3)
         #longShot2.set_manual_order(4)
-        longShot0.set_manual_order(4)
+        #longShot0.set_manual_order(4)
         #longShot1.set_manual_order(4)
         #treatmentAct.set_manual_order(5)
         #panelAct.set_manual_order(6)
