@@ -3,6 +3,8 @@
 #include "EEPROM.h"
 #include "DW1000Ranging.h"
 
+extern boolean deviceConnected;
+
 void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "update anchor number\n";
     byte number = input.read<byte>();
@@ -46,4 +48,9 @@ void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
     int y = DW1000Ranging.getPosY();
     output.write<uint16_t>(x);
     output.write<uint16_t>(y);
+}
+
+// return true if pannel connected, false otherwise
+void GET_PANEL_STATUS(SerialTalks &talks, Deserializer &input, Serializer &output){
+    output.write<bool>(deviceConnected);
 }

@@ -13,6 +13,7 @@ SKETCH_LIBS = ~/Arduino/libraries/ESP8266_and_ESP32_Oled_Driver_for_SSD1306_disp
 LIBS = 	$(ESP_LIBS)/SPI \
 		$(ESP_LIBS)/EEPROM \
 		$(ESP_LIBS)/Wire \
+		$(ESP_LIBS)/BLE \
 	    $(COMMON)/SerialTalks.cpp \
 		$(COMMON)/mathutils.cpp \
 		$(COMMON)/CRC16.cpp\
@@ -27,10 +28,11 @@ LIBS = 	$(ESP_LIBS)/SPI \
 # Define
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x20
 CPPFLAGS += -DPUREPURSUIT_MAX_WAYPOINTS=32
-
+CPPFLAGS += -DCONFIG_CXX_EXCEPTIONS=1
 
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
 MODULEMK_DIR = ../..
+CPP_EXTRA += -fexceptions
 include $(MODULEMK_DIR)/Module.mk
 
