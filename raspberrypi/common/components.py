@@ -6,7 +6,7 @@ from types import MethodType
 from threading import RLock
 import warnings
 from common.tcptalks import TCPTalks, TCPTalksServer, NotConnectedError
-
+from common.serialtalks import WARNING_OPCODE
 COMPONENTS_SERVER_DEFAULT_PORT = 25566
 
 CREATE_SERIALTALKS_COMPONENT_OPCODE = 0x10
@@ -52,7 +52,14 @@ try:
             self.disconnect()
 
         def receive(self, input, timeout=0.5):
-            opcode = str(input.read(BYTE)) + self.uuid
+            opcode = input.read(BYTE)
+            retcode = input.read(LONG)
+            if opcode == WARNING_OPCODE:
+                message = input.read(STRING)
+                self.launch_warning_(message)
+                return
+
+            opcode =str(opcode) + self.uuid
             retcode = input.read(LONG)
 
             try:
@@ -293,7 +300,7 @@ class Proxy():
 class SerialTalksProxy(Proxy):
 
     def __init__(self, manager, uuid):
-        compid = manager.execute(CREATE_SERIALTALKS_COMPONENT_OPCODE, uuid)
+        compid = manager.execute(CREATE_SERIALTALKS_COMPONENT_OPCODE, uuid, timeout=6)
         attrlist = ['port', 'is_connected']
         methlist = ['connect', 'disconnect', 'send', 'poll', 'flush', 'execute', 'getuuid', 'setuuid', 'getout',
                     'geterr']
