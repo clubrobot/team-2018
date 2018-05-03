@@ -42,20 +42,20 @@ void BallsShaker::shake()
     if(mode == BallsShaker::DIFF_FREQ)
     {
         if(count_clock_horizontal == PER_HORIZONTAL/2){
-            shakerHorizontal.write(SHAKER_HORIZONTAL_1);
+            shakerHorizontal.Velocitywrite(SHAKER_HORIZONTAL_1);
         }
         
         if(count_clock_horizontal == PER_HORIZONTAL){
-            shakerHorizontal.write(SHAKER_HORIZONTAL_2);
+            shakerHorizontal.Velocitywrite(SHAKER_HORIZONTAL_2);
             count_clock_horizontal = 0;
         }
 
         if(count_clock_vertical == PER_VERTICAL/2)
         {
-            shakerVertical.write(SHAKER_VERTICAL_1);
+            shakerVertical.Velocitywrite(SHAKER_VERTICAL_1);
         }
         if(count_clock_vertical == PER_VERTICAL){
-            shakerVertical.write(SHAKER_VERTICAL_2);
+            shakerVertical.Velocitywrite(SHAKER_VERTICAL_2);
             count_clock_vertical = 0;
         }
     }
@@ -63,19 +63,19 @@ void BallsShaker::shake()
     else if(mode == BallsShaker::EQUAL_FREQ)
     {
         if(count_clock_horizontal == PER_EQUAL/4){
-            shakerHorizontal.write(SHAKER_HORIZONTAL_2);
+            shakerHorizontal.Velocitywrite(SHAKER_HORIZONTAL_2);
         }
 
         if(count_clock_horizontal == PER_EQUAL/2){
-            shakerHorizontal.write(SHAKER_HORIZONTAL_1);
+            shakerHorizontal.Velocitywrite(SHAKER_HORIZONTAL_1);
         }
 
         if(count_clock_horizontal == 3*PER_EQUAL/4){
-            shakerVertical.write(SHAKER_VERTICAL_2);
+            shakerVertical.Velocitywrite(SHAKER_VERTICAL_2);
         }
 
         if(count_clock_horizontal == PER_EQUAL){
-            shakerVertical.write(SHAKER_VERTICAL_1);
+            shakerVertical.Velocitywrite(SHAKER_VERTICAL_1);
             count_clock_horizontal = 0;
         }
     }
@@ -85,22 +85,41 @@ void BallsShaker::shake()
 
 void BallsShaker::enableShakerEqualFreq(){
     this->mode = BallsShaker::EQUAL_FREQ;
+    shakerHorizontal.Velocitywrite(SHAKER_HORIZONTAL_1);
+    shakerVertical.Velocitywrite(SHAKER_VERTICAL_1);
+    shakerHorizontal.enable();
+    shakerVertical.enable();
     enable();
 }
 
 void BallsShaker::enableShakerDiffFreq(){
     this->mode = BallsShaker::DIFF_FREQ;
+    shakerHorizontal.Velocitywrite(SHAKER_HORIZONTAL_1);
+    shakerVertical.Velocitywrite(SHAKER_VERTICAL_1);
+    shakerHorizontal.enable();
+    shakerVertical.enable();
     enable();
 }
 
 void BallsShaker::disableShaker(){
     this->writeHorizontal(SHAKER_HORIZONTAL_1);
     this->writeVertical(SHAKER_VERTICAL_1);
+    shakerHorizontal.disable();
+    shakerVertical.disable();
     disable();
 }
 
 void BallsShaker::updateShaker(){
 	PeriodicProcess::update();
+    shakerHorizontal.update();
+    shakerVertical.update();
+}
+
+void BallsShaker::set_velocity(int vel)
+{
+    disableShaker();
+    shakerVertical.setVelocity(vel);
+    shakerHorizontal.setVelocity(vel);
 }
 
 void BallsShaker::process(float timestep){

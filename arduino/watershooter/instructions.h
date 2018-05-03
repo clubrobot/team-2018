@@ -27,6 +27,7 @@
 #define _DISABLE_SHAKING_OPCODE                0x26
 #define _WRITE_BEEACTIVATOR_OPCODE			   0x27
 #define _ENABLE_SHAKING_DIFF_OPCODE            0x28
+#define _SET_SHAKER_VELOCITY_OPCODE            0x29
 
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
@@ -47,6 +48,7 @@ void GET_SHAKER_VERTICAL(SerialTalks &inst, Deserializer &input, Serializer &out
 void ENABLE_SHAKING_DIFF(SerialTalks &inst, Deserializer &input, Serializer &output);
 void ENABLE_SHAKING_EQUAL(SerialTalks &inst, Deserializer &input, Serializer &output);
 void DISABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output);
+void SET_SHAKER_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 void WRITE_TRASH_UNLOADER(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_TRASH_UNLOADER(SerialTalks &inst, Deserializer &input, Serializer &output);

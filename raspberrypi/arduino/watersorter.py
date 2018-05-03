@@ -25,6 +25,7 @@ _WRITE_TRASH_UNLOADER_OPCODE     =      0x24
 _ENABLE_SHAKING_EQUAL_OPCODE     =      0x25
 _DISABLE_SHAKING_OPCODE          =      0x26
 _ENABLE_SHAKING_DIFF_OPCODE      =      0x28
+_SET_SHAKER_VELOCITY_OPCODE      =      0x29
 
 INDOOR_DOOR_OPEN = 50
 INDOOR_DOOR_CLOSED = 32
@@ -142,3 +143,6 @@ class WaterSorter(SecureSerialTalksProxy):
 
     def disable_shaker(self):
         self.send(_DISABLE_SHAKING_OPCODE)
+
+    def set_shaker_velocity(self, vel):
+        self.send(_SET_SHAKER_VELOCITY_OPCODE, INT(vel))

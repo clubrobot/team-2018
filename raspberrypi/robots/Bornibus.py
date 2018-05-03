@@ -122,9 +122,9 @@ class Bornibus:
 
         #dispMono.set_manual_order(1)
         #shortShot.set_manual_order(2)
-        #dispMulti.set_manual_order(3)
-        #longShot.set_manual_order(4)
-        panelAct.set_manual_order(5)
+        dispMulti.set_manual_order(3)
+        longShot.set_manual_order(4)
+        #panelAct.set_manual_order(5)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
                                      mode=Heuristics.MANUAL)
@@ -138,7 +138,8 @@ class Bornibus:
         self.arduinos["wheeledbase"].lookahead.set(200)
         self.arduinos["wheeledbase"].max_linvel.set(500)
         self.arduinos["wheeledbase"].max_angvel.set(6)
-        self.arduinos["wheeledbase"].set_position(592, 290, 0)
+
+        self.arduinos["watersorter"].set_shaker_velocity(400)
         self.arduinos["beeActioner"].close()
         self.arduinos["watersorter"].close_trash_unloader()
         self.arduinos["watersorter"].close_trash()
@@ -146,6 +147,7 @@ class Bornibus:
         act = self.heuristics.get_best()
         print(act)
         while act is not None:
+            act.before_action()
             self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
             self.mover.goto(*act.actionPoint)
             self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
@@ -156,7 +158,8 @@ class Bornibus:
 
 if __name__ == '__main__':
     from robots.setup_bornibus import *
-    side = 0
+    side = 1
+    b.set_position(592, 3000-290, 0)
 
     print("DEBUT CHARGEMENT ROADMAP")
     geo = Geogebra('bornibus.ggb')
@@ -173,5 +176,5 @@ if __name__ == '__main__':
     bm.start()
 
     auto = Bornibus(side, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back, br, bm)
-    time.sleep(5)
     auto.run()
+    exit()
