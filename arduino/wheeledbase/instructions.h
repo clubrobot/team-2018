@@ -28,6 +28,8 @@
 
 #define GET_VELOCITIES_WANTED_OPCODE    0x1D
 #define GOTO_DELTA_OPCODE               0x1E
+
+#define RESET_PARAMETERS_OPCODE         0x1F
 // Parameters identifiers
 
 #define LEFTWHEEL_RADIUS_ID             0x10
@@ -66,6 +68,7 @@
 #define POSITIONCONTROL_ANGPOSTHRESHOLD_ID  0xD5
 #define PUREPURSUIT_LOOKAHED_ID         0xE0
 #define PUREPURSUIT_LOOKAHEADBIS_ID     0xE2
+
 
 // Instructions prototypes
 void DISABLE(SerialTalks& talks, Deserializer& input, Serializer& output);

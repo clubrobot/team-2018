@@ -33,6 +33,7 @@ ADD_PUREPURSUIT_WAYPOINT_OPCODE = 0x1B
 GET_CODEWHEELS_COUNTERS_OPCODE  = 0x1C
 GET_VELOCITIES_WANTED_OPCODE    = 0x1D
 GOTO_DELTA_OPCODE               = 0x1E
+RESET_PARAMETERS_OPCODE         = 0x1F
 
 LEFTWHEEL_RADIUS_ID	            = 0x10
 LEFTWHEEL_CONSTANT_ID           = 0x11
@@ -70,6 +71,7 @@ POSITIONCONTROL_LINPOSTHRESHOLD_ID  = 0xD4
 POSITIONCONTROL_ANGPOSTHRESHOLD_ID  = 0xD5
 PUREPURSUIT_LOOKAHEAD_ID        = 0xE0
 PUREPURSUIT_LOOKAHEADBIS_ID     = 0xE2
+
 
 
 class WheeledBase(SecureSerialTalksProxy):
@@ -231,3 +233,6 @@ class WheeledBase(SecureSerialTalksProxy):
         output = self.execute(GET_PARAMETER_VALUE_OPCODE, BYTE(id))
         value = output.read(valuetype)
         return value
+
+    def reset_parameters(self):
+        self.send(RESET_PARAMETERS_OPCODE)

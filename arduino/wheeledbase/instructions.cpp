@@ -508,3 +508,17 @@ void GET_PARAMETER_VALUE(SerialTalks& talks, Deserializer& input, Serializer& ou
 	}
 }
 
+void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& output)
+{
+	purePursuit.setLookAhead(200);
+	purePursuit.save(PUREPURSUIT_ADDRESS);
+
+	positionControl.setVelLimits(600, 6);
+	positionControl.save(POSITIONCONTROL_ADDRESS);
+	
+	leftWheel.setMaxPWM(1);
+	leftWheel.save(LEFTWHEEL_ADDRESS);
+	
+	rightWheel.setMaxPWM(1);
+	rightWheel.save(RIGHTWHEEL_ADDRESS);
+}

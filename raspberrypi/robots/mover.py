@@ -87,11 +87,7 @@ class Mover:
     def reset(self):
         self.front_flag.clear()
         self.withdraw_flag.clear()
-        self.wheeledbase.lookahead.set(200)
-        self.wheeledbase.max_linvel.set(600)
-        self.wheeledbase.max_angvel.set(6)
-        self.wheeledbase.left_wheel_maxPWM.set(1)
-        self.wheeledbase.right_wheel_maxPWM.set(1)
+        self.wheeledbase.reset_parameters()
         self.interupted_timeout.clear()
         self.interupted_status.clear()
         self.isarrived = False
