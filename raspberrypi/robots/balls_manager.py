@@ -104,7 +104,13 @@ class Shot(Actionnable):
         
         
     def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=23):
+        nb_balls = 0
+        begin_time = time.time()
+        motor_base = 80
+        watersorter.open_outdoor()
+        timeout_per_ball = 1
         currentPosXY=wheeledbase.get_position()[:2]
+        waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
             self.mover.turnonthespot(theta, 3, Mover.AIM)
@@ -116,11 +122,6 @@ class Shot(Actionnable):
         watersorter.close_trash()
         watersorter.open_indoor()
         watersorter.close_outdoor()
-        nb_balls = 0
-        begin_time = time.time()
-        motor_base = 80
-        watersorter.open_outdoor()
-        timeout_per_ball = 1
         while nb_balls < 8 and time.time() - begin_time < global_timeout:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.open_indoor()
@@ -140,20 +141,20 @@ class Shot(Actionnable):
 
             close_time = time.time()
             while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100) and not (time.time() - begin_time > global_timeout):
-                time.sleep(0.2)
-
+                time.sleep(0.1)
                 waterlauncher.set_motor_pulsewidth(1000+motor_base)
                 if time.time() - close_time > timeout_per_ball:
                     watersorter.close_trash()
                     close_time = time.time()
             
-            time.sleep(0.3)
+            time.sleep(0.8)
             if time.time() - begin_time < global_timeout:
                 nb_balls += 1
                 display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
                 display.happy(1)
             waterlauncher.set_motor_pulsewidth(1150)
             time.sleep(0.1)
+            waterlauncher.set_motor_pulsewidth(1000 + motor_base)
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
