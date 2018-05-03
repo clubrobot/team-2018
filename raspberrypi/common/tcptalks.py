@@ -137,14 +137,15 @@ class TCPTalks:
 			# current instance is connected to the other
 			self.is_connected = True
 
-			# Password authentification
-			if self.ip is None: # Raspberry Pi
-				if not self.wait_for_authentification(1):
-					self.disconnect()
-			else: # Remote controller
-				if not self.authentificate(1):
-					self.disconnect()
-					raise AuthentificationError('authentification failed')
+            # Password authentification
+            if self.ip is None: # Raspberry Pi
+                if not self.wait_for_authentification(1):
+                    self.disconnect()
+            else: # Remote controller
+                if not self.authentificate(1):
+                    self.disconnect()
+                    raise AuthentificationError('authentification failed')
+            time.sleep(1)
 
 	def authentificate(self, timeout):
 		self.sendback(AUTHENTIFICATION_OPCODE, self.password)
