@@ -28,7 +28,7 @@
 #define _WRITE_BEEACTIVATOR_OPCODE			   0x27
 #define _ENABLE_SHAKING_DIFF_OPCODE            0x28
 #define _SET_SHAKER_VELOCITY_OPCODE            0x29
-#define _GET_LAUNCHED_WATER_OPCODE             0x30
+#define _GET_LAUNCHED_WATER_OPCODE             0x2A
 
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
