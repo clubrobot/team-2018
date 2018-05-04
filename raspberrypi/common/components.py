@@ -55,8 +55,7 @@ try:
             opcode = input.read(BYTE)
             retcode = input.read(LONG)
             if opcode == WARNING_OPCODE:
-                message = input.read(STRING)
-                self.launch_warning_(message)
+                self.launch_warning_(input)
                 return
 
             opcode =str(opcode) + self.uuid

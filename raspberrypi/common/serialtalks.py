@@ -227,7 +227,11 @@ class SerialTalks:
         except TimeoutError:
             if self.warning_flag.is_set():
                 if crc == self.crc_corrupted:
-                    output = self.poll(retcode, timeout)
+                    self.warning_flag.clear()
+                    retcode, crc = self.send(opcode, *args, get_crc=False)
+                    return self.poll(retcode, timeout)
+            else:
+                raise TimeoutError
         else:
             return output
 
@@ -283,10 +287,9 @@ class SerialTalks:
         binary_file.close()
 
     def launch_warning_(self, message):
-        warnings.warn("Message corrupted !", SerialTalksWarning)
+        warnings.warn("Message send corrupted !", SerialTalksWarning)
         self.warning_flag.set()
         self.crc_corrupted = message.read(USHORT)
-        print(self.crc_corrupted)
 
 
     def getout(self, timeout=0):
@@ -351,7 +354,7 @@ class SerialListener(Thread):
                     if type_packet == SLAVE_BYTE: self.parent.process(Deserializer(buffer))
                     if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
                 else:
-                    # print('error') #TODO: replace by warning
+                    warnings.warn("Message receive corrupted !", SerialTalksWarning)
                     state = 'waiting'
 
             except NotConnectedError:
