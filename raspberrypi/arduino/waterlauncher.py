@@ -13,17 +13,22 @@ _GET_MOTOR_VELOCITY_OPCODE		= 0x18
 _SET_MOTOR_PULSEWIDTH_OPCODE	= 0x1A
 _GET_MOTOR_PULSEWIDTH_OPCODE	= 0x1B
 _FORCE_PULSEWIDTH				= 0x1E
+_GET_LAUNCHED_WATER_OPCODE      = 0x28
 
-class WaterLauncher(SerialTalksProxy):	
+
+class WaterLauncher(SerialTalksProxy):
 	def __init__(self,parent, uuid='watershooter'):
 		SerialTalksProxy.__init__(self, parent, uuid)
+
+	def get_nb_launched_water(self):
+		output = self.execute(_GET_LAUNCHED_WATER_OPCODE);
+		return output.read(INT);
 
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
 		inSetup = output.read(INT)
 		if not inSetup :
 			return "Please wait, ESC in startup..."
-		
 
 	def get_motor_velocity(self):
 		output = self.execute(_GET_MOTOR_VELOCITY_OPCODE)

@@ -15,7 +15,11 @@ Servo outdoor;
 Servo trash;
 Servo trashUnloader;
 BallsShaker shaker;
-Servo beeActivator; 
+Servo beeActivator;
+
+int ballCount = 0;
+bool lastState = HIGH;
+unsigned long timeDebouncer = 0;
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
@@ -31,8 +35,8 @@ Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 void resetVelocity();
 
 void setup(){
-    Serial.begin(SERIALTALKS_BAUDRATE);
-    talks.begin(Serial);
+  Serial.begin(SERIALTALKS_BAUDRATE);
+  talks.begin(Serial);
 	talks.bind(_GET_INDOOR_OPCODE, GET_INDOOR);
 	talks.bind(_WRITE_INDOOR_OPCODE, WRITE_INDOOR);
 	talks.bind(_GET_OUTDOOR_OPCODE, GET_OUTDOOR);
@@ -46,7 +50,7 @@ void setup(){
 	talks.bind(_GET_TRASH_UNLOADER_OPCODE, GET_TRASH_UNLOADER);
 	talks.bind(_WRITE_TRASH_UNLOADER_OPCODE, WRITE_TRASH_UNLOADER);
 	talks.bind(_GET_MOTOR_VELOCITY_OPCODE, GET_MOTOR_VELOCITY);
-    talks.bind(_SET_MOTOR_VELOCITY_OPCODE, SET_MOTOR_VELOCITY);
+  talks.bind(_SET_MOTOR_VELOCITY_OPCODE, SET_MOTOR_VELOCITY);
 	talks.bind(_GET_WATER_COLOR_OPCODE, GET_WATER_COLOR);
 	talks.bind(_SET_MOTOR_PULSEWIDTH_OPCODE, SET_MOTOR_PULSEWIDTH);
 	talks.bind(_GET_MOTOR_PULSEWIDTH_OPCODE, GET_MOTOR_PULSEWIDTH);
@@ -57,10 +61,10 @@ void setup(){
 	talks.bind(_DISABLE_SHAKING_OPCODE, DISABLE_SHAKING);
 	talks.bind(_WRITE_BEEACTIVATOR_OPCODE, WRITE_BEEACTIVATOR);
 	talks.bind(SERIALTALKS_DISCONNECT_OPCODE, DISABLE);
-
+  talks.bind(_GET_LAUNCHED_WATER_OPCODE, GET_LAUNCHED_WATER);
 
 	pinMode(SERVO1, OUTPUT);
-    pinMode(SERVO2, OUTPUT);
+  pinMode(SERVO2, OUTPUT);
 	pinMode(SERVO3, OUTPUT);
 	pinMode(SERVO4, OUTPUT);
 	pinMode(SERVO5, OUTPUT);
@@ -68,9 +72,11 @@ void setup(){
 	pinMode(SWITCH2, OUTPUT);
 	pinMode(BRUSHLESS, OUTPUT);
 	pinMode(SWITCH1, INPUT_PULLUP);
+  pinMode(3, INPUT_PULLUP);
 
+  attachInterrupt(digitalPinToInterrupt(3), incrementBallCount, FALLING);
 	attachInterrupt(digitalPinToInterrupt(SWITCH1), resetVelocity, FALLING);
-	
+
 	motor.attach(BRUSHLESS);
 	motor.setVelocity(MIN_VELOCITY);
 	motor.enableMotor();
@@ -92,6 +98,16 @@ void setup(){
 	waterSensor.begin();
 }
 
+void incrementBallCount(){
+  if((micros() - timeDebouncer > 1000) && lastState == HIGH){
+      ballCount++;
+      lastState = LOW;
+  }
+  lastState = digitalRead(3);
+  timeDebouncer = micros();
+}
+
+
 void resetVelocity(){
 	motor.enableStartup();
 }
@@ -101,7 +117,3 @@ void loop(){
 	motor.updateStartup();
 	shaker.updateShaker();
 }
-
-
-
-
