@@ -34,6 +34,14 @@ bool a4Connected = false;
 
 float p[2] = {-1,-1}; // Target point
 
+void loopCore0(void *pvParameters)  // loop on core 0
+{
+  for(;;){
+    display.update();
+    delay(10);
+  }
+}
+
 void newRange()
 {
   uint8_t color = DW1000Ranging.getColor();
@@ -299,9 +307,7 @@ void newDevice(DW1000Device *device)
 {
   int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
   int tagNumber = DW1000Ranging.getTagDevicesNumber();
-  //Serial.print("ranging init; 1 device added ! -> ");
-  //Serial.print(" short:");
-  //Serial.println(device->getShortAddress(), HEX);
+
   byte id = device->getShortAddress();
   switch (id)
   {
@@ -432,6 +438,15 @@ void setup() {
   display.flipScreenVertically();
   display.setTextAlignment(TEXT_ALIGN_CENTER);
 
+  xTaskCreatePinnedToCore(
+      loopCore0,   /* Function to implement the task */
+      "loopCore0", /* Name of the task */
+      10000,       /* Stack size in words */
+      NULL,        /* Task input parameter */
+      0,           /* Priority of the task */
+      NULL,        /* Task handle. */
+      0);   /* Core where the task should run */
+
   pinMode(PIN_LED_FAIL, OUTPUT);
   pinMode(PIN_LED_OK, OUTPUT);
   digitalWrite(PIN_LED_OK, HIGH);
@@ -443,10 +458,9 @@ void setup() {
     display.displayMsg(Text("PETIT\nROBOT", 4, 64, 0));
 }
 
-void loop() {
+void loop() {   // loop on core 1
   DW1000Ranging.loop();
   talks.execute();
-  display.update();
 }
 
 
