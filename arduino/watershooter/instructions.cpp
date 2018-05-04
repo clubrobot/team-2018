@@ -14,7 +14,8 @@ extern Servo trash;
 extern BallsShaker shaker;
 extern Servo trashUnloader;
 extern Adafruit_TCS34725 waterSensor;
-extern Servo beeActivator; 
+extern Servo beeActivator;
+extern ballCount;
 uint16_t red, green, blue, clear;
 
 
@@ -103,16 +104,28 @@ void SET_LED_OFF(SerialTalks& inst, Deserializer& input, Serializer& output){
 	digitalWrite(LED, LOW);
 }
 
-void ENABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output){
-	shaker.enableShaker();
+void ENABLE_SHAKING_DIFF(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shaker.enableShakerDiffFreq();
 }
+
+void ENABLE_SHAKING_EQUAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shaker.enableShakerEqualFreq();
+}
+
 void DISABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 }
+
+void SET_SHAKER_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output)
+{
+	shaker.set_velocity(input.read<int>());
+}
+
 void DISABLE(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 	motor.setPulsewidth(1000);
-}	
+}
+
 void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& output){
 	int val = input.read<int>();
     if (val >= 0)
@@ -127,4 +140,9 @@ void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& outp
     {
         beeActivator.detach();
     }
+}
+
+void GET_LAUNCHED_WATER(SerialTalks& inst, Deserializer& input, Serializer& output){
+	output.write<int>(ballCount);
+	ballCount = 0;
 }

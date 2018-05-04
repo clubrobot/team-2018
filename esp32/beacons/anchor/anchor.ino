@@ -20,52 +20,66 @@
 #include "../../common/SerialTalks.h"
 #include "instructions.h"
 
-
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <BLE2902.h>
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
 
 byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
 
+// BLE variables
+BLECharacteristic *pCharacteristic;
+boolean deviceConnected = false;
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+  //  Serial.println("connected");
+    deviceConnected = true;
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+  //  Serial.println("disconnected");
+    deviceConnected = false;
+  }
+};
+
 void newRange()
 {
-
   DW1000Ranging.setRangeFilterValue(5);
-  float distance = DW1000Ranging.getDistantDevice()->getRange()*1000;
-  float projection = distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG));
-  if(projection > 0)
-    distance = round(sqrt(projection)/10); // projection dans le plan des tags
-  else 
-    distance = 0;
 
-  display.clear();
-  display.setFont(ArialMT_Plain_16);
-  String toDisplay = "";
-  toDisplay += (int)distance;
-  toDisplay += "cm";
-  display.drawString(64, 0, toDisplay);
- 
+  String toDisplay;
+
   if(calibrationRunning==true){
     display.setFont(ArialMT_Plain_16);
     toDisplay = "timeOut";
   } else {
-    /*int antennaDelay = DW1000.getAntennaDelay();
-    toDisplay = antennaDelay;*/
-    display.setFont(ArialMT_Plain_16);
-    float x = DW1000Ranging.getPosX() / 10;
-    float y = DW1000Ranging.getPosY() / 10;
+    display.setFont(ArialMT_Plain_24);
+    // get master tag coordinates
+    float x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[0]) / 10;
+    float y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[0]) / 10;
     toDisplay = "(";
     toDisplay += (int)x;
     toDisplay += ", ";
     toDisplay += (int)y;
-    toDisplay += ")";
+    toDisplay += ")\n";
+    // get slave tag coordinates
+    x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[1]) / 10;
+    y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[1]) / 10;
+    toDisplay += "(";
+    toDisplay += (int)x;
+    toDisplay += ", ";
+    toDisplay += (int)y;
+    toDisplay += ")\n";
   }
-  
-  display.drawString(64, 20, toDisplay);
-  uint8_t c = DW1000Ranging.getColor();
-  toDisplay = c;
-  toDisplay += c==0?" : green":" : orange";
-  display.drawString(64,40,toDisplay);
+
+  display.clear();
+  display.drawString(64, 0, toDisplay);
   display.display();
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -144,6 +158,7 @@ void setup() {
   talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
   talks.bind(UPDATE_COLOR_OPCODE, UPDATE_COLOR);
   talks.bind(GET_COORDINATE_OPCODE,GET_COORDINATE);
+  talks.bind(GET_PANEL_STATUS_OPCODE, GET_PANEL_STATUS);
 
   /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
@@ -161,7 +176,7 @@ void setup() {
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachInactiveAncDevice(inactiveDevice);  // TODO : rename func
   DW1000Ranging.attachAutoCalibration(calibration);
 
   unsigned int replyTime;
@@ -215,6 +230,27 @@ void setup() {
   display.display();
 
   display.setFont(ArialMT_Plain_24);
+  Serial.print("init : ");
+  Serial.println(currentBeaconNumber);
+  // Start BLE Server only if this is the supervisor anchor
+  if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
+  {
+    BLEDevice::init("srv");
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_READ |
+            BLECharacteristic::PROPERTY_WRITE |
+            BLECharacteristic::PROPERTY_NOTIFY);
+    pCharacteristic->setValue("insa rennes");
+    pService->start();
+    BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising->addServiceUUID(pService->getUUID());
+    pAdvertising->start();
+   // Serial.println("Characteristic defined! Now you can read it in your phone!");
+  }
 }
 
 void loop() {

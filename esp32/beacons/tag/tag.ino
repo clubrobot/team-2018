@@ -6,6 +6,7 @@
  *  - give example description
  */
 #include "pin.h"
+#include "configuration.h"
 #include <EEPROM.h>
 
 #include <SPI.h>
@@ -19,6 +20,7 @@
 #include "instructions.h"
 
 SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
+byte currentBeaconNumber = 1;
 
 static float d1 = 0;
 static float d2 = 0;
@@ -107,7 +109,9 @@ void newRange()
   switch(nbDevices){
     case 0:
      {
-      toDisplay = "(0)";
+      toDisplay = "(0) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
      // display.display();
       p[0] = -1000;
@@ -116,7 +120,9 @@ void newRange()
       break;
     case 1:
       {
-      toDisplay = "(1)";
+      toDisplay = "(1) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
      // display.display();
       p[0] = -1000;
@@ -125,7 +131,9 @@ void newRange()
       break;
     case 2:
     {
-      toDisplay = "(2)";
+      toDisplay = "(2) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
      // display.display();
       p[0] = -1000;
@@ -183,7 +191,9 @@ void newRange()
       toDisplay += round(p[0]/10);
       toDisplay += ",";
       toDisplay += round(p[1]/10);
-      toDisplay += ")\n(3)";
+      toDisplay += ")\n(3) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
      // display.display();
     }
@@ -209,7 +219,9 @@ void newRange()
       toDisplay += round(p[0] / 10);
       toDisplay += ",";
       toDisplay += round(p[1] / 10);
-      toDisplay += ")\n(4)";
+      toDisplay += ")\n(4) ";
+      toDisplay += DW1000Ranging.getFrameRate();
+      toDisplay += "Hz";
       display.drawString(64, 0, toDisplay);
       //display.display();
       
@@ -280,8 +292,8 @@ void newRange()
       break;
   }
   
-  DW1000Ranging.setPosX(p[0]);
-  DW1000Ranging.setPosY(p[1]);
+  DW1000Ranging.setPosX(p[0],0);
+  DW1000Ranging.setPosY(p[1],0);
 
   uint8_t c = DW1000Ranging.getColor();
   toDisplay = c;
@@ -296,6 +308,8 @@ void newRange()
 
 void newDevice(DW1000Device *device)
 {
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
   //Serial.print("ranging init; 1 device added ! -> ");
   //Serial.print(" short:");
   //Serial.println(device->getShortAddress(), HEX);
@@ -314,12 +328,24 @@ void newDevice(DW1000Device *device)
   case 38: //TODO : should be 3
     a4Connected = true;
   }
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
-void inactiveDevice(DW1000Device *device)
+void inactiveAncDevice(DW1000Device *device)
 {
-  //Serial.print("delete inactive device: ");
-  //Serial.println(device->getShortAddress(), HEX);
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber() -1;
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+
   byte id = device->getShortAddress();
   switch (id)
   {
@@ -335,16 +361,61 @@ void inactiveDevice(DW1000Device *device)
   case 38: //TODO : should be 3
     a4Connected = false;
   }
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
   if (!(a1Connected || a2Connected || a3Connected || a4Connected))
   {
-    display.clear();
-    display.drawString(64, 0, "INACTIVE");
-    display.display();
-    digitalWrite(PIN_LED_OK, LOW);
-    digitalWrite(PIN_LED_FAIL, HIGH);
     p[0] = -1;
     p[1] = -1;
   }
+
+  if(tagNumber + networkNumber == 0){
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
+}
+
+void inactiveTagDevice(DW1000Device *device)
+{
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber() -1;
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
+  if (tagNumber + networkNumber == 0)
+  {
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
+}
+
+void blinkDevice(DW1000Device *device){
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+ 
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+  display.clear();
+  display.drawString(64, 0, toDisplay);
+  display.display();
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
 void setup() {
@@ -353,18 +424,26 @@ void setup() {
 
   talks.bind(GET_POSITION_OPCODE, GET_POSITION);
 
+#if 0
+  EEPROM.write(EEPROM_NUM_TAG, currentBeaconNumber);
+  EEPROM.commit();
+#endif
+  currentBeaconNumber = EEPROM.read(EEPROM_NUM_TAG);
+
   //init the configuration
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   //define the sketch as anchor. It will be great to dynamically change the type of module
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachNewDevice(newDevice);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachInactiveAncDevice(inactiveAncDevice);
+  DW1000Ranging.attachInactiveTagDevice(inactiveTagDevice);
+  DW1000Ranging.attachBlinkDevice(blinkDevice);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
   DW1000Ranging.setRangeFilterValue(5);
 
   //we start the module as a tag
-  DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+  DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();
