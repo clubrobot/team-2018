@@ -29,4 +29,8 @@ class BaliseReceiver(TCPTalks):
         self.send(SET_COLOR_OPCODE, color)
 
     def get_panel_status(self):
-        return self.execute(GET_PANEL_STATUS_OPCODE)
+        try:
+            result =  self.execute(GET_PANEL_STATUS_OPCODE)
+        except:
+            return True
+        return result
