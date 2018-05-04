@@ -167,7 +167,7 @@ private:
 	static void DISCONNECT(SerialTalks& talks, Deserializer& input, Serializer& output){ESP.restart();}
 	static void GETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void SETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
-	void LAUNCHWARNING(String message);
+	void LAUNCHWARNING(unsigned char * message);
 };
 
 extern SerialTalks talks;
