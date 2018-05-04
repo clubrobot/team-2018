@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from math import cos, sin, pi, hypot, copysign
+from math import cos, sin, pi, copysign, hypot
 from threading import *
 import time
 from statistics import mean
 
 from common.sync_flag_signal import Flag
-from robots.listener.position_listener import *
 from robots.listener.sensor_listener import *
-from beacons.balise_receiver import *
 from common.roadmap import RoadMap
 
 DELTA = 100
@@ -35,8 +33,10 @@ SENSORS_RANGE = 200
 # -  BEACONS CONSTANT
 ENEMY_THRESHOLD = 200
 
+
 # <> ERROR <>
-class PositionUnreachable(RuntimeError): pass
+class PositionUnreachable(RuntimeError):
+    pass
 
 
 class Mover:
@@ -45,10 +45,10 @@ class Mover:
     QUICK = 3
     SAFE = 4
     FAST = 5
-    SIMPLE  = 6
-    HARD   = 7
+    SIMPLE = 6
+    HARD = 7
 
-    def __init__(self, side, roadmap, arduinos, logger,  becons_receiver):
+    def __init__(self, side, roadmap, arduinos, logger, becons_receiver):
 
         # RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
@@ -62,7 +62,6 @@ class Mover:
         self.sensors_back = arduinos["sensors_back"]
         self.side = side
 
-
         # Objet qui sont en relation avec les sensors
         self.sensors_front_listener = SensorListener(self.sensors_front.get_mesure)
         self.sensors_back_listener = SensorListener(self.sensors_back.get_mesure)
@@ -70,8 +69,6 @@ class Mover:
 
         self.front_flag = Flag(self.front_obstacle)
         self.withdraw_flag = Flag(self._withdraw_interrup)
-
-
 
         self.path = list()
         self.isarrived = False
@@ -82,7 +79,6 @@ class Mover:
         self.direction = "forward"
         self.goal = (0, 0, 0)
         self.timeout = 1
-
 
     def reset(self):
         self.front_flag.clear()
@@ -99,40 +95,44 @@ class Mover:
     def get_enemy_status(self, x, y):
         robot_0 = self.becons_receiver.get_position(0)
         robot_1 = self.becons_receiver.get_position(1)
-        if hypot(robot_0[0]-x,robot_0[1]-y)<ENEMY_THRESHOLD or robot_0 == (-1000,-1000):
+        if hypot(robot_0[0] - x, robot_0[1] - y) < ENEMY_THRESHOLD or robot_0 == (-1000, -1000):
             return True
-        if hypot(robot_1[0]-x,robot_1[1]-y)<ENEMY_THRESHOLD or robot_1 == (-1000,-1000):
+        if hypot(robot_1[0] - x, robot_1[1] - y) < ENEMY_THRESHOLD or robot_1 == (-1000, -1000):
             return True
         return False
 
-    def get_wall_status(self, x, y):
-        return (x < WALL_RANGE or (2000 - x) < WALL_RANGE or y < WALL_RANGE or (3000 - y) < WALL_RANGE)
+    @staticmethod
+    def get_wall_status(x, y):
+        return x < WALL_RANGE or (2000 - x) < WALL_RANGE or y < WALL_RANGE or (3000 - y) < WALL_RANGE
 
     def gowall(self, try_limit=3, strategy=FAST, direction="forward"):
         #  /\ Determination de la proximité avec un enemies et initialisation des variables /\
-        #closed_to_enemy = self.get_enemy_status()
+        # closed_to_enemy = self.get_enemy_status()
         self.goal = self.wheeledbase.get_position()
-        if strategy == Mover.FAST: self._gowall_fast(try_limit,direction)
+        if strategy == Mover.FAST:
+            self._gowall_fast(try_limit, direction)
         self.reset()
 
     # Button activation
     def _gowall_fast(self, try_limit, direction):
         wall_reached = False
         nb_try = try_limit
-        direction = {"forward" : 1, "backward": -1}[direction]
+        direction = {"forward": 1, "backward": -1}[direction]
         while not wall_reached:
             try:
-                self.wheeledbase.set_velocities(250*direction, 0)
+                self.wheeledbase.set_velocities(250 * direction, 0)
                 while not self.wheeledbase.isarrived():
                     time.sleep(0.1)
             except RuntimeError:
-                if not nb_try > 0: break
+                if not nb_try > 0:
+                    break
                 nb_try -= 1
-                if (direction==1 and  mean(self.sensors_front.get_mesure()) < 45) or (direction==-1 and mean(self.sensors_back.get_mesure()) < 55):
+                if (direction == 1 and mean(self.sensors_front.get_mesure()) < 45) or (
+                        direction == -1 and mean(self.sensors_back.get_mesure()) < 55):
                     wall_reached = True
 
                 else:
-                    #TODO maybe increase the threshold 40
+                    # TODO maybe increase the threshold 40
                     print(mean(self.sensors_back.get_mesure()))
                     print(mean(self.sensors_front.get_mesure()))
                     _, ang = self.wheeledbase.get_velocities_wanted(True)
@@ -153,17 +153,17 @@ class Mover:
                             except RuntimeError:
                                 self.wheeledbase.left_wheel_maxPWM.set(1)
                                 self.wheeledbase.right_wheel_maxPWM.set(1)
-                                self.wheeledbase.set_velocities(-100*direction, 0)
+                                self.wheeledbase.set_velocities(-100 * direction, 0)
                                 sleep(0.2)
                                 self.wheeledbase.stop()
                         # Go backward
                         if ang < 0:
-                            self.wheeledbase.goto_delta(-50*direction, 0)
+                            self.wheeledbase.goto_delta(-50 * direction, 0)
                         else:
-                            self.wheeledbase.goto_delta(-40*direction, 0)
+                            self.wheeledbase.goto_delta(-40 * direction, 0)
                         try:
                             self.wheeledbase.wait()
-                        except:
+                        except RuntimeError:
                             pass
 
                         # TURN HARD
@@ -175,10 +175,10 @@ class Mover:
                         except RuntimeError:
                             pass
                     else:
-                        self.wheeledbase.goto_delta(-10*direction, 0)
+                        self.wheeledbase.goto_delta(-10 * direction, 0)
                         try:
                             self.wheeledbase.wait()
-                        except:
+                        except RuntimeError:
                             pass
                         self.wheeledbase.set_velocities(0, -6)
                         sleep(0.8)
@@ -191,19 +191,20 @@ class Mover:
                             except RuntimeError:
                                 pass
 
-
-    def withdraw(self,x, y,direction="forward", timeout=5, strategy=SIMPLE, last_point_aim=None):
-        self.goal = (x,y)
+    def withdraw(self, x, y, direction="forward", timeout=5, strategy=SIMPLE, last_point_aim=None):
+        self.goal = (x, y)
         self.timeout = timeout
-        if strategy == Mover.SIMPLE: self._withdraw_simple(direction)
-        if strategy == Mover.HARD: self._withdraw_hard(direction, last_point_aim)
+        if strategy == Mover.SIMPLE:
+            self._withdraw_simple(direction)
+        if strategy == Mover.HARD:
+            self._withdraw_hard(direction, last_point_aim)
         self.reset()
 
     def _withdraw_simple(self, direction):
         self.wheeledbase.max_linvel.set(100)
 
         self.direction = direction
-        if direction =="forward":
+        if direction == "forward":
             self.withdraw_flag.bind(self.sensors_front_listener.signal)
             self.sensors_front_listener.threadhold = 80
         else:
@@ -212,28 +213,27 @@ class Mover:
         while not self.isarrived or self.interupted_status.is_set():
 
             try:
-                if  self.interupted_status.is_set() :
+                if self.interupted_status.is_set():
                     sleep(0.2)
                 else:
                     self.wheeledbase.goto(*self.goal, direction=direction)
                     self.isarrived = True
 
             except RuntimeError:
-                if self.interupted_timeout.is_set() :
+                if self.interupted_timeout.is_set():
                     sleep(0.7)
-                    self.wheeledbase.set_velocities(100 if direction=="forward" else -100, 0)
+                    self.wheeledbase.set_velocities(100 if direction == "forward" else -100, 0)
                     sleep(0.3)
                     self.wheeledbase.stop()
                 else:
                     pass
         self.reset()
 
-
     def _withdraw_hard(self, direction, last_point_aim):
         self.wheeledbase.max_linvel.set(100)
         self.logger("MOVER : ", "Start withdraw hard")
         self.direction = direction
-        if direction =="forward":
+        if direction == "forward":
             self.withdraw_flag.bind(self.sensors_front_listener.signal)
             self.sensors_front_listener.threadhold = 80
         else:
@@ -242,65 +242,59 @@ class Mover:
         while not self.isarrived or self.interupted_status.is_set():
 
             try:
-                if  self.interupted_status.is_set() :
+                if self.interupted_status.is_set():
                     sleep(0.2)
                 else:
                     self.logger("MOVER : ", "Launch a goto")
                     self.wheeledbase.goto(*self.goal, direction=direction)
-                    try:
-                        self.isarrived = True
-                    except:
-                        pass
+                    self.isarrived = True
 
             except RuntimeError:
                 self.logger("MOVER : ", "Spin detected !")
-                if self.interupted_status.is_set() :
+                if self.interupted_status.is_set():
                     continue
-                self.logger("MOVER : ", "Go back a little !")
+                self.logger("MOVER : ", 'Go back a little !')
                 self.wheeledbase.stop()
                 if last_point_aim is None:
-                    self.wheeledbase.set_velocities( -100 if self.direction =="forward" else 100, 0)
+                    self.wheeledbase.set_velocities(-100 if self.direction == "forward" else 100, 0)
                 else:
                     try:
                         self.wheeledbase.goto(*last_point_aim)
-                    except:
+                    except RuntimeError:
                         pass
                 time.sleep(0.5)
                 self.wheeledbase.stop()
 
-
-
-
     def _withdraw_interrup(self):
         self.logger("MOVER : ", "Interruption !")
-        if self.interupted_timeout.is_set() : return
-        if not self.interupted_lock.acquire(blocking=False): return
+        if self.interupted_timeout.is_set():
+            return
+        if not self.interupted_lock.acquire(blocking=False):
+            return
         self.interupted_status.set()
         self.logger("MOVER : ", "Stop the wheeledbase")
         self.wheeledbase.stop()
         sensors = self.sensors_front if self.direction == "forward" else self.sensors_back
         try:
             self.logger("MOVER : ", "Wait sensors")
-            sensors.wait(80, timeout= self.timeout)
+            sensors.wait(80, timeout=self.timeout)
         except TimeoutError:
-            self.logger("MOVER : ", "Time out ", self.timeout )
+            self.logger("MOVER : ", "Time out ", self.timeout)
             self.interupted_timeout.set()
             self.withdraw_flag.clear()
             self.wheeledbase.max_linvel.set(100)
         self.interupted_status.clear()
         self.interupted_lock.release()
 
-
-
-
-
     def turnonthespot(self, angle, try_limit=3, stategy=AIM):
         self.running.set()
         self.isarrived = False
         self.goal = (*self.wheeledbase.get_position()[:-1], angle)
         try:
-            if stategy == Mover.AIM: self._turnonthespot_aim(try_limit)
-            if stategy == Mover.SOFT: self._turnonthespot_soft(try_limit)
+            if stategy == Mover.AIM:
+                self._turnonthespot_aim(try_limit)
+            if stategy == Mover.SOFT:
+                self._turnonthespot_soft(try_limit)
         except PositionUnreachable:
             self.reset()
             raise PositionUnreachable()
@@ -313,8 +307,7 @@ class Mover:
         closed_to_wall = self.get_wall_status(*self.goal[:-1])  # Boolean qui représente la proximité à un cube
         closed_to_enemy = True  # self.get_enemy_status() # Boolean qui représente la proximité à un enemie
         position_reach = False
-        x, y = self.goal[:-1]
-        while not position_reach and ((try_limit + 1) >= try_number or try_limit<0):
+        while not position_reach and ((try_limit + 1) >= try_number or try_limit < 0):
             try:
                 self.wheeledbase.turnonthespot(self.goal[2], direction=way)
                 self.wheeledbase.wait()
@@ -322,21 +315,23 @@ class Mover:
             except RuntimeError:
                 _, ang_vel = self.wheeledbase.get_velocities_wanted(True)
                 # /\ récupéré les données des balises de devant /\
-                if ang_vel >= 0: std_f, _ = self.sensors_front.get_normal(0)[1]
-                if ang_vel < 0: std_f, _ = self.sensors_front.get_normal(0)[0]
+                if ang_vel >= 0:
+                    std_f, _ = self.sensors_front.get_normal(0)[1]
+                if ang_vel < 0:
+                    std_f, _ = self.sensors_front.get_normal(0)[0]
                 # /\ récupéré les données des balises de derriere /\
-                if ang_vel >= 0: std_b, _ = self.sensors_back.get_normal(0)[0]
-                if ang_vel < 0: std_b, _ = self.sensors_back.get_normal(0)[1]
+                if ang_vel >= 0:
+                    std_b, _ = self.sensors_back.get_normal(0)[0]
+                if ang_vel < 0:
+                    std_b, _ = self.sensors_back.get_normal(0)[1]
                 # /\ récupéré les données des balises des côtés /\
                 std_l, _ = self.sensors_lat.get_normal(0)[1]
                 std_r, _ = self.sensors_back.get_normal(0)[0]
-                print(std_b)
                 # <> Premiere essaie <>
-                if (try_number == 0):
-                    if (closed_to_enemy and (std_f < SENSORS_RANGE or std_b < SENSORS_RANGE)):
-
+                if try_number == 0:
+                    if closed_to_enemy and (std_f < SENSORS_RANGE or std_b < SENSORS_RANGE):
                         self.wheeledbase.max_angvel.set(1.5)
-                        if (std_f < SENSORS_RANGE):
+                        if std_f < SENSORS_RANGE:
                             try:
                                 self.sensors_front.wait(SENSORS_RANGE, 22)
                             except TimeoutError:
@@ -352,16 +347,16 @@ class Mover:
                     self.wheeledbase.max_angvel.set(2)
                     try_number += 1
                     continue
-                if (try_number == 1):
+                if try_number == 1:
                     # On ne regarde pas les enemies on change juste de sens
                     way = {'forward': 'backward', 'backward': 'forward'}[way]
                     try_number += 1
                     continue
-                if (try_number == 2):
+                if try_number == 2:
                     # On regarde les enemies et si c'est bien ce probleme on attend un peu sinon on change de sens
-                    if (closed_to_enemy and (std_f < SENSORS_RANGE or std_b < SENSORS_RANGE)):
+                    if closed_to_enemy and (std_f < SENSORS_RANGE or std_b < SENSORS_RANGE):
                         self.wheeledbase.max_angvel.set(1.5)
-                        if (std_f < SENSORS_RANGE):
+                        if std_f < SENSORS_RANGE:
                             self.sensors_front.wait(SENSORS_RANGE, 2)
                         else:
                             self.sensors_back.wait(SENSORS_RANGE, 2)
@@ -371,25 +366,24 @@ class Mover:
                     way = {'forward': 'backward', 'backward': 'forward'}[way]
                     try_number += 1
                     continue
-                if (try_number == 3):
+                if try_number == 3:
                     try_number = 0
                     try_limit -= 3
                     continue
 
-        if (not position_reach):
+        if not position_reach:
             raise PositionUnreachable()
 
     def _turnonthespot_aim(self, try_limit):
 
-        try_number =0
+        try_number = 0
         way = 'forward'
         closed_to_wall = self.get_wall_status(*self.goal[:-1])  # Boolean qui représente la proximité à un cube
         closed_to_enemy = self.get_enemy_status(*self.goal[:-1])  # Boolean qui représente la proximité à un enemie
-        x, y = self.goal[:-1]
         self.wheeledbase.left_wheel_maxPWM.set(0.4)
         self.wheeledbase.right_wheel_maxPWM.set(0.4)
         constant_pwm = 0.4
-        while not self.isarrived  and ((try_limit-try_number) > 0 or try_limit<0):
+        while not self.isarrived and ((try_limit - try_number) > 0 or try_limit < 0):
             try:
                 self.wheeledbase.turnonthespot(self.goal[2], direction=way)
                 self.wheeledbase.wait()
@@ -397,19 +391,18 @@ class Mover:
             except RuntimeError:
                 self.wheeledbase.stop()
                 lin_vel, ang_vel = self.wheeledbase.get_velocities_wanted(True)
-                if (abs(lin_vel)>300):
-                    self.wheeledbase.set_velocities(copysign(BACKWARD_VELOCITY,-lin_vel),0)
+                if abs(lin_vel) > 300:
+                    self.wheeledbase.set_velocities(copysign(BACKWARD_VELOCITY, -lin_vel), 0)
                     time.sleep(0.35)
                     self.wheeledbase.stop()
                 else:
-                    constant_pwm = min(constant_pwm+0.2,1)
+                    constant_pwm = min(constant_pwm + 0.2, 1)
                     way = {'forward': 'backward', 'backward': 'forward'}[way]
                     self.wheeledbase.left_wheel_maxPWM.set(constant_pwm)
                     self.wheeledbase.right_wheel_maxPWM.set(constant_pwm)
                 try_number += 1
 
-
-        if (not self.isarrived):
+        if not self.isarrived:
             raise PositionUnreachable()
 
     def goto(self, x, y):
@@ -467,10 +460,10 @@ class Mover:
             return
         self.interupted_status.set()
         x, y, theta = self.wheeledbase.get_position()
-        if (hypot(y - self.goal[1], x - self.goal[0]) < 300) :
+        if hypot(y - self.goal[1], x - self.goal[0]) < 300:
             self.interupted_status.clear()
             self.interupted_lock.release()
-            #TODO QUOI FAIRE ?
+            # TODO QUOI FAIRE ?
             return
 
         if not self.get_enemy_status(x, y):
@@ -479,7 +472,7 @@ class Mover:
             return
 
         lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted()
-        if (abs(ang_wanted) > 7):
+        if abs(ang_wanted) > 7:
             self.wheeledbase.set_velocities(copysign(150, -lin_wanted), copysign(1, ang_wanted))
             time.sleep(1)  # 0.5
             self.wheeledbase.set_velocities(copysign(150, lin_wanted), 0)
@@ -496,13 +489,13 @@ class Mover:
         if right > 800:
             side = RoadMap.RIGHT
         self.logger("MOVER : ", "I'm decided to turn {} at {},{}".format("left" if side == 1 else "right", x, y))
-        while (True):
+        while True:
             try:
                 self.wheeledbase.turnonthespot(theta - pi / 2)
 
                 self.wheeledbase.wait()
                 break
-            except:
+            except RuntimeError:
                 self.wheeledbase.stop()
                 # PROBLEME
                 self.wheeledbase.set_velocities(-200, 0)
@@ -510,7 +503,6 @@ class Mover:
                 self.wheeledbase.stop()
                 continue
 
-        blocking = True
         time.sleep(1)
         # Wait varience  pour attendre des variables stable
         init_time = time.time()
@@ -526,7 +518,7 @@ class Mover:
                 else:
                     self.wheeledbase.set_velocities(-100 * side, 0)
                 time.sleep(0.2)
-            except:
+            except RuntimeError:
                 side *= -1
                 self.wheeledbase.set_velocities(-100 * side, 0)
         time.sleep(0.1)
@@ -535,7 +527,7 @@ class Mover:
         self.wheeledbase.turnonthespot(theta)
         try:
             self.wheeledbase.wait()
-        except:
+        except RuntimeError:
             pass
             # Creation de l'obstacle
         x_obs = (x + x_p) / 2
@@ -547,10 +539,9 @@ class Mover:
             ((-100, height / 2), (-100, -height / 2), (100, -height / 2), (100, height / 2)), timeout=TIMEOUT_OBSTACLE)
         obs.set_position(x_obs, y_obs, theta)
         self.path = self.roadmap.get_shortest_path((x_p, y_p), self.goal)
-        #try:
+        # try:
         self.wheeledbase.purepursuit(self.path)
-        #except ValueError:
+        # except ValueError:
         #    pass  # TODO
         self.interupted_status.clear()
         self.interupted_lock.release()
-
