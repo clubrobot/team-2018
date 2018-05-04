@@ -1,4 +1,4 @@
-import cv2
+import opencv3 as cv
 import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
@@ -39,4 +39,4 @@ class Pattern:
 		self.rawCapture.truncate(0)
 
 	def save_pattern(self):
-		cv2.imwrite('pattern.jpg', self.image)
+		cv.imwrite('pattern.jpg', self.image)
