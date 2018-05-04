@@ -106,18 +106,16 @@ void setup(){
 	indoor.write(INDOOR_DOOR_CLOSED);
 	trashUnloader.write(TRASH_UNLOADER_CLOSED);
 	shaker.writeHorizontal(SHAKER_HORIZONTAL_1);
-    shaker.writeVertical(SHAKER_VERTICAL_1);
+  shaker.writeVertical(SHAKER_VERTICAL_1);
 
 	waterSensor.begin();
 }
 
 void incrementBallCount(){
-  if((micros() - timeDebouncer > 1000) && lastState == HIGH){
+  if(micros() - timeDebouncer > 500000){
       ballCount++;
-      lastState = LOW;
+      timeDebouncer = micros();
   }
-  lastState = digitalRead(3);
-  timeDebouncer = micros();
 }
 
 
@@ -126,7 +124,7 @@ void resetVelocity(){
 }
 
 void loop(){
-    talks.execute();
+  talks.execute();
 	motor.updateStartup();
 	shaker.updateShaker();
 }
