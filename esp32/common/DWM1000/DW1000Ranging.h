@@ -41,11 +41,17 @@
 #define RANGING_INIT 			5
 #define TRILATERATION_REPORT 	6
 #define CHANGE_COLOR 			7
+#define TAG_SYNC				8
+#define TAG_SYNC_ACK			9
+#define TAG_SYNC_END			10
 
 #define LEN_DATA 120
 
 //Max devices we put in the networkDevices array ! Each DW1000Device is 74 Bytes in SRAM memory for now.
 #define MAX_DEVICES 4
+
+// Max tag devices to put in the tagDevices array.
+#define MAX_TAG_DEVICES 3
 
 //Default Pin for module:
 #define DEFAULT_RST_PIN 9
@@ -81,11 +87,14 @@ public:
 	static void    configureNetwork(uint16_t deviceAddress, uint16_t networkId, const byte mode[]);
 	static void    generalStart();
 	static void    startAsAnchor(char address[], const byte mode[], const byte anchorAddress);
-	static void    startAsTag(char address[], const byte mode[], const bool randomShortAddress = true);
+	static void    startAsTag(char address[], const byte mode[], const byte tagAddress, const bool isMasterTag);
 	static boolean addNetworkDevices(DW1000Device* device, boolean shortAddress);
 	static boolean addNetworkDevices(DW1000Device* device);
 	static void    removeNetworkDevices(int16_t index);
-	
+	static boolean addTagDevices(DW1000Device *device, boolean shortAddress);
+	static boolean addTagDevices(DW1000Device *device);
+	static void removeTagDevices(int16_t index);
+
 	//setters
 	static void setReplyTime(uint16_t replyDelayTimeUs);
 	static void setResetPeriod(uint32_t resetPeriod);
@@ -94,7 +103,9 @@ public:
 	static byte* getCurrentAddress() { return _currentAddress; };
 	static byte* getCurrentShortAddress() { return _currentShortAddress; };
 	static uint8_t getNetworkDevicesNumber() { return _networkDevicesNumber; };
-	
+	static uint8_t getTagDevicesNumber() { return _tagDevicesNumber; };
+	static uint16_t getFrameRate() { return _rangingFrameRate; };
+
 	//ranging functions
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
@@ -106,7 +117,8 @@ public:
 	static void attachNewRange(void (* handleNewRange)(void)) { _handleNewRange = handleNewRange; };
 	static void attachBlinkDevice(void (* handleBlinkDevice)(DW1000Device*)) { _handleBlinkDevice = handleBlinkDevice; };
 	static void attachNewDevice(void (* handleNewDevice)(DW1000Device*)) { _handleNewDevice = handleNewDevice; };
-	static void attachInactiveDevice(void (* handleInactiveDevice)(DW1000Device*)) { _handleInactiveDevice = handleInactiveDevice; };
+	static void attachInactiveAncDevice(void (*handleInactiveAncDevice)(DW1000Device *)) { _handleInactiveAncDevice = handleInactiveAncDevice; };
+	static void attachInactiveTagDevice(void (*handleInactiveTagDevice)(DW1000Device *)) { _handleInactiveTagDevice = handleInactiveTagDevice; };
 	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
 
 	// Auto calibration
@@ -114,10 +126,12 @@ public:
 	static void stopCalibration();
 
 	// Trilateration
-	static float getPosX();
-	static float getPosY();
-	static void setPosX(float &x);
-	static void setPosY(float &y);
+	static float getPosX(uint16_t shortAddress);			// get x coordinate of the tag whose short address is "shortAddress"
+	static float getPosX();									// get x coordinate of the first tag connected
+	static float getPosY(uint16_t shortAddress);			// get y coordinate of the tag whose short address is "shortAddress"
+	static float getPosY();									// get y coordinate of the first tag connected
+	static void setPosX(float &x, uint8_t index);   
+	static void setPosY(float &y, uint8_t index);   
 	static void transmitTrilaterationReport();
 
 	// Others
@@ -142,12 +156,24 @@ private:
 	static DW1000Mac    _globalMac;
 	static int32_t      timer;
 	static int16_t      counterForBlink;
-	
+	static int16_t		counterForinactivity;
+	static int16_t		counterForSync;
+
+	// for TAG only : other tags in the network
+	static DW1000Device _tagDevices[MAX_TAG_DEVICES];		
+	static byte _masterTagShortAddress[2];
+	static volatile uint8_t _tagDevicesNumber;	// number of tag devices in the tagDevices array (excluding this)
+	static boolean _isMasterTag;	// is true if this tag is the master tag
+	static boolean _isEnabled;		// is true if this tag is computing ranging
+	static int _enabledTagNumber;	// the number of the tag computing ranging
+	static boolean _waitingSyncAck;	// is true if the master tag sent a sync signal and is waiting for response
+
 	//Handlers:
 	static void (* _handleNewRange)(void);
 	static void (* _handleBlinkDevice)(DW1000Device*);
 	static void (* _handleNewDevice)(DW1000Device*);
-	static void (* _handleInactiveDevice)(DW1000Device*);
+	static void (* _handleInactiveAncDevice)(DW1000Device *);
+	static void (* _handleInactiveTagDevice)(DW1000Device *);
 	static void (* _handleCalibration)(int,int);	// real distance (INT), mesure (INT)
 	
 	//sketch type (tag or anchor)
@@ -171,8 +197,10 @@ private:
 	//timer Tick delay
 	static uint16_t     _timerDelay;
 	// ranging counter (per second)
-	static uint16_t     _successRangingCount;
-	static uint32_t    _rangingCountPeriod;
+	static uint16_t 	_rangingFrameRate;		// the last frameRate
+	static uint16_t     _successRangingCount;	// the current ranging success counter
+	static uint32_t    	_rangingCountPeriod;	// the update period (in ms)
+	static uint32_t		_frameRateStartTime;	// the start time of the framerate calculation process (in ms)
 	//ranging filter
 	static volatile boolean _useRangeFilter;
 	static uint16_t         _rangeFilterValue;
@@ -188,8 +216,8 @@ private:
 	static unsigned long _startCalibrationTime;	//ms
 	static unsigned long _calibrationTimeOut;	//ms
 	// for trilateration
-	static float _pos_x;
-	static float _pos_y;
+	static float _pos_x[MAX_TAG_DEVICES];
+	static float _pos_y[MAX_TAG_DEVICES];
 	// others
 	static uint8_t _color;	// 0 = green, 1 = orange
 
@@ -214,7 +242,9 @@ private:
 	static void transmitRangeReport(DW1000Device* myDistantDevice);
 	static void transmitRangeFailed(DW1000Device* myDistantDevice);
 	static void receiver();
-	
+	static void transmitTagSyncEnd();
+	static void transmitTagSync(DW1000Device *myDistantDevice);
+
 	//for ranging protocole (TAG)
 	static void transmitPoll(DW1000Device* myDistantDevice);
 	static void transmitRange(DW1000Device* myDistantDevice);
@@ -223,6 +253,10 @@ private:
 	static void computeRangeAsymmetric(DW1000Device* myDistantDevice, DW1000Time* myTOF);
 	
 	static void timerTick();
+
+	// frameRate counter
+	static void rangingSuccess();
+	static void updateRangingCounter();
 	
 	//Utils
 	static float filterValue(float value, float previousValue, uint16_t numberOfElements);

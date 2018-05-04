@@ -8,7 +8,7 @@
 #define CALIBRATION_ROUTINE_OPCODE  0x12
 #define UPDATE_COLOR_OPCODE         0x13
 #define GET_COORDINATE_OPCODE       0x14
-#define GET_PANEL_STATUS_OPCODE     0x15
+#define GET_PANEL_STATUS_OPCODE     0x17
 
 // Instructions prototypes
 
