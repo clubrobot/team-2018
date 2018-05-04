@@ -355,7 +355,7 @@ class SerialListener(Thread):
                     state = 'waiting'
 
             except NotConnectedError:
-                self.disconnect()
+                self.parent.disconnect()
                 break
 
             # Reset the finite state machine
