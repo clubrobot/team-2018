@@ -2,7 +2,7 @@
 
 REPOSITORY=$(dirname $(readlink -f "$BASH_SOURCE"))
 PROFILE="$HOME/.profile"
-BASHRC ="$HOME/.bashrc"
+BASHRC="$HOME/.bashrc"
 # Download and install Aduino IDE if it is not already installed
 
 if [ -z "$ARDUINO_DIR" ]; then # ifndef ARDUINO_DIR
