@@ -171,6 +171,7 @@ class Heuristics:
             current_values = heuristic()
             for action in self.action_names:
                 heuristics_values[action] *= current_values[action]
+            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=heuristics_values)
 
         self.logger("HEURISTIC : ", "TOTAL", heuristic=heuristics_values)
         return heuristics_values
