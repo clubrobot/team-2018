@@ -339,16 +339,22 @@ class Treatment(Actionnable):
         self.display.angry(1)
         self.logger("TREATMENT :", "Launch a go wall ")
         try:
-            self.mover.gowall(1,direction="backward")
+            self.mover.gowall(3,direction="backward", strategy=Mover.POSITION, position=self.shootTreatmentPoint)
         except PositionUnreachable:
             self.logger("TREATMENT :", "Position Unreachable ")
             pass
         turn = False
         self.logger("TREATMENT :", "Turning !")
         try:
-            self.mover.turnonthespot(math.pi/2, 3, stategy=Mover.AIM)
-        except PositionUnreachable:
-            return
+            self.wheeledbase.goto_delta(90, 0)
+            self.wheeledbase.wait()
+            self.mover.turnonthespot(math.pi / 2, 3, stategy=Mover.AIM)
+
+        except RuntimeError:
+            try:
+                self.mover.turnonthespot(math.pi / 2, 3, stategy=Mover.AIM)
+            except PositionUnreachable:
+                return
 
         self.display.happy(2)
         self.logger("TREATMENT :", "Droping !")

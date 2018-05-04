@@ -148,11 +148,11 @@ class Bornibus:
         #longShot2.set_manual_order(4)
         #longShot0.set_manual_order(4)
         #longShot1.set_manual_order(4)
-        #treatmentAct.set_manual_order(5)
+        treatmentAct.set_manual_order(5)
         #panelAct.set_manual_order(6)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
-                                     mode=Heuristics.AUTO)
+                                     mode=Heuristics.MANUAL)
 
     def set_side(self,side):
         self.side = side
@@ -160,14 +160,13 @@ class Bornibus:
     def run(self):
         self.displayManager.start()
         self.logger.reset_time()
-        self.arduinos["wheeledbase"].lookahead.set(200)
-        self.arduinos["wheeledbase"].max_linvel.set(500)
-        self.arduinos["wheeledbase"].max_angvel.set(6)
-
+        self.mover.reset()
         self.arduinos["watersorter"].set_shaker_velocity(400)
         self.arduinos["beeActioner"].close()
         self.arduinos["watersorter"].close_trash_unloader()
         self.arduinos["watersorter"].close_trash()
+
+        self.data["nb_balls_in_unloader"] = 0
 
         act = self.heuristics.get_best()
         print(act)
