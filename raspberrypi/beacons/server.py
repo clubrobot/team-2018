@@ -21,7 +21,6 @@ class Server(Thread, TCPTalksServer):
 		TCPTalksServer.__init__(self,PORT_BALISE)
 		Thread.__init__(self)
 		self.bind(GET_POSITION_OPCODE, self.getPosition)
-        	#self.panel = Panel()
 		self.beacon = Anchor()
 		self.beacon.connect()
 
