@@ -13,6 +13,13 @@ const float Z_TAG = 503.3;
 const float Z_HEIGHT[MAX_ANCHORS] = {Z_ANCHOR, Z_ANCHOR, Z_ANCHOR, Z_CENTRAL};
 
 /**
+ * BLE Server
+ */
+#define BEACON_BLE_ADDRESS (ANCHOR_SHORT_ADDRESS[3])
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+/**
  * EEPROM addresses
  */
 

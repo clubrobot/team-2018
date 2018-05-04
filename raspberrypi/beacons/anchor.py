@@ -13,6 +13,7 @@ UPDATE_ANTENNA_DELAY_OPCODE = 0x11
 CALIBRATION_ROUTINE_OPCODE = 0x12
 UPDATE_COLOR_OPCODE = 0x13
 GET_POSITION_OPCODE = 0x14
+GET_PANEL_STATUS_OPCODE = 0x15
 
 
 class Anchor(SerialTalks):
@@ -41,5 +42,10 @@ class Anchor(SerialTalks):
 		output = self.execute(GET_POSITION_OPCODE)
 		x, y = output.read(INT, INT)
 		return x, y		
+
+	def is_panel_on(self):
+		output = self.execute(GET_PANEL_STATUS_OPCODE)
+		ret = output.read(BYTE)
+		return ret
 	
 
