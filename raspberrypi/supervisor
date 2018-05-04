@@ -10,7 +10,7 @@ from beacons.server import Server
 def server(args):
 
     srv = Server()
-    srv.start()
+    srv.run()
 
 
 
