@@ -59,8 +59,6 @@ try:
                 return
 
             opcode =str(opcode) + self.uuid
-            retcode = input.read(LONG)
-
             try:
                 output = self.parent.execute(MAKE_MANAGER_REPLY_OPCODE, opcode, input, timeout=0.5)
             except ConnectionError:
@@ -421,6 +419,13 @@ class SecureSerialTalksProxy(Proxy):
         object.__setattr__(self, "connect", MethodType(connect, self))
         object.__setattr__(self, "execute", MethodType(execute, self))
         object.__setattr__(self, "send", MethodType(send, self))
+    def bind(self, opcode, function):
+        if not str(opcode) + self._compid in self._manager.instructions:
+            self._manager.serial_instructions[str(opcode) + self._compid] = function
+        else:
+            raise KeyError("Opcode already use")
+
+
 
 class SwitchProxy(Proxy):
 
