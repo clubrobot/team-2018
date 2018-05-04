@@ -43,10 +43,13 @@ void SerialTalks::SETEEPROM(SerialTalks& inst, Deserializer& input, Serializer& 
 }
 
 // Built-in Processing 
-void SerialTalks::LAUNCHWARNING(String message)
+void SerialTalks::LAUNCHWARNING(unsigned char * message)
 {
 	Serializer output = getSerializer();
-	output.write(message);
+	for(int i = 0;i<3;i++)
+	{
+		output.write(*(message+i));	
+	}
 	send(SERIALTALKS_WARNING_OPCODE, output);
 }
 
@@ -263,7 +266,11 @@ bool SerialTalks::execute()
 				}
 				else
 				{
-					LAUNCHWARNING("message corrupted !!");
+					unsigned char message_warning[3];
+					message_warning[0] = (unsigned char) (received_crc_value);
+					message_warning[1] = (unsigned char) (received_crc_value>>8);
+					message_warning[2] = (unsigned char) 0;
+					LAUNCHWARNING(message_warning);
 					m_state = SERIALTALKS_WAITING_STATE;
 				}	
 			}
