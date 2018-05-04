@@ -143,12 +143,12 @@ class Bornibus:
 
 
         #dispMono.set_manual_order(1)
-    #shortShot.set_manual_order(2)
+        shortShot.set_manual_order(2)
         #dispMulti.set_manual_order(3)
         #longShot2.set_manual_order(4)
         #longShot0.set_manual_order(4)
         #longShot1.set_manual_order(4)
-        treatmentAct.set_manual_order(5)
+        #treatmentAct.set_manual_order(5)
         #panelAct.set_manual_order(6)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,

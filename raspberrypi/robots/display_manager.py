@@ -13,8 +13,8 @@ class DisplayPoints:
         self.points = 10
         self.locker = RLock()
         self.eyes_locker = RLock()
-        self.left_eye.set_message("^^^^^%^",1)
-        self.right_eye.set_message('_____&_',1)
+        self.left_eye.set_message("^^^^^%^",1,speed=100)
+        self.right_eye.set_message('_____&_',1,speed=100)
 
     def start(self):
         self.start_time = time.time()

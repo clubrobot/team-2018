@@ -250,6 +250,7 @@ class Mover:
                             pass
 
                         # TURN HARD
+                        print("ANG", ang)
                         self.wheeledbase.set_velocities(0, copysign(6, -ang))
                         sleep(0.8)
                         try:

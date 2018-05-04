@@ -107,7 +107,6 @@ class Shot(Actionnable):
         nb_balls = 0
         begin_time = time.time()
         motor_base = 80
-        watersorter.open_outdoor()
         timeout_per_ball = 1
         currentPosXY=wheeledbase.get_position()[:2]
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
@@ -117,6 +116,7 @@ class Shot(Actionnable):
         except PositionUnreachable:
             return
         old = wheeledbase.angpos_threshold.get()
+        watersorter.open_outdoor()
         wheeledbase.angpos_threshold.set(0.1)
         watersorter.enable_shaker_equal()
         watersorter.close_trash()
@@ -140,14 +140,13 @@ class Shot(Actionnable):
             watersorter.close_indoor()
 
             close_time = time.time()
-            while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100) and not (time.time() - begin_time > global_timeout):
+            while waterlauncher.get_nb_launched_water() != 1 and not (time.time() - begin_time > global_timeout):
                 time.sleep(0.1)
                 waterlauncher.set_motor_pulsewidth(1000+motor_base)
                 if time.time() - close_time > timeout_per_ball:
                     watersorter.close_trash()
                     close_time = time.time()
-            
-            time.sleep(0.8)
+
             if time.time() - begin_time < global_timeout:
                 nb_balls += 1
                 display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
@@ -227,7 +226,9 @@ class Shot(Actionnable):
                     while (watersorter.get_water_color()[0]>80 or watersorter.get_water_color()[1]>80) and not (time.time() - begin_time > global_timeout):
                         time.sleep(0.1)
                         self.logger("SHOT : ", "En attente de la sortie")
-                    time.sleep(0.6)
+                    while waterlauncher.get_nb_launched_water() != 1 and not (
+                            time.time() - begin_time > global_timeout):
+                        time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1200)
                     time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1000 + motor_base)
@@ -346,7 +347,7 @@ class Treatment(Actionnable):
         turn = False
         self.logger("TREATMENT :", "Turning !")
         try:
-            self.wheeledbase.goto_delta(90, 0)
+            self.wheeledbase.goto_delta(70, 0)
             self.wheeledbase.wait()
             self.mover.turnonthespot(math.pi / 2, 3, stategy=Mover.AIM)
 
