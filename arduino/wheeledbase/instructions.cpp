@@ -516,8 +516,6 @@ void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& outpu
 	leftWheel.setMaxPWM(1);
 	rightWheel.setMaxPWM(1);
 
-	linVelPID.setMaxOutput(897.501220703125);
-	linVelPID.setMinOutput(-897.501220703125);
-	angVelPID.setMaxOutput(14.36001968383789);
-	angVelPID.setMinOutput(-14.36001968383789);
+	linVelPID.setOutputLimits(-897.501220703125, 897.501220703125);
+	angVelPID.setOutputLimits(-14.36001968383789,14.36001968383789);
 }
