@@ -75,7 +75,6 @@ class SerialTalks:
     def __init__(self, port):
         # Serial things
         self.port = port
-        self.logged = True if not re.compile('.*wheeledbase.*').search(port) is None else False
         self.is_connected = False
 
         # Threading things
@@ -87,10 +86,6 @@ class SerialTalks:
         # Instructions
         self.instructions = dict()
         self.instructions[WARNING_OPCODE] = self.launch_warning_
-        if self.logged:
-            self.rec_file_rcv = open("/tmp/seriallog/log-rcv-{}.txt".format(time.asctime().split(" ")[4]),"w")
-            self.rec_file_send = open("/tmp/seriallog/log-send-{}.txt".format(time.asctime().split(" ")[4]),"w")
-
 
     def __enter__(self):
         self.connect()
@@ -103,9 +98,6 @@ class SerialTalks:
         if self.is_connected:
             raise AlreadyConnectedError('{} is already connected'.format(self.port))
 
-        if self.logged:
-            self.rec_file_rcv.write("Try to connect\n")
-            self.rec_file_send.write("Try to connect\n")
         # Connect to the serial port
         try:
             self.stream = serial.Serial(self.port, baudrate=BAUDRATE, bytesize=serial.EIGHTBITS,
@@ -122,10 +114,7 @@ class SerialTalks:
         startingtime = time.monotonic()
         while not self.is_connected:
             try:
-                if self.logged:
-                    self.rec_file_send.write("Ping\n")
-                    self.rec_file_rcv.write("Ping\n")
-                output = self.execute(PING_OPCODE, timeout=0.5)
+                output = self.execute(PING_OPCODE, timeout=0.1)
             except NotConnectedError:
                 pass
             except TimeoutError:
@@ -140,10 +129,6 @@ class SerialTalks:
             self.reset_queues()
 
     def disconnect(self):
-        if hasattr(self, "rec_file_send"):
-            self.rec_file_send.close()
-            self.rec_file_rcv.close()
-            delattr(self,"rec_file_send")
         try:
             self.send(DISCONNECT_OPCODE)
         except NotConnectedError:
@@ -170,7 +155,6 @@ class SerialTalks:
     def rawsend(self, rawbytes):
         try:
             if hasattr(self, 'stream') and self.stream.is_open:
-                if self.logged: self.rec_file_send.write("contenu : {}\n".format(rawbytes))
                 sentbytes = self.stream.write(rawbytes)
                 return sentbytes
         except SerialException:
@@ -180,9 +164,6 @@ class SerialTalks:
     def send(self, opcode, *args, get_crc=False):
         retcode = random.randint(0, 0xFFFFFFFF)
         content = BYTE(opcode) + ULONG(retcode) + bytes().join(args)
-        if hasattr(self,"rec_file_rcv"):
-            self.rec_file_rcv.write("ENVOIE OPCODE : {} retcode {}\n".format(opcode,ULONG(retcode)))
-            self.rec_file_send.write("ENVOIE OPCODE : {} retcode {}\n".format(opcode, ULONG(retcode)))
         # crc calculation
         crc = CRCprocessBuffer(content)
         prefix = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
@@ -228,11 +209,6 @@ class SerialTalks:
             output = queue.get(block, timeout)
         except Empty:
             if timeout is not None:
-                if hasattr(self, "rec_file_send"):
-                    self.rec_file_rcv.write("TIMEOUT\n")
-                    self.rec_file_send.write("TIMEOUT\n")
-                    #self.rec_file.close()
-                    #delattr(self, "rec_file")
                 raise TimeoutError('timeout exceeded') from None
             else:
                 return None
@@ -258,7 +234,6 @@ class SerialTalks:
     def receive(self, input):
         opcode = input.read(BYTE)
         retcode = input.read(LONG)
-        print("receive instruction {}".format(opcode))
         try:
             output = self.instructions[opcode](input)
             if output is None: return
@@ -339,10 +314,6 @@ class SerialListener(Thread):
             # Wait until new bytes arrive
             try:
                 inc = self.parent.stream.read()
-                try:
-                    self.parent.rec_file_rcv.write("{}, {}\n".format(str(inc),str(type_packet)))
-                except AttributeError:
-                    pass
             except serial.serialutil.SerialException:
                 self.parent.disconnect()
                 break
