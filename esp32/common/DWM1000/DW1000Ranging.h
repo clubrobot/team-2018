@@ -260,6 +260,7 @@ private:
 	
 	//Utils
 	static float filterValue(float value, float previousValue, uint16_t numberOfElements);
+	static void log(String text);
 };
 
 extern DW1000RangingClass DW1000Ranging;
