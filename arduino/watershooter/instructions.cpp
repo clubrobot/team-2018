@@ -15,7 +15,7 @@ extern BallsShaker shaker;
 extern Servo trashUnloader;
 extern Adafruit_TCS34725 waterSensor;
 extern Servo beeActivator;
-extern ballCount;
+extern int ballCount;
 uint16_t red, green, blue, clear;
 
 

@@ -39,6 +39,7 @@ Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 #define BEE_CLOSED 0
 
 void resetVelocity();
+void incrementBallCount();
 
 void setup(){
   Serial.begin(SERIALTALKS_BAUDRATE);
