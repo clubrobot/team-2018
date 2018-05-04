@@ -5,7 +5,7 @@ from picamera import PiCamera
  
 
 class Pattern:
-    def __init__(self):
+	def __init__(self):
 		self.first_color = "unknown"
 		self.middle_color = "unknown"
 		self.last_color = "unknown"
@@ -23,11 +23,14 @@ class Pattern:
 		self.rawCapture.truncate(0)
 	
 	def find_pattern(self, image):
+		a=1
 
 
 	def get_pattern(self):
+		a=1
 
 	def color_guesser(self, r, g, b):
+		a=1
 
 
 	def take_photo(self):
