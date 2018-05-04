@@ -24,8 +24,9 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 #include <BLE2902.h>
+#include "../common/OLED_display.h"
 
-SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
+OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
 
 byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
@@ -40,14 +41,25 @@ class MyServerCallbacks : public BLEServerCallbacks
   {
   //  Serial.println("connected");
     deviceConnected = true;
+    display.log("panneau connecté");
   };
 
   void onDisconnect(BLEServer *pServer)
   {
   //  Serial.println("disconnected");
     deviceConnected = false;
+    display.log("panneau déconnecté");
   }
 };
+
+void loopCore0(void *pvParameters) // loop on core 0
+{
+  for (;;)
+  {
+    display.update();
+    delay(10);
+  }
+}
 
 void newRange()
 {
@@ -56,10 +68,8 @@ void newRange()
   String toDisplay;
 
   if(calibrationRunning==true){
-    display.setFont(ArialMT_Plain_16);
-    toDisplay = "timeOut";
+    display.log("timeOut");
   } else {
-    display.setFont(ArialMT_Plain_24);
     // get master tag coordinates
     float x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[0]) / 10;
     float y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[0]) / 10;
@@ -78,9 +88,7 @@ void newRange()
     toDisplay += ")\n";
   }
 
-  display.clear();
-  display.drawString(64, 0, toDisplay);
-  display.display();
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
 }
@@ -122,30 +130,48 @@ void calibration(int realDistance, int mesure){
     }
   }
   
-  display.clear();
-  display.setFont(ArialMT_Plain_16);
   String toDisplay = "target: ";
   toDisplay += realDistance;
   toDisplay += "mm\nmesure: ";
   toDisplay += mesure;
   toDisplay += "mm\ndelay: ";
   toDisplay += antennaDelay;
-  display.drawString(64, 0, toDisplay);
-  display.display();
+  display.displayMsg(Text(toDisplay, 6, 64, 0));
 }
 
 void newBlink(DW1000Device *device)
 {
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
 
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
 void inactiveDevice(DW1000Device *device)
 {
-  display.clear();
-  display.drawString(64, 0, "INACTIVE");
-  display.display();
-  digitalWrite(PIN_LED_OK, LOW);
-  digitalWrite(PIN_LED_FAIL, HIGH);
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber()-1;
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
+
+  if (tagNumber + networkNumber == 0)
+  {
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
 }
 
 void setup() {
@@ -214,27 +240,31 @@ void setup() {
 
   display.init();
   display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER );
+
+  xTaskCreatePinnedToCore(
+      loopCore0,   /* Function to implement the task */
+      "loopCore0", /* Name of the task */
+      10000,       /* Stack size in words */
+      NULL,        /* Task input parameter */
+      0,           /* Priority of the task */
+      NULL,        /* Task handle. */
+      0);          /* Core where the task should run */
 
   pinMode(PIN_LED_FAIL,OUTPUT);
   pinMode(PIN_LED_OK,OUTPUT);
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
 
-  String toDisplay = "SYNCHRONISATION\n(anchor : ";
-  toDisplay += DW1000Ranging.getCurrentShortAddress()[0]; //currentBeaconNumber;
-  toDisplay += ")\n";
-  toDisplay += antennaDelay;
-  display.drawString(64, 64/4, toDisplay);
-  display.display();
+  String s = "ANCHOR\n";
+  s+=currentBeaconNumber;
+  display.displayMsg(Text("SYNC", 3, 64, 0));
+  display.displayMsg(Text(s, 4, 64, 0));
 
-  display.setFont(ArialMT_Plain_24);
-  Serial.print("init : ");
-  Serial.println(currentBeaconNumber);
   // Start BLE Server only if this is the supervisor anchor
   if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
   {
+    display.log("panneau déconnecté");
     BLEDevice::init("srv");
     BLEServer *pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
