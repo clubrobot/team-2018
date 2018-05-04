@@ -4,6 +4,10 @@
 #define CURRENT_BEACON_NUMBER 0 // Numéro courant de la balise à uploader. compris entre 0 et MAX_ANCHORS
 
 #define MAX_ANCHORS 4   // nombre maximum de balises fixes
+#define MAX_TAG 2 // nombre maximum de trackers
+
+const byte TAG_SHORT_ADDRESS[MAX_TAG] = {50, 51};
+const byte MASTER_TAG_ADDRESS = 50;
 
 const byte ANCHOR_SHORT_ADDRESS[MAX_ANCHORS] = {35, 36, 37, 38};
 const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16495, 16542, 16556, 16531};

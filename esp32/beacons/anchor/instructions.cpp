@@ -44,11 +44,20 @@ void UPDATE_COLOR(SerialTalks &talks, Deserializer &input, Serializer &output)
 
 void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
 {
-    int x = DW1000Ranging.getPosX();
-    int y = DW1000Ranging.getPosY();
-    output.write<uint16_t>(x);
-    output.write<uint16_t>(y);
+    int robotID = input.read<int16_t>();
+    if(robotID < 0 || robotID >= MAX_TAG){
+        int x = DW1000Ranging.getPosX();
+        int y = DW1000Ranging.getPosY();
+        output.write<uint16_t>(x);
+        output.write<uint16_t>(y);
+    } else {
+        int x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[robotID]);
+        int y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[robotID]);
+        output.write<uint16_t>(x);
+        output.write<uint16_t>(y);
+    }
 }
+
 
 // return true if pannel connected, false otherwise
 void GET_PANEL_STATUS(SerialTalks &talks, Deserializer &input, Serializer &output){

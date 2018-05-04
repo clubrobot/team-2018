@@ -10,10 +10,10 @@ from common.serialtalks import *
 
 UPDATE_ANCHOR_NUMBER_OPCODE = 0x10
 UPDATE_ANTENNA_DELAY_OPCODE = 0x11
-CALIBRATION_ROUTINE_OPCODE = 0x12
-UPDATE_COLOR_OPCODE = 0x13
-GET_POSITION_OPCODE = 0x14
-GET_PANEL_STATUS_OPCODE = 0x15
+CALIBRATION_ROUTINE_OPCODE 	= 0x12
+UPDATE_COLOR_OPCODE 		= 0x13
+GET_POSITION_OPCODE 		= 0x14
+GET_PANEL_STATUS_OPCODE 	= 0x17
 
 
 class Anchor(SerialTalks):
@@ -38,8 +38,8 @@ class Anchor(SerialTalks):
 	def update_color(self, color):
 		self.send(UPDATE_COLOR_OPCODE,INT(color))
 
-	def get_position(self):
-		output = self.execute(GET_POSITION_OPCODE)
+	def get_position(self, robotID):
+		output = self.execute(GET_POSITION_OPCODE,INT(robotID))
 		x, y = output.read(INT, INT)
 		return x, y		
 
@@ -47,5 +47,5 @@ class Anchor(SerialTalks):
 		output = self.execute(GET_PANEL_STATUS_OPCODE)
 		ret = output.read(BYTE)
 		return ret
-	
+
 
