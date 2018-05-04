@@ -28,6 +28,7 @@
 #define _WRITE_BEEACTIVATOR_OPCODE			   0x27
 #define _ENABLE_SHAKING_DIFF_OPCODE            0x28
 #define _SET_SHAKER_VELOCITY_OPCODE            0x29
+#define _GET_LAUNCHED_WATER_OPCODE             0x2A
 
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
@@ -67,6 +68,8 @@ void SET_LED_ON(SerialTalks& inst, Deserializer& input, Serializer& output);
 void SET_LED_OFF(SerialTalks& inst, Deserializer& input, Serializer& output);
 
 void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& output);
+
+void GET_LAUNCHED_WATER(SerialTalks& inst, Deserializer& input, Serializer& output);
 
 void DISABLE(SerialTalks &inst, Deserializer &input, Serializer &output);
 #endif

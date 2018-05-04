@@ -14,7 +14,8 @@ extern Servo trash;
 extern BallsShaker shaker;
 extern Servo trashUnloader;
 extern Adafruit_TCS34725 waterSensor;
-extern Servo beeActivator; 
+extern Servo beeActivator;
+extern int ballCount;
 uint16_t red, green, blue, clear;
 
 
@@ -123,7 +124,7 @@ void SET_SHAKER_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &out
 void DISABLE(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 	motor.setPulsewidth(1000);
-}	
+}
 
 void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& output){
 	int val = input.read<int>();
@@ -139,4 +140,9 @@ void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& outp
     {
         beeActivator.detach();
     }
+}
+
+void GET_LAUNCHED_WATER(SerialTalks& inst, Deserializer& input, Serializer& output){
+	output.write<int>(ballCount);
+	ballCount = 0;
 }
