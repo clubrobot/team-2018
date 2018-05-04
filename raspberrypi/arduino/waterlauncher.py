@@ -14,12 +14,8 @@ _GET_MOTOR_VELOCITY_OPCODE		= 0x18
 _SET_MOTOR_PULSEWIDTH_OPCODE	= 0x1A
 _GET_MOTOR_PULSEWIDTH_OPCODE	= 0x1B
 _FORCE_PULSEWIDTH				= 0x1E
-_GET_LAUNCHED_WATER_OPCODE      = 0x28
+_GET_LAUNCHED_WATER_OPCODE      = 0x30
 
-<<<<<<< HEAD
-
-class WaterLauncher(SerialTalksProxy):
-=======
 class WaterLauncher(SecureSerialTalksProxy):
 	_DEFAULT = {
 		_SET_MOTOR_VELOCITY_OPCODE : Deserializer(INT(0)),
@@ -27,7 +23,6 @@ class WaterLauncher(SecureSerialTalksProxy):
 		_SET_MOTOR_PULSEWIDTH_OPCODE : Deserializer(INT(0)),
 		_GET_MOTOR_PULSEWIDTH_OPCODE : Deserializer(INT(0)),
 	}
->>>>>>> 5e5b49c0d78080e71f922672406e2cacefef7f40
 	def __init__(self,parent, uuid='watershooter'):
 		SecureSerialTalksProxy.__init__(self, parent, uuid, WaterLauncher._DEFAULT)
 

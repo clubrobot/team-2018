@@ -124,12 +124,8 @@ void SET_SHAKER_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &out
 void DISABLE(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 	motor.setPulsewidth(1000);
-<<<<<<< HEAD
 }
-=======
-}	
 
->>>>>>> 5e5b49c0d78080e71f922672406e2cacefef7f40
 void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& output){
 	int val = input.read<int>();
     if (val >= 0)

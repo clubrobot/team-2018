@@ -25,15 +25,11 @@
 #define _WRITE_TRASH_UNLOADER_OPCODE           0x24
 #define _ENABLE_SHAKING_EQUAL_OPCODE           0x25
 #define _DISABLE_SHAKING_OPCODE                0x26
-<<<<<<< HEAD
-#define _WRITE_BEEACTIVATOR_OPCODE			       0x27
-#define _GET_LAUNCHED_WATER_OPCODE             0x28
-=======
 #define _WRITE_BEEACTIVATOR_OPCODE			   0x27
 #define _ENABLE_SHAKING_DIFF_OPCODE            0x28
 #define _SET_SHAKER_VELOCITY_OPCODE            0x29
+#define _GET_LAUNCHED_WATER_OPCODE             0x30
 
->>>>>>> 5e5b49c0d78080e71f922672406e2cacefef7f40
 
 void WRITE_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
 void GET_INDOOR(SerialTalks &inst, Deserializer &input, Serializer &output);
