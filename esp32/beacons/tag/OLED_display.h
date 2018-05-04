@@ -6,8 +6,8 @@
 #include <Wire.h>
 
 #define NB_MSG_MAX 5
-#define DEFAULT_DURATION 0
-#define DEFAULT_PERSISTENCE 1000
+#define DEFAULT_DURATION 10000
+#define DEFAULT_PERSISTENCE 2500
 
 class OLEDdisplay;
 
@@ -28,25 +28,22 @@ private:
 class OLEDdisplay : public SSD1306{
 public:
   OLEDdisplay(uint8_t address, uint8_t pin_sda, uint8_t pin_scl) : SSD1306(address, pin_sda, pin_scl),
-                                                                   _duration(DEFAULT_DURATION),
                                                                    _msgPersistence(DEFAULT_PERSISTENCE),
                                                                    _index(0)
     { 
         _displayStartTime = millis();
-        _logStartTime = millis();
+        _updateNeeded = true;
     }
 
   void drawString(int16_t x, int16_t y, String text);
 
   void update();
-  void log(String text, unsigned long duration = 10000);
+  void log(String text);
   void displayMsg(Text msg);
   void clearMsg(int id);
   void clearAll();
 
 private:
-  unsigned long _logStartTime;
-  unsigned long _duration;
   unsigned long _displayStartTime;
   unsigned long _msgPersistence;
 
@@ -54,6 +51,7 @@ private:
   Text _msg[NB_MSG_MAX];
   int _msgNumber; // number of msg
   int _index;
+  boolean _updateNeeded;
 
 };
 

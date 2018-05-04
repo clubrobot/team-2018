@@ -6,51 +6,61 @@ void Text::clear(){
 }
 
 void OLEDdisplay::drawString(int16_t x, int16_t y, String text){
-    //this->SSD1306::drawString(x,y,text);
     displayMsg(Text(text,-1,x,y));;
 }
 
 void OLEDdisplay::update()
 {
-    clear();
+    if(millis() - _displayStartTime >= _msgPersistence)
+        _updateNeeded = true;
 
-    if(_msgNumber > 0){
-        if (millis() - _displayStartTime >= _msgPersistence)
-        {
-            _displayStartTime = millis();
-            if (_index >= _msgNumber -1)
-                _index = 0;
-            else
-                _index++;
+    if(_updateNeeded){
+       _updateNeeded = false;
+       clear();
+
+       if (_msgNumber > 0)
+       {
+           if (millis() - _displayStartTime >= _msgPersistence)
+           {
+               _displayStartTime = millis();
+               if (_index >= _msgNumber - 1)
+                   _index = 0;
+               else
+                   _index++;
+           }
+           setFont(ArialMT_Plain_24);
+           SSD1306::drawString(_msg[_index]._x, _msg[_index]._y, _msg[_index]._value);
         }
-        setFont(ArialMT_Plain_24);
-        SSD1306::drawString(_msg[_index]._x, _msg[_index]._y, _msg[_index]._value);
-    }
-    
-    if (millis() - _logStartTime < _duration){
+
         setFont(ArialMT_Plain_10);
         SSD1306::drawString(_log._x, _log._y, _log._value);
-    }
 
-    display();
+        display();
+    }
 }
 
-void OLEDdisplay::log(String text, unsigned long duration)
+void OLEDdisplay::log(String text)
 {
-    _log = Text(text,-1,64,50);
-    _duration = duration;
-    _logStartTime = millis();
-    update();
+    if(text != _log._value){
+        _log = Text(text, -1, 64, 50);
+        _updateNeeded = true;
+    }
 }
 
 void OLEDdisplay::displayMsg(Text msg)
 {
+    boolean idFound = false;
     if (_msgNumber < NB_MSG_MAX){
-        boolean idFound = false;
-        for(int i = 0; i<_msgNumber;i++){
+        for(int i = 0; i<_msgNumber && !idFound;i++){
             if(_msg[i]._id == msg._id && msg._id != -1){
                 idFound = true;
-                _msg[i] = msg;
+                if (_msg[i]._value != msg._value || _msg[i]._x != msg._x || _msg[i]._y != msg._y)
+                {
+                    _msg[i] = msg;
+                    if(i==_index){
+                        _updateNeeded = true;
+                    }
+                }
             }
         }
         if(!idFound){
@@ -58,7 +68,6 @@ void OLEDdisplay::displayMsg(Text msg)
             _msgNumber++;
         }
     }
-    update();
 }
 
 void OLEDdisplay::clearMsg(int id)
@@ -72,11 +81,14 @@ void OLEDdisplay::clearMsg(int id)
                 _msg[_msgNumber-1].clear();
             }
             _msgNumber--;
-            if(_index>= _msgNumber)
+            if(_index>= _msgNumber){
                 _index = 0;
+                _updateNeeded = true;
+            }
+            if(_index == i)
+                _updateNeeded = true;
         }
     }
-    update();
 }
 
 void OLEDdisplay::clearAll()
@@ -87,5 +99,5 @@ void OLEDdisplay::clearAll()
     }
     _msgNumber = 0;
     _index = 0;
-    update();
+    _updateNeeded = true;
 }
