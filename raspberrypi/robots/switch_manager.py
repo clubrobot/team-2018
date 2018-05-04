@@ -63,26 +63,27 @@ class Abeille(Actionnable):
         except PositionUnreachable:
             return
         try:
-            robot.purepursuit([self.preparation, self.interrupteur], direction="backward")
+            robot.angpos_threshold.set(0.05)
+            robot.purepursuit([self.preparation, self.interrupteur], direction="backward", lookahead=50,
+                              finalangle=math.pi/2+(self.side*2-1)*math.pi/4, lookaheadbis=400)
             robot.wait()
         except RuntimeError:
-            return
-        try:
-            self.mover.turnonthespot(math.pi+(self.side*2-1)*math.pi/4, try_limit=3,stategy=Mover.AIM)
-        except PositionUnreachable:
             return
         self.beeActioner.open()
         time.sleep(0.3)
         robot.set_velocities(0, -(self.side*2-1)*9)
         time.sleep(0.7)
-        while not robot.isarrived():
+        self.beeActioner.close()
+        robot.stop()
+        arrived = False
+        while not arrived:
             try:
                 robot.goto(*self.preparation)
+                arrived = True
             except:
                 robot.stop()
                 robot.set_velocities(-100, 0)
                 time.sleep(0.5)
-        self.beeActioner.close()
         display.addPoints(Abeille.POINTS)
 
         #override Actionnable

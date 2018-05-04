@@ -116,7 +116,6 @@ class Shot(Actionnable):
         except PositionUnreachable:
             return
         old = wheeledbase.angpos_threshold.get()
-        watersorter.open_outdoor()
         wheeledbase.angpos_threshold.set(0.1)
         watersorter.enable_shaker_equal()
         watersorter.close_trash()
