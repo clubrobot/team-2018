@@ -17,6 +17,7 @@ class BaliseReceiver(TCPTalks):
         TCPTalks.__init__(self, ip=ip, port=port)
 
     def get_position(self, robotID):
+        if not  self.is_connected : return (-1000,-1000)
         try:
             output = self.execute(GET_POSITION_OPCODE, robotID)
         except:

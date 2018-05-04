@@ -8,9 +8,9 @@ import time
 import random
 import warnings
 from common.CRC16 import *
-from queue import Queue, Empty
+from queue import Queue, Empty, LifoQueue
 from threading import Thread, RLock, Event, current_thread
-
+import re
 from common.serialutils import Deserializer, IntegerType, FloatType, StringType
 
 BAUDRATE = 115200
@@ -80,6 +80,8 @@ class SerialTalks:
         # Threading things
         self.queues_dict = dict()
         self.queues_lock = RLock()
+        self.warning_flag = Event()
+        self.crc_corrupted = 0
 
         # Instructions
         self.instructions = dict()
@@ -159,7 +161,7 @@ class SerialTalks:
             pass
         raise NotConnectedError('\'{}\' is not connected.'.format(self.port)) from None
 
-    def send(self, opcode, *args):
+    def send(self, opcode, *args, get_crc=False):
         retcode = random.randint(0, 0xFFFFFFFF)
         content = BYTE(opcode) + ULONG(retcode) + bytes().join(args)
         # crc calculation
@@ -167,7 +169,11 @@ class SerialTalks:
         prefix = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
 
         self.rawsend(prefix + content)
-        return retcode
+        if get_crc:
+            return (retcode, crc)
+        else:
+            return retcode
+
 
     def get_queue(self, retcode):
         self.queues_lock.acquire()
@@ -215,9 +221,19 @@ class SerialTalks:
             pass
 
     def execute(self, opcode, *args, timeout=5):
-        retcode = self.send(opcode, *args)
-        output = self.poll(retcode, timeout)
-        return output
+        retcode, crc = self.send(opcode, *args,get_crc=True)
+        try:
+            output = self.poll(retcode, timeout)
+        except TimeoutError:
+            if self.warning_flag.is_set():
+                if crc == self.crc_corrupted:
+                    self.warning_flag.clear()
+                    retcode, crc = self.send(opcode, *args, get_crc=False)
+                    return self.poll(retcode, timeout)
+            else:
+                raise TimeoutError
+        else:
+            return output
 
     def receive(self, input):
         opcode = input.read(BYTE)
@@ -271,7 +287,10 @@ class SerialTalks:
         binary_file.close()
 
     def launch_warning_(self, message):
-        warnings.warn(message, SerialTalksWarning)
+        warnings.warn("Message send corrupted !", SerialTalksWarning)
+        self.warning_flag.set()
+        self.crc_corrupted = message.read(USHORT)
+
 
     def getout(self, timeout=0):
         return self.getlog(STDOUT_RETCODE, timeout)
@@ -335,11 +354,11 @@ class SerialListener(Thread):
                     if type_packet == SLAVE_BYTE: self.parent.process(Deserializer(buffer))
                     if type_packet == MASTER_BYTE: self.parent.receive(Deserializer(buffer))
                 else:
-                    # print('error') #TODO: replace by warning
+                    warnings.warn("Message receive corrupted !", SerialTalksWarning)
                     state = 'waiting'
 
             except NotConnectedError:
-                self.disconnect()
+                self.parent.disconnect()
                 break
 
             # Reset the finite state machine

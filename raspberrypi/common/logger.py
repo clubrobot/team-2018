@@ -18,6 +18,9 @@ class Logger:
     def __call__(self, *args, **kwargs):
         self.write(*args, **kwargs)
 
+    def reset_time(self):
+        self.initial_time = time()
+
     def write(self, *args, **kwargs):
         if self.exec_param%2 == 0:
             print("[{0:.3g}] :".format(time() - self.initial_time), *args)

@@ -104,16 +104,32 @@ void SET_LED_OFF(SerialTalks& inst, Deserializer& input, Serializer& output){
 	digitalWrite(LED, LOW);
 }
 
-void ENABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output){
-	shaker.enableShaker();
+void ENABLE_SHAKING_DIFF(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shaker.enableShakerDiffFreq();
 }
+
+void ENABLE_SHAKING_EQUAL(SerialTalks &inst, Deserializer &input, Serializer &output){
+	shaker.enableShakerEqualFreq();
+}
+
 void DISABLE_SHAKING(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 }
+
+void SET_SHAKER_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &output)
+{
+	shaker.set_velocity(input.read<int>());
+}
+
 void DISABLE(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 	motor.setPulsewidth(1000);
+<<<<<<< HEAD
 }
+=======
+}	
+
+>>>>>>> 5e5b49c0d78080e71f922672406e2cacefef7f40
 void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& output){
 	int val = input.read<int>();
     if (val >= 0)
