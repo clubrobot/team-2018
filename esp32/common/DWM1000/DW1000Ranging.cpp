@@ -686,7 +686,7 @@ void DW1000RangingClass::loop() {
 			}
 			
 			if(myDistantDevice == NULL){
-				Serial.println("NULL ptr instead of device !");
+				log("NULL ptr instead of device !");
 				return;
 			}
 				
@@ -696,14 +696,15 @@ void DW1000RangingClass::loop() {
 				if(messageType != _expectedMsgId) {
 					// unexpected message, start over again (except if already POLL)
 
-					Serial.print("IGNORED Unexppected msg : ");
-					Serial.print(messageType);
-					Serial.print(" expected : ");
-					Serial.println(_expectedMsgId);
+					String s = "IGNORED Unexppected msg : ";
+					s+=messageType;
+					s+=" expected : ";
+					s+=_expectedMsgId;
+					log(s);
 					_protocolFailed = true;
 				}
 				if(messageType == POLL) {
-					Serial.print("POLL : ");
+					String s = "POLL : ";
 					//we receive a POLL which is a broacast message
 					//we need to grab info about it
 					int16_t numberDevices = 0;
@@ -733,17 +734,19 @@ void DW1000RangingClass::loop() {
 							_expectedMsgId = RANGE;
 							transmitPollAck(myDistantDevice);
 							noteActivity();
-							Serial.println("success");
+							s+="success";
+							log(s);
 							return;
 						}
 						
 					}
-					Serial.println("fail");
+					s+="fail";
+					log(s);
 					
 					
 				}
 				else if(messageType == RANGE) {
-					Serial.println("RANGE");
+					log("RANGE");
 					//we receive a RANGE which is a broacast message
 					//we need to grab info about it
 					uint8_t numberDevices = 0;
@@ -876,11 +879,11 @@ void DW1000RangingClass::loop() {
 				}
 				if (_isEnabled && messageType == POLL_ACK)
 				{
-					log("POLL_ACK from");
+					String s = "POLL_ACK from";
 					uint16_t addr = 0;
 					if(myDistantDevice != NULL)
 						addr = myDistantDevice->getShortAddress();
-					Serial.println(addr);
+					log(s+addr);
 
 					DW1000.getReceiveTimestamp(myDistantDevice->timePollAckReceived);
 					//we note activity for our device:
