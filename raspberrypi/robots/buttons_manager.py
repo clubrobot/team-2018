@@ -21,7 +21,8 @@ _ORANGE_COLOR = 4
 class ButtonGestureMatch():
     WAITING_TEAM = 0
     WAITING_ODOMETRY = 1
-    WAITING_MATCH = 2
+    WAITING_TIRRET = 2
+    WAITING_MATCH = 3
 
     def __init__(self, buttons, display, wheelebase, server, side_setter):
         self.buttons = buttons
@@ -66,6 +67,10 @@ class ButtonGestureMatch():
             self.buttons.off(_BLUE_COLOR)
             self.display.set_message("Select")
         if (self.status == ButtonGestureMatch.WAITING_MATCH):
+            self.status = ButtonGestureMatch.WAITING_TIRRET
+            self.display.set_message("TIRRET")
+
+        if self.status == ButtonGestureMatch.WAITING_TIRRET:
             self.status = ButtonGestureMatch.WAITING_ODOMETRY
             self.display.set_message("ODOMETRIE")
 
@@ -76,14 +81,11 @@ class ButtonGestureMatch():
 
     def _blue(self):
         if not self.lock_stat.acquire(blocking=False): return
-        if self.status == ButtonGestureMatch.WAITING_ODOMETRY:
-            self.setter(self.side)
-            if self.side == 0:
 
-                self.wheeledbase.set_position(592, 290, 0)
-            else:
-                self.wheeledbase.set_position(592, 2710, 0)
 
+
+
+        if self.status == ButtonGestureMatch.WAITING_TIRRET:
             if self.tirret_status.is_set():
                 for k in range(3):
                     for i in range(4):
@@ -98,6 +100,18 @@ class ButtonGestureMatch():
                 self.status = ButtonGestureMatch.WAITING_MATCH
                 self.display.set_message("WAIT")
 
+        if self.status == ButtonGestureMatch.WAITING_ODOMETRY:
+            self.setter(self.side)
+            if self.side == 0:
+
+                self.wheeledbase.set_position(592, 290, 0)
+            else:
+                self.wheeledbase.set_position(592, 2710, 0)
+            self.status = ButtonGestureMatch.WAITING_TIRRET
+            self.display.set_message("TIRRET")
+            sleep(0.5)
+
+
         if (self.status == ButtonGestureMatch.WAITING_TEAM and not self.side is None):
             self.status = ButtonGestureMatch.WAITING_ODOMETRY
             self.buttons.off(_BLUE_COLOR)
@@ -110,7 +124,6 @@ class ButtonGestureMatch():
                 self.buttons.on(_ORANGE_COLOR)
             self.display.set_message("ODOMETRIE")
             sleep(0.5)
-
         self.lock_stat.release()
 
     def button_green(self):
