@@ -317,7 +317,6 @@ class SerialListener(Thread):
             # Wait until new bytes arrive
             try:
                 inc = self.parent.stream.read()
-                print(inc)
             except serial.serialutil.SerialException:
                 self.parent.disconnect()
                 break
