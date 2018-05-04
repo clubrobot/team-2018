@@ -26,7 +26,7 @@ class Action():
     def set_predecessors(self, predecessors):
         self.predecessors = predecessors
 
-    def check_impossible_combinations(self, actions):
+    def check_impossible_combinations(self):
         for combi in self.combinations:
             if combi():
                 return False
