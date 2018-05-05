@@ -29,7 +29,7 @@ class Dispenser(Actionnable):
     def realize(self,robot ,watersorter ,display):
         theta = math.atan2(self.preparationPoint[1]-self.targetPoint[1],self.preparationPoint[0]-self.targetPoint[0])+3.141592
         robot.max_linvel.set(300)
-        robot.max_angvel.set(1)
+        robot.max_angvel.set(3)
         watersorter.close_trash()
         watersorter.close_outdoor()
         watersorter.open_indoor()
@@ -112,8 +112,11 @@ class Shot(Actionnable):
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
+            wheeledbase.angpos_threshold.set(0.05)
             self.mover.turnonthespot(theta, 3, Mover.AIM)
+
         except PositionUnreachable:
+            wheeledbase.angpos_threshold.set(0.1)
             return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
@@ -139,7 +142,7 @@ class Shot(Actionnable):
             watersorter.close_indoor()
 
             close_time = time.time()
-            while waterlauncher.get_nb_launched_water() != 1 and not (time.time() - begin_time > global_timeout):
+            while waterlauncher.get_nb_launched_water() < 1 and not (time.time() - begin_time > global_timeout):
                 time.sleep(0.1)
                 waterlauncher.set_motor_pulsewidth(1000+motor_base)
                 if time.time() - close_time > timeout_per_ball:
@@ -153,6 +156,9 @@ class Shot(Actionnable):
             waterlauncher.set_motor_pulsewidth(1150)
             time.sleep(0.1)
             waterlauncher.set_motor_pulsewidth(1000 + motor_base)
+            watersorter.open_indoor()
+            watersorter.close_outdoor()
+            time.sleep(0.2)
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
@@ -166,8 +172,10 @@ class Shot(Actionnable):
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
+            wheeledbase.angpos_threshold.set(0.05)
             self.mover.turnonthespot(theta, 3, Mover.AIM)
         except PositionUnreachable:
+            wheeledbase.angpos_threshold.set(0.1)
             return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
