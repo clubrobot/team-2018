@@ -16,6 +16,8 @@ from common.serialtalks import *
 from arduino.waterlauncher import *
 from robots.Bornibus import Bornibus
 from arduino.bee import *
+from beacons.balise_receiver import BaliseReceiver
+from robots.beacons_manager import BeaconsManagement
 
 DEV_MODE = True
 MATCH_MODE = False
@@ -40,7 +42,15 @@ def start(args):
     led2 = LEDMatrix(m, 2)
     geo = Geogebra('{}/robots/bornibus.ggb'.format(sys.path[0]))
     rm = RoadMap.load(geo)
-    automate = Bornibus(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back)
+    br = BaliseReceiver("192.168.1.11")
+    try:
+        br.connect()
+    except:
+        print("Balise Receiver not connected ! ")
+
+    bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
+    bm.start()
+    automate = Bornibus(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back,  br, bm)
     button_gesture = ButtonGestureMatch(button_card, ssd, b, m, automate.set_side)
     button_gesture.run()
     button_card.disconnect()
