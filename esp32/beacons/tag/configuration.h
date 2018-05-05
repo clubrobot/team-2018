@@ -9,11 +9,9 @@ const byte TAG_SHORT_ADDRESS[MAX_TAG] = {50, 51};
 const byte MASTER_TAG_ADDRESS = 50;
 //const uint16_t ANTENNA_DELAY[MAX_ANCHORS] = {16547, 16545, 16537, 16556};
 
-// TODO : used these vraiables instead of the one in the tag.ino
-//const float Z_ANCHOR = 438.3;
-//const float Z_CENTRAL = 1016.3;
-//const float Z_TAG = 483.3;
-//const float Z_HEIGHT[MAX_ANCHORS] = {Z_ANCHOR, Z_ANCHOR, Z_ANCHOR, Z_CENTRAL};
+const float Z_ANCHOR = 438.3;
+const float Z_CENTRAL = 1016.3;
+const float Z_TAG = 483.3;
 
 /**
  * EEPROM addresses
