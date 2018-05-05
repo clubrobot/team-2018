@@ -135,6 +135,8 @@ class Bornibus:
         shortShot.link_area(shortShot.name)
         beeAct.link_area(beeAct.name)
 
+        bm.start()
+
         def longShot():
             return not (longShot0 or longShot1 or longShot2)
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
@@ -152,12 +154,13 @@ class Bornibus:
         #panelAct.set_manual_order(6)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
-                                     mode=Heuristics.MANUAL)
+                                     mode=Heuristics.AUTO)
 
     def set_side(self,side):
         self.side = side
 
     def run(self):
+        time.sleep(5)
         self.displayManager.start()
         self.logger.reset_time()
         self.mover.reset()
@@ -190,14 +193,14 @@ if __name__ == '__main__':
     rm = RoadMap.load(geo)
     print("Fin Chargement")
 
-    br = BaliseReceiver("192.168.1.11")
-    #try:
-    #    br.connect()
-    #except:
-    #    pass
+    br = BaliseReceiver("192.168.12.3")
+    try:
+        br.connect()
+    except:
+        print("BALISE : Not connected")
+        pass
 
     bm = BeaconsManagement(br, "area.ggb")
-    bm.start()
 
     auto = Bornibus(side, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
     auto.run()

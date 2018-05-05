@@ -11,7 +11,7 @@ from robots.mover import Mover, PositionUnreachable
 class Dispenser(Actionnable):
     typ="Dispenser"
     POINTS_DISPENSER = 10
-    TIME = 10
+    TIME = 15
     def __init__(self,numberDispenser, rm, geo, arduinos, display, mover, logger, data):
         self.rm  = rm
         self.geo = geo
@@ -54,14 +54,14 @@ class Dispenser(Actionnable):
             self.logger("DISPENSER : ", "CONTACT !! Just try to take balls here {},{}", *init_pos)
             begin = time.time()
             while time.time() - begin < 2:
-                self.wheeledbase.set_velocities(-150, 1)
+                self.wheeledbase.set_velocities(-150, 2)
                 time.sleep(0.4)
-                self.wheeledbase.set_velocities(200, -1)
+                self.wheeledbase.set_velocities(200, -2)
                 time.sleep(0.4)
 
         self.logger("DISPENSER : ", "Trying to go backward ")
         pos = robot.get_position()[:-1]
-        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=3, strategy=Mover.HARD,
+        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=5, strategy=Mover.HARD,
                             last_point_aim=self.preparationPoint)
         self.watersorter.disable_shaker()
         robot.stop()
@@ -106,7 +106,7 @@ class Shot(Actionnable):
     def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=23):
         nb_balls = 0
         begin_time = time.time()
-        motor_base = 80
+        motor_base = 83
         timeout_per_ball = 1
         currentPosXY=wheeledbase.get_position()[:2]
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
@@ -161,7 +161,7 @@ class Shot(Actionnable):
         watersorter.open_indoor()
             
     def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=25):
-        motor_base = 105
+        motor_base = 110
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])

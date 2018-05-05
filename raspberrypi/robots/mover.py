@@ -214,7 +214,7 @@ class Mover:
                 current_position = self.wheeledbase.get_position()
                 # TODO Change for more generic com      paraison
                 self.logger("MOVER : ", position_goal=position_goal, current_position=current_position)
-                if abs(current_position[0] - position_goal[0]) < 30:
+                if abs(current_position[0] - position_goal[0]) < 60:
                     wall_reached = True
 
                 else:
@@ -342,6 +342,7 @@ class Mover:
                 self.wheeledbase.stop()
                 if last_point_aim is None:
                     self.wheeledbase.set_velocities(-100 if self.direction == "forward" else 100, 0)
+                    sleep(0.5)
                 else:
                     try:
                         self.wheeledbase.goto(*last_point_aim)
