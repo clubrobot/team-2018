@@ -180,6 +180,18 @@ void newRange()
       memcpy(&Ainv[0][0], &A[0][0], sizeof(float) * 4);
       Matrix.Invert(&Ainv[0][0], 2);
       Matrix.Multiply(&Ainv[0][0], &b[0], 2, 2, 1, &p[0]);
+
+      // projection à l'intérieur de la table
+      if(p[0]<X_MIN)
+        p[0] = X_MIN;
+      else if(p[0]>X_MAX)
+        p[0] = X_MAX;
+
+      if (p[1] < Y_MIN)
+        p[1] = Y_MIN;
+      else if (p[1] > Y_MAX)
+        p[1] = Y_MAX;
+
       String toDisplay = "(";
       toDisplay += round(p[0]/10);
       toDisplay += ",";
@@ -207,6 +219,18 @@ void newRange()
       float Atemp[2][3];
       Matrix.Multiply(&Ainv[0][0], &Atr[0][0], 2, 2, 3, &Atemp[0][0]);
       Matrix.Multiply(&Atemp[0][0], &b[0], 2, 3, 1, &p[0]);
+
+      // projection à l'intérieur de la table
+      if (p[0] < X_MIN)
+        p[0] = X_MIN;
+      else if (p[0] > X_MAX)
+        p[0] = X_MAX;
+
+      if (p[1] < Y_MIN)
+        p[1] = Y_MIN;
+      else if (p[1] > Y_MAX)
+        p[1] = Y_MAX;
+
       String toDisplay = "(";
       toDisplay += round(p[0] / 10);
       toDisplay += ",";

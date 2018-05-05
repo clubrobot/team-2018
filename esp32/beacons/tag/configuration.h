@@ -13,6 +13,11 @@ const float Z_ANCHOR = 438.3;
 const float Z_CENTRAL = 1016.3;
 const float Z_TAG = 483.3;
 
+const float X_MIN = 1;
+const float X_MAX = 1999;
+const float Y_MIN = 1;
+const float Y_MAX = 2999;
+
 /**
  * EEPROM addresses
  */
