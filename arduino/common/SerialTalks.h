@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "QueueArray.h"
 #include "serialutils.h"
+#include "CRC16.h"
 
 #ifndef SERIALTALKS_BAUDRATE
 #define SERIALTALKS_BAUDRATE 115200
@@ -44,9 +45,11 @@
 #define SERIALTALKS_DISCONNECT_OPCODE 0x3
 #define SERIALTALKS_GETEEPROM_OPCODE  0x4
 #define SERIALTALKS_SETEEPROM_OPCODE  0x5
+#define SERIALTALKS_WARNING_OPCODE    0xFE
 #define SERIALTALKS_STDOUT_RETCODE 0xFFFFFFFF
 #define SERIALTALKS_STDERR_RETCODE 0xFFFFFFFE
 
+#define SERIALTALKS_CRC_SIZE 2
 
 class SerialTalks
 {
@@ -124,6 +127,7 @@ protected: // Protected methods
 	{
 		SERIALTALKS_WAITING_STATE,
 		SERIALTALKS_INSTRUCTION_STARTING_STATE,
+		SERIALTALKS_CRC_RECIEVING_STATE,
 		SERIALTALKS_INSTRUCTION_RECEIVING_STATE,
 	}           m_state;
 
@@ -137,6 +141,15 @@ protected: // Protected methods
 	byte        m_bytesCounter;
 	long        m_lastTime;
 
+	// for cyclic redundancy check
+	CRC16 m_crc;
+
+	byte m_crcBytesCounter;
+	uint16_t received_crc_value;
+
+	byte m_crc_tab[SERIALTALKS_CRC_SIZE+1];
+	byte m_crc_tmp[SERIALTALKS_OUTPUT_BUFFER_SIZE];
+
 private:
 
 	static void PING   (SerialTalks& talks, Deserializer& input, Serializer& output);
@@ -144,6 +157,7 @@ private:
 	static void SETUUID(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void GETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
 	static void SETEEPROM(SerialTalks& talks, Deserializer& input, Serializer& output);
+	void LAUNCHWARNING(unsigned char *  message);
 };
 
 extern SerialTalks talks;

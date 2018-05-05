@@ -3,16 +3,16 @@
 
 #include <Arduino.h>
 
-#define BUTTON_1    8
+#define BUTTON_1    A4
 #define BUTTON_2    A5
-#define BUTTON_3    A4
+#define BUTTON_3    8
 #define BUTTON_4    A3
 
 #define TIRETTE    12
 
-#define LED_1   11
+#define LED_1   5
 #define LED_2   10
-#define LED_3   5
+#define LED_3   11
 #define LED_4   6
 
 #define INVERTER_DEV  A1

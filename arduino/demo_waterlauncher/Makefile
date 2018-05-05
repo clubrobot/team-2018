@@ -10,6 +10,7 @@ LOCAL_INO_SRCS = demo.ino
 LOCAL_CPP_SRCS = \
     instructions.cpp \
     $(COMMON)/SerialTalks.cpp \
+    $(COMMON)/CRC16.cpp \
     $(COMMON)/BrushlessMotor.cpp
 
 

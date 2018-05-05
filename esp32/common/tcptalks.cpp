@@ -14,57 +14,48 @@ void SWITCH_LED(TCPTalks &inst, UnPickler& input, Pickler& output)
    
     if(var)
     {
-        Serial.println("ON");
+        //Serial.println("ON");
         digitalWrite(2, HIGH);
 
     }
     else 
     {
-        Serial.println("false");
+        //Serial.println("false");
         digitalWrite(2, LOW);
     }
 
-    output.dump<bool>(var);
-    output.dump<long>(10);
+
+    //output.dump<bool>(var);
+    //output.dump<long>(10);
     output.dump<double>(1.1);
+    
+    //output.dump<char>(0X02);
     output.dump<long>(11);
-    output.dump<long>(999999);
-
-    //output.dump<char*>("hello world");
-
-
 
 }
 
-TCPTalks::TCPTalks()
+TCPTalks::TCPTalks(char* network_ssid, char* network_password, char* server_ip, int server_port)
 {
 	
-    //ip = "192.168.0.16";
-    //ip = "192.168.1.13";
-    ip = "172.20.10.8";
+
+    ip = server_ip;
     
-	port =  25565;
+	port =  server_port;
 
 	password = "\n";
 
-	is_connected = false;
-	is_authentificated = false;
+	m_connected = false;
+	m_authentificated = false;
 
-	// ssid = "NUMERICABLE-9251_2GEXT";
-	// pass = "26338b5a57";
-
-    // ssid = "CLUB_ROBOT";
-    // pass = "zigouigoui";
-
-    ssid = "iPhone_Mathis";
-    pass = "azertyuiop";
+    ssid = network_ssid;
+    pass = network_password;
 
 }
 
 void TCPTalks::connect(int timeout)
 {
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
+    //Serial.print("Connecting to ");
+    //Serial.println(ssid);
     /* connect to your WiFi */
     WiFi.begin(ssid, pass);
     /* wait until ESP32 connect to WiFi*/
@@ -73,74 +64,70 @@ void TCPTalks::connect(int timeout)
     while (WiFi.status() != WL_CONNECTED) 
     {
         delay(5);
-        Serial.print(".");
+        //Serial.print(".");
         long current_time = millis();
         if(current_time - last_time > timeout )
         {
-            Serial.println("Connexion Failed");
+            //Serial.println("Connexion Failed");
             return;
         }
     }
 
-    Serial.println("");
-    Serial.println("WiFi connected with IP address: ");
-    Serial.println(WiFi.localIP());
-    Serial.println("");
+    //Serial.println("");
+    //Serial.println("WiFi connected with IP address: ");
+    //Serial.println(WiFi.localIP());
+    //Serial.println("");
 
     last_time = millis();
-    Serial.print("wait for server...");
+    //Serial.print("wait for server...");
 
     while(!client.connect(ip, port))
     {
-        Serial.print(".");
+        //Serial.print(".");
         delay(5);
         long current_time = millis();
         if(current_time - last_time > timeout )
         {
-            Serial.println("Connexion Failed");
+            //Serial.println("Connexion Failed");
             return;
         }
        
     }
 
-    is_connected = true;
-    Serial.println("connected");
+    m_connected = true;
+    //Serial.println("connected");
 
+    last_time = millis();
+    //Serial.println("wait for authentification...");
 
-    authentificate(5);
+    authentificate();
 
-    /* add authentification steps */
+    while(!is_authentificated())
+    {
+        //Serial.print(".");
+        delay(5);
+        long current_time = millis();
+        if(current_time - last_time > timeout )
+        {
+            //Serial.println("authentification Failed");
+            return;
+        }
+       
+    }
 
+    //Serial.println("authentificated");
 }
 
-bool TCPTalks::authentificate(int timeout)
+void TCPTalks::authentificate()
 {
     sendback(AUTHENTIFICATION_OPCODE,NOT_RETCODE,(byte*)password);
-
-    // last_time = millis();
-    // Serial.print("wait for authentification...");
-
-    // while(!client.connect(ip, port))
-    // {
-    //     Serial.print(".");
-    //     delay(5);
-    //     long current_time = millis();
-    //     if(current_time - last_time > timeout )
-    //     {
-    //         Serial.println("authentification Failed");
-    //         return;
-    //     }
-       
-    // }
-    is_authentificated = true;
-	return is_authentificated;
 }
 
 void TCPTalks::disconnect()
 {	
 	client.stop();
     
-	is_connected = false;
+	m_connected = false;
 }
 
 void TCPTalks::bind(uint8_t opcode, Instruction instruction)
@@ -162,13 +149,13 @@ bool TCPTalks::execinstruction(uint8_t* inputBuffer)
 
     long opcode = input.load<long>();
 
-    Serial.print("opcode : ");
-    Serial.println(opcode, HEX);
+    //Serial.print("opcode : ");
+    //Serial.println(opcode, HEX);
 
     long retcode = input.load<long>();
 
-    Serial.print("retcode : ");
-    Serial.println(retcode);
+    //Serial.print("retcode : ");
+    //Serial.println(retcode);
 
     if(input.is_tuple())
         input.remove_tuple_header();
@@ -206,37 +193,75 @@ bool TCPTalks::execute()
 
         client.read(&inc , 1);
 
-        Serial.println(inc,HEX);
+        //Serial.println(inc,HEX);
         m_lastTime = currentTime;
         // Use a state machine to process the above byte
         switch (m_state)
         {
         // An instruction always begin with the Master byte
         case TCPTALKS_WAITING_STATE:
+
             if (inc == TCPTALKS_MASTER_BYTE)
             {
                 m_state = TCPTALKS_INSTRUCTION_RECEIVING_STATE;
                 m_bytesCounter = 0;
             }
+
+            if (inc == AUTHENTIFICATION_OPCODE)
+            {
+                m_state = TCPTALKS_AUTHENTIFICATION_STATE;
+                m_bytesCounter = 0;
+            }
            
-            Serial.println("wait...");
+            //Serial.println("wait...");
             continue;
 
         case TCPTALKS_INSTRUCTION_RECEIVING_STATE:
+
             m_inputBuffer[m_bytesCounter] = inc;
             m_bytesCounter++;
 
-            Serial.println("exec");
+            //Serial.println("exec");
             if(inc == '.')
             {
-                Serial.println();
-                is_connected = true;
+                //Serial.println();
+                m_connected = true;
                 ret |= execinstruction(m_inputBuffer);
                 m_state = TCPTALKS_WAITING_STATE;
             }
+            break;
+
+        case TCPTALKS_AUTHENTIFICATION_STATE:
+
+            m_inputBuffer[m_bytesCounter] = inc;
+            m_bytesCounter++;
+
+            if(inc == '.')
+            {
+                //Serial.print("is_authentificated : ");
+                //Serial.println(m_authentificated);
+
+                UnPickler input(m_inputBuffer);
+                m_authentificated = input.load<bool>();
+                m_state = TCPTALKS_WAITING_STATE;
+                
+                //Serial.print("is_authentificated : ");
+                //Serial.println(m_authentificated);
+            }
+            break;
         }
     }
     return ret;
+}
+
+bool TCPTalks::is_connected()
+{
+    return m_connected;
+}
+
+bool TCPTalks::is_authentificated()
+{
+    return m_authentificated;
 }
 
 int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
@@ -311,11 +336,11 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
     {
         /* get argument size */
         size = strlen((char*)args);
-        Serial.println(size);
+        //Serial.println(size);
 
         if(args[size - 3] == TUPLE)
         {
-            Serial.println("big tuple");
+            //Serial.println("big tuple");
 
             uint8_t tmp[MAX_BUFFER_SIZE];
             
@@ -347,10 +372,10 @@ int TCPTalks::sendback(uint8_t opcode, long retcode, byte * args)
 
     for(int i = 0; i<=ptr;i++)
     {
-        Serial.print(frame[i],HEX);
-        Serial.print(" ");
+        //Serial.print(frame[i],HEX);
+        //Serial.print(" ");
     }
 
-    Serial.println("");
+    //Serial.println("");
     
 }

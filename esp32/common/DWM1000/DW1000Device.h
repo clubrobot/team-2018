@@ -22,7 +22,7 @@
  */
 
 
-#define INACTIVITY_TIME 1000
+#define INACTIVITY_TIME 2000
 
 #ifndef _DW1000Device_H_INCLUDED
 #define _DW1000Device_H_INCLUDED
@@ -64,7 +64,7 @@ public:
 	
 	int8_t getIndex() { return _index; }
 	
-	//String getAddress();
+	String getAddress();
 	byte* getByteShortAddress();
 	uint16_t getShortAddress();
 	//String getShortAddress();

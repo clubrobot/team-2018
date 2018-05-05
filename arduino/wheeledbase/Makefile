@@ -9,6 +9,7 @@ LOCAL_INO_SRCS = wheeledbase.ino
 LOCAL_CPP_SRCS = \
 	instructions.cpp \
 	$(COMMON)/SerialTalks.cpp \
+	$(COMMON)/CRC16.cpp \
 	$(COMMON)/DCMotor.cpp \
 	$(COMMON)/Codewheel.cpp \
 	$(COMMON)/PeriodicProcess.cpp \
@@ -22,7 +23,6 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/mathutils.cpp
 
 # Define
-CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x20
 CPPFLAGS += -DPUREPURSUIT_MAX_WAYPOINTS=32
 
 # Sketch libraries

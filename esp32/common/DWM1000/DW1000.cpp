@@ -61,6 +61,7 @@ byte       DW1000Class::_preambleLength      = TX_PREAMBLE_LEN_128;
 byte       DW1000Class::_preambleCode        = PREAMBLE_CODE_16MHZ_4;
 byte       DW1000Class::_channel             = CHANNEL_5;
 DW1000Time DW1000Class::_antennaDelay;
+int 	   DW1000Class::_antennaDelayInt = 16384;
 boolean    DW1000Class::_smartPower          = false;
 
 boolean    DW1000Class::_frameCheck          = true;
@@ -1105,11 +1106,20 @@ void DW1000Class::commitConfiguration() {
 	tune();
 	// TODO clean up code + antenna delay/calibration API
 	// TODO setter + check not larger two bytes integer
+	setAntennaDelay(_antennaDelayInt); //16384 for tag, 16530 for anchor
+}
+
+void DW1000Class::setAntennaDelay(int delay){
+	_antennaDelayInt = delay;
 	byte antennaDelayBytes[LEN_STAMP];
-	writeValueToBytes(antennaDelayBytes, 16384, LEN_STAMP);
+	writeValueToBytes(antennaDelayBytes, delay, LEN_STAMP); 
 	_antennaDelay.setTimestamp(antennaDelayBytes);
 	writeBytes(TX_ANTD, NO_SUB, antennaDelayBytes, LEN_TX_ANTD);
 	writeBytes(LDE_IF, LDE_RXANTD_SUB, antennaDelayBytes, LEN_LDE_RXANTD);
+}
+
+int DW1000Class::getAntennaDelay(){
+	return _antennaDelayInt;
 }
 
 void DW1000Class::waitForResponse(boolean val) {

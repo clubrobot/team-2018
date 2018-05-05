@@ -170,6 +170,22 @@ void Pickler::dump<char*>(char* var)
 	ptr++;
 }
 
+template<>
+void Pickler::dump<char>(char var)
+{
+	uint8_t tmp[2] = {BINPUT, 0X00};
+	current_frame[ptr] = (uint8_t)SHORT_BINBYTES;
+	ptr++;
+	current_frame[ptr] = (uint8_t)0X01;
+	ptr++;
+	current_frame[ptr] = (uint8_t)var;
+	ptr++;
+    
+    memcpy(current_frame+ptr, tmp, 2);
+    ptr+=2;
+
+}
+
 UnPickler::UnPickler(uint8_t* frame)
 {
 	current_frame = frame;

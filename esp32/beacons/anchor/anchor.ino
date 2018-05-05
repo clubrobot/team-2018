@@ -5,88 +5,287 @@
  *  - fix deprecated convertation form string to char* startAsAnchor
  *  - give example description
  */
+
+#include "pin.h"
+#include "configuration.h"
+#include <EEPROM.h>
+
 #include <SPI.h>
 #include "DW1000Ranging.h"
-#include "pin.h"
+#include "DW1000.h"
+
 #include "SSD1306.h"
 #include <Wire.h>
 
-SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
+#include "../../common/SerialTalks.h"
+#include "instructions.h"
+
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <BLE2902.h>
+#include "../common/OLED_display.h"
+
+OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
+
+byte currentBeaconNumber = 1;
+boolean calibrationRunning = false;
+
+// BLE variables
+BLECharacteristic *pCharacteristic;
+boolean deviceConnected = false;
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+  //  Serial.println("connected");
+    deviceConnected = true;
+    display.log("panneau connecté");
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+  //  Serial.println("disconnected");
+    deviceConnected = false;
+    display.log("panneau déconnecté");
+  }
+};
+
+void loopCore0(void *pvParameters) // loop on core 0
+{
+  for (;;)
+  {
+    display.update();
+    delay(10);
+  }
+}
 
 void newRange()
 {
-  Serial.print("from: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
-  Serial.print("\t Range: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getRange());
-  Serial.print(" m");
-  Serial.print("\t RX power: ");
-  Serial.print(DW1000Ranging.getDistantDevice()->getRXPower());
-  Serial.println(" dBm");
+  DW1000Ranging.setRangeFilterValue(5);
 
-  display.clear();
-  float distance = DW1000Ranging.getDistantDevice()->getRange()*100;
-  String toDisplay = "Distance : \n";
-  toDisplay += distance;
-  toDisplay += "cm";
-  display.drawString(64, 0, toDisplay);
-  display.display();
+  String toDisplay;
+
+  if(calibrationRunning==true){
+    display.log("timeOut");
+  } else {
+    // get master tag coordinates
+    float x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[0]) / 10;
+    float y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[0]) / 10;
+    toDisplay = "(";
+    toDisplay += (int)x;
+    toDisplay += ", ";
+    toDisplay += (int)y;
+    toDisplay += ")\n";
+    // get slave tag coordinates
+    x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[1]) / 10;
+    y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[1]) / 10;
+    toDisplay += "(";
+    toDisplay += (int)x;
+    toDisplay += ", ";
+    toDisplay += (int)y;
+    toDisplay += ")\n";
+  }
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
 }
 
+void calibration(int realDistance, int mesure){
+  static int lastErrors[3] = {100,100,100};
+  static int errorIndex = 0;
+  static uint16_t antennaDelay ;
+  if(calibrationRunning==false){
+    antennaDelay = DW1000.getAntennaDelay();
+    calibrationRunning = true;
+  }
+  DW1000Ranging.setRangeFilterValue(15);
+  mesure = sqrt(mesure * mesure - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG))); // projection dans le plan des tags
+  
+  lastErrors[errorIndex++] = realDistance - mesure;
+  
+  if(errorIndex > 2){
+    errorIndex = 0;
+    int meanError = (lastErrors[0] + lastErrors[1] + lastErrors[2]) / 3;
+
+    if (abs(meanError) < 1)
+    { // end of calibration
+      DW1000Ranging.stopCalibration();
+      calibrationRunning = false;
+      lastErrors[0] = 100;
+      lastErrors[1] = 100;
+      lastErrors[2] = 100;
+      //EEPROM.write(EEPROM_ANTENNA_DELAY, antennaDelay >> 8);    // TODO bug potentiel ici (valeurs incohérentes à la relecture de l'eeprom)
+      //EEPROM.write(EEPROM_ANTENNA_DELAY + 1, antennaDelay % 256);
+      //EEPROM.commit();
+      //ESP.restart();
+    } else if (meanError < 0) {
+      antennaDelay++;
+      DW1000Class::setAntennaDelay(antennaDelay);
+    } else {
+      antennaDelay--;
+      DW1000Class::setAntennaDelay(antennaDelay);
+    }
+  }
+  
+  String toDisplay = "target: ";
+  toDisplay += realDistance;
+  toDisplay += "mm\nmesure: ";
+  toDisplay += mesure;
+  toDisplay += "mm\ndelay: ";
+  toDisplay += antennaDelay;
+  display.displayMsg(Text(toDisplay, 6, 64, 0));
+}
+
 void newBlink(DW1000Device *device)
 {
-  Serial.print("blink; 1 device added ! -> ");
-  Serial.print(" short:");
-  Serial.println(device->getShortAddress(), HEX);
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
 void inactiveDevice(DW1000Device *device)
 {
-  Serial.print("delete inactive device: ");
-  Serial.println(device->getShortAddress(), HEX);
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber()-1;
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
 
-  display.clear();
-  display.drawString(64, 0, "INACTIVE");
-  display.display();
-  digitalWrite(PIN_LED_OK, LOW);
-  digitalWrite(PIN_LED_FAIL, HIGH);
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
+
+  if (tagNumber + networkNumber == 0)
+  {
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
 }
 
 void setup() {
-  Serial.begin(115200);
-  delay(1000);
-  //init the configuration
-  //initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2, int8_t sck = -1, int8_t miso = -1, int8_t mosi = -1)
+  
+  Serial.begin(SERIALTALKS_BAUDRATE);
+  talks.begin(Serial);
+  
+  talks.bind(UPDATE_ANCHOR_NUMBER_OPCODE, UPDATE_ANCHOR_NUMBER);
+  talks.bind(UPDATE_ANTENNA_DELAY_OPCODE, UPDATE_ANTENNA_DELAY);
+  talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
+  talks.bind(UPDATE_COLOR_OPCODE, UPDATE_COLOR);
+  talks.bind(GET_COORDINATE_OPCODE,GET_COORDINATE);
+  talks.bind(GET_PANEL_STATUS_OPCODE, GET_PANEL_STATUS);
+
+  /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
+  {
+    //Serial.println("failed to initialise EEPROM");
+    delay(1000000);
+  }*/
+
+  #if 0
+  EEPROM.write(EEPROM_NUM_ANCHOR, currentBeaconNumber);
+  EEPROM.commit();
+  #endif
+  currentBeaconNumber = EEPROM.read(EEPROM_NUM_ANCHOR);
+
+  // init communication
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
-  //define the sketch as anchor. It will be great to dynamically change the type of module
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachInactiveAncDevice(inactiveDevice);  // TODO : rename func
+  DW1000Ranging.attachAutoCalibration(calibration);
+
+  unsigned int replyTime;
+  switch (currentBeaconNumber){
+    case 0 :
+      replyTime = 7000;
+      break;
+    case 1:
+      replyTime = 21000;
+      break;
+    case 2:
+      replyTime = 35000;
+      break;
+    case 3:
+      replyTime = 49000;
+      break;
+  }
+  
+  DW1000Ranging.setReplyTime(replyTime);
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
-  
+  DW1000Ranging.setRangeFilterValue(5);
+
+  int antennaDelay = ANTENNA_DELAY[currentBeaconNumber];
+  #if 0
+  EEPROM.write(EEPROM_ANTENNA_DELAY, antennaDelay >> 8);
+  EEPROM.write(EEPROM_ANTENNA_DELAY + 1, antennaDelay % 256);
+  EEPROM.commit();
+  #endif
+ // antennaDelay = (EEPROM.read(EEPROM_ANTENNA_DELAY) << 8) + EEPROM.read(EEPROM_ANTENNA_DELAY+1);
+  DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, approximately 16530 for anchors
+
   //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:5B:D5:A9:9A:E2:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER );
+
+  xTaskCreatePinnedToCore(
+      loopCore0,   /* Function to implement the task */
+      "loopCore0", /* Name of the task */
+      10000,       /* Stack size in words */
+      NULL,        /* Task input parameter */
+      0,           /* Priority of the task */
+      NULL,        /* Task handle. */
+      0);          /* Core where the task should run */
 
   pinMode(PIN_LED_FAIL,OUTPUT);
   pinMode(PIN_LED_OK,OUTPUT);
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
-  display.drawString(64, 24, "SYNCHRONISATION");
-  display.display();
 
-  display.setFont(ArialMT_Plain_24);
+  String s = "ANCHOR\n";
+  s+=currentBeaconNumber;
+  display.displayMsg(Text("SYNC", 3, 64, 0));
+  display.displayMsg(Text(s, 4, 64, 0));
+
+  // Start BLE Server only if this is the supervisor anchor
+  if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
+  {
+    display.log("panneau déconnecté");
+    BLEDevice::init("srv");
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_READ |
+            BLECharacteristic::PROPERTY_WRITE |
+            BLECharacteristic::PROPERTY_NOTIFY);
+    pCharacteristic->setValue("insa rennes");
+    pService->start();
+    BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising->addServiceUUID(pService->getUUID());
+    pAdvertising->start();
+   // Serial.println("Characteristic defined! Now you can read it in your phone!");
+  }
 }
 
 void loop() {
   DW1000Ranging.loop();
+  talks.execute();
 }
 
 

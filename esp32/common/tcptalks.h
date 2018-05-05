@@ -30,24 +30,21 @@
 typedef uint8_t byte;
 
 
-
 class TCPTalks
 {
 	public: // Public API
 
-	TCPTalks();
+	TCPTalks(char* network_ssid, char* network_password,char* server_ip, int server_port);
 
 	typedef void (*Instruction)(TCPTalks& inst, UnPickler& input, Pickler& output);
 
 	void connect(int timeout);
 
-	bool authentificate(int timeout);
+	void authentificate();
 		
 	void disconnect();
 		
 	void bind(uint8_t opcode, Instruction instruction);
-
-	//void rawsend(uint8_t* rawbytes);
 		
 	void send(uint8_t opcode, uint8_t* args);
 
@@ -63,6 +60,10 @@ class TCPTalks
 
 	int sendback(uint8_t opcode, long retcode, byte * args);
 
+	bool is_connected();
+
+	bool is_authentificated();
+
 		
 	protected: // Protected methods
 
@@ -72,10 +73,10 @@ class TCPTalks
 
 	char* password = "";
 
-	bool is_connected;
-	bool is_authentificated;
+	bool m_connected;
+	bool m_authentificated;
 
-	char* ssid     = "";
+	char* ssid = "";
 	char* pass = "";
 
 	WiFiClient client;
@@ -87,6 +88,7 @@ class TCPTalks
 		TCPTALKS_WAITING_STATE,
 		TCPTALKS_INSTRUCTION_STARTING_STATE,
 		TCPTALKS_INSTRUCTION_RECEIVING_STATE,
+		TCPTALKS_AUTHENTIFICATION_STATE,
 	}m_state;
 
 
@@ -98,8 +100,7 @@ class TCPTalks
 	byte  m_outputBuffer[TCPTALKS_OUTPUT_BUFFER_SIZE];
 
 
+
 };
-
-
 void SWITCH_LED(TCPTalks& inst, UnPickler& input, Pickler& output);
 #endif // __TCPTALKS_H__
