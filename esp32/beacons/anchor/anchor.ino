@@ -256,10 +256,7 @@ void setup() {
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
 
-  String s = "ANCHOR\n";
-  s+=currentBeaconNumber;
   display.displayMsg(Text("SYNC", 3, 64, 0));
-  display.displayMsg(Text(s, 4, 64, 0));
 
   // Start BLE Server only if this is the supervisor anchor
   if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
@@ -279,7 +276,10 @@ void setup() {
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->addServiceUUID(pService->getUUID());
     pAdvertising->start();
-   // Serial.println("Characteristic defined! Now you can read it in your phone!");
+  } else {
+    String s = "ANCHOR\n";
+    s += currentBeaconNumber;
+    display.displayMsg(Text(s, 4, 64, 0));
   }
 }
 
