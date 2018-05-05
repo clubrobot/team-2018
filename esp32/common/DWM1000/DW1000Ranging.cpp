@@ -1085,7 +1085,7 @@ void DW1000RangingClass::timerTick() {
 	if(_waitingSyncAck){
 		counterForSync++;
 	}
-	if(counterForSync>10){
+	if(counterForSync>4){
 		_waitingSyncAck = false;
 		counterForSync = 0;
 		_isEnabled = false;
