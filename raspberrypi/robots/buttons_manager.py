@@ -24,8 +24,9 @@ class ButtonGestureMatch():
     WAITING_TIRRET = 2
     WAITING_MATCH = 3
 
-    def __init__(self, buttons, display, wheelebase, server, side_setter):
+    def __init__(self, buttons, urgency, display, wheelebase, server, side_setter):
         self.buttons = buttons
+        self.urgency = urgency
         self.display = display
         self.server = server
         self.wheeledbase = wheelebase
@@ -86,7 +87,7 @@ class ButtonGestureMatch():
 
 
         if self.status == ButtonGestureMatch.WAITING_TIRRET:
-            if self.tirret_status.is_set():
+            if self.tirret_status.is_set() or not bool(self.urgency.get_emergency_state()):
                 for k in range(3):
                     for i in range(4):
                         self.buttons.on(i+1)
