@@ -49,9 +49,8 @@ def start(args):
         print("Balise Receiver not connected ! ")
 
     bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
-    bm.start()
     automate = Bornibus(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back,  br, bm)
-    button_gesture = ButtonGestureMatch(button_card, ssd, b, m, automate.set_side)
+    button_gesture = ButtonGestureMatch(button_card, l, ssd, b, m, automate.set_side)
     button_gesture.run()
     button_card.disconnect()
     try:
