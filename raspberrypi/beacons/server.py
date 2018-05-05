@@ -46,12 +46,10 @@ class Server(TCPTalksServer):
             pass
 
     def getPosition(self, id):
-        print(id)
-        if id == 0:
-            try:
-                return self.beacon.get_position()
-            except:
-                return (-1000, -1000)
+        try:
+            return self.beacon.get_position(id)
+        except:
+            return (-1000, -1000)
 
         return (-1000, -1000)
 
