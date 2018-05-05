@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
-#from picamera.array import PiRGBArray
-#from picamera import PiCamera
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 import time
 import math
  
@@ -116,6 +116,7 @@ class Pattern:
 
 
 p = Pattern()
-p.take_photo()
-p.find_pattern()
-print(p.color_pat[0], p.color_pat[1], p.color_pat[2])
+while(True):
+	p.take_photo()
+	p.find_pattern()
+	print(p.color_pat[0], p.color_pat[1], p.color_pat[2])
