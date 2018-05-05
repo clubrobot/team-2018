@@ -107,9 +107,9 @@ class Pattern:
 
 
 	def take_photo(self):
-	#	self.camera.capture(self.rawCapture,format='bgr')
-	#	self.image=rawCapture.array.copy()
-	#	self.rawCapture.truncate(0)
+		self.camera.capture(self.rawCapture,format='bgr')
+		self.image=rawCapture.array.copy()
+		self.rawCapture.truncate(0)
 		self.image = cv.imread('pattern.jpg', cv.IMREAD_COLOR)
 	
 	def save_pattern(self):
