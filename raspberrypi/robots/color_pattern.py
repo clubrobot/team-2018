@@ -32,7 +32,7 @@ class Pattern:
 		#initialize a first image
 		self.rawCapture=PiRGBArray(self.camera)
 		self.camera.capture(self.rawCapture,format='bgr')
-		self.image=rawCapture.array.copy()
+		self.image=self.rawCapture.array.copy()
 		self.rawCapture.truncate(0)
 	
 
@@ -80,35 +80,29 @@ class Pattern:
 		color_number = 0
 		for c in moy :
 			RGB_color = (c[2], c[1], c[0])
-			min = 1000000000000
-
-			for color_name, color_value in colors_constants.items():
-				norm = getNorm(RGB_color, color_value)
-				if norm <= min : 
-					min = norm
-					self.color_pat[color_number] = color_name
-					
-
-					
+			min = 1000000000000				
+			self.color_pat[color_number] = self.color_guesser(RGB_color)
 			if self.color_pat[color_number] != 'grey' : 		
 				color_number +=1
 			if color_number >2 : 
 				break
 
-
-
-
-		
 	def get_pattern(self):
-		a=1
+		return self.color_pat
 
-	def color_guesser(self, r, g, b):
-		a=1
+	def color_guesser(self, rgb):
+		name = "unknown"
+		for color_name, color_value in colors_constants.items():
+			norm = getNorm(rgb, color_value)
+			if norm <= min : 
+				min = norm
+				name = color_name
+		return name 
 
 
 	def take_photo(self):
 		self.camera.capture(self.rawCapture,format='bgr')
-		self.image=rawCapture.array.copy()
+		self.image=self.rawCapture.array.copy()
 		self.rawCapture.truncate(0)
 	
 	def save_pattern(self):
@@ -120,3 +114,4 @@ while(True):
 	p.take_photo()
 	p.find_pattern()
 	print(p.color_pat[0], p.color_pat[1], p.color_pat[2])
+	time.sleep(1)
