@@ -135,6 +135,8 @@ class Bornibus:
         shortShot.link_area(shortShot.name)
         beeAct.link_area(beeAct.name)
 
+        bm.start()
+
         def longShot():
             return not (longShot0 or longShot1 or longShot2)
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
@@ -143,7 +145,7 @@ class Bornibus:
 
 
         #dispMono.set_manual_order(1)
-    #shortShot.set_manual_order(2)
+        shortShot.set_manual_order(2)
         #dispMulti.set_manual_order(3)
         #longShot2.set_manual_order(4)
         #longShot0.set_manual_order(4)
@@ -158,16 +160,16 @@ class Bornibus:
         self.side = side
 
     def run(self):
+        time.sleep(5)
         self.displayManager.start()
         self.logger.reset_time()
-        self.arduinos["wheeledbase"].lookahead.set(200)
-        self.arduinos["wheeledbase"].max_linvel.set(500)
-        self.arduinos["wheeledbase"].max_angvel.set(6)
-
+        self.mover.reset()
         self.arduinos["watersorter"].set_shaker_velocity(400)
         self.arduinos["beeActioner"].close()
         self.arduinos["watersorter"].close_trash_unloader()
         self.arduinos["watersorter"].close_trash()
+
+        self.data["nb_balls_in_unloader"] = 0
 
         act = self.heuristics.get_best()
         print(act)
@@ -191,14 +193,14 @@ if __name__ == '__main__':
     rm = RoadMap.load(geo)
     print("Fin Chargement")
 
-    br = BaliseReceiver("192.168.1.11")
-    #try:
-    #    br.connect()
-    #except:
-    #    pass
+    br = BaliseReceiver("192.168.12.3")
+    try:
+        br.connect()
+    except:
+        print("BALISE : Not connected")
+        pass
 
     bm = BeaconsManagement(br, "area.ggb")
-    bm.start()
 
     auto = Bornibus(side, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
     auto.run()

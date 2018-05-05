@@ -26,7 +26,7 @@ class Action():
     def set_predecessors(self, predecessors):
         self.predecessors = predecessors
 
-    def check_impossible_combinations(self, actions):
+    def check_impossible_combinations(self):
         for combi in self.combinations:
             if combi():
                 return False
@@ -50,6 +50,30 @@ class Action():
     def set_before_action(self, action):
         self.before_action = action
 
+class MultipleAction(Action):
+    def __init__(self, actions):
+        self.actions = actions
+        for action in self.actions:
+            for action2 in self.actions:
+                if action == action2:
+                    break
+                action.set_impossible_combination(action2)
+
+    def set_predecessors(self, predecessors):
+        for action in self.actions:
+            action.set_predecessors(predecessors)
+
+    def get_actions(self):
+        return self.actions
+
+    def __bool__(self):
+        for action in self.actions:
+            if action:
+                return True
+        return False
+
 class Actionnable():
     def getAction(self):
         raise NotImplementedError("Need implementation")
+
+

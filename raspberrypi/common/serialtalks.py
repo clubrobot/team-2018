@@ -115,8 +115,8 @@ class SerialTalks:
         while not self.is_connected:
             try:
                 output = self.execute(PING_OPCODE, timeout=0.1)
-            except NotConnectedError:
-                pass
+                self.is_connected = True
+                self.reset_queues()
             except TimeoutError:
                 if time.monotonic() - startingtime > timeout:
                     self.disconnect()
@@ -125,8 +125,9 @@ class SerialTalks:
                             self.stream.port)) from None
                 else:
                     continue
-            self.is_connected = True
-            self.reset_queues()
+
+            except NotConnectedError:
+                self.is_connected = False
 
     def disconnect(self):
         try:

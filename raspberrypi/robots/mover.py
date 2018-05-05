@@ -47,6 +47,8 @@ class Mover:
     FAST = 5
     SIMPLE = 6
     HARD = 7
+    SENSORS = 8
+    POSITION = 9
 
     def __init__(self, side, roadmap, arduinos, logger, becons_receiver):
 
@@ -105,16 +107,20 @@ class Mover:
     def get_wall_status(x, y):
         return x < WALL_RANGE or (2000 - x) < WALL_RANGE or y < WALL_RANGE or (3000 - y) < WALL_RANGE
 
-    def gowall(self, try_limit=3, strategy=FAST, direction="forward"):
+    def gowall(self, try_limit=3, strategy=SENSORS, direction="forward", position=None):
         #  /\ Determination de la proximité avec un enemies et initialisation des variables /\
         # closed_to_enemy = self.get_enemy_status()
         self.goal = self.wheeledbase.get_position()
-        if strategy == Mover.FAST:
-            self._gowall_fast(try_limit, direction)
+        if strategy == Mover.SENSORS:
+            self._gowall_sensors(try_limit, direction)
+        elif strategy == Mover.POSITION:
+            if position is None:
+                raise ValueError
+            self._gowall_position(try_limit, direction, position)
         self.reset()
 
     # Button activation
-    def _gowall_fast(self, try_limit, direction):
+    def _gowall_sensors(self, try_limit, direction):
         wall_reached = False
         nb_try = try_limit
         direction = {"forward": 1, "backward": -1}[direction]
@@ -175,6 +181,85 @@ class Mover:
                         except RuntimeError:
                             pass
                     else:
+                        self.wheeledbase.goto_delta(-10 * direction, 0)
+                        try:
+                            self.wheeledbase.wait()
+                        except RuntimeError:
+                            pass
+                        self.wheeledbase.set_velocities(0, -6)
+                        sleep(0.8)
+                        self.wheeledbase.stop()
+                        while True:
+                            try:
+                                self.wheeledbase.turnonthespot(self.goal[-1])
+                                self.wheeledbase.wait()
+                                break
+                            except RuntimeError:
+                                pass
+
+    def _gowall_position(self, try_limit, direction, position_goal):
+        wall_reached = False
+        nb_try = try_limit
+        direction = {"forward": 1, "backward": -1}[direction]
+        while not wall_reached:
+            try:
+                self.wheeledbase.set_velocities(250 * direction, 0)
+                while not self.wheeledbase.isarrived():
+                    time.sleep(0.1)
+            except RuntimeError:
+                if not nb_try > 0:
+                    break
+                nb_try -= 1
+
+                current_position = self.wheeledbase.get_position()
+                # TODO Change for more generic com      paraison
+                self.logger("MOVER : ", position_goal=position_goal, current_position=current_position)
+                if abs(current_position[0] - position_goal[0]) < 60:
+                    wall_reached = True
+
+                else:
+                    _, ang = self.wheeledbase.get_velocities_wanted(True)
+                    self.logger("MOVER : ", "Obstacle detected")
+                    if abs(ang) > 4.5:
+                        self.logger("MOVER : ", "Try to avoid a lateral obstacle")
+                        # Try to reach the initial angle
+                        while True:
+                            try:
+                                # TODO DANGER
+                                self.wheeledbase.left_wheel_maxPWM.set(0.5)
+                                self.wheeledbase.right_wheel_maxPWM.set(0.5)
+                                self.wheeledbase.turnonthespot(self.goal[-1])
+                                self.wheeledbase.wait()
+                                self.wheeledbase.left_wheel_maxPWM.set(1)
+                                self.wheeledbase.right_wheel_maxPWM.set(1)
+                                break
+                            except RuntimeError:
+                                self.wheeledbase.left_wheel_maxPWM.set(1)
+                                self.wheeledbase.right_wheel_maxPWM.set(1)
+                                self.wheeledbase.set_velocities(-100 * direction, 0)
+                                sleep(0.2)
+                                self.wheeledbase.stop()
+                        # Go backward
+                        if ang < 0:
+                            self.wheeledbase.goto_delta(-50 * direction, 0)
+                        else:
+                            self.wheeledbase.goto_delta(-40 * direction, 0)
+                        try:
+                            self.wheeledbase.wait()
+                        except RuntimeError:
+                            pass
+
+                        # TURN HARD
+                        print("ANG", ang)
+                        self.wheeledbase.set_velocities(0, copysign(6, -ang))
+                        sleep(0.8)
+                        try:
+                            self.wheeledbase.turnonthespot(self.goal[-1])
+                            self.wheeledbase.wait()
+                        except RuntimeError:
+                            pass
+                    else:
+                        self.logger("MOVER : ", "Try to avoid a front obstacle")
                         self.wheeledbase.goto_delta(-10 * direction, 0)
                         try:
                             self.wheeledbase.wait()
@@ -257,6 +342,7 @@ class Mover:
                 self.wheeledbase.stop()
                 if last_point_aim is None:
                     self.wheeledbase.set_velocities(-100 if self.direction == "forward" else 100, 0)
+                    sleep(0.5)
                 else:
                     try:
                         self.wheeledbase.goto(*last_point_aim)

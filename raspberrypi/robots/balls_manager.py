@@ -11,7 +11,7 @@ from robots.mover import Mover, PositionUnreachable
 class Dispenser(Actionnable):
     typ="Dispenser"
     POINTS_DISPENSER = 10
-    TIME = 10
+    TIME = 15
     def __init__(self,numberDispenser, rm, geo, arduinos, display, mover, logger, data):
         self.rm  = rm
         self.geo = geo
@@ -29,7 +29,7 @@ class Dispenser(Actionnable):
     def realize(self,robot ,watersorter ,display):
         theta = math.atan2(self.preparationPoint[1]-self.targetPoint[1],self.preparationPoint[0]-self.targetPoint[0])+3.141592
         robot.max_linvel.set(300)
-        robot.max_angvel.set(1)
+        robot.max_angvel.set(3)
         watersorter.close_trash()
         watersorter.close_outdoor()
         watersorter.open_indoor()
@@ -54,14 +54,14 @@ class Dispenser(Actionnable):
             self.logger("DISPENSER : ", "CONTACT !! Just try to take balls here {},{}", *init_pos)
             begin = time.time()
             while time.time() - begin < 2:
-                self.wheeledbase.set_velocities(-150, 1)
+                self.wheeledbase.set_velocities(-150, 2)
                 time.sleep(0.4)
-                self.wheeledbase.set_velocities(200, -1)
+                self.wheeledbase.set_velocities(200, -2)
                 time.sleep(0.4)
 
         self.logger("DISPENSER : ", "Trying to go backward ")
         pos = robot.get_position()[:-1]
-        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=3, strategy=Mover.HARD,
+        self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=5, strategy=Mover.HARD,
                             last_point_aim=self.preparationPoint)
         self.watersorter.disable_shaker()
         robot.stop()
@@ -106,15 +106,17 @@ class Shot(Actionnable):
     def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=23):
         nb_balls = 0
         begin_time = time.time()
-        motor_base = 80
-        watersorter.open_outdoor()
+        motor_base = 83
         timeout_per_ball = 1
         currentPosXY=wheeledbase.get_position()[:2]
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
+            wheeledbase.angpos_threshold.set(0.05)
             self.mover.turnonthespot(theta, 3, Mover.AIM)
+
         except PositionUnreachable:
+            wheeledbase.angpos_threshold.set(0.1)
             return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
@@ -140,14 +142,13 @@ class Shot(Actionnable):
             watersorter.close_indoor()
 
             close_time = time.time()
-            while (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100) and not (time.time() - begin_time > global_timeout):
+            while waterlauncher.get_nb_launched_water() < 1 and not (time.time() - begin_time > global_timeout):
                 time.sleep(0.1)
                 waterlauncher.set_motor_pulsewidth(1000+motor_base)
                 if time.time() - close_time > timeout_per_ball:
                     watersorter.close_trash()
                     close_time = time.time()
-            
-            time.sleep(0.8)
+
             if time.time() - begin_time < global_timeout:
                 nb_balls += 1
                 display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
@@ -155,6 +156,9 @@ class Shot(Actionnable):
             waterlauncher.set_motor_pulsewidth(1150)
             time.sleep(0.1)
             waterlauncher.set_motor_pulsewidth(1000 + motor_base)
+            watersorter.open_indoor()
+            watersorter.close_outdoor()
+            time.sleep(0.2)
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
@@ -163,13 +167,15 @@ class Shot(Actionnable):
         watersorter.open_indoor()
             
     def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=25):
-        motor_base = 105
+        motor_base = 110
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
         try:
+            wheeledbase.angpos_threshold.set(0.05)
             self.mover.turnonthespot(theta, 3, Mover.AIM)
         except PositionUnreachable:
+            wheeledbase.angpos_threshold.set(0.1)
             return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
@@ -227,7 +233,9 @@ class Shot(Actionnable):
                     while (watersorter.get_water_color()[0]>80 or watersorter.get_water_color()[1]>80) and not (time.time() - begin_time > global_timeout):
                         time.sleep(0.1)
                         self.logger("SHOT : ", "En attente de la sortie")
-                    time.sleep(0.6)
+                    while waterlauncher.get_nb_launched_water() != 1 and not (
+                            time.time() - begin_time > global_timeout):
+                        time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1200)
                     time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1000 + motor_base)
@@ -339,16 +347,22 @@ class Treatment(Actionnable):
         self.display.angry(1)
         self.logger("TREATMENT :", "Launch a go wall ")
         try:
-            self.mover.gowall(1,direction="backward")
+            self.mover.gowall(3,direction="backward", strategy=Mover.POSITION, position=self.shootTreatmentPoint)
         except PositionUnreachable:
             self.logger("TREATMENT :", "Position Unreachable ")
             pass
         turn = False
         self.logger("TREATMENT :", "Turning !")
         try:
-            self.mover.turnonthespot(math.pi/2, 3, stategy=Mover.AIM)
-        except PositionUnreachable:
-            return
+            self.wheeledbase.goto_delta(70, 0)
+            self.wheeledbase.wait()
+            self.mover.turnonthespot(math.pi / 2, 3, stategy=Mover.AIM)
+
+        except RuntimeError:
+            try:
+                self.mover.turnonthespot(math.pi / 2, 3, stategy=Mover.AIM)
+            except PositionUnreachable:
+                return
 
         self.display.happy(2)
         self.logger("TREATMENT :", "Droping !")
