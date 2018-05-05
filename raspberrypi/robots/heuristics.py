@@ -110,6 +110,8 @@ class Heuristics:
         for action in self.action_names:
             if not self.action_dict[action].done:
                 point = self.action_dict[action].actionPoint
+                print(point)
+                print(robot_pos)
                 max_distance = max(math.hypot(robot_pos[0] - point[0], robot_pos[1] - point[1]), max_distance)
 
         for action in self.action_names:
