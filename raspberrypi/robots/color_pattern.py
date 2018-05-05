@@ -1,4 +1,4 @@
-import opencv3 as cv
+import cv3 as cv
 import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
