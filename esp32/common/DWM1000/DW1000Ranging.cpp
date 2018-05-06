@@ -86,6 +86,8 @@ float DW1000RangingClass::_pos_y[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 
 // others
 uint8_t DW1000RangingClass::_color = 0;
+uint8_t DW1000RangingClass::_dataSyncSize = 0;
+void *DW1000RangingClass::_dataSync = NULL;
 
 // data buffer
 byte          DW1000RangingClass::data[LEN_DATA];
@@ -111,6 +113,7 @@ void (* DW1000RangingClass::_handleNewDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveAncDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveTagDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
+void (* DW1000RangingClass::_handleDataSync)(uint8_t, void *) = 0;
 
 /* ###########################################################################
  * #### Debug ################################################################
@@ -903,7 +906,16 @@ void DW1000RangingClass::loop() {
 					memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
 					float curRXPower;
 					memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
-					
+
+					// we receive dataSync
+					memcpy(&_dataSyncSize, data + 9 + SHORT_MAC_LEN, 1);
+					if (_dataSyncSize > 0 && _dataSync != 0)
+						memcpy(_dataSync, data + 10 + SHORT_MAC_LEN, _dataSyncSize);
+					if (_handleDataSync != 0)
+					{
+						(*_handleDataSync)(_dataSyncSize,_dataSync);
+					}
+
 					if (_useRangeFilter) {
 						//Skip first range
 						if (myDistantDevice->getRange() != 0.0f) {
@@ -1277,6 +1289,11 @@ void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
 	//We add the Range and then the RXPower
 	memcpy(data+1+SHORT_MAC_LEN, &curRange, 4);
 	memcpy(data+5+SHORT_MAC_LEN, &curRXPower, 4);
+	// we send dataSync
+	memcpy(data+9+SHORT_MAC_LEN, &_dataSyncSize, 1);
+	if(_dataSyncSize>0 && _dataSync != 0)
+		memcpy(data + 10 + SHORT_MAC_LEN, _dataSync, _dataSyncSize);
+
 	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
 	transmit(data, DW1000Time(_replyDelayTimeUS, DW1000Time::MICROSECONDS));
 }
@@ -1479,4 +1496,16 @@ void DW1000RangingClass::transmitColor(uint8_t color)
 
 uint8_t DW1000RangingClass::getColor(){
 	return _color;
+}
+
+// dataSync
+void DW1000RangingClass::setDataSyncSize(uint8_t dataSize)
+{
+	_dataSyncSize = dataSize;
+	
+}
+
+void DW1000RangingClass::setDataSync(void *data)
+{
+	_dataSync = data;
 }

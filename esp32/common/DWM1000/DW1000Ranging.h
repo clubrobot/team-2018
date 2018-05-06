@@ -120,6 +120,7 @@ public:
 	static void attachInactiveAncDevice(void (*handleInactiveAncDevice)(DW1000Device *)) { _handleInactiveAncDevice = handleInactiveAncDevice; };
 	static void attachInactiveTagDevice(void (*handleInactiveTagDevice)(DW1000Device *)) { _handleInactiveTagDevice = handleInactiveTagDevice; };
 	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
+	static void attachDataSync(void (*handleDataSync)(uint8_t, void *)) { _handleDataSync = handleDataSync; };
 
 	// Auto calibration
 	static void startAutoCalibration(int realDistance, unsigned long timeOut);
@@ -144,8 +145,11 @@ public:
 	//FOR DEBUGGING
 	static void visualizeDatas(byte datas[]);
 
+	// dataSync
+	static void setDataSyncSize(uint8_t dataSize);
+	static void setDataSync(void *data);
 
-private:
+  private:
 	//other devices in the network
 	static DW1000Device _networkDevices[MAX_DEVICES];
 	static volatile uint8_t _networkDevicesNumber;
@@ -175,7 +179,8 @@ private:
 	static void (* _handleInactiveAncDevice)(DW1000Device *);
 	static void (* _handleInactiveTagDevice)(DW1000Device *);
 	static void (* _handleCalibration)(int,int);	// real distance (INT), mesure (INT)
-	
+	static void (* _handleDataSync)(uint8_t,void*);
+
 	//sketch type (tag or anchor)
 	static int16_t          _type; //0 for tag and 1 for anchor
 	// TODO check type, maybe enum?
@@ -220,6 +225,8 @@ private:
 	static float _pos_y[MAX_TAG_DEVICES];
 	// others
 	static uint8_t _color;	// 0 = green, 1 = orange
+	static uint8_t _dataSyncSize;
+	static void *_dataSync;
 
 	//methods
 	static void handleSent();
@@ -261,6 +268,7 @@ private:
 	//Utils
 	static float filterValue(float value, float previousValue, uint16_t numberOfElements);
 	static void log(String text);
+
 };
 
 extern DW1000RangingClass DW1000Ranging;

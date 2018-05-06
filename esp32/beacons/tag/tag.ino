@@ -12,6 +12,7 @@
 #include <SPI.h>
 #include "DW1000Ranging.h"
 #include "MatrixMath.h"
+#include "../common/dataSync.h"
 
 #include "../../common/SerialTalks.h"
 #include "instructions.h"
@@ -22,6 +23,7 @@
 
 OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
 byte currentBeaconNumber = 1;
+DataSync data;
 
 bool a1Connected = false;
 bool a2Connected = false;
@@ -248,11 +250,8 @@ void newRange()
   DW1000Ranging.setPosY(p[1],0);
 
   uint8_t c = DW1000Ranging.getColor();
-  String toDisplay;
-  toDisplay += c;
-  toDisplay += c==0?" : green":" : orange";
-  display.log(toDisplay);
 
+  display.log(data.color == GREEN ? "green" : "orange");
 
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
@@ -378,6 +377,7 @@ void setup() {
   EEPROM.commit();
 #endif
   currentBeaconNumber = EEPROM.read(EEPROM_NUM_TAG);
+  data.color = GREEN;
 
   //init the configuration
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
@@ -386,6 +386,8 @@ void setup() {
   DW1000Ranging.attachInactiveAncDevice(inactiveAncDevice);
   DW1000Ranging.attachInactiveTagDevice(inactiveTagDevice);
   DW1000Ranging.attachBlinkDevice(blinkDevice);
+  DW1000Ranging.setDataSync(&data);
+  DW1000Ranging.setDataSyncSize(sizeof(data));
   //Enable the filter to smooth the distance
   DW1000Ranging.useRangeFilter(true);
   DW1000Ranging.setRangeFilterValue(5);
@@ -412,6 +414,7 @@ void setup() {
   pinMode(PIN_LED_OK, OUTPUT);
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, HIGH);
+
 
   display.displayMsg(Text("SYNC", 3, 64, 0));
   if (TAG_SHORT_ADDRESS[currentBeaconNumber] == MASTER_TAG_ADDRESS)
