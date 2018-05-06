@@ -120,7 +120,7 @@ public:
 	static void attachInactiveAncDevice(void (*handleInactiveAncDevice)(DW1000Device *)) { _handleInactiveAncDevice = handleInactiveAncDevice; };
 	static void attachInactiveTagDevice(void (*handleInactiveTagDevice)(DW1000Device *)) { _handleInactiveTagDevice = handleInactiveTagDevice; };
 	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
-	static void attachDataSync(void (*handleDataSync)(uint8_t, void *)) { _handleDataSync = handleDataSync; };
+	static void attachDataSync(void (*handleDataSync)()) { _handleDataSync = handleDataSync; };
 
 	// Auto calibration
 	static void startAutoCalibration(int realDistance, unsigned long timeOut);
@@ -179,7 +179,7 @@ public:
 	static void (* _handleInactiveAncDevice)(DW1000Device *);
 	static void (* _handleInactiveTagDevice)(DW1000Device *);
 	static void (* _handleCalibration)(int,int);	// real distance (INT), mesure (INT)
-	static void (* _handleDataSync)(uint8_t,void*);
+	static void (* _handleDataSync)();
 
 	//sketch type (tag or anchor)
 	static int16_t          _type; //0 for tag and 1 for anchor

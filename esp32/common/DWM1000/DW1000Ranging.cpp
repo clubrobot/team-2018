@@ -113,7 +113,7 @@ void (* DW1000RangingClass::_handleNewDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveAncDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveTagDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
-void (* DW1000RangingClass::_handleDataSync)(uint8_t, void *) = 0;
+void (* DW1000RangingClass::_handleDataSync)() = 0;
 
 /* ###########################################################################
  * #### Debug ################################################################
@@ -913,7 +913,7 @@ void DW1000RangingClass::loop() {
 						memcpy(_dataSync, data + 10 + SHORT_MAC_LEN, _dataSyncSize);
 					if (_handleDataSync != 0)
 					{
-						(*_handleDataSync)(_dataSyncSize,_dataSync);
+						(*_handleDataSync)();
 					}
 
 					if (_useRangeFilter) {

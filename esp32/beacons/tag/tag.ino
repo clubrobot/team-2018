@@ -250,10 +250,6 @@ void newRange()
   DW1000Ranging.setPosX(p[0],0);
   DW1000Ranging.setPosY(p[1],0);
 
-  uint8_t c = DW1000Ranging.getColor();
-
-  display.log(data.color == GREEN ? "green" : "orange");
-
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
 }
@@ -367,6 +363,10 @@ void blinkDevice(DW1000Device *device){
   digitalWrite(PIN_LED_FAIL, LOW);
 }
 
+void handleDataSync(){
+  display.log(data.color == GREEN ? "green" : "orange");
+}
+
 void setup() {
   Serial.begin(SERIALTALKS_BAUDRATE);
   talks.begin(Serial);
@@ -387,6 +387,7 @@ void setup() {
   DW1000Ranging.attachInactiveAncDevice(inactiveAncDevice);
   DW1000Ranging.attachInactiveTagDevice(inactiveTagDevice);
   DW1000Ranging.attachBlinkDevice(blinkDevice);
+  DW1000Ranging.attachDataSync(handleDataSync);
   DW1000Ranging.setDataSync(&data);
   DW1000Ranging.setDataSyncSize(sizeof(data));
   //Enable the filter to smooth the distance
