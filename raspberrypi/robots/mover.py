@@ -71,7 +71,7 @@ class Mover:
 
         self.front_flag = Flag(self.front_obstacle)
         self.withdraw_flag = Flag(self._withdraw_interrup)
-
+        self.front_safe_flag = Flag(self.front_obstacle_safe)
         self.path = list()
         self.isarrived = False
         self.interupted_lock = RLock()
@@ -85,6 +85,7 @@ class Mover:
     def reset(self):
         self.front_flag.clear()
         self.withdraw_flag.clear()
+        self.front_safe_flag.clear()
         self.wheeledbase.reset_parameters()
         self.interupted_timeout.clear()
         self.interupted_status.clear()
@@ -629,5 +630,48 @@ class Mover:
         self.wheeledbase.purepursuit(self.path)
         # except ValueError:
         #    pass  # TODO
+        self.interupted_status.clear()
+        self.interupted_lock.release()
+
+
+    def goto_safe(self, x, y):
+
+        self.goal = (x, y)
+        self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2], self.goal)
+        self.logger("MOVER : ", path=self.path)
+        self.wheeledbase.max_linvel.set(300)
+        self.wheeledbase.purepursuit(self.path)
+        self.front_safe_flag.bind(self.sensors_front_listener.signal)
+        self.isarrived = False
+        while not self.isarrived or self.interupted_status.is_set():
+            try:
+                self.isarrived = self.wheeledbase.isarrived()
+                sleep(0.1)
+            except RuntimeError as e:
+                print(e)
+                self.logger("MOVER : ", "Spin ! We will wait ")
+                if not self.interupted_lock.acquire(blocking=True, timeout=0.5):
+                    continue
+                self.wheeledbase.stop()
+                sleep(5)
+                self.wheeledbase.purepursuit(self.path)
+                self.interupted_lock.release()
+            except TimeoutError:
+                self.isarrived = False
+
+        self.reset()
+
+    def front_obstacle_safe(self):
+        x, y, _ = self.wheeledbase.get_position()
+        if hypot(y-self.goal[1],x-self.goal[0])<70:
+            return
+        if not self.interupted_lock.acquire(blocking=True, timeout=0.5):
+            return
+        self.logger("MOVER : ", "Object in the front detected !")
+        self.interupted_status.set()
+        self.wheeledbase.set_velocities(0,0)
+        self.logger("MOVER : ", "Wait....")
+        self.sensors_front.wait(220, timeout=100)
+        self.wheeledbase.purepursuit(self.path)
         self.interupted_status.clear()
         self.interupted_lock.release()

@@ -15,6 +15,7 @@ _SET_MOTOR_PULSEWIDTH_OPCODE	= 0x1A
 _GET_MOTOR_PULSEWIDTH_OPCODE	= 0x1B
 _FORCE_PULSEWIDTH				= 0x1E
 _GET_LAUNCHED_WATER_OPCODE      = 0x2A
+_GET_EMERGENCY_STATE_OPCODE		= 0x2B
 
 class WaterLauncher(SecureSerialTalksProxy):
 	_DEFAULT = {
@@ -25,6 +26,10 @@ class WaterLauncher(SecureSerialTalksProxy):
 	}
 	def __init__(self,parent, uuid='watershooter'):
 		SecureSerialTalksProxy.__init__(self, parent, uuid, WaterLauncher._DEFAULT)
+
+	def get_emergency_state(self):
+		output = self.execute(_GET_EMERGENCY_STATE_OPCODE);
+		return output.read(INT);
 
 	def get_nb_launched_water(self):
 		output = self.execute(_GET_LAUNCHED_WATER_OPCODE);

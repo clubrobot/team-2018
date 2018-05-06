@@ -34,7 +34,7 @@ OUTDOOR_DOOR_CLOSED = 70
 INDOOR_DOOR_CLOSED = 38
 
 TRASH_BEFORE_CLOSE = 90
-TRASH_CLOSED = 118
+TRASH_CLOSED = 120
 TRASH_OPEN = 149
 
 SHAKER_HORIZONTAL_1 = 3
@@ -120,7 +120,7 @@ class WaterSorter(SecureSerialTalksProxy):
     def get_shaker_horizontal(self):
         output = self.execute(_GET_SHAKER_HORIZONTAL_OPCODE)
         return output.read(INT)
-    
+
     def get_shaker_vertical(self):
         output = self.execute(_GET_SHAKER_VERTICAL_OPCODE)
         return output.read(INT)

@@ -15,6 +15,7 @@ from common.roadmap import *
 from common.serialtalks import *
 from arduino.waterlauncher import *
 from robots.Bornibus import Bornibus
+from robots.Bornibus_approval import BornibusApproval
 from arduino.bee import *
 from beacons.balise_receiver import BaliseReceiver
 from robots.beacons_manager import BeaconsManagement
@@ -42,16 +43,15 @@ def start(args):
     led2 = LEDMatrix(m, 2)
     geo = Geogebra('{}/robots/bornibus.ggb'.format(sys.path[0]))
     rm = RoadMap.load(geo)
-    br = BaliseReceiver("192.168.1.11")
+    br = BaliseReceiver("192.168.12.3")
     try:
         br.connect()
     except:
         print("Balise Receiver not connected ! ")
 
     bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
-    bm.start()
     automate = Bornibus(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back,  br, bm)
-    button_gesture = ButtonGestureMatch(button_card, ssd, b, m, automate.set_side)
+    button_gesture = ButtonGestureMatch(button_card, l, ssd, b, m, automate.set_side)
     button_gesture.run()
     button_card.disconnect()
     try:
@@ -59,6 +59,42 @@ def start(args):
     except TimeoutError:
         pass
     m.disconnect()
+
+
+
+def start_approval(args):
+    m = Manager()
+    m.connect()
+    button_card = ButtonCard(m)
+    ssd = SevenSegments(m)
+    b= WheeledBase(m)
+    d = WaterSorter(m)
+    l = WaterLauncher(m)
+    a = BeeActuator(m)
+    s_lat   = Sensors(m, "sensorsLat")
+    s_front = Sensors(m, "sensorsAv")
+    s_back  = Sensors(m, "sensorsAr")
+    led1 = LEDMatrix(m, 1)
+    led2 = LEDMatrix(m, 2)
+    geo = Geogebra('{}/robots/bornibus.ggb'.format(sys.path[0]))
+    rm = RoadMap.load(geo)
+    br = BaliseReceiver("192.168.12.3")
+    try:
+        br.connect()
+    except:
+        print("Balise Receiver not connected ! ")
+
+    bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
+    automate = BornibusApproval(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back,  br, bm)
+    button_gesture = ButtonGestureMatch(button_card, l, ssd, b, m, automate.set_side)
+    button_gesture.run()
+    button_card.disconnect()
+    try:
+        automate.run()
+    except TimeoutError:
+        pass
+    m.disconnect()
+
 
 def dev_mode(args):
     m = Manager()
@@ -190,6 +226,9 @@ showip_parser.set_defaults(func=showip)
 
 start_parser = subparsers.add_parser('start')
 start_parser.set_defaults(func=start)
+
+start_approval_parser = subparsers.add_parser('start_approval')
+start_approval_parser.set_defaults(func=start_approval)
 
 dev_parser = subparsers.add_parser('dev_mode')
 dev_parser.set_defaults(func=dev_mode)
