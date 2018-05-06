@@ -108,10 +108,3 @@ class Pattern:
 	def save_pattern(self):
 		cv.imwrite('pattern.jpg', self.image)
 
-
-p = Pattern()
-while(True):
-	p.take_photo()
-	p.find_pattern()
-	print(p.color_pat[0], p.color_pat[1], p.color_pat[2])
-	time.sleep(1)
