@@ -80,9 +80,8 @@ class SerialTalks:
         # Threading things
         self.queues_dict = dict()
         self.queues_lock = RLock()
-        self.warning_flag = Event()
-        self.crc_corrupted = 0
-
+        self.history = list()
+        self.history_lock = RLock()
         # Instructions
         self.instructions = dict()
         self.instructions[WARNING_OPCODE] = self.launch_warning_
@@ -162,18 +161,19 @@ class SerialTalks:
             pass
         raise NotConnectedError('\'{}\' is not connected.'.format(self.port)) from None
 
-    def send(self, opcode, *args, get_crc=False):
+    def send(self, opcode, *args):
         retcode = random.randint(0, 0xFFFFFFFF)
         content = BYTE(opcode) + ULONG(retcode) + bytes().join(args)
         # crc calculation
         crc = CRCprocessBuffer(content)
         prefix = MASTER_BYTE + BYTE(len(content)) + USHORT(crc)
-
+        self.history_lock.acquire()
+        self.history.append((crc, prefix+content))
+        if len(self.history)>20:
+            _  = self.history.pop(0)
+        self.history_lock.release()
         self.rawsend(prefix + content)
-        if get_crc:
-            return (retcode, crc)
-        else:
-            return retcode
+        return retcode
 
 
     def get_queue(self, retcode):
@@ -222,19 +222,9 @@ class SerialTalks:
             pass
 
     def execute(self, opcode, *args, timeout=5):
-        retcode, crc = self.send(opcode, *args,get_crc=True)
-        try:
-            output = self.poll(retcode, timeout)
-        except TimeoutError:
-            if self.warning_flag.is_set():
-                if crc == self.crc_corrupted:
-                    self.warning_flag.clear()
-                    retcode, crc = self.send(opcode, *args, get_crc=False)
-                    return self.poll(retcode, timeout)
-            else:
-                raise TimeoutError
-        else:
-            return output
+        retcode = self.send(opcode, *args)
+        output = self.poll(retcode, timeout)
+        return output
 
     def receive(self, input):
         opcode = input.read(BYTE)
@@ -289,8 +279,14 @@ class SerialTalks:
 
     def launch_warning_(self, message):
         warnings.warn("Message send corrupted !", SerialTalksWarning)
-        self.warning_flag.set()
-        self.crc_corrupted = message.read(USHORT)
+        crc_corrupted = message.read(USHORT)
+        self.history_lock.acquire()
+        for i in range(len(self.history)):
+            if self.history[i][0] == crc_corrupted:
+                print("Message resend !")
+                self.rawsend(self.history[i][1])
+                break
+        self.history_lock.release()
 
 
     def getout(self, timeout=0):
