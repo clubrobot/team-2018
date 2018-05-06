@@ -26,6 +26,11 @@ class DisplayPoints:
         self.points += points
         self.locker.release()
 
+    def removePoints(self, points):
+        self.locker.acquire()
+        self.points -= points
+        self.locker.release()
+
     def normal(self, **kwargs):
         if not self.eyes_locker.acquire(blocking=False):
             return

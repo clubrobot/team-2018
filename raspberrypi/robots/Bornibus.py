@@ -7,7 +7,7 @@ import time
 from robots.cubes_manager           import CubeManagement
 from robots.balls_manager           import Dispenser, Treatment, Shot
 from robots.display_manager         import DisplayPoints
-from robots.switch_manager_bornibus import Interrupteur, Abeille
+from robots.switch_manager_bornibus import Interrupteur_Bornibus, Abeille_Bornibus
 from robots.mover                   import Mover
 from robots.heuristics              import Heuristics
 from common.logger                  import Logger
@@ -63,9 +63,9 @@ class Bornibus:
         self.d4 = Dispenser(4, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                             self.data)
         # Generate buttons
-        self.bee = Abeille(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.bee = Abeille_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                            self.data)
-        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.panel = Interrupteur_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                                   self.beacons_receiver, self.data)
 
         # Generate balls manipulate
@@ -202,11 +202,11 @@ if __name__ == '__main__':
     print("Fin Chargement")
 
     br = BaliseReceiver("192.168.12.3")
-  # try:
-  #     br.connect()
-  # except:
-  #     print("BALISE : Not connected")
-  #     pass
+    try:
+        br.connect()
+    except:
+        print("BALISE : Not connected")
+        pass
 
     bm = BeaconsManagement(br, "area.ggb")
 
