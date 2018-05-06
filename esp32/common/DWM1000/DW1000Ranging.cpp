@@ -85,7 +85,6 @@ float DW1000RangingClass::_pos_x[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 float DW1000RangingClass::_pos_y[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 
 // others
-uint8_t DW1000RangingClass::_color = 0;
 uint8_t DW1000RangingClass::_dataSyncSize = 0;
 void *DW1000RangingClass::_dataSync = NULL;
 
@@ -831,9 +830,7 @@ void DW1000RangingClass::loop() {
 				if(messageType != _expectedMsgId) {
 					
 					//not needed ?
-					if(messageType == CHANGE_COLOR){
-						memcpy(&_color,  data + 1 + SHORT_MAC_LEN, 1);
-					} else if(!_isEnabled) {
+					 if(!_isEnabled) {
 						String s = "IGNORED Unexppected msg : ";
 						s+=messageType;
 						s+=" expected : ";
@@ -1466,36 +1463,6 @@ void DW1000RangingClass::setPosX(float &x, uint8_t index)
 void DW1000RangingClass::setPosY(float &y, uint8_t index)
 {
 	_pos_y[index] = y;
-}
-
-void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
-{
-
-	transmitInit();
-	byte shortBroadcast[2] = {0xFF, 0xFF};
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
-	data[SHORT_MAC_LEN] = TRILATERATION_REPORT;
-	//memcpy(data + SHORT_MAC_LEN + 1, &_pos_x, 4);
-	//memcpy(data + SHORT_MAC_LEN + 5, &_pos_y, 4);
-
-	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
-	transmit(data);
-}
-
-void DW1000RangingClass::transmitColor(uint8_t color)
-{
-	_color = color;
-	DW1000Device *myDistantDevice = getDistantDevice();
-	transmitInit();
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
-	data[SHORT_MAC_LEN] = CHANGE_COLOR;
-	memcpy(data + 1 + SHORT_MAC_LEN, &color, 1);
-	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
-	transmit(data, DW1000Time(_replyDelayTimeUS, DW1000Time::MICROSECONDS));
-}
-
-uint8_t DW1000RangingClass::getColor(){
-	return _color;
 }
 
 // dataSync

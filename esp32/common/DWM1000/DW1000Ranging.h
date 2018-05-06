@@ -39,10 +39,7 @@
 #define RANGE_FAILED 			255
 #define BLINK 					4
 #define RANGING_INIT 			5
-#define TRILATERATION_REPORT 	6
-#define CHANGE_COLOR 			7
 #define TAG_SYNC				8
-#define TAG_SYNC_ACK			9
 #define TAG_SYNC_END			10
 
 #define LEN_DATA 120
@@ -133,11 +130,8 @@ public:
 	static float getPosY();									// get y coordinate of the first tag connected
 	static void setPosX(float &x, uint8_t index);   
 	static void setPosY(float &y, uint8_t index);   
-	static void transmitTrilaterationReport();
 
 	// Others
-	static void transmitColor(uint8_t color);
-	static uint8_t getColor();
 
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);
@@ -224,7 +218,6 @@ public:
 	static float _pos_x[MAX_TAG_DEVICES];
 	static float _pos_y[MAX_TAG_DEVICES];
 	// others
-	static uint8_t _color;	// 0 = green, 1 = orange
 	static uint8_t _dataSyncSize;
 	static void *_dataSync;
 
