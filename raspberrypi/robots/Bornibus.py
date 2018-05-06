@@ -143,7 +143,7 @@ class Bornibus:
         shortShot.link_area(shortShot.name)
         beeAct.link_area(beeAct.name)
 
-        bm.start()
+        self.beacons_manager.start()
 
         def longShot():
             return not (longShot0 or longShot1 or longShot2)
@@ -166,9 +166,9 @@ class Bornibus:
                                      mode=Heuristics.MANUAL)
 
         if self.side == Bornibus.GREEN:
-            wheeledbase.set_position(592, 290, 0)
+            self.arduinos["wheeledbase"].set_position(592, 290, 0)
         else:
-            wheeledbase.set_position(592, 3000-290, 0)
+            self.arduinos["wheeledbase"].set_position(592, 3000-290, 0)
 
     def run(self):
         self.displayManager.start()
