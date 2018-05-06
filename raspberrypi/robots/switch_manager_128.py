@@ -100,32 +100,59 @@ class Odometry(Actionnable):
 
     def realize(self):
         self.logger("ODOMETRY : ", "Launch a mover turnOnTheSpot")
-        for i in range(2):
-            try:
-                self.mover.turnonthespot([-math.pi/2,math.pi][i], 3, Mover.AIM)
-            except PositionUnreachable:
-                self.logger("ODOMETRY :", "Angle not reachable, odometry aborded")
-                self.wheeledbase.left_wheel_maxPWM.set(1)
-                self.wheeledbase.right_wheel_maxPWM.set(1)
-                return
-            try:
-                self.wheeledbase.set_velocities(200, 0)
-                self.wheeledbase.left_wheel_maxPWM.set(0.8)
-                self.wheeledbase.right_wheel_maxPWM.set(0.8)
-                self.wheeledbase.wait()
-            except RuntimeError:
+        try:
+            self.mover.turnonthespot([-math.pi/2,math.pi][0], 3, Mover.AIM)
+        except PositionUnreachable:
+            self.logger("ODOMETRY :", "Angle not reachable, odometry aborded")
+            self.wheeledbase.left_wheel_maxPWM.set(1)
+            self.wheeledbase.right_wheel_maxPWM.set(1)
+            return
+        try:
+            self.wheeledbase.set_velocities(200, 0)
+            self.wheeledbase.left_wheel_maxPWM.set(0.8)
+            self.wheeledbase.right_wheel_maxPWM.set(0.8)
+            self.wheeledbase.wait()
+        except RuntimeError:
 
-                # Do an odometry recalibration
-                xref, yref = self.wall[i]
-                thetaref = [-math.pi/2,math.pi][i]
-                #		thetaref = wheeledbase.get_position()[2]
-                xthought, ythought = self.wheeledbase.get_position()[:2]
-                offset = math.hypot(xref - xthought, yref - ythought) * math.cos(
-                    thetaref - math.atan2(yref - ythought, xref - xthought))
-                xthought += offset * math.cos(thetaref)
-                ythought += offset * math.sin(thetaref)
-                self.wheeledbase.set_position(xthought, ythought, thetaref)
+            # Do an odometry recalibration
+            xref, yref = self.wall[0]
+            thetaref = [-math.pi/2,math.pi][0]
+            #		thetaref = wheeledbase.get_position()[2]
+            xthought, ythought = self.wheeledbase.get_position()[:2]
+            offset = math.hypot(xref - xthought, yref - ythought) * math.cos(
+                thetaref - math.atan2(yref - ythought, xref - xthought))
+            xthought += offset * math.cos(thetaref)
+            ythought += offset * math.sin(thetaref)
+            self.wheeledbase.set_position(xthought, ythought, thetaref)
 
+        self.mover.withdraw(self.preparation[0], self.preparation[1],"backward",Mover.SOFT)
+
+        try:
+            self.mover.turnonthespot([-math.pi/2,math.pi][1], 3, Mover.AIM)
+        except PositionUnreachable:
+            self.logger("ODOMETRY :", "Angle not reachable, odometry aborded")
+            self.wheeledbase.left_wheel_maxPWM.set(1)
+            self.wheeledbase.right_wheel_maxPWM.set(1)
+            return
+        try:
+            self.wheeledbase.set_velocities(200, 0)
+            self.wheeledbase.left_wheel_maxPWM.set(0.8)
+            self.wheeledbase.right_wheel_maxPWM.set(0.8)
+            self.wheeledbase.wait()
+        except RuntimeError:
+
+            # Do an odometry recalibration
+            xref, yref = self.wall[1]
+            thetaref = [-math.pi/2,math.pi][1]
+            #		thetaref = wheeledbase.get_position()[2]
+            xthought, ythought = self.wheeledbase.get_position()[:2]
+            offset = math.hypot(xref - xthought, yref - ythought) * math.cos(
+                thetaref - math.atan2(yref - ythought, xref - xthought))
+            xthought += offset * math.cos(thetaref)
+            ythought += offset * math.sin(thetaref)
+            self.wheeledbase.set_position(xthought, ythought, thetaref)
+
+        self.mover.withdraw(self.preparation[0], self.preparation[1],"backward",Mover.SOFT)
 
 
     def getAction(self):

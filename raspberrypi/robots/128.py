@@ -5,7 +5,7 @@ from robots.heuristics           import Heuristics
 from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
-from robots.switch_manager_128       import Interrupteur_128, Abeille_128
+from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
 
 class R128:
     cube ="cube"
@@ -45,6 +45,8 @@ class R128:
         self.panel = Interrupteur_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                                   self.beacons_receiver, self.data)
 
+        self.odometry = Odometry(self.side, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
+        self.odoAct  =self.odometry.getAction()[0]
         self.action_list = []
         self.cross = []
         self.cross = Cross(self.side, 1, self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
@@ -55,10 +57,12 @@ class R128:
 
         self.action_list = [
             self.beeAct,
-            self.panelAct
+            self.panelAct,
+            self.odoAct
         ]
 
-        self.beeAct.set_manual_order(1)
+        self.odoAct.set_manual_order(1)
+        self.beeAct.set_manual_order(3)
         self.panelAct.set_manual_order(2)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
