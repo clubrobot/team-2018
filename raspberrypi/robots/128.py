@@ -5,7 +5,7 @@ from robots.heuristics           import Heuristics
 from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
-from robots.switch_manager_128       import Interrupteur, Abeille
+from robots.switch_manager_128       import Interrupteur_128, Abeille_128
 
 class R128:
     cube ="cube"
@@ -40,9 +40,9 @@ class R128:
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
-        self.bee = Abeille(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.bee = Abeille_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                            self.data)
-        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.panel = Interrupteur_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                                   self.beacons_receiver, self.data)
 
         self.action_list = []
