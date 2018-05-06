@@ -291,7 +291,7 @@ class Mover:
         self.reset()
 
     def _withdraw_simple(self, direction):
-        self.wheeledbase.max_linvel.set(100)
+        self.wheeledbase.max_linvel.set(200)
 
         self.direction = direction
         if direction == "forward":
@@ -320,7 +320,7 @@ class Mover:
         self.reset()
 
     def _withdraw_hard(self, direction, last_point_aim):
-        self.wheeledbase.max_linvel.set(100)
+        self.wheeledbase.max_linvel.set(200)
         self.logger("MOVER : ", "Start withdraw hard")
         self.direction = direction
         if direction == "forward":

@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+from threading import Event
+
 class Action():
     def __init__(self,actionPoint,actionFunction,typ, name, points, time):
         self.actionPoint=actionPoint
         self.actionFunction=actionFunction
         self.typ=typ
         self.predecessors = []
-        self.done = False
+        self.done = Event()
+        self.done.clear()
         self.name = name
         self.points = points
         self.combinations = []

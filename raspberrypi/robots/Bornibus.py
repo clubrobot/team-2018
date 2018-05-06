@@ -4,15 +4,15 @@
 import time
 
 
-from robots.cubes_manager        import CubeManagement
-from robots.balls_manager        import Dispenser, Treatment, Shot
-from robots.display_manager      import DisplayPoints
-from robots.switch_manager       import Interrupteur, Abeille
-from robots.mover                import Mover
-from robots.heuristics           import Heuristics
-from common.logger               import Logger
-from robots.beacons_manager      import BeaconsManagement
-from beacons.balise_receiver     import BaliseReceiver
+from robots.cubes_manager           import CubeManagement
+from robots.balls_manager           import Dispenser, Treatment, Shot
+from robots.display_manager         import DisplayPoints
+from robots.switch_manager_bornibus import Interrupteur, Abeille
+from robots.mover                   import Mover
+from robots.heuristics              import Heuristics
+from common.logger                  import Logger
+from robots.beacons_manager         import BeaconsManagement
+from beacons.balise_receiver        import BaliseReceiver
 
 # Setup and launch the user interface
 class Bornibus:
@@ -43,6 +43,8 @@ class Bornibus:
         self.logger   = Logger(Logger.SHOW)
         self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
         self.data = dict()
+        self.beacons_receiver = br
+        self.beacons_manager = bm
 
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
@@ -58,7 +60,7 @@ class Bornibus:
         self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
         # Generate buttons
         self.bee   = Abeille(self.side, self.geogebra,  self.arduinos, self.displayManager, self.mover, self.logger, self.data)
-        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
+        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.beacons_receiver, self.data)
 
         # Generate balls manipulate
         self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
@@ -113,9 +115,6 @@ class Bornibus:
         longShot1.set_impossible_combination(lambda: longShot0 or longShot2)
         longShot2.set_impossible_combination(lambda: longShot1 or longShot0)
 
-        self.beacons_receiver = br
-        self.beacons_manager = bm
-
         if self.beacons_manager is not None and self.beacons_receiver is not None:
             self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
             self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
@@ -145,22 +144,22 @@ class Bornibus:
 
 
         #dispMono.set_manual_order(1)
-        shortShot.set_manual_order(2)
+        #shortShot.set_manual_order(2)
         #dispMulti.set_manual_order(3)
         #longShot2.set_manual_order(4)
         #longShot0.set_manual_order(4)
         #longShot1.set_manual_order(4)
         #treatmentAct.set_manual_order(5)
-        #panelAct.set_manual_order(6)
+        panelAct.set_manual_order(6)
+        beeAct.set_manual_order(7)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
-                                     mode=Heuristics.AUTO)
+                                     mode=Heuristics.MANUAL)
 
     def set_side(self,side):
         self.side = side
 
     def run(self):
-        time.sleep(5)
         self.displayManager.start()
         self.logger.reset_time()
         self.mover.reset()
@@ -179,7 +178,7 @@ class Bornibus:
             self.mover.goto(*act.actionPoint)
             self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
             act()
-            act.done = True
+            act.done.set()
             act = self.heuristics.get_best()
             self.mover.reset()
 

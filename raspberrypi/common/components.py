@@ -330,6 +330,7 @@ class SecureSerialTalksProxy(Proxy):
             execute_addr = self.execute
             send_addr = self.send
         except (ConnectionFailedError,TimeoutError):
+            object.__setattr__(self, '_compid', uuid)
             warnings.warn("Arduino {} is unreachable !".format(uuid), NotConnectedWarning)
             def trash_none(*args,**kwargs) : return None
             def trash_return(opcode, *args, **kwargs):
