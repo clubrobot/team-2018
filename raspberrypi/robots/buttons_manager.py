@@ -83,9 +83,6 @@ class ButtonGestureMatch():
     def _blue(self):
         if not self.lock_stat.acquire(blocking=False): return
 
-
-
-
         if self.status == ButtonGestureMatch.WAITING_TIRRET:
             if self.tirret_status.is_set() or not bool(self.urgency.get_emergency_state()):
                 for k in range(3):
@@ -103,11 +100,6 @@ class ButtonGestureMatch():
 
         if self.status == ButtonGestureMatch.WAITING_ODOMETRY:
             self.setter(self.side)
-            if self.side == 0:
-
-                self.wheeledbase.set_position(592, 290, 0)
-            else:
-                self.wheeledbase.set_position(592, 2710, 0)
             self.status = ButtonGestureMatch.WAITING_TIRRET
             self.display.set_message("TIRRET")
             sleep(0.5)
