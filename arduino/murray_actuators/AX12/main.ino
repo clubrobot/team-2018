@@ -4,6 +4,7 @@
 #include "../../common/SerialTalks.h"
 #include "../../common/ShiftRegister.h"
 #include "../../common/ShiftRegAX12.h"
+#include "../../common/StepByStepMotor.h"
 #include "../../common/RobotArm.h"
 #include "PIN.h"
 #include "instructions.h"
@@ -15,9 +16,12 @@ SoftwareSerial SoftSerial(RX_AX12,TX_AX12);
 
 ShiftRegister shift;
 
+StepByStepMotor motor;
+
 ShiftRegAX12 servoax;
+
 //            X |  Y  |  Z  | Th | SPEED
-RobotArm arm(0.0, 30.0, 10.0, 90.0, 1000);
+RobotArm arm(15.0, 15.0, 10.0, 0.0, 100);
 
 void setup()
 {
@@ -46,16 +50,14 @@ void setup()
     //initialise ShiftRegister
     shift.attach(LATCHPIN,CLOCKPIN,DATAPIN);
 
-    ShiftRegAX12::SerialBegin(9600, RX_AX12, TX_AX12, AX12_DATA_CONTROL);
-    
-    //arm.set_angles(150.0, 150.0, 150.0);
+    motor.attach(STEP_PAP, DIR_PAP, ENABLE_PAP, RST_PAP, SLEEP_PAP);
 
-    arm.attach(2,1,3,SERVO1);
-    
-    arm.begin();
+    ShiftRegAX12::SerialBegin(9600, RX_AX12, TX_AX12, AX12_DATA_CONTROL);
+
 }
 
 void loop()
 {
 	talks.execute();
+
 }

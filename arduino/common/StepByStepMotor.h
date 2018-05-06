@@ -5,9 +5,9 @@
 
 #define P_MM 80L
 
-#define ACC  500	/* 1500 p/s² */
-#define PLAT 500	/* 1500 p/s  */
-#define DECC 700	/* 1700 p/s² */
+#define ACC  150000L	/* 1500 p/s² */
+#define PLAT 9000L	/* 1500 p/s  */
+#define DECC 150000L	/* 1700 p/s² */
 
 class StepByStepMotor
 {
@@ -18,7 +18,7 @@ class StepByStepMotor
 
 		void begin();
 
-		void step(int dir);
+		void step();
 
 		void update();
 

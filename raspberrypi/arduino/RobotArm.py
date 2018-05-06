@@ -24,13 +24,15 @@ _SET_ANGLES_OPCODE	 = 0X1A
 _OPEN_GRIPPER_OPCODE = 0X1B
 _CLOSE_GRIPPER_OPCODE = 0X1C
 
+Z_FIRST = 1
+Z_LAST  = 0
 
 CROSS_1 = 0
 CROSS_2 = 1
 CROSS_3 = 2
 CROSS_4 = 3
 CROSS_5 = 4
-CROSS_6 = 51
+CROSS_6 = 5
 
 GREEN_CUBE  = 0
 BLUE_CUBE	= 1
@@ -53,17 +55,32 @@ CROSS_LIST = [CROSS1, CROSS2, CROSS3, CROSS4, CROSS5, CROSS6]
 class RobotArm(SerialTalks):	
 	def __init__(self, uuid='ttyUSB0'):
 		SerialTalks.__init__(self, "/dev/{}".format(uuid))
+		r_x = 0
+		r_y = 0
+		r_t = 0
 
 	def begin(self):
 		self.send(_BEGIN_OPCODE)
 
-	def set_pos(self, x, y ,z ,theta):
-		output = self.execute(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta))
+	def set_robot_pos(x, y, theta):
+		r_x = x
+		r_y = y
+		r_t = theta
+
+	def set_pos(self, x, y ,z ,theta, z_o):
+		output = self.execute(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta),INT(z_o))
 		ret = output.read(INT);
-		if(ret):
-			return "Go to ("+str(x)+","+str(y)+","+str(z)+","+str(theta)+")"
-		else:
-			return "Postition unreachable, try new pos"
+		return ret
+
+	def put_in_tank():
+		output = self.execute(_SET_POS_OPCODE, FLOAT(10), FLOAT(10), FLOAT(10), FLOAT(90))
+		ret = output.read(INT);
+		return ret
+
+	def process_cubes(num_cubes, cross_num, order_list):
+		for i in range(0,num_cubes):
+			x, y, th = CROSS_LIST[cross_num][order_list[i]]
+			set_pos(x,y)
 
 	def set_x(self,x):
 		output = self.execute(_SET_X_OPCODE, FLOAT(x))

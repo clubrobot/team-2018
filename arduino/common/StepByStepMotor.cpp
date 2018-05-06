@@ -4,6 +4,8 @@
 #define FORWARD  0
 #define BACKWARD 1
 
+#define _BV(bit) (1 << (bit))
+
 extern ShiftRegister shift;
 
 StepByStepMotor::StepByStepMotor()
@@ -31,39 +33,23 @@ void StepByStepMotor::begin()
 	m_current_pos = 0;
 	m_last_pos = 0;
 
-	//set_speed in rpm
-	set_speed(100);
-
 	m_en = true;
 }
 
-void StepByStepMotor::step(int dir)
+void StepByStepMotor::step()
 {
-	shift.write(m_dir,(dir == 1 ? FORWARD : BACKWARD));
-
-	/************************comment to disable ***************************/
-	digitalWrite(m_step, LOW);
+	//digitalWrite(m_step, LOW);
+	PORTB &= ~(_BV(5));
     delayMicroseconds(5);
-    digitalWrite(m_step, HIGH); 
-    
+    PORTB |= _BV(5);            
 
-    //adjust tempo:  
-  	if(m_speed < 31)
+    if(m_speed < 31)
   	{
     	delay(1000 / m_speed);
     	delayMicroseconds(1000 * (1000 / m_speed - int(1000 / m_speed)) - 110);
   	}
   	else
     	delayMicroseconds(1000000 / m_speed - 110);
-
-    /**************************************************************************/
-
-    /****************** Uncomment : safe version ******************************/
-	// digitalWrite(m_step, LOW);
- //    delayMicroseconds(m_speed/2);
- //    digitalWrite(m_step, HIGH); 
-	// delayMicroseconds(m_speed/2);
-	/**************************************************************************/
 }
 
 void StepByStepMotor::update()
@@ -74,11 +60,15 @@ void StepByStepMotor::update()
 
 	steps = (m_current_pos - m_last_pos) * P_MM;
 
-	/***********************comment to disable*******************************/
 	abssteps = (steps>0 ? steps : -steps);
 
-	pAcc = long(abssteps / (1.0 + ACC/DEC) + 0.5);
-	pDec = steps - pAcc;
+	pAcc = abssteps / (1.0 + ACC/DECC);
+	pDec = abssteps - pAcc;
+
+	if(steps > 0)
+		shift.write(m_dir,FORWARD);
+	else
+		shift.write(m_dir,BACKWARD);
 
 	for(p=1; p<=pAcc; p++)
   	{
@@ -86,33 +76,18 @@ void StepByStepMotor::update()
 	    if(m_speed > PLAT)
 	    	m_speed = PLAT;
 
-		step(steps > 0 ? FORWARD : BACKWARD);
+		step();
+
 	    
   	}
-	for(p = pDec; p >=0 ; p--)
+	for(p = pDec; p > 0 ; p--)
 	{
-		m_speed = sqrt(2*p*DEC);
+		m_speed = sqrt(2*p*DECC);
 		if(m_speed > PLAT)
 			m_speed = PLAT;
-
-		step(steps > 0 ? FORWARD : BACKWARD);
+		
+		step();
 	}
-	/****************************************************************************/
-
-	/***********************Uncomment : safe version****************************/
-	// while(steps != 0)
-	// {
-	// 	if(steps > 0)
-	// 	{
-	// 		step(FORWARD);
-	// 		steps--;
-	// 	}
-	// 	else
-	// 	{
-	// 		step(BACKWARD);
-	// 		steps++;
-	// }
-	/***************************************************************************/
 
 	m_last_pos = m_pos;
 }

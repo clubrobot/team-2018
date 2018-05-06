@@ -14,11 +14,11 @@
 /********ARM OFFSETS*******/
 #define ARM1_OFFSET 60
 #define ARM2_OFFSET 30
-#define ARM3_OFFSET 4
+#define ARM3_OFFSET 5
 
 /*******GRIPPER POS *******/
 #define GRIPPER_OPEN 50
-#define GRIPPER_CLOSE 110
+#define GRIPPER_CLOSE 120
 
 /****** MIN/MAX ANGLE *****/
 #define AX1_MAX_ANGLE 250
@@ -31,14 +31,17 @@
 #define X_MAX_UP 30.0
 #define X_MIN_UP -30.0
 
-#define X_MAX_DOWN 5.0
-#define X_MIN_DOWN -5.0
+#define X_MAX_DOWN 2.5
+#define X_MIN_DOWN -2.5
 
 #define RAY_1		((X_MIN_UP + X_MIN_DOWN)/2)
 #define RAY_2		((X_MIN_DOWN + X_MIN_DOWN)/2)
 #define RAY_3		((X_MAX_UP + X_MAX_DOWN)/2)
 
-#define DELTA_POS 0.29
+#define Z_FIRST		1
+#define Z_LAST 		0
+
+#define DELTA_POS 5
 
 class RobotArm
 {
@@ -54,7 +57,7 @@ class RobotArm
 
 		bool solve_coords(double x, double y);
 
-		bool ReachPosition(double x, double y, double z, double theta);
+		bool ReachPosition(double x, double y, double z, double theta, int z_order);
 
 		void set_gripper_angle(double a);
 
