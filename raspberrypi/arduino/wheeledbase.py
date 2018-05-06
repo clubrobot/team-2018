@@ -7,6 +7,8 @@ import math
 from common.serialtalks import BYTE, INT, LONG, FLOAT
 from common.components import SecureSerialTalksProxy
 from common.serialutils import Deserializer
+from robots.get_robot_name import *
+
 # Instructions
 
 
@@ -235,4 +237,4 @@ class WheeledBase(SecureSerialTalksProxy):
         return value
 
     def reset_parameters(self):
-        self.send(RESET_PARAMETERS_OPCODE)
+        self.send(RESET_PARAMETERS_OPCODE, BYTE(ROBOT_ID))

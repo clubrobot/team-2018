@@ -22,7 +22,7 @@ class Heuristics:
             if beacon_management is not None:
                 self.heuristics_soft += [self.opponent_position]
 
-            self.influences = {"points":1, "reliability":1, "time":1, "action_distance":1, "opponent_position": 1}
+            self.influences = {"points":3, "reliability":1, "time":2, "action_distance":1, "opponent_position": 4}
             self.heuristics_hard = [self.order, self.combinations, self.done]
 
         else:
@@ -53,7 +53,7 @@ class Heuristics:
         for action in self.action_names:
             available = True
             for pred in self.action_dict[action].predecessors:
-                if not pred.done:
+                if not pred.done.is_set():
                     available = False
             if available:
                 heuristic[action] = 1
@@ -75,7 +75,7 @@ class Heuristics:
         heuristic = dict()
         max_points = 0
         for action in self.action_names:
-            if not self.action_dict[action].done:
+            if not self.action_dict[action].done.is_set():
                 max_points = max(self.action_dict[action].points, max_points)
 
         for action in self.action_names:
@@ -88,7 +88,7 @@ class Heuristics:
     def combinations(self):
         heuristic = dict()
         for action in self.action_names:
-            if self.action_dict[action].check_impossible_combinations(self.action_dict) is False:
+            if self.action_dict[action].check_impossible_combinations() is False:
                 heuristic[action] = 0
             else:
                 heuristic[action] = 1
@@ -97,7 +97,7 @@ class Heuristics:
     def done(self):
         heuristic = dict()
         for action in self.action_names:
-            if self.action_dict[action].done:
+            if self.action_dict[action].done.is_set():
                 heuristic[action] = 0
             else:
                 heuristic[action] = 1
@@ -108,8 +108,10 @@ class Heuristics:
         max_distance = 0
         robot_pos = self.wheeledbase.get_position()[:-1]
         for action in self.action_names:
-            if not self.action_dict[action].done:
+            if not self.action_dict[action].done.is_set():
                 point = self.action_dict[action].actionPoint
+                print(point)
+                print(robot_pos)
                 max_distance = max(math.hypot(robot_pos[0] - point[0], robot_pos[1] - point[1]), max_distance)
 
         for action in self.action_names:
@@ -124,7 +126,7 @@ class Heuristics:
         heuristic = dict()
         max_time = 0
         for action in self.action_names:
-            if not self.action_dict[action].done:
+            if not self.action_dict[action].done.is_set():
                 max_time = max(self.action_dict[action].points, max_time)
 
         for action in self.action_names:
@@ -148,7 +150,6 @@ class Heuristics:
         heuristic = dict()
         for action in self.action_names:
             heuristic[action] = self.action_dict[action].reliability
-        print(heuristic)
         return heuristic
 
     def compute_heuristics(self):
@@ -162,7 +163,7 @@ class Heuristics:
             for action in self.action_names:
                 heuristics_values[action] += current_values[action] * self.influences[heuristic.__name__]
             total_influences += self.influences[heuristic.__name__]
-            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=heuristics_values)
+            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=current_values)
 
         for action in self.action_names:
             heuristics_values[action] /= total_influences
@@ -171,7 +172,7 @@ class Heuristics:
             current_values = heuristic()
             for action in self.action_names:
                 heuristics_values[action] *= current_values[action]
-            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=heuristics_values)
+            self.logger("HEURISTIC : ", heuristic.__name__, heuristic=current_values)
 
         self.logger("HEURISTIC : ", "TOTAL", heuristic=heuristics_values)
         return heuristics_values

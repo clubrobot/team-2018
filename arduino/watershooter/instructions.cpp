@@ -121,6 +121,10 @@ void SET_SHAKER_VELOCITY(SerialTalks &inst, Deserializer &input, Serializer &out
 	shaker.set_velocity(input.read<int>());
 }
 
+void GET_EMERGENCY_STATE(SerialTalks& inst, Deserializer& input, Serializer& output){
+	output.write<int>(digitalRead(SWITCH1));
+}
+
 void DISABLE(SerialTalks &inst, Deserializer &input, Serializer &output){
 	shaker.disableShaker();
 	motor.setPulsewidth(1000);

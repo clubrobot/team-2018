@@ -13,8 +13,8 @@ class DisplayPoints:
         self.points = 10
         self.locker = RLock()
         self.eyes_locker = RLock()
-        self.left_eye.set_message("^^^^^%^",1)
-        self.right_eye.set_message('_____&_',1)
+        self.left_eye.set_message("^^^^^%^",1,speed=100)
+        self.right_eye.set_message('_____&_',1,speed=100)
 
     def start(self):
         self.start_time = time.time()
@@ -24,6 +24,11 @@ class DisplayPoints:
     def addPoints(self, points):
         self.locker.acquire()
         self.points += points
+        self.locker.release()
+
+    def removePoints(self, points):
+        self.locker.acquire()
+        self.points -= points
         self.locker.release()
 
     def normal(self, **kwargs):
@@ -51,8 +56,8 @@ class DisplayPoints:
         self._reset_normal(duration)
 
     def love(self, duration=1):
-        self.left_eye.set_message("[\\]\\",1,100)
-        self.right_eye.set_message("[\\]\\",1,100)
+        self.left_eye.set_message("[\\]\\",1,400)
+        self.right_eye.set_message("[\\]\\",1,400)
         self._reset_normal(duration)
 
     def angry(self, duration=1):
@@ -73,12 +78,12 @@ class DisplayPoints:
     def updateDisplay(self):
         remaining_time = MATCH_DURATION-2-round(time.time()- self.start_time)
         if remaining_time > 0:
-            self.display.set_message("T:"+str(remaining_time)+ "  P:" + str(self.points))
+            try:
+                self.display.set_message("T:"+str(remaining_time)+ "  P:" + str(self.points))
+            except ValueError:
+                self.display.set_message("P:" + str(self.points))
         else:
             self.display.set_message("P:" + str(self.points))
-
-
-
 
     def run(self):
         while True:
