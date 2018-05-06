@@ -51,7 +51,6 @@ void newRange()
   static float d3 = 0;
   static float d4 = 0;
 
-  uint8_t color = DW1000Ranging.getColor();
   const float x_1 = 5;
   const float x_2 = 1000;
   const float x_3 = 1950;
@@ -61,7 +60,7 @@ void newRange()
   float y_3 = -73;
   float y_4 = 1326;
 
-  if(color == 1){ // ORANGE
+  if(data.color != GREEN){ // ORANGE
     y_1 = 3073;
     y_2 = -73;
     y_3 = 3073;
