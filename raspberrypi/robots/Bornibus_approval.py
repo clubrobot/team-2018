@@ -77,7 +77,7 @@ class BornibusApproval:
         longShot2 = self.shot.getAction()[4]
         treatmentAct = self.treatment.getAction()[0]
 
-        if self.side == Bornibus.GREEN:
+        if self.side == BornibusApproval.GREEN:
             dispMulti = d3Act
             dispMono = d1Act
 
@@ -118,7 +118,7 @@ class BornibusApproval:
 
         if self.beacons_manager is not None and self.beacons_receiver is not None:
             self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
-            self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
+            self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == BornibusApproval.GREEN else 3))
             self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
             self.beacons_manager.create_area(longShot0.name, "auxLongShot{}0_*".format(self.side))
             self.beacons_manager.create_area(longShot1.name, "auxLongShot{}1_*".format(self.side))
