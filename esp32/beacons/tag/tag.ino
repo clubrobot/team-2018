@@ -37,6 +37,7 @@ void loopCore0(void *pvParameters)  // loop on core 0
 {
   for(;;){
     display.update();
+    talks.execute();
     delay(10);
   }
 }
@@ -425,7 +426,6 @@ void setup() {
 
 void loop() {   // loop on core 1
   DW1000Ranging.loop();
-  talks.execute();
 }
 
 
