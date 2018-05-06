@@ -16,7 +16,6 @@ from beacons.balise_receiver        import BaliseReceiver
 
 # Setup and launch the user interface
 class Bornibus:
-
     cube ="cube"
     dispenser = "disp"
     shot = "shot"
@@ -45,28 +44,37 @@ class Bornibus:
         self.data = dict()
         self.beacons_receiver = br
         self.beacons_manager = bm
-
-        # Apply cube obstacle
+        self.displayManager = DisplayPoints(display, led1, led2)
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
-        self.action_list = [list(),list()]
 
-        self.displayManager = DisplayPoints(display, led1, led2)
+
+    def set_side(self,side):
+        self.side = side
+        self.action_list = [list(), list()]
 
         # Generate Dispenser
-        self.d1 = Dispenser(1,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
-        self.d2 = Dispenser(2,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
-        self.d3 = Dispenser(3,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
-        self.d4 = Dispenser(4,self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
+        self.d1 = Dispenser(1, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+                            self.data)
+        self.d2 = Dispenser(2, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+                            self.data)
+        self.d3 = Dispenser(3, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+                            self.data)
+        self.d4 = Dispenser(4, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+                            self.data)
         # Generate buttons
-        self.bee   = Abeille(self.side, self.geogebra,  self.arduinos, self.displayManager, self.mover, self.logger, self.data)
-        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.beacons_receiver, self.data)
+        self.bee = Abeille(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+                           self.data)
+        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+                                  self.beacons_receiver, self.data)
 
         # Generate balls manipulate
-        self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
-        self.shot      = Shot     (self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager,self.mover, self.logger, self.data)
+        self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager,
+                                   self.mover, self.logger, self.data)
+        self.shot = Shot(self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover,
+                         self.logger, self.data)
 
-        #Generate predecessors list
+        # Generate predecessors list
         beeAct = self.bee.getAction()[0]
         panelAct = self.panel.getAction()[0]
         d1Act = self.d1.getAction()[0]
@@ -117,7 +125,8 @@ class Bornibus:
 
         if self.beacons_manager is not None and self.beacons_receiver is not None:
             self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
-            self.beacons_manager.create_area(dispMulti.name, "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
+            self.beacons_manager.create_area(dispMulti.name,
+                                             "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
             self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
             self.beacons_manager.create_area(longShot0.name, "auxLongShot{}0_*".format(self.side))
             self.beacons_manager.create_area(longShot1.name, "auxLongShot{}1_*".format(self.side))
@@ -138,26 +147,28 @@ class Bornibus:
 
         def longShot():
             return not (longShot0 or longShot1 or longShot2)
+
         dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
         treatmentAct.set_impossible_combination(lambda: not longShot)
         dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
 
-
-        #dispMono.set_manual_order(1)
-        #shortShot.set_manual_order(2)
-        #dispMulti.set_manual_order(3)
-        #longShot2.set_manual_order(4)
-        #longShot0.set_manual_order(4)
-        #longShot1.set_manual_order(4)
-        #treatmentAct.set_manual_order(5)
+        # dispMono.set_manual_order(1)
+        # shortShot.set_manual_order(2)
+        # dispMulti.set_manual_order(3)
+        # longShot2.set_manual_order(4)
+        # longShot0.set_manual_order(4)
+        # longShot1.set_manual_order(4)
+        # treatmentAct.set_manual_order(5)
         panelAct.set_manual_order(6)
         beeAct.set_manual_order(7)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
                                      mode=Heuristics.MANUAL)
 
-    def set_side(self,side):
-        self.side = side
+        if self.side == Bornibus.GREEN:
+            wheeledbase.set_position(592, 290, 0)
+        else:
+            wheeledbase.set_position(592, 3000-290, 0)
 
     def run(self):
         self.displayManager.start()
@@ -184,8 +195,6 @@ class Bornibus:
 
 if __name__ == '__main__':
     from robots.setup_bornibus import *
-    side = 0
-    wheeledbase.set_position(592, 290, 0)
 
     print("DEBUT CHARGEMENT ROADMAP")
     geo = Geogebra('bornibus.ggb')
@@ -193,14 +202,14 @@ if __name__ == '__main__':
     print("Fin Chargement")
 
     br = BaliseReceiver("192.168.12.3")
-    try:
-        br.connect()
-    except:
-        print("BALISE : Not connected")
-        pass
+  # try:
+  #     br.connect()
+  # except:
+  #     print("BALISE : Not connected")
+  #     pass
 
     bm = BeaconsManagement(br, "area.ggb")
 
-    auto = Bornibus(side, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
+    auto = Bornibus(0, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
+    auto.set_side(0)
     auto.run()
-    exit()
