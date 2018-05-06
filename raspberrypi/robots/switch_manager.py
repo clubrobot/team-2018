@@ -28,6 +28,7 @@ class Interrupteur(Actionnable):
         self.watcher = None
 
     def realize(self,robot, display):
+        raise NotImplementedError("Need implementation")
         return
 
         #override Actionnable

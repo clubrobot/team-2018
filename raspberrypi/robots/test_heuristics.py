@@ -1,5 +1,5 @@
-from heuristics           import Heuristics
-from action               import Action
+from robots.heuristics           import Heuristics
+from robots.action               import Action
 import time
 
 shortshot = Action(None, None, None, "shortshot", 40, 20)
