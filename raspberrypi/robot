@@ -227,6 +227,9 @@ showip_parser.set_defaults(func=showip)
 start_parser = subparsers.add_parser('start')
 start_parser.set_defaults(func=start)
 
+start_approval_parser = subparsers.add_parser('start_approval')
+start_approval_parser.set_defaults(func=start_approval)
+
 dev_parser = subparsers.add_parser('dev_mode')
 dev_parser.set_defaults(func=dev_mode)
 
