@@ -33,6 +33,9 @@ SENSORS_RANGE = 200
 # -  BEACONS CONSTANT
 ENEMY_THRESHOLD = 200
 
+# GOTO
+TIMEOUT_GOAL = 5
+
 
 # <> ERROR <>
 class PositionUnreachable(RuntimeError):
@@ -63,7 +66,7 @@ class Mover:
         self.sensors_lat = arduinos["sensors_lat"]
         self.sensors_back = arduinos["sensors_back"]
         self.side = side
-
+        self.goto_interrupt = Event()
         # Objet qui sont en relation avec les sensors
         self.sensors_front_listener = SensorListener(self.sensors_front.get_mesure)
         self.sensors_back_listener = SensorListener(self.sensors_back.get_mesure)
@@ -89,6 +92,7 @@ class Mover:
         self.wheeledbase.reset_parameters()
         self.interupted_timeout.clear()
         self.interupted_status.clear()
+        self.goto_interrupt.clear()
         self.isarrived = False
         self.path = list()
         self.running.clear()
@@ -508,6 +512,8 @@ class Mover:
         self.isarrived = False
         while not self.isarrived or self.interupted_status.is_set():
             try:
+                if(self.goto_interrupt.is_set()):
+                    break
                 self.isarrived = self.wheeledbase.isarrived()
                 sleep(0.1)
             except RuntimeError:
@@ -535,22 +541,35 @@ class Mover:
                 self.isarrived = False
 
         # self.on_path_flag.clear()
+        if (self.goto_interrupt.is_set()):
+            self.reset()
+            raise PositionUnreachable()
 
-        self.reset()
+
+
 
     def front_obstacle(self):
         # RoadMap.LEFT
         # RoadMap.RIGHT
-
+        if self.goto_interrupt.is_set():
+            return
         self.logger("MOVER : ", "Object in the front detected !")
         if not self.interupted_lock.acquire(blocking=True, timeout=1):
             return
         self.interupted_status.set()
         x, y, theta = self.wheeledbase.get_position()
+        self.logger("MOVER : ", "Objet on the goal", hypot(y - self.goal[1], x - self.goal[0]))
         if hypot(y - self.goal[1], x - self.goal[0]) < 300:
+            # Obstacle on the goal !
+            self.wheeledbase.set_velocities(0, 0)
+            try:
+                self.sensors_front.wait(250, timeout=TIMEOUT_GOAL)
+            except TimeoutError:
+                self.goto_interrupt.set()
+
             self.interupted_status.clear()
             self.interupted_lock.release()
-            # TODO QUOI FAIRE ?
+
             return
 
         if not self.get_enemy_status(x, y):
