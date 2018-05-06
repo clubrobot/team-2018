@@ -89,7 +89,7 @@ class Abeille(Actionnable):
         arrived = False
         while not arrived:
             try:
-                robot.goto(*self.preparation)
+                self.mover.withdraw(*self.preparation, direction="forward")
                 arrived = True
             except:
                 robot.stop()
