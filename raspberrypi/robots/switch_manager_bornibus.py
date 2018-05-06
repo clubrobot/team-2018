@@ -88,25 +88,3 @@ class Abeille_Bornibus(Abeille):
         display.addPoints(Abeille.POINTS)
 
 
-class Odometrie(Actionnable):
-    typ="Odometrie"
-    def __init__(self, side, geo,id):#id = 0 (vers le bas) ou 1(vers la droite)
-        self.side=side
-        self.preparation=geo.get('Odometrie'+str(self.side)+'_{'+str(id)+'}')
-        self.mur=geo.get('Odometrie'+str(self.side)+'_{'+str(id)+',0}')
-
-    def realize(self,robot):
-        #print("Realisation")
-        theta = math.atan2(self.mur[1]-self.preparation[1],self.mur[0]-self.preparation[0])
-        AutomateTools.myTurnonthespot(robot,theta)
-        path = [ self.preparation, self.mur]
-        robot.purepursuit(path)
-            #si on patine alors on stop l'action
-        AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
-
-        #override Actionnable
-    def getAction(self,robot,builerCollector,waterDispenser):
-            return [Action(self.preparation,
-                    lambda : self.realize(robot),
-                    Odometrie.typ, 
-                    "ODOMETRIE") ]

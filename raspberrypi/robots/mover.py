@@ -505,7 +505,7 @@ class Mover:
         self.wheeledbase.purepursuit(self.path)
         self.isarrived = False
         x, y, _ = self.wheeledbase.get_position()
-        while hypot(x-self.goal[0],y-self.goal[1])<10:
+        while hypot(x-self.goal[0],y-self.goal[1])>50:
             while not self.isarrived or self.interupted_status.is_set():
                 try:
                     if(self.goto_interrupt.is_set()):
