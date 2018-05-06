@@ -1,6 +1,6 @@
 from robots.cubes_manager        import CubeManagement, Cross
 from robots.display_manager      import DisplayPoints
-from robots.mover                import Mover
+from robots.mover                import Mover, PositionUnreachable
 from robots.heuristics           import Heuristics
 from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
@@ -65,14 +65,15 @@ class R128:
         act = self.heuristics.get_best()
         print(act)
         while act is not None:
-            act.before_action()
-            self.logger("MAIN : ", "Let's go to the next action : {}".format(act.name))
-            self.mover.goto(*act.actionPoint)
-            self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
-            act()
-            act.done.set()
-            act = self.heuristics.get_best()
-            self.mover.reset()
+            try:
+                act.before_action()
+                self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
+                self.mover.goto(*act.actionPoint)
+                self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
+                act()
+                act.done.set()
+            except PositionUnreachable:
+                act.temp_disable(5)
 
 
 if __name__ == '__main__':
