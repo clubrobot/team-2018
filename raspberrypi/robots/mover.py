@@ -575,12 +575,7 @@ class Mover:
 
             return
 
-        if not self.get_enemy_status(x, y):
-            self.interupted_status.clear()
-            self.interupted_lock.release()
-            return
-
-        lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted()
+        lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted(True)
         if abs(ang_wanted) > 7:
             self.wheeledbase.set_velocities(copysign(150, -lin_wanted), copysign(1, ang_wanted))
             time.sleep(1)  # 0.5
@@ -590,60 +585,6 @@ class Mover:
 
         self.wheeledbase.stop()
 
-        side = self.roadmap.best_side(x, y, theta)
-        time.sleep(0.4)
-        (left, _), (right, _) = self.sensors_front.get_normal(0)
-        if left > 800:
-            side = RoadMap.LEFT
-        if right > 800:
-            side = RoadMap.RIGHT
-        self.logger("MOVER : ", "I'm decided to turn {} at {},{}".format("left" if side == 1 else "right", x, y))
-        while True:
-            try:
-                self.wheeledbase.turnonthespot(theta - pi / 2)
-
-                self.wheeledbase.wait()
-                break
-            except RuntimeError:
-                self.wheeledbase.stop()
-                # PROBLEME
-                self.wheeledbase.set_velocities(-200, 0)
-                time.sleep(0.4)
-                self.wheeledbase.stop()
-                continue
-
-        time.sleep(1)
-        # Wait varience  pour attendre des variables stable
-        """
-        init_time = time.time()
-        while self.sensors_lat.get_normal(0)[0][1] > 1000 and time.time() - init_time < 2:
-            time.sleep(0.2)
-        """
-        self.wheeledbase.set_velocities(-150 * side, 0)
-        print(self.sensors_lat.get_mesure()[1])
-        init_time = time.time()
-        while self.sensors_lat.get_mesure()[1] < 200 or time.time()-init_time <1 :
-            print(self.sensors_lat.get_mesure()[1])
-            try:
-                self.wheeledbase.isarrived()
-                if self.sensors_lat.get_mesure()[1] < 40:
-                    self.wheeledbase.set_velocities(-100 * side, 0.2 * side)
-                if 40<= self.sensors_lat.get_mesure()[1] < 80:
-                    self.wheeledbase.set_velocities(-100 * side, 0)
-                if self.sensors_lat.get_mesure()[1] >=80:
-                    self.wheeledbase.set_velocities(-100 * side, -0.2 * side)
-                time.sleep(0.2)
-            except RuntimeError:
-                side *= -1
-                self.wheeledbase.set_velocities(-100 * side, 0)
-        time.sleep(0.1)
-        self.wheeledbase.stop()
-        x_p, y_p, theta_p = self.wheeledbase.get_position()
-        self.wheeledbase.turnonthespot(theta)
-        try:
-            self.wheeledbase.wait()
-        except RuntimeError:
-            pass
             # Creation de l'obstacle
         x_obs = (x + x_p) / 2
         y_obs = (y + y_p) / 2
