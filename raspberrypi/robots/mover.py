@@ -653,16 +653,19 @@ class Mover:
         obs = self.roadmap.create_temp_obstacle(
             ((-100, height / 2), (-100, -height / 2), (100, -height / 2), (100, height / 2)), timeout=TIMEOUT_OBSTACLE)
         obs.set_position(x_obs, y_obs, theta)
+        old_path = self.path
         try:
             self.path = self.roadmap.get_shortest_path((x_p, y_p), self.goal)
         except RuntimeError:
-            #TODO Le path reste le meme
-            pass
+            time.sleep(1)
+        try:
+            self.wheeledbase.purepursuit(self.path)
+        except ValueError:
+            self.path = old_path
+            self.wheeledbase.purepursuit(self.path)
             time.sleep(1)
 
-        self.wheeledbase.purepursuit(self.path)
-
-        self.logger("MOVER : ", "FIn de l'interruption avec isarrived = ", self.wheeledbase.isarrived())
+        self.logger("MOVER : ", "Fin de l'interruption avec isarrived = ", self.wheeledbase.isarrived())
         self.interupted_lock.release()
         self.interupted_status.clear()
 
