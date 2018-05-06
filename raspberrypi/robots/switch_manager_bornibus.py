@@ -69,7 +69,7 @@ class Abeille_Bornibus(Abeille):
         self.logger("BEE : ", "Activate arm")
         self.beeActioner.open()
         time.sleep(0.3)
-        self.logger("BEE : ", "Activate bee")
+        self.logger("BEE : ", "Activa te bee")
         robot.set_velocities(0, -(self.side*2-1)*9)
         time.sleep(0.7)
         self.beeActioner.close()

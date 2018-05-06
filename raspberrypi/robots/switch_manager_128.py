@@ -21,7 +21,7 @@ class Interrupteur_128(Interrupteur):
             self.logger("SWITCH : ", "Turn toward switch")
             self.mover.turnonthespot(theta, try_limit=3, stategy=Mover.AIM)
             self.logger("SWITCH : ", "Activate switch")
-            self.mover.gowall(try_limit=5, strategy=Mover.SENSORS, direction="forward")
+            self.mover.gowall(try_limit=5, strategy=Mover.POSITION, direction="forward", position=self.interrupteur)
         except PositionUnreachable:
             return
         display.addPoints(Interrupteur.POINTS)
@@ -50,7 +50,7 @@ class Abeille_128(Abeille):
             nb_try += 1
             try:
                 robot.purepursuit([self.preparation, self.interrupteur], direction="backward", lookahead=50,
-                                  finalangle=(self.side*2-1)*math.pi/4, lookaheadbis=400)
+                                  finalangle=math.pi/2*(self.side*2-1)*math.pi/4, lookaheadbis=400)
                 robot.wait()
                 arrived = True
             except RuntimeError:
