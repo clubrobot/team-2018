@@ -53,7 +53,7 @@ class Heuristics:
         for action in self.action_names:
             available = True
             for pred in self.action_dict[action].predecessors:
-                if not pred.done:
+                if not pred.done.is_set():
                     available = False
             if available:
                 heuristic[action] = 1
@@ -75,7 +75,7 @@ class Heuristics:
         heuristic = dict()
         max_points = 0
         for action in self.action_names:
-            if not self.action_dict[action].done:
+            if not self.action_dict[action].done.is_set():
                 max_points = max(self.action_dict[action].points, max_points)
 
         for action in self.action_names:
@@ -97,7 +97,7 @@ class Heuristics:
     def done(self):
         heuristic = dict()
         for action in self.action_names:
-            if self.action_dict[action].done:
+            if self.action_dict[action].done.is_set():
                 heuristic[action] = 0
             else:
                 heuristic[action] = 1
@@ -108,7 +108,7 @@ class Heuristics:
         max_distance = 0
         robot_pos = self.wheeledbase.get_position()[:-1]
         for action in self.action_names:
-            if not self.action_dict[action].done:
+            if not self.action_dict[action].done.is_set():
                 point = self.action_dict[action].actionPoint
                 print(point)
                 print(robot_pos)
@@ -126,7 +126,7 @@ class Heuristics:
         heuristic = dict()
         max_time = 0
         for action in self.action_names:
-            if not self.action_dict[action].done:
+            if not self.action_dict[action].done.is_set():
                 max_time = max(self.action_dict[action].points, max_time)
 
         for action in self.action_names:

@@ -5,7 +5,7 @@ from robots.heuristics           import Heuristics
 from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
-
+from robots.switch_manager_128       import Interrupteur, Abeille
 
 class R128:
     def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back, br, bm):
@@ -32,6 +32,9 @@ class R128:
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
+        self.bee   = Abeille(self.side, self.geogebra,  self.arduinos, self.displayManager, self.mover, self.logger, self.data)
+        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.beacons_receiver, self.data)
+
         self.action_list = []
         self.cross = []
         self.cross = Cross(self.side, 1,self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
@@ -52,7 +55,7 @@ class R128:
             self.mover.goto(*act.actionPoint)
             self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
             act()
-            act.done = True
+            act.done.set()
             act = self.heuristics.get_best()
             self.mover.reset()
 
