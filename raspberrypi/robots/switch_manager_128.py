@@ -82,3 +82,57 @@ class Abeille_128(Abeille):
                 robot.set_velocities(-100, 0)
                 time.sleep(0.5)
         display.addPoints(Abeille.POINTS)
+
+
+
+
+class Odometry(Actionnable):
+    typ="Odometrie"
+    def __init__(self, side, geo, arduinos, mover, logger, data):
+
+        self.side=side
+        self.mover = mover
+        self.logger = logger
+        self.data = data
+        self.wheeledbase = arduinos["wheeledbase"]
+        self.preparation = geo.get('Odometry'+str(self.side))
+        self.wall  = [geo.get('Odometry'+str(self.side)+'_0'),geo.get('Odometry' + str(self.side) + '_1')]
+
+    def realize(self):
+        self.logger("ODOMETRY : ", "Launch a mover turnOnTheSpot")
+        for i in range(2):
+            try:
+                self.mover.turnonthespot([-math.pi/2,math.pi][i], 3, Mover.AIM)
+            except PositionUnreachable:
+                self.logger("ODOMETRY :", "Angle not reachable, odometry aborded")
+                self.wheeledbase.left_wheel_maxPWM.set(1)
+                self.wheeledbase.right_wheel_maxPWM.set(1)
+                return
+            try:
+                self.wheeledbase.set_velocities(200, 0)
+                self.wheeledbase.left_wheel_maxPWM.set(0.8)
+                self.wheeledbase.right_wheel_maxPWM.set(0.8)
+                self.wheeledbase.wait()
+            except RuntimeError:
+
+                # Do an odometry recalibration
+                xref, yref = self.wall[i]
+                thetaref = [-math.pi/2,math.pi][i]
+                #		thetaref = wheeledbase.get_position()[2]
+                xthought, ythought = self.wheeledbase.get_position()[:2]
+                offset = math.hypot(xref - xthought, yref - ythought) * math.cos(
+                    thetaref - math.atan2(yref - ythought, xref - xthought))
+                xthought += offset * math.cos(thetaref)
+                ythought += offset * math.sin(thetaref)
+                self.wheeledbase.set_position(xthought, ythought, thetaref)
+
+
+
+    def getAction(self):
+            return [Action(self.preparation,
+                    lambda : self.realize(),
+                     Odometry.typ,
+                    "Odometry",
+                    0,
+                    0) ]
+
