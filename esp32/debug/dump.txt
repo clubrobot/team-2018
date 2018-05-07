@@ -1,10 +1,12 @@
-Guru Meditation Error: Core  1 panic'ed (StoreProhibited). Exception was unhandled.
+Guru Meditation Error: Core  0 panic'ed (InstrFetchProhibited)
+. Exception was unhandled.
 Register dump:
-PC      : 0x400d25f2  PS      : 0x00060730  A0      : 0x800d56c6  A1      : 0x3ffcae20  
-A2      : 0x00000000  A3      : 0x0000001e  A4      : 0x0000000a  A5      : 0x3ffc274a  
-A6      : 0x00060320  A7      : 0x3ffc8fe0  A8      : 0x800d25f2  A9      : 0x3ffcae00  
-A10     : 0x00000e1d  A11     : 0x3f403f55  A12     : 0x0000000a  A13     : 0x00000002  
-A14     : 0x3ffc2696  A15     : 0x00000001  SAR     : 0x00000006  EXCCAUSE: 0x0000001d  
-EXCVADDR: 0x0000006c  LBEG    : 0x400014fd  LEND    : 0x4000150d  LCOUNT  : 0xfffffff8  
+PC      : 0x00000000  PS      : 0x00060830  A0      : 0x800d0eed  A1      : 0x3ffcd820  
+A2      : 0x3ffc22ac  A3      : 0x00000040  A4      : 0x00000032  A5      : 0x3ffc7614  
+A6      : 0x00000001  A7      : 0x00000001  A8      : 0x800d68bd  A9      : 0x3ffcd800  
+A10     : 0x3ffc22ac  A11     : 0x00000040  A12     : 0x0000003f  A13     : 0x3ffc6874  
+A14     : 0x00000000  A15     : 0x3f404ee0  SAR     : 0x0000001b  EXCCAUSE: 0x00000014  
+EXCVADDR: 0x00000000  LBEG    : 0x400014fd  LEND    : 0x4000150d  LCOUNT  : 0xfffffffe  
 
-Backtrace: 0x400d25f2:0x3ffcae20 0x400d56c3:0x3ffcae40 0x400d0f85:0x3ffcaf20 0x400e7391:0x3ffcaf40
+Backtrace: 0x00000000:0x3ffcd820 0x400d0eea:0x3ffcd850
+

@@ -510,12 +510,12 @@ void GET_PARAMETER_VALUE(SerialTalks& talks, Deserializer& input, Serializer& ou
 
 void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
-	byte brobot = input.read<byte>();
+	robot = input.read<byte>();
 	if(robot == BORNIBUS)
 	{
 		purePursuit.setLookAhead(200);
 		positionControl.setVelLimits(600, 6);
-		
+
 		leftWheel.setMaxPWM(1);
 		rightWheel.setMaxPWM(1);
 
@@ -526,7 +526,7 @@ void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& outpu
 	{
 		purePursuit.setLookAhead(300);
 		positionControl.setVelLimits(800, 9);
-		
+
 		leftWheel.setMaxPWM(1);
 		rightWheel.setMaxPWM(1);
 
