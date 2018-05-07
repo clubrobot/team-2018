@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from math import cos, sin, pi, copysign, hypot
+from math import cos, sin, pi, copysign, hypot, atan2
 from threading import *
 import time
 from statistics import mean
 
 from common.sync_flag_signal import Flag
 from robots.listener.sensor_listener import *
+from robots.listener.position_listener import *
 from common.roadmap import RoadMap
+from robots.friend_manager import FriendManager
+from robots.get_robot_name import *
+
 
 DELTA = 100
 PUREPURSUIT_LOOKAHEAD_ID = 0xE0
@@ -53,12 +57,20 @@ class Mover:
     SENSORS = 8
     POSITION = 9
 
-    def __init__(self, side, roadmap, arduinos, logger, becons_receiver):
+    def __init__(self, side, friend ,roadmap, arduinos, logger, becons_receiver):
 
         # RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
         self.logger = logger
         self.becons_receiver = becons_receiver
+
+        # Launch Friend Manager
+        self.friend = FriendManager(arduinos["wheeledbase"], self, 0.4, logger)
+        self.friend.start()
+        if ROBOT_ID == R128_ID:
+            self.friend_obstacle = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
+            self.friend_obstacle.set_position(-1000,-1000)
+            self.friend_listener = PositionListener(lambda: self.friend.get_friend_position(), 0.5)
 
         # Arduino et autre
         self.wheeledbase = arduinos["wheeledbase"]
@@ -75,6 +87,10 @@ class Mover:
         self.front_flag = Flag(self.front_obstacle)
         self.withdraw_flag = Flag(self._withdraw_interrup)
         self.front_safe_flag = Flag(self.front_obstacle_safe)
+        if ROBOT_ID == R128_ID :
+            self.in_path_flag = Flag(self.on_path_obstacle)
+
+
         self.path = list()
         self.isarrived = False
         self.interupted_lock = RLock()
@@ -85,10 +101,15 @@ class Mover:
         self.goal = (0, 0, 0)
         self.timeout = 1
 
+    def get_friend(self):
+        return self.friend
+
     def reset(self):
         self.front_flag.clear()
         self.withdraw_flag.clear()
         self.front_safe_flag.clear()
+        if ROBOT_ID == R128_ID :
+            self.in_path_flag.clear()
         self.wheeledbase.reset_parameters()
         self.interupted_timeout.clear()
         self.interupted_status.clear()
@@ -495,12 +516,10 @@ class Mover:
     def goto(self, x, y):
         self.goal = (x, y)
 
-        # self.on_path_flag.bind(self.big_listener.signal)
-        # self.on_path_flag.bind(self.little_listener.signal)
+        if ROBOT_ID == R128_ID :
+            self.in_path_flag.bind(self.friend_listener.signal)
         self.front_flag.bind(self.sensors_front_listener.signal)
 
-        # self.obstacle_big.set_position(*self.balise.get_position(BIG_ROBOT))
-        # self.obstacle_little.set_position(*self.balise.get_position(LITTLE_ROBOT))
 
         self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2], self.goal)
         self.logger("MOVER : ", path=self.path)
@@ -671,6 +690,32 @@ class Mover:
         self.interupted_lock.release()
         self.interupted_status.clear()
 
+    def get_path(self):
+        x, y ,theta = self.wheeledbase.get_position()
+        result = self.path
+        for point in self.path:
+            theta_bis = atan2(point[1]-y, point[0]-x)
+            if (theta_bis-theta)%pi>pi/2:
+                result.remove(point)
+        return result
+
+    def on_path_obstacle(self):
+        self.friend_obstacle.set_position(*self.friend.get_friend_position())
+        if not self.interupted_lock.acquire():
+            return
+        self.interupted_status.set()
+        self.wheeledbase.set_velocities(0, 0)
+        x, y, _ = self.wheeledbase.get_position_previous(0.5)
+        x_f, y_f = self.friend.get_friend_position()
+        while hypot(y-y_f, x - x_f)<400:
+            sleep(0.2)
+            x_f, y_f = self.friend.get_friend_position()
+
+        self.wheeledbase.purepursuit(self.path)
+        self.interupted_status.clear()
+        self.interupted_lock.release()
+
+
 
     def goto_safe(self, x, y):
 
@@ -713,3 +758,4 @@ class Mover:
         self.wheeledbase.purepursuit(self.path)
         self.interupted_status.clear()
         self.interupted_lock.release()
+

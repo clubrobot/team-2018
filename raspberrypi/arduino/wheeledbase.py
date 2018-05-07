@@ -139,6 +139,10 @@ class WheeledBase(SecureSerialTalksProxy):
 
         self.lookahead    = WheeledBase.Parameter(self, PUREPURSUIT_LOOKAHEAD_ID, FLOAT)
         self.lookaheadbis = WheeledBase.Parameter(self, PUREPURSUIT_LOOKAHEADBIS_ID, FLOAT)
+        self.x = 0
+        self.y = 0
+        self.theta = 0
+        self.previous_measure = 0
 
     def set_openloop_velocities(self, left, right):
         self.send(SET_OPENLOOP_VELOCITIES_OPCODE, FLOAT(left), FLOAT(right))
@@ -220,8 +224,14 @@ class WheeledBase(SecureSerialTalksProxy):
 
     def get_position(self, **kwargs):
         output = self.execute(GET_POSITION_OPCODE, **kwargs)
-        x, y, theta = output.read(FLOAT, FLOAT, FLOAT)
-        return x, y, theta
+        self.x, self.y, self.theta = output.read(FLOAT, FLOAT, FLOAT)
+        self.previous_measure = time.time()
+        return self.x, self.y, self.theta
+
+    def get_position_previous(self, delta):
+        if time.time()-self.previous_measure>delta:
+            self.get_position()
+        return self.x, self.y, self.theta
 
     def get_velocities(self, **kwargs):
         output = self.execute(GET_VELOCITIES_OPCODE, **kwargs)

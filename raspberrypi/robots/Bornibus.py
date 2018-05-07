@@ -13,7 +13,7 @@ from robots.heuristics              import Heuristics
 from common.logger                  import Logger
 from robots.beacons_manager         import BeaconsManagement
 from beacons.balise_receiver        import BaliseReceiver
-
+from robots.friend_manager import FriendManager
 # Setup and launch the user interface
 class Bornibus:
     cube ="cube"
@@ -41,6 +41,7 @@ class Bornibus:
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
         self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
+        self.friend = self.mover.get_friend()
         self.data = dict()
         self.beacons_receiver = br
         self.beacons_manager = bm

@@ -7,6 +7,7 @@ from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
 from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
 from robots.get_robot_name import *
+from robots.friend_manager import FriendManager
 #if ROBOT_ID == R128_ID:
 #    from robots.color_pattern import Pattern
 
@@ -37,6 +38,7 @@ class R128:
         self.logger   = Logger(Logger.SHOW)
         robot_arm.set_logger(self.logger)
         self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
+        self.friend = self.mover.get_friend()
         self.beacons_receiver = br
         self.beacons_manager = bm
         self.data = dict()
