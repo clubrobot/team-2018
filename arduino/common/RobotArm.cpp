@@ -3,14 +3,16 @@
 #include "RobotArm.h"
 #include "ShiftRegAX12.h" 
 #include "SoftwareSerial.h"
+#include "StepByStepMotor.h"
 
 extern ShiftRegAX12 servoax;
+extern StepByStepMotor motor;
 
 RobotArm::RobotArm(double x, double y, double z, double theta, float speed)
 {
-	m_x = x * -1; //revert x
+	m_x = x;
 	m_y = y;
-	m_z = z;
+	m_z = z * 10;
 	m_theta = theta;
 
 	m_speed = speed;
@@ -27,7 +29,8 @@ void RobotArm::attach(unsigned char A1_id, unsigned char A2_id, unsigned char A3
 
 void RobotArm::begin()
 {
-	//Set AX config
+	motor.begin();
+	//Set AX configx
 	//Broadcast address
 	servoax.attach(254);
 
@@ -44,7 +47,7 @@ void RobotArm::begin()
 	servoax.hold(OFF);
 
 	//Set start position
-	ReachPosition(m_x, m_y, m_z, m_theta);
+	ReachPosition(m_x, m_y, m_z, m_theta, Z_FIRST);
 }
 
 bool RobotArm::solve_angles(double x, double y)
@@ -57,10 +60,20 @@ bool RobotArm::solve_angles(double x, double y)
 	//D2 can be calculated using the law of cosines where a = dist, b = len1, and c = len2.	
 	if(!lawOfCosines(dist, ARM_LEN_1, ARM_LEN_2, &D2)) return false;
 	//Then A1 is simply the sum of D1 and D2.	
-	m_A1 = convert_deg(D1 + D2);
+	
+
 	if(!lawOfCosines(ARM_LEN_1, ARM_LEN_2, dist, &R2)) return false;
 	//A2 can also be calculated with the law of cosine, but this time with a = len1, b = len2, and c = dist.	
-	m_A2 = convert_deg(R2);
+	if(x >= 0)
+	{
+		m_A1 = convert_deg(D1 + D2);
+		m_A2 = convert_deg(R2);
+	}
+	else
+	{
+		m_A1 = convert_deg(D1 - D2);
+		m_A2 = 360 - convert_deg(R2);
+	}
 
 	return true;
 }
@@ -70,13 +83,9 @@ bool RobotArm::solve_coords(double x, double y)
 	if((x >= X_MIN_UP) && (x<= X_MAX_UP))
 	{
 		if(y <= up(x) && y >= down(x))
-		{
 			return true;
-		}
 		else
-		{
 			return false;
-		}
 	}
 	else
 	{
@@ -89,46 +98,46 @@ bool RobotArm::solve_coords(double x, double y)
 bool RobotArm::is_reached()
 {
 	bool ret1,ret2,ret3;
+	double A1,A2;
 
-	if(abs(get_A1() - get_A1theo()) <= DELTA_POS)
+	A1 = get_A1();
+	A2 = get_A2();
+
+	if(abs(A1 - get_A1theo()) <= DELTA_POS)
 		ret1 = true;
 	else
 		ret1 = false;
 
-	if(abs(get_A2() - get_A2theo()) <= DELTA_POS)
+	if(abs(A2 - get_A2theo()) <= DELTA_POS)
 		ret2 = true;
 	else
 		ret2 = false;
-		
-	if(abs(get_A3() - get_A3theo()) <= DELTA_POS)
-		ret3 = true;
-	else
-		ret3 = false;
 
-	return ret1 & ret2 & ret3;
+	return ret1 & ret2;
 
 }
 
-bool RobotArm::ReachPosition(double x, double y, double z, double theta)
+bool RobotArm::ReachPosition(double x, double y, double z, double theta, int z_order)
 {
-	m_x 	= x; //revert x
+	m_x 	= x;
 	m_y 	= y;
 	m_z 	= z;
+
 	m_theta = theta;
 
 	double t1,t2,t3;
 
-	if(solve_coords(x,y) && solve_angles(x,y))
+	if(solve_angles(x,y))
 	{
-		//calculate gripper angle
-		m_A3 = (360-(m_A1+m_A2)) + m_theta;
+
+		if(z_order == Z_FIRST)
+			motor.set_position(m_z);
+
 
 		//calculate real position with offset
 		t1 = m_A1 + ARM1_OFFSET;
 
 		t2 = m_A2 - ARM2_OFFSET;
-
-		t3 = m_A3 + ARM3_OFFSET;
 
 		// send pos to AX12 servos
 		servoax.attach(m_A1_id);
@@ -141,12 +150,19 @@ bool RobotArm::ReachPosition(double x, double y, double z, double theta)
 		servoax.moveSpeed((float)t2, m_speed);
 		servoax.detach();
 
+		
+		m_A3 = (360-(m_A1+m_A2)) + m_theta;
+		t3 = m_A3 + ARM3_OFFSET;
+
 		servoax.attach(m_A3_id);
 		servoax.setMaxTorqueRAM(1023);
 		servoax.moveSpeed((float)t3, m_speed);
 		servoax.detach();
-
 		while(!is_reached());
+
+
+		if(z_order == Z_LAST)
+			motor.set_position(m_z);
 
 		//TODO : add pap Z axis
 
@@ -175,26 +191,35 @@ void RobotArm::set_angles(float A1, float A2, float A3)
 
 bool RobotArm::set_x(double x)
 {
-	m_x = x*-1;
-	return ReachPosition(m_x, m_y, m_z,m_theta);
+	m_x = x;
+	return ReachPosition(m_x, m_y, m_z,m_theta, Z_FIRST);
 }
 
 bool RobotArm::set_y(double y)
 {
 	m_y = y;
-	return ReachPosition(m_x, m_y, m_z, m_theta);
+	return ReachPosition(m_x, m_y, m_z, m_theta, Z_FIRST);
 }
 
 bool RobotArm::set_z(double z)
 {
-	m_z = z;	
+	m_z = z*10;
+	motor.set_position(m_z);	
 	return true;
 }
 
 bool RobotArm::set_theta(double theta)
 {
 	m_theta = theta;
-	return ReachPosition(m_x, m_y, m_z, m_theta);
+			//calculate gripper angle classic
+	m_A3 = (360-(m_A1+m_A2)) + m_theta;
+	double t = m_A3 + ARM3_OFFSET;
+
+	servoax.attach(m_A3_id);
+	servoax.setMaxTorqueRAM(1023);
+	servoax.moveSpeed((float)t, m_speed);
+	servoax.detach();
+	return true;
 }
 
 void RobotArm::set_speed(float speed)
@@ -214,17 +239,17 @@ void RobotArm::open_gripper()
 
 double RobotArm::get_A1theo()
 {
-	return m_A1;
+	return m_A1 + ARM1_OFFSET;
 }
 
 double RobotArm::get_A2theo()
 {
-	return m_A2;
+	return m_A2 - ARM2_OFFSET;
 }
 
 double RobotArm::get_A3theo()
 {
-	return m_A3;
+	return m_A3 + ARM3_OFFSET;
 }
 
 double RobotArm::get_A1()

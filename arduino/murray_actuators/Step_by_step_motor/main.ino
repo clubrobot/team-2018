@@ -14,20 +14,37 @@ void setup()
 	motor.begin();
 
 
-	motor.set_position(50);
+	motor.set_position(150);
 
-	delay(2000);
-
-	motor.set_position(100);
-
-	delay(2000);
+	delay(200);
 
 	motor.set_position(0);
+
+	delay(200);
+
+	motor.set_position(150);
+
+	delay(200);
+
+	motor.set_position(0);
+
+	delay(200);
+
+	motor.set_position(150);
+
+	delay(200);
+
+	motor.set_position(0);
+
+	
 
 
 	
 }
 void loop()
 {
+	//motor.set_position(50);
+
+	//delay(2000);
 
 }

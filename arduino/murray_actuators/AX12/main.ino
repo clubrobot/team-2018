@@ -4,6 +4,7 @@
 #include "../../common/SerialTalks.h"
 #include "../../common/ShiftRegister.h"
 #include "../../common/ShiftRegAX12.h"
+#include "../../common/StepByStepMotor.h"
 #include "../../common/RobotArm.h"
 #include "PIN.h"
 #include "instructions.h"
@@ -20,9 +21,12 @@ Servo beeActivator;
 
 ShiftRegister shift;
 
+StepByStepMotor motor;
+
 ShiftRegAX12 servoax;
+
 //            X |  Y  |  Z  | Th | SPEED
-RobotArm arm(0.0, 30.0, 10.0, 90.0, 1000);
+RobotArm arm(15.0, 15.0, 10.0, 0.0, 100);
 
 void setup()
 {
@@ -60,16 +64,27 @@ void setup()
     //initialise ShiftRegister
     shift.attach(LATCHPIN,CLOCKPIN,DATAPIN);
 
+    motor.attach(STEP_PAP, DIR_PAP, ENABLE_PAP, RST_PAP, SLEEP_PAP);
+
     ShiftRegAX12::SerialBegin(9600, RX_AX12, TX_AX12, AX12_DATA_CONTROL);
+<<<<<<< HEAD
 
     //arm.set_angles(150.0, 150.0, 150.0);
 
     arm.attach(2,1,3,SERVO1);
 
     arm.begin();
+=======
+
+>>>>>>> 0ebc8a222df4f9d85c589cce3a542eee6517ecd3
 }
 
 void loop()
 {
 	talks.execute();
+<<<<<<< HEAD
 }
+=======
+
+}
+>>>>>>> 0ebc8a222df4f9d85c589cce3a542eee6517ecd3

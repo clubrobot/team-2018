@@ -12,5 +12,6 @@ from arduino.RobotArm 		   import *
 
 try:
 	r = RobotArm()
+	r.connect()
 except:
 	print('\'RobotArm\' not connected')

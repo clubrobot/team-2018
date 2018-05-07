@@ -10,9 +10,6 @@ extern Servo beeActivator;
 
 void BEGIN(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
-	pinMode(13,OUTPUT);
-	digitalWrite(13,HIGH);
-
 	arm.attach(2,1,3,SERVO1);
 
 	arm.begin();
@@ -23,14 +20,15 @@ void SET_POSITION(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
 	bool ret;
 
-	float x = input.read<float>();
-	float y = input.read<float>();
-	float z = input.read<float>();
-	float d = input.read<float>();
+	float x 	= input.read<float>();
+	float y 	= input.read<float>();
+	float z 	= input.read<float>();
+	float d 	= input.read<float>();
+	float z_o 	= input.read<int>();
 
-	ret = arm.ReachPosition(x,y,z,d);
+	ret = arm.ReachPosition(x,y,z*10,d,z_o);
 
-	output.write<bool>(ret);
+	output.write<int>(ret);
 
 }
 
@@ -40,7 +38,7 @@ void SET_X(SerialTalks &inst, Deserializer &input, Serializer &output)
 
 	arm.set_x(input.read<float>());
 
-	output.write<bool>(ret);
+	output.write<int>(ret);
 }
 
 void SET_Y(SerialTalks &inst, Deserializer &input, Serializer &output)
@@ -49,7 +47,7 @@ void SET_Y(SerialTalks &inst, Deserializer &input, Serializer &output)
 
 	arm.set_y(input.read<float>());
 
-	output.write<bool>(ret);
+	output.write<int>(ret);
 }
 
 void SET_Z(SerialTalks &inst, Deserializer &input, Serializer &output)
@@ -58,7 +56,7 @@ void SET_Z(SerialTalks &inst, Deserializer &input, Serializer &output)
 
 	arm.set_z(input.read<float>());
 
-	output.write<bool>(ret);
+	output.write<int>(ret);
 }
 
 void SET_THETA(SerialTalks &inst, Deserializer &input, Serializer &output)
@@ -67,7 +65,7 @@ void SET_THETA(SerialTalks &inst, Deserializer &input, Serializer &output)
 
 	arm.set_theta(input.read<float>());
 
-	output.write<bool>(ret);
+	output.write<int>(ret);
 }
 
 void SET_SPEED(SerialTalks &inst, Deserializer &input, Serializer &output)
