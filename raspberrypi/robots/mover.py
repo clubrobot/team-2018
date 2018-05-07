@@ -470,9 +470,11 @@ class Mover:
         constant_pwm = 0.4
         while not self.isarrived and ((try_limit - try_number) > 0 or try_limit < 0):
             try:
+                self.logger("MOVER : ", "Turn on the spot start")
                 self.wheeledbase.turnonthespot(self.goal[2], direction=way)
                 self.wheeledbase.wait()
                 self.isarrived = True
+                self.logger("MOVER : ", "Turn on the spot reached")
             except RuntimeError:
                 self.wheeledbase.stop()
                 lin_vel, ang_vel = self.wheeledbase.get_velocities_wanted(True)
@@ -505,7 +507,7 @@ class Mover:
         self.wheeledbase.purepursuit(self.path)
         self.isarrived = False
         x, y, _ = self.wheeledbase.get_position()
-        while hypot(x-self.goal[0],y-self.goal[1])>300:
+        while hypot(x-self.goal[0],y-self.goal[1])>50:
             while not self.isarrived or self.interupted_status.is_set():
                 try:
                     if(self.goto_interrupt.is_set()):
