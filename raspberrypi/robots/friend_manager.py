@@ -65,7 +65,7 @@ class FriendManager(TCPTalks,Thread):
         except:
             return
 
-    def get_friend_action_did(self):
+    def get_friend_action_done(self):
         self.action_lock.acquire()
         result = self.action_did_by_friend + [self.friend_action]
         self.action_lock.release()

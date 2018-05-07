@@ -1,9 +1,14 @@
 import math
 
+
+
+
+
+
 class Heuristics:
     MANUAL = 1
     AUTO = 0
-    def __init__(self, actions, arduinos, logger, beacon_management, mode=AUTO):
+    def __init__(self, actions, arduinos, logger, beacon_management, friend, mode=AUTO):
         self.actions = actions
         self.action_names = []
         self.action_dict = dict()
@@ -32,6 +37,7 @@ class Heuristics:
 
         self.wheeledbase = arduinos["wheeledbase"]
         self.beacon_management = beacon_management
+        self.friend = friend
 
     def init_points_recursive(self, action, points):
         for pred in action.predecessors:
@@ -178,6 +184,9 @@ class Heuristics:
         return heuristics_values
 
     def get_best(self):
+        for friend_action in self.friend.get_friend_action_done():
+            friend_action.done.set()
+
         heuristics_values = self.compute_heuristics()
         name_best = ""
         for action in self.action_names:

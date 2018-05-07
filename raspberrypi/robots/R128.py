@@ -76,7 +76,7 @@ class R128:
         #self.panelAct.set_manual_order(2)
         self.crossAct.set_manual_order(2)
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
         if self.side == R128.GREEN:
             wheeledbase.set_position(510, 270, 0)
