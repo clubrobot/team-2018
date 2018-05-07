@@ -7,8 +7,9 @@ from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
 from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
 from robots.get_robot_name import *
-if ROBOT_ID == R128:
-    from robots.color_pattern import Pattern
+#if ROBOT_ID == R128_ID:
+#    from robots.color_pattern import Pattern
+
 
 class R128:
     cube ="cube"
@@ -67,10 +68,10 @@ class R128:
             self.crossAct,
         ]
 
-        #self.odoAct.set_manual_order(1)
+        self.odoAct.set_manual_order(1)
         #self.beeAct.set_manual_order(3)
         #self.panelAct.set_manual_order(2)
-        self.crossAct.set_manual_order(1)
+        self.crossAct.set_manual_order(2)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
                                      mode=Heuristics.MANUAL)

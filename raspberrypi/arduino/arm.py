@@ -72,15 +72,6 @@ class RobotArm(SecureSerialTalksProxy):
     def set_pos(self, x, y ,z ,theta, z_o):
         self.send(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta),INT(z_o))
 
-    def put_in_tank(self):
-        self.send(_SET_POS_OPCODE, FLOAT(-25), FLOAT(10), FLOAT(2), FLOAT(180),INT(0))
-
-
-    def process_cubes(self,num_cubes):
-        for i in range(0,num_cubes):
-            x, y, th = CROSS_LIST[cross_num][order_list[i]]
-            self.set_pos(x,y,10, th, 0)
-
     def set_x(self,x):
         self.send(_SET_X_OPCODE, FLOAT(x))
 
@@ -94,7 +85,7 @@ class RobotArm(SecureSerialTalksProxy):
         self.send(_SET_THETA_OPCODE, FLOAT(theta))
 
     def set_speed(self,speed):
-        self.send(_SET_THETA_OPCODE, FLOAT(speed))
+        self.send(_SET_SPEED_OPCODE, FLOAT(speed))
 
     def get_pos(self):
         output = self.execute(_GET_POS_OPCODE)
@@ -107,7 +98,7 @@ class RobotArm(SecureSerialTalksProxy):
         return (x,y,z)
 
     def set_angles(self,a,b,c):
-        self.send(_SET_ANGLES_OPCODE, FLOAT(a),FLOAT(b),FLOAT(C))
+        self.send(_SET_ANGLES_OPCODE, FLOAT(a),FLOAT(b),FLOAT(c))
 
     def open_gripper(self):
         self.send(_OPEN_GRIPPER_OPCODE)
