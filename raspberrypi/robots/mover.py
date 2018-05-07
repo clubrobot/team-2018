@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from math import cos, sin, pi, copysign, hypot
+from math import cos, sin, pi, copysign, hypot, atan2
 from threading import *
 import time
 from statistics import mean
@@ -514,11 +514,11 @@ class Mover:
                     self.isarrived = self.wheeledbase.isarrived()
                     sleep(0.1)
                 except RuntimeError:
-                    self.logger("MOVER : ", "Spin! ")
                     if not self.interupted_lock.acquire(blocking=True, timeout=0.5):
                         while self.interupted_status.is_set():
                             sleep(0.1)
                         continue
+                    self.logger("MOVER : ", "Spin! ")
                     x, y, _ = self.wheeledbase.get_position()
                     vel, ang = self.wheeledbase.get_velocities_wanted(True)
                     self.wheeledbase.set_velocities(copysign(150, -vel), copysign(1, ang))
@@ -585,19 +585,35 @@ class Mover:
 
         self.wheeledbase.stop()
 
+
+
             # Creation de l'obstacle
-        x_obs = (x + x_p) / 2
-        y_obs = (y + y_p) / 2
-        height = hypot(x - x_p, y - y_p)*1.4
-        x_obs += cos(theta) * 100
-        y_obs += sin(theta) * 100
+        x_obs = x
+        y_obs = y
+        height = 200
+        x_obs += cos(theta) * 250
+        y_obs += sin(theta) * 250
         obs = self.roadmap.create_temp_obstacle(
-            ((-100, height / 2), (-100, -height / 2), (100, -height / 2), (100, height / 2)), timeout=TIMEOUT_OBSTACLE)
+            ((-150, height), (-150, -height ), (150, -height ), (150, height)), timeout=TIMEOUT_OBSTACLE)
         obs.set_position(x_obs, y_obs, theta)
         old_path = self.path
         try:
-            self.path = self.roadmap.get_shortest_path((x_p, y_p), self.goal)
-        except RuntimeError:
+            self.path = self.roadmap.get_shortest_path((x, y), self.goal)
+            print(self.path)
+            aim_theta= atan2(self.path[1][1]-self.path[0][1], self.path[1][0]-self.path[0][0])
+            arrived = False
+            while not arrived:
+                try:
+                    self.wheeledbase.turnonthespot(aim_theta)
+                    self.wheeledbase.wait()
+                    arrived = True
+                except RuntimeError:
+                    vel_wanted, _ = self.wheeledbase.get_velocities_wanted(True)
+                    self.wheeledbase.stop()
+                    self.wheeledbase.goto_delta(copysign(150,-vel_wanted),0)
+                    sleep(0.5)
+        except (RuntimeError,RuntimeWarning) as e:
+            print(e)
             time.sleep(1)
         try:
             self.wheeledbase.purepursuit(self.path)
