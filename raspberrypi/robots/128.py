@@ -13,14 +13,15 @@ class R128:
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
-    def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back, br, bm):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner, rarm, sensors_front, sensors_lat, sensors_back, br, bm):
         # Save arduinos
         self.arduinos = dict(wheeledbase=wheeledbase,
                              display=display,
                              beeActioner=beeActioner,
                              sensors_front=sensors_front,
                              sensors_lat=sensors_lat,
-                             sensors_back=sensors_back
+                             sensors_back=sensors_back,
+                             robot_arm=rarm,
                              )
 
 
@@ -50,7 +51,7 @@ class R128:
         self.action_list = []
         self.cross = []
         self.cross = Cross(self.side, 1, self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
-        #self.action_list += self.cross.getAction()
+        self.crossAct = self.cross.getAction()[1]
 
         self.beeAct = self.bee.getAction()[0]
         self.panelAct = self.panel.getAction()[0]
@@ -58,12 +59,14 @@ class R128:
         self.action_list = [
             self.beeAct,
             self.panelAct,
-            self.odoAct
+            self.odoAct,
+            self.crossAct,
         ]
 
-        self.odoAct.set_manual_order(1)
-        self.beeAct.set_manual_order(3)
-        self.panelAct.set_manual_order(2)
+        #self.odoAct.set_manual_order(1)
+        #self.beeAct.set_manual_order(3)
+        #self.panelAct.set_manual_order(2)
+        self.crossAct.set_manual_order(1)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
                                      mode=Heuristics.MANUAL)
@@ -77,11 +80,13 @@ class R128:
         self.mover.reset()
 
         act = self.heuristics.get_best()
+        self.arduinos["robot_arm"].begin()
+        time.sleep(2)
         print(act)
         while act is not None:
             try:
                 act.before_action()
-                self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
+                self.logger("MAIN : ", "Let's go to the next action : {}".format(act.name))
                 self.mover.goto(*act.actionPoint)
                 self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
                 act()
@@ -110,6 +115,6 @@ if __name__ == '__main__':
 
     bm = BeaconsManagement(br, "area.ggb")
 
-    auto = R128(0, rm, geo, wheeledbase, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
+    auto = R128(0, rm, geo, wheeledbase, ssd, led1, led2, beeactuator, arm, s_front, s_lat, s_back, br, bm)
     auto.set_side(0)
     auto.run()
