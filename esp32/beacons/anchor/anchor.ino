@@ -32,7 +32,7 @@ OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
 
 byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
-DataSync data;
+DataSync data = {GREEN, LONGDATA_RANGE_ACCURACY};
 
 // BLE variables
 BLECharacteristic *pCharacteristic;
@@ -178,6 +178,65 @@ void inactiveDevice(DW1000Device *device)
   }
 }
 
+void handleNewChannel(uint16_t channel){
+  switch (data.channel)
+  {
+  case LONGDATA_RANGE_LOWPOWER:
+  {
+    DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_LOWPOWER, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case SHORTDATA_FAST_LOWPOWER:
+  {
+    DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_SHORTDATA_FAST_LOWPOWER, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case LONGDATA_FAST_LOWPOWER:
+  {
+    DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_FAST_LOWPOWER, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+   String s = "Channel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case SHORTDATA_FAST_ACCURACY:
+  {
+    DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_SHORTDATA_FAST_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case LONGDATA_FAST_ACCURACY:
+  {
+    DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_FAST_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+   String s = "Channel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case LONGDATA_RANGE_ACCURACY:
+  {
+    DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  default:
+    String s = "Error\nchannel ";
+    s += data.channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+    break;
+  }
+}
+
 void setup() {
   
   Serial.begin(SERIALTALKS_BAUDRATE);
@@ -189,6 +248,7 @@ void setup() {
   talks.bind(UPDATE_COLOR_OPCODE, UPDATE_COLOR);
   talks.bind(GET_COORDINATE_OPCODE,GET_COORDINATE);
   talks.bind(GET_PANEL_STATUS_OPCODE, GET_PANEL_STATUS);
+  talks.bind(CHANGE_CHANNEL_OPCODE, CHANGE_CHANNEL);
 
   /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
@@ -200,7 +260,7 @@ void setup() {
   EEPROM.write(EEPROM_NUM_ANCHOR, currentBeaconNumber);
   EEPROM.commit();
   #endif
-  currentBeaconNumber = EEPROM.read(EEPROM_NUM_ANCHOR);
+      currentBeaconNumber = EEPROM.read(EEPROM_NUM_ANCHOR);
 
   // init communication
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
@@ -208,6 +268,7 @@ void setup() {
   DW1000Ranging.attachBlinkDevice(newBlink);
   DW1000Ranging.attachInactiveAncDevice(inactiveDevice);  // TODO : rename func
   DW1000Ranging.attachAutoCalibration(calibration);
+  DW1000Ranging.attachNewChannel(handleNewChannel);
 
   unsigned int replyTime;
   switch (currentBeaconNumber){
@@ -240,7 +301,7 @@ void setup() {
   DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, approximately 16530 for anchors
 
   //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_FAST_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();
@@ -261,8 +322,6 @@ void setup() {
   digitalWrite(PIN_LED_FAIL,HIGH);
 
   display.displayMsg(Text("SYNC", 3, 64, 0));
-
-  data.color = GREEN;
 
   // Start BLE Server only if this is the supervisor anchor
   if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)

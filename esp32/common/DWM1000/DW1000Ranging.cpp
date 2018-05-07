@@ -113,6 +113,7 @@ void (* DW1000RangingClass::_handleInactiveAncDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveTagDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
 void (* DW1000RangingClass::_handleDataSync)() = 0;
+void (* DW1000RangingClass::_handleNewChannel)(uint16_t) = 0;
 
 /* ###########################################################################
  * #### Debug ################################################################
@@ -695,7 +696,16 @@ void DW1000RangingClass::loop() {
 			
 			//then we proceed to range protocole
 			if(_type == ANCHOR) {
-				if(messageType != _expectedMsgId) {
+				if(messageType == CHANGE_CHANNEL_MODE){
+					uint16_t channel;
+					memcpy(&channel, data + SHORT_MAC_LEN + 1, 2);
+					String s = "change channel to channel ";
+					s+= channel;
+					log(s);
+					if(_handleNewChannel != 0)
+						(*_handleNewChannel)(channel);
+					return;
+				}else if(messageType != _expectedMsgId) {
 					// unexpected message, start over again (except if already POLL)
 
 					String s = "IGNORED Unexppected msg : ";
@@ -1475,4 +1485,16 @@ void DW1000RangingClass::setDataSyncSize(uint8_t dataSize)
 void DW1000RangingClass::setDataSync(void *data)
 {
 	_dataSync = data;
+}
+
+void DW1000RangingClass::transmitChangeChannel(uint16_t channel)
+{
+	log("transmitChangeChannel");
+	transmitInit();
+	byte shortBroadcast[2] = {0xFF, 0xFF};
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
+	data[SHORT_MAC_LEN] = CHANGE_CHANNEL_MODE;
+	memcpy(data + SHORT_MAC_LEN + 1,&channel,2);
+	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
+	transmit(data);
 }
