@@ -22,6 +22,8 @@
 
 #define OPEN_GRIPPER_OPCODE 0X1B
 #define CLOSE_GRIPPER_OPCODE 0X1C
+#define GET_EMERGENCY_STATE_OPCODE 0x1D
+#define WRITE_BEEACTIVATOR_OPCODE 0x1E
 
 void BEGIN(SerialTalks &inst, Deserializer &input, Serializer &output);
 
@@ -47,5 +49,8 @@ void OPEN_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 void CLOSE_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output);
 
+void GET_EMERGENCY_STATE(SerialTalks &inst, Deserializer &input, Serializer &output);
+
+void WRITE_BEE_ACTIVATOR(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 #endif //__INSTRUCTIONS_H__

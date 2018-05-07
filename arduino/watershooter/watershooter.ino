@@ -15,7 +15,7 @@ Servo outdoor;
 Servo trash;
 Servo trashUnloader;
 BallsShaker shaker;
-Servo beeActivator; 
+Servo beeActivator;
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
@@ -60,7 +60,7 @@ void setup(){
 
 
 	pinMode(SERVO1, OUTPUT);
-    pinMode(SERVO2, OUTPUT);
+  pinMode(SERVO2, OUTPUT);
 	pinMode(SERVO3, OUTPUT);
 	pinMode(SERVO4, OUTPUT);
 	pinMode(SERVO5, OUTPUT);
@@ -70,7 +70,7 @@ void setup(){
 	pinMode(SWITCH1, INPUT_PULLUP);
 
 	attachInterrupt(digitalPinToInterrupt(SWITCH1), resetVelocity, FALLING);
-	
+
 	motor.attach(BRUSHLESS);
 	motor.setVelocity(MIN_VELOCITY);
 	motor.enableMotor();
@@ -101,7 +101,3 @@ void loop(){
 	motor.updateStartup();
 	shaker.updateShaker();
 }
-
-
-
-
