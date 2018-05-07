@@ -2,7 +2,7 @@
 
 REPOSITORY=$(dirname $(readlink -f "$BASH_SOURCE"))
 PROFILE="$HOME/.profile"
-
+BASHRC="$HOME/.bashrc"
 # Download and install Aduino IDE if it is not already installed
 
 if [ -z "$ARDUINO_DIR" ]; then # ifndef ARDUINO_DIR
@@ -47,7 +47,7 @@ cd tools
 python get.py
 
 echo export ESP_ROOT="/opt/$ARDUINO_SRC/hardware/espressif/esp32" >> "$PROFILE"
-
+echo export PYTHONPATH="$REPOSITORY/raspberrypi/:\$PYTHONPATH" >> "$BASHRC"
 
 # Install Arduino-Makefile if it is not already installed
 
@@ -65,7 +65,7 @@ sudo usermod -a -G dialout $USER
 PYTHONPATH=$(python3 -m site --user-site)
 
 UDEVRULES_DIRECTORY=/etc/udev/rules.d
-UDEVRULE='KERNEL=="ttyUSB*", PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c" \nKERNEL=="ttyACM*" , PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c" '
+UDEVRULE='KERNEL=="ttyUSB*", PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH:$REPOSITORY/raspberrypi/"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c" \nKERNEL=="ttyACM*" , PROGRAM="/usr/bin/env PATH='"$PATH"' PYTHONPATH='"$PYTHONPATH:$REPOSITORY/raspberrypi/"' '"$REPOSITORY/raspberrypi/robot getuuid"' /dev/%k", SYMLINK+="arduino/%c" '
 
 echo -e $UDEVRULE | sudo tee "$UDEVRULES_DIRECTORY/serialtalks.rules" > /dev/null
 sudo udevadm control --reload-rules

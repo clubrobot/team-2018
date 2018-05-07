@@ -6,13 +6,13 @@
 
 ButtonCard buttonCard;
 int oldreadmode = 1;
-long timeInverter, timeButton, timeTirette;
+long timeInverter, timeButton, timeTirette, savedTime = 0;
 int oldemergency = 0;
 
 void setup() {
   Serial.begin(SERIALTALKS_BAUDRATE);
   talks.begin(Serial);
-  //talks.attach(10,button); 
+  //talks.attach(10,button);
   buttonCard.setup();
   talks.bind(ENABLE_LED_OPCODE, ENABLE_LED);
   talks.bind(DISABLE_LED_OPCODE, DISABLE_LED);
@@ -49,4 +49,14 @@ if (buttonCard.readMode() != oldreadmode && millis()>timeInverter+10){
     talks.send(4, mode);
     timeInverter = millis();
   }*/
+if(analogRead(EMERGENCY)<710){
+    if(millis() - savedTime > 250 && millis() - savedTime < 500){
+      tone(ALED_3, 1500);
+    } else if(millis() - savedTime > 500){
+      noTone(ALED_3);
+      savedTime = millis();
+    }
+}
+
+
 }

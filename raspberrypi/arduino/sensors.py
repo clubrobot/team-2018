@@ -34,13 +34,18 @@ class Sensors(SecureSerialTalksProxy):
 	def get_mesure(self,**kwargs):
 		output = self.execute(_GET_MESURE_SENSOR_OPCODE, **kwargs)
 		ar,av=output.read(INT,INT)
+		if self._compid == "sensorsAr":
+			return ar, av
 		return ar,av
 
 	def wait(self,threshold,timeout=2):
 		init_time = time.time()
 		while (self.get_mesure()[0]<threshold or self.get_mesure()[1]<threshold ) \
 			and time.time()-init_time<timeout:
+			print(self.get_mesure())
 			time.sleep(0.2)
+		if  not (self.get_mesure()[0]>threshold and self.get_mesure()[1]>threshold ):
+			raise TimeoutError()
 
 	def activate(self):
 		self.send(_ACTIVATE_SENSORS_OPCODE, BYTE(1))

@@ -22,7 +22,7 @@
 BUILD_EXTRA_FLAGS = -D BOARD_UUID=\"$(BOARD_UUID)\" $(CPPFLAGS)
 
 #Set the baudrate upload
-UPLOAD_SPEED = 115200
+UPLOAD_SPEED = 921600
 
 # Include possible project makefile. This can be used to override the defaults below
 -include $(firstword $(PROJ_CONF) $(dir $(SKETCH))config.mk)

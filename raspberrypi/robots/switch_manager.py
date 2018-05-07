@@ -3,16 +3,18 @@
 
 import math
 import time
+from threading import Thread
 
 from robots.automateTools import AutomateTools
 from robots.action import *
-
+from robots.mover import Mover, PositionUnreachable
 
 
 class Interrupteur(Actionnable):
     typ="Interrupteur"
     POINTS = 25
-    def __init__(self,side, geo, arduinos, display, mover, logger):
+    TIME = 5
+    def __init__(self,side, geo, arduinos, display, mover, logger, br, data):
         self.side=side
         self.mover = mover
         self.logger = logger
@@ -20,33 +22,42 @@ class Interrupteur(Actionnable):
         self.display = display
         self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
         self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
+        self.data = data
+        self.beacon_receiver = br
+        self.actions = []
+        self.watcher = None
 
     def realize(self,robot, display):
-        #print("Realisation")
-        theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
-        AutomateTools.myTurnonthespot(robot,theta)
-        path = [ self.preparation, self.interrupteur]
-        robot.purepursuit(path)
-            #si on patine alors on stop l'action
-        AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
-        robot.goto(self.preparation[0],self.preparation[1])
-        try:
-            robot.wait()
-        except:
-            pass
-        display.addPoints(Interrupteur.POINTS)
+        return
 
         #override Actionnable
     def getAction(self):
-            return [Action( self.preparation,
-                            lambda : self.realize(self.wheeledbase, self.display),
+        self.actions =  [Action( self.preparation,
+                        lambda : self.realize(self.wheeledbase, self.display),
                             Interrupteur.typ,
-                            "INTERRUPTEUR")  ]
+                            "INTERRUPTEUR",
+                            Interrupteur.POINTS,
+                            Interrupteur.TIME)  ]
+        return self.actions
+
+    def watch(self):
+        self.logger("SWITCH WATCHER : ", "Start thread")
+        time.sleep(7)
+        if not self.beacon_receiver.get_panel_status():
+            self.logger("SWITCH WATCHER : ", "Panel off")
+            self.actions[0].done.clear()
+            self.display.removePoints(Interrupteur.POINTS)
+
+        else:
+            self.logger("SWITCH WATCHER : ", "Panel on")
+
+
 
 class Abeille(Actionnable):
     typ="Abeille"
     POINTS = 50
-    def __init__(self, side, geo, arduinos, display, mover, logger):
+    TIME = 10
+    def __init__(self, side, geo, arduinos, display, mover, logger, data):
         self.side=side
         self.logger = logger
         self.mover = mover
@@ -55,36 +66,19 @@ class Abeille(Actionnable):
         self.beeActioner = arduinos["beeActioner"]
         self.preparation=geo.get('Abeille'+str(self.side)+'_0')
         self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
+        self.data = data
 
     def realize(self,robot, display):
-        robot.turnonthespot(math.pi)
-        robot.wait()
-        robot.purepursuit([self.preparation, self.interrupteur], direction="backward")
-        robot.wait()
-        robot.turnonthespot(math.pi+(self.side*2-1)*math.pi/4)
-        robot.wait()
-        self.beeActioner.open()
-        time.sleep(0.3)
-        robot.set_velocities(0, -(self.side*2-1)*9)
-        time.sleep(0.7)
-        while not robot.isarrived():
-            try:
-                robot.goto(*self.preparation)
-            except:
-                robot.stop()
-                robot.set_velocities(-100, 0)
-                time.sleep(0.5)
-
-        robot.wait()
-        self.beeActioner.close()
-        display.addPoints(Abeille.POINTS)
+        return
 
         #override Actionnable
     def getAction(self):
             return [Action( self.preparation,
                             lambda : self.realize(self.wheeledbase, self.display),
                             Interrupteur.typ,
-                            "ABEILLE")]
+                            "ABEILLE",
+                            Abeille.POINTS,
+                            Abeille.TIME)]
 
 class Odometrie(Actionnable):
     typ="Odometrie"
@@ -107,4 +101,6 @@ class Odometrie(Actionnable):
             return [Action(self.preparation,
                     lambda : self.realize(robot),
                     Odometrie.typ, 
-                    "ODOMETRIE") ]
+                    "ODOMETRIE",
+                    0,
+                    0) ]
