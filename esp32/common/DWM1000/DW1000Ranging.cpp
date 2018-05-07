@@ -85,7 +85,8 @@ float DW1000RangingClass::_pos_x[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 float DW1000RangingClass::_pos_y[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 
 // others
-uint8_t DW1000RangingClass::_color = 0;
+uint8_t DW1000RangingClass::_dataSyncSize = 0;
+void *DW1000RangingClass::_dataSync = NULL;
 
 // data buffer
 byte          DW1000RangingClass::data[LEN_DATA];
@@ -111,6 +112,7 @@ void (* DW1000RangingClass::_handleNewDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveAncDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveTagDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
+void (* DW1000RangingClass::_handleDataSync)() = 0;
 
 /* ###########################################################################
  * #### Debug ################################################################
@@ -828,9 +830,7 @@ void DW1000RangingClass::loop() {
 				if(messageType != _expectedMsgId) {
 					
 					//not needed ?
-					if(messageType == CHANGE_COLOR){
-						memcpy(&_color,  data + 1 + SHORT_MAC_LEN, 1);
-					} else if(!_isEnabled) {
+					 if(!_isEnabled) {
 						String s = "IGNORED Unexppected msg : ";
 						s+=messageType;
 						s+=" expected : ";
@@ -903,7 +903,16 @@ void DW1000RangingClass::loop() {
 					memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
 					float curRXPower;
 					memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
-					
+
+					// we receive dataSync
+					memcpy(&_dataSyncSize, data + 9 + SHORT_MAC_LEN, 1);
+					if (_dataSyncSize > 0 && _dataSync != 0)
+						memcpy(_dataSync, data + 10 + SHORT_MAC_LEN, _dataSyncSize);
+					if (_handleDataSync != 0)
+					{
+						(*_handleDataSync)();
+					}
+
 					if (_useRangeFilter) {
 						//Skip first range
 						if (myDistantDevice->getRange() != 0.0f) {
@@ -1085,7 +1094,7 @@ void DW1000RangingClass::timerTick() {
 	if(_waitingSyncAck){
 		counterForSync++;
 	}
-	if(counterForSync>10){
+	if(counterForSync>4){
 		_waitingSyncAck = false;
 		counterForSync = 0;
 		_isEnabled = false;
@@ -1277,6 +1286,11 @@ void DW1000RangingClass::transmitRangeReport(DW1000Device* myDistantDevice) {
 	//We add the Range and then the RXPower
 	memcpy(data+1+SHORT_MAC_LEN, &curRange, 4);
 	memcpy(data+5+SHORT_MAC_LEN, &curRXPower, 4);
+	// we send dataSync
+	memcpy(data+9+SHORT_MAC_LEN, &_dataSyncSize, 1);
+	if(_dataSyncSize>0 && _dataSync != 0)
+		memcpy(data + 10 + SHORT_MAC_LEN, _dataSync, _dataSyncSize);
+
 	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
 	transmit(data, DW1000Time(_replyDelayTimeUS, DW1000Time::MICROSECONDS));
 }
@@ -1451,32 +1465,14 @@ void DW1000RangingClass::setPosY(float &y, uint8_t index)
 	_pos_y[index] = y;
 }
 
-void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
+// dataSync
+void DW1000RangingClass::setDataSyncSize(uint8_t dataSize)
 {
-
-	transmitInit();
-	byte shortBroadcast[2] = {0xFF, 0xFF};
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
-	data[SHORT_MAC_LEN] = TRILATERATION_REPORT;
-	//memcpy(data + SHORT_MAC_LEN + 1, &_pos_x, 4);
-	//memcpy(data + SHORT_MAC_LEN + 5, &_pos_y, 4);
-
-	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
-	transmit(data);
+	_dataSyncSize = dataSize;
+	
 }
 
-void DW1000RangingClass::transmitColor(uint8_t color)
+void DW1000RangingClass::setDataSync(void *data)
 {
-	_color = color;
-	DW1000Device *myDistantDevice = getDistantDevice();
-	transmitInit();
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
-	data[SHORT_MAC_LEN] = CHANGE_COLOR;
-	memcpy(data + 1 + SHORT_MAC_LEN, &color, 1);
-	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
-	transmit(data, DW1000Time(_replyDelayTimeUS, DW1000Time::MICROSECONDS));
-}
-
-uint8_t DW1000RangingClass::getColor(){
-	return _color;
+	_dataSync = data;
 }

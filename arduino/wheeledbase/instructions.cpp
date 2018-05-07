@@ -510,12 +510,27 @@ void GET_PARAMETER_VALUE(SerialTalks& talks, Deserializer& input, Serializer& ou
 
 void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
-	purePursuit.setLookAhead(200);
-	positionControl.setVelLimits(600, 6);
-	
-	leftWheel.setMaxPWM(1);
-	rightWheel.setMaxPWM(1);
+	robot = input.read<byte>();
+	if(robot == BORNIBUS)
+	{
+		purePursuit.setLookAhead(200);
+		positionControl.setVelLimits(600, 6);
+		
+		leftWheel.setMaxPWM(1);
+		rightWheel.setMaxPWM(1);
 
-	linVelPID.setOutputLimits(-897.501220703125, 897.501220703125);
-	angVelPID.setOutputLimits(-14.36001968383789,14.36001968383789);
+		linVelPID.setOutputLimits(-897.501220703125, 897.501220703125);
+		angVelPID.setOutputLimits(-14.36001968383789,14.36001968383789);
+	}
+	else
+	{
+		purePursuit.setLookAhead(300);
+		positionControl.setVelLimits(800, 9);
+		
+		leftWheel.setMaxPWM(1);
+		rightWheel.setMaxPWM(1);
+
+		linVelPID.setOutputLimits(-1100, 1100);
+		angVelPID.setOutputLimits(-18,18);
+	}
 }
