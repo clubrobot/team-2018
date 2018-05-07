@@ -13,6 +13,7 @@
 #include <SPI.h>
 #include "DW1000Ranging.h"
 #include "DW1000.h"
+#include "../common/dataSync.h"
 
 #include "SSD1306.h"
 #include <Wire.h>
@@ -26,10 +27,12 @@
 #include <BLE2902.h>
 #include "../common/OLED_display.h"
 
+
 OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
 
 byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
+DataSync data;
 
 // BLE variables
 BLECharacteristic *pCharacteristic;
@@ -39,14 +42,14 @@ class MyServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
-  //  Serial.println("connected");
+    //  Serial.println("connected");
     deviceConnected = true;
     display.log("panneau connecté");
   };
 
   void onDisconnect(BLEServer *pServer)
   {
-  //  Serial.println("disconnected");
+    //  Serial.println("disconnected");
     deviceConnected = false;
     display.log("panneau déconnecté");
   }
@@ -57,6 +60,7 @@ void loopCore0(void *pvParameters) // loop on core 0
   for (;;)
   {
     display.update();
+    talks.execute();
     delay(10);
   }
 }
@@ -256,15 +260,17 @@ void setup() {
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
 
-  String s = "ANCHOR\n";
-  s+=currentBeaconNumber;
   display.displayMsg(Text("SYNC", 3, 64, 0));
-  display.displayMsg(Text(s, 4, 64, 0));
+
+  data.color = GREEN;
 
   // Start BLE Server only if this is the supervisor anchor
   if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
   {
-    display.log("panneau déconnecté");
+    DW1000Ranging.setDataSync(&data);
+    DW1000Ranging.setDataSyncSize(sizeof(data));
+    display.log(data.color==GREEN?"green":"orange");
+
     BLEDevice::init("srv");
     BLEServer *pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
@@ -279,13 +285,16 @@ void setup() {
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->addServiceUUID(pService->getUUID());
     pAdvertising->start();
-   // Serial.println("Characteristic defined! Now you can read it in your phone!");
+
+  } else {
+    String s = "ANCHOR\n";
+    s += currentBeaconNumber;
+    display.displayMsg(Text(s, 4, 64, 0));
   }
 }
 
 void loop() {
   DW1000Ranging.loop();
-  talks.execute();
 }
 
 

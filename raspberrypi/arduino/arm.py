@@ -70,14 +70,11 @@ class RobotArm(SecureSerialTalksProxy):
         self.send(_BEGIN_OPCODE)
 
     def set_pos(self, x, y ,z ,theta, z_o):
-        output = self.execute(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta),INT(z_o))
-        #ret = output.read(INT)
-        #return ret
+        self.send(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta),INT(z_o))
 
     def put_in_tank(self):
-        output = self.execute(_SET_POS_OPCODE, FLOAT(-25), FLOAT(10), FLOAT(2), FLOAT(180),INT(0))
-        #ret = output.read(INT)
-        #return ret
+        self.send(_SET_POS_OPCODE, FLOAT(-25), FLOAT(10), FLOAT(2), FLOAT(180),INT(0))
+
 
     def process_cubes(self,num_cubes):
         for i in range(0,num_cubes):
@@ -85,36 +82,16 @@ class RobotArm(SecureSerialTalksProxy):
             self.set_pos(x,y,10, th, 0)
 
     def set_x(self,x):
-        output = self.execute(_SET_X_OPCODE, FLOAT(x))
-        #ret = output.read(INT)
-        #if(ret):
-        #    return "Move to x = "+str(x)
-        #else:
-        #    return "Postition unreachable, try new pos"
+        self.send(_SET_X_OPCODE, FLOAT(x))
 
     def set_y(self,y):
-        output = self.execute(_SET_Y_OPCODE, FLOAT(y))
-        #ret = output.read(INT)
-        #if(ret):
-        #    return "Move to y = "+str(y)
-        #else:
-        #    return "Postition unreachable, try new pos"
+        self.send(_SET_Y_OPCODE, FLOAT(y))
 
     def set_z(self,z):
-        output = self.execute(_SET_Z_OPCODE, FLOAT(z))
-        #ret = output.read(INT)
-        #if(ret):
-        #    return "Move to z = "+str(z)
-        #else:
-        #    return "Postition unreachable, try new pos"
+        self.send(_SET_Z_OPCODE, FLOAT(z))
 
     def set_theta(self,theta):
-        output = self.execute(_SET_THETA_OPCODE, FLOAT(theta))
-        #ret = output.read(INT)
-        #if(ret):
-        #    return "Move to theta = "+str(theta)
-        #else:
-        #    return "Postition unreachable, try new pos"
+        self.send(_SET_THETA_OPCODE, FLOAT(theta))
 
     def set_speed(self,speed):
         self.send(_SET_THETA_OPCODE, FLOAT(speed))
@@ -126,8 +103,8 @@ class RobotArm(SecureSerialTalksProxy):
 
     def get_pos_theo(self):
         output = self.execute(_GET_POS_THEO_OPCODE)
-        #x, y, z = output.read(FLOAT, FLOAT, FLOAT)
-        #return (x,y,z)
+        x, y, z = output.read(FLOAT, FLOAT, FLOAT)
+        return (x,y,z)
 
     def set_angles(self,a,b,c):
         self.send(_SET_ANGLES_OPCODE, FLOAT(a),FLOAT(b),FLOAT(C))

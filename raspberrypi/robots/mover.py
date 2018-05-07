@@ -470,9 +470,11 @@ class Mover:
         constant_pwm = 0.4
         while not self.isarrived and ((try_limit - try_number) > 0 or try_limit < 0):
             try:
+                self.logger("MOVER : ", "Turn on the spot start")
                 self.wheeledbase.turnonthespot(self.goal[2], direction=way)
                 self.wheeledbase.wait()
                 self.isarrived = True
+                self.logger("MOVER : ", "Turn on the spot reached")
             except RuntimeError:
                 self.wheeledbase.stop()
                 lin_vel, ang_vel = self.wheeledbase.get_velocities_wanted(True)

@@ -6,7 +6,9 @@ from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
 from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
-from robots.color_pattern import Pattern
+from robots.get_robot_name import *
+if ROBOT_ID == R128:
+    from robots.color_pattern import Pattern
 
 class R128:
     cube ="cube"
@@ -28,7 +30,7 @@ class R128:
 
         # Save annexes inf
         self.side     = side
-        self.pattern = pattern
+        self.pattern = p
         self.roadmap  = roadmap
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
@@ -53,7 +55,7 @@ class R128:
         self.action_list = []
         self.cross = []
         self.cross = Cross(self.side, 1, self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
-        self.crossAct = self.cross.getAction()[1]
+        self.crossAct = self.cross.getAction()[3]
 
         self.beeAct = self.bee.getAction()[0]
         self.panelAct = self.panel.getAction()[0]
@@ -116,7 +118,10 @@ if __name__ == '__main__':
    #     pass
 
     bm = BeaconsManagement(br, "area.ggb")
-    p = Pattern()
+    if ROBOT_ID == R128:
+        p = Pattern()
+    else:
+        p = None
     auto = R128(0, rm, geo, wheeledbase, ssd, led1, led2, beeactuator, arm, s_front, s_lat, s_back, br, bm, p)
     auto.set_side(0)
     auto.run()

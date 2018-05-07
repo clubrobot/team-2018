@@ -49,6 +49,7 @@ class Cross(Actionnable):
         self.data = data
 
     def realize(self, cube):
+        time.sleep(5)
         theta = math.atan2(self.catchPoint[cube][1] - self.preparationPoint[cube][1],
                            self.catchPoint[cube][0] - self.preparationPoint[cube][0])
         self.logger("CUBES : ", "Go to cross", self.numberCross, "cube n°", cube)
@@ -61,8 +62,10 @@ class Cross(Actionnable):
             time.sleep(1)
             current_position = self.wheeledbase.get_position()
             self.logger("CUBES : ", "Go to catch position")
-            self.wheeledbase.goto_delta(self.catchPoint[cube][0] - current_position[0],
-                                        self.catchPoint[cube][1] - current_position[1])
+            try:
+                self.wheeledbase.goto(*self.catchPoint[cube])
+            except RuntimeError:
+                return
             self.wheeledbase.wait()
             time.sleep(1)
         except RuntimeError:
@@ -74,6 +77,9 @@ class Cross(Actionnable):
             time.sleep(2)
             self.arm.close_gripper()
             time.sleep(1)
+            self.arm.set_z(RobotArm.MAX_Z-5)
+            time.sleep(1)
+            self.arm.set_z(RobotArm.MAX_Z)
             self.logger("CUBES : ", "Drop off the cube")
             self.arm.set_pos(*RobotArm.TANK)
             time.sleep(2)
