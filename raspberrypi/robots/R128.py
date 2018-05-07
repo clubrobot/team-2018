@@ -17,7 +17,7 @@ class R128:
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
-    def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner, rarm, sensors_front, sensors_lat, sensors_back, br, bm, p):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner, robot_arm, sensors_front, sensors_lat, sensors_back, br, bm, p):
         # Save arduinos
         self.arduinos = dict(wheeledbase=wheeledbase,
                              display=display,
@@ -25,7 +25,7 @@ class R128:
                              sensors_front=sensors_front,
                              sensors_lat=sensors_lat,
                              sensors_back=sensors_back,
-                             robot_arm=rarm,
+                             robot_arm=robot_arm,
                              )
 
 
@@ -35,6 +35,7 @@ class R128:
         self.roadmap  = roadmap
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
+        robot_arm.set_logger(self.logger)
         self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
         self.beacons_receiver = br
         self.beacons_manager = bm
