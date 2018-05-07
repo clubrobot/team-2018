@@ -697,6 +697,7 @@ void DW1000RangingClass::loop() {
 			//then we proceed to range protocole
 			if(_type == ANCHOR) {
 				if(messageType == CHANGE_CHANNEL_MODE){
+					log("CHANGE_CHANNEL_MODE");
 					uint16_t channel;
 					memcpy(&channel, data + SHORT_MAC_LEN + 1, 2);
 					String s = "change channel to channel ";
@@ -837,8 +838,21 @@ void DW1000RangingClass::loop() {
 			}
 			else if(_type == TAG) {
 				// get message and parse
-				if(messageType != _expectedMsgId) {
-					
+				if (messageType == CHANGE_CHANNEL_MODE)
+				{
+					log("CHANGE_CHANNEL_MODE");
+					uint16_t channel;
+					memcpy(&channel, data + SHORT_MAC_LEN + 1, 2);
+					String s = "change channel to channel ";
+					s += channel;
+					log(s);
+					if (_handleNewChannel != 0)
+						(*_handleNewChannel)(channel);
+					return;
+				}
+				else if (messageType != _expectedMsgId)
+				{
+
 					//not needed ?
 					 if(!_isEnabled) {
 						String s = "IGNORED Unexppected msg : ";

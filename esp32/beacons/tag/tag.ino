@@ -370,6 +370,7 @@ void handleDataSync(){
     case LONGDATA_RANGE_LOWPOWER:
     {
       DW1000Ranging.transmitChangeChannel((uint16_t)data.channel);
+      delay(100);
       DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_LOWPOWER, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
       currentChannel = LONGDATA_RANGE_LOWPOWER;
       String s = "Channel ";
@@ -380,6 +381,7 @@ void handleDataSync(){
     case SHORTDATA_FAST_LOWPOWER:
     {
       DW1000Ranging.transmitChangeChannel((uint16_t)data.channel);
+      delay(100);
       DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_SHORTDATA_FAST_LOWPOWER, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
       currentChannel = SHORTDATA_FAST_LOWPOWER;
       String s = "Channel ";
@@ -390,6 +392,7 @@ void handleDataSync(){
     case LONGDATA_FAST_LOWPOWER:
     {
       DW1000Ranging.transmitChangeChannel((uint16_t)data.channel);
+      delay(100);
       DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_FAST_LOWPOWER, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
       currentChannel = LONGDATA_FAST_LOWPOWER;
       String s = "Channel ";
@@ -400,6 +403,7 @@ void handleDataSync(){
     case SHORTDATA_FAST_ACCURACY:
     {
       DW1000Ranging.transmitChangeChannel((uint16_t)data.channel);
+      delay(100);
       DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_SHORTDATA_FAST_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
       currentChannel = SHORTDATA_FAST_ACCURACY;
       String s = "Channel ";
@@ -410,6 +414,7 @@ void handleDataSync(){
     case LONGDATA_FAST_ACCURACY:
     {
       DW1000Ranging.transmitChangeChannel((uint16_t)data.channel);
+      delay(100);
       DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_FAST_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
       currentChannel = LONGDATA_FAST_ACCURACY;
       String s = "Channel ";
@@ -420,6 +425,7 @@ void handleDataSync(){
     case LONGDATA_RANGE_ACCURACY:
     {
       DW1000Ranging.transmitChangeChannel((uint16_t)data.channel);
+      delay(100);
       DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
       currentChannel = LONGDATA_RANGE_ACCURACY;
       String s = "Channel ";
@@ -433,6 +439,66 @@ void handleDataSync(){
       display.displayMsg(Text(s, 8, 64, 0));
       break;
     }
+  }
+}
+
+void handleNewChannel(uint16_t channel)
+{
+  switch (channel)
+  {
+  case LONGDATA_RANGE_LOWPOWER:
+  {
+    DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_LOWPOWER, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case SHORTDATA_FAST_LOWPOWER:
+  {
+    DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_SHORTDATA_FAST_LOWPOWER, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case LONGDATA_FAST_LOWPOWER:
+  {
+    DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_FAST_LOWPOWER, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case SHORTDATA_FAST_ACCURACY:
+  {
+    DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_SHORTDATA_FAST_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case LONGDATA_FAST_ACCURACY:
+  {
+    DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_FAST_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  case LONGDATA_RANGE_ACCURACY:
+  {
+    DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+    String s = "Channel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+  }
+  break;
+  default:
+    String s = "Error\nchannel ";
+    s += channel;
+    display.displayMsg(Text(s, 8, 64, 0));
+    break;
   }
 }
 
@@ -456,6 +522,7 @@ void setup() {
   DW1000Ranging.attachInactiveTagDevice(inactiveTagDevice);
   DW1000Ranging.attachBlinkDevice(blinkDevice);
   DW1000Ranging.attachDataSync(handleDataSync);
+  DW1000Ranging.attachNewChannel(handleNewChannel);
   DW1000Ranging.setDataSync(&data);
   DW1000Ranging.setDataSyncSize(sizeof(data));
   //Enable the filter to smooth the distance
@@ -463,7 +530,7 @@ void setup() {
   DW1000Ranging.setRangeFilterValue(5);
 
   //we start the module as a tag
-  DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_FAST_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
+  DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, TAG_SHORT_ADDRESS[currentBeaconNumber], MASTER_TAG_ADDRESS == TAG_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();

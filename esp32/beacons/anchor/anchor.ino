@@ -179,13 +179,13 @@ void inactiveDevice(DW1000Device *device)
 }
 
 void handleNewChannel(uint16_t channel){
-  switch (data.channel)
+  switch (channel)
   {
   case LONGDATA_RANGE_LOWPOWER:
   {
     DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_LOWPOWER, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
     String s = "Channel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
   }
   break;
@@ -193,7 +193,7 @@ void handleNewChannel(uint16_t channel){
   {
     DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_SHORTDATA_FAST_LOWPOWER, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
     String s = "Channel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
   }
   break;
@@ -201,7 +201,7 @@ void handleNewChannel(uint16_t channel){
   {
     DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_FAST_LOWPOWER, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
    String s = "Channel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
   }
   break;
@@ -209,7 +209,7 @@ void handleNewChannel(uint16_t channel){
   {
     DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_SHORTDATA_FAST_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
     String s = "Channel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
   }
   break;
@@ -217,7 +217,7 @@ void handleNewChannel(uint16_t channel){
   {
     DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_FAST_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
    String s = "Channel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
   }
   break;
@@ -225,13 +225,13 @@ void handleNewChannel(uint16_t channel){
   {
     DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
     String s = "Channel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
   }
   break;
   default:
     String s = "Error\nchannel ";
-    s += data.channel;
+    s += channel;
     display.displayMsg(Text(s, 8, 64, 0));
     break;
   }
@@ -301,7 +301,7 @@ void setup() {
   DW1000Class::setAntennaDelay(antennaDelay); //16384 for tag, approximately 16530 for anchors
 
   //we start the module as an anchor
-  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_FAST_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
+  DW1000Ranging.startAsAnchor("82:17:FC:87:0D:71:DC:75", DW1000.MODE_LONGDATA_RANGE_ACCURACY, ANCHOR_SHORT_ADDRESS[currentBeaconNumber]);
 
   display.init();
   display.flipScreenVertically();
