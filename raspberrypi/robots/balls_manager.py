@@ -124,6 +124,7 @@ class Shot(Actionnable):
         watersorter.close_trash()
         watersorter.open_indoor()
         watersorter.close_outdoor()
+        waterlauncher.get_nb_launched_water()
         while nb_balls < 8 and time.time() - begin_time < global_timeout:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             watersorter.open_indoor()
@@ -185,6 +186,7 @@ class Shot(Actionnable):
         watersorter.close_indoor()
         watersorter.close_trash_unloader()
         watersorter.close_outdoor()
+        waterlauncher.get_nb_launched_water()
         nb_ball = 0
         begin_time = time.time()
         timeout_per_ball = 1

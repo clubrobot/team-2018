@@ -2,8 +2,12 @@
 #include "configuration.h"
 #include "EEPROM.h"
 #include "DW1000Ranging.h"
+#include "../common/dataSync.h"
+#include "../common/OLED_display.h"
 
 extern boolean deviceConnected;
+extern DataSync data;
+extern OLEDdisplay display;
 
 void UPDATE_ANCHOR_NUMBER(SerialTalks &talks, Deserializer &input, Serializer &output){
     talks.out << "update anchor number\n";
@@ -38,8 +42,8 @@ void CALIBRATION_ROUTINE(SerialTalks &talks, Deserializer &input, Serializer &ou
 void UPDATE_COLOR(SerialTalks &talks, Deserializer &input, Serializer &output)
 {
     talks.out << "changed color\n";
-    int color = input.read<uint16_t>();
-    DW1000Ranging.transmitColor((uint8_t)color);
+    data.color = (Color)input.read<uint16_t>();
+    display.log(data.color == GREEN ? "green" : "orange");
 }
 
 void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)

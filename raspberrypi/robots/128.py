@@ -1,11 +1,11 @@
 from robots.cubes_manager        import CubeManagement, Cross
 from robots.display_manager      import DisplayPoints
-from robots.mover                import Mover
+from robots.mover                import Mover, PositionUnreachable
 from robots.heuristics           import Heuristics
 from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
-from robots.switch_manager_128       import Interrupteur, Abeille
+from robots.switch_manager_128       import Interrupteur_128, Abeille_128
 
 class R128:
     cube ="cube"
@@ -40,9 +40,9 @@ class R128:
         # Apply cube obstacle
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
-        self.bee = Abeille(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.bee = Abeille_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                            self.data)
-        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.panel = Interrupteur_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                                   self.beacons_receiver, self.data)
 
         self.action_list = []
@@ -65,14 +65,15 @@ class R128:
         act = self.heuristics.get_best()
         print(act)
         while act is not None:
-            act.before_action()
-            self.logger("MAIN : ", "Let's go to the next action : {}".format(act.name))
-            self.mover.goto(*act.actionPoint)
-            self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
-            act()
-            act.done.set()
-            act = self.heuristics.get_best()
-            self.mover.reset()
+            try:
+                act.before_action()
+                self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
+                self.mover.goto(*act.actionPoint)
+                self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
+                act()
+                act.done.set()
+            except PositionUnreachable:
+                act.temp_disable(5)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from threading import Event
+from threading import Event, Thread
+import time
 
 class Action():
     def __init__(self,actionPoint,actionFunction,typ, name, points, time):
@@ -53,7 +54,16 @@ class Action():
     def set_before_action(self, action):
         self.before_action = action
 
-class MultipleAction(Action):
+    def temp_disable(self, timeout):
+        Thread(target=self._temp_disable(timeout), daemon=True).start()
+
+    def _temp_disable(self, timeout):
+        self.done.set()
+        time.sleep(timeout)
+        self.done.clear()
+
+
+class MultipleAction:
     def __init__(self, actions):
         self.actions = actions
         for action in self.actions:

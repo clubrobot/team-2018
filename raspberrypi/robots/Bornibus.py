@@ -7,8 +7,8 @@ import time
 from robots.cubes_manager           import CubeManagement
 from robots.balls_manager           import Dispenser, Treatment, Shot
 from robots.display_manager         import DisplayPoints
-from robots.switch_manager_bornibus import Interrupteur, Abeille
-from robots.mover                   import Mover
+from robots.switch_manager_bornibus import Interrupteur_Bornibus, Abeille_Bornibus
+from robots.mover                   import Mover, PositionUnreachable
 from robots.heuristics              import Heuristics
 from common.logger                  import Logger
 from robots.beacons_manager         import BeaconsManagement
@@ -63,9 +63,9 @@ class Bornibus:
         self.d4 = Dispenser(4, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                             self.data)
         # Generate buttons
-        self.bee = Abeille(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.bee = Abeille_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                            self.data)
-        self.panel = Interrupteur(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
+        self.panel = Interrupteur_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                                   self.beacons_receiver, self.data)
 
         # Generate balls manipulate
@@ -184,14 +184,19 @@ class Bornibus:
         act = self.heuristics.get_best()
         print(act)
         while act is not None:
-            act.before_action()
-            self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
-            self.mover.goto(*act.actionPoint)
-            self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
-            act()
-            act.done.set()
+            try:
+                act.before_action()
+                self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
+                self.mover.goto(*act.actionPoint)
+                self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
+                act()
+                act.done.set()
+            except PositionUnreachable:
+                self.logger("MAIN : ", "Unreachable action")
+                act.temp_disable(5)
             act = self.heuristics.get_best()
             self.mover.reset()
+
 
 if __name__ == '__main__':
     from robots.setup_bornibus import *
@@ -202,11 +207,11 @@ if __name__ == '__main__':
     print("Fin Chargement")
 
     br = BaliseReceiver("192.168.12.3")
-  # try:
-  #     br.connect()
-  # except:
-  #     print("BALISE : Not connected")
-  #     pass
+    try:
+        br.connect()
+    except:
+        print("BALISE : Not connected")
+        pass
 
     bm = BeaconsManagement(br, "area.ggb")
 

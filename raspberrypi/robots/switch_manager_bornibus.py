@@ -8,24 +8,12 @@ from threading import Thread
 from robots.automateTools import AutomateTools
 from robots.action import *
 from robots.mover import Mover, PositionUnreachable
+from robots.switch_manager import Abeille, Interrupteur
 
 
-class Interrupteur(Actionnable):
-    typ="Interrupteur"
-    POINTS = 25
-    TIME = 5
+class Interrupteur_Bornibus(Interrupteur):
     def __init__(self,side, geo, arduinos, display, mover, logger, br, data):
-        self.side=side
-        self.mover = mover
-        self.logger = logger
-        self.wheeledbase = arduinos["wheeledbase"]
-        self.display = display
-        self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
-        self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
-        self.data = data
-        self.beacon_receiver = br
-        self.actions = []
-        self.watcher = None
+        Interrupteur.__init__(self, side, geo, arduinos, display, mover, logger, br, data)
 
     def realize(self,robot, display):
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0])
@@ -43,42 +31,12 @@ class Interrupteur(Actionnable):
         self.watcher = Thread(target=self.watch, daemon=True)
         self.watcher.start()
 
-        #override Actionnable
-    def getAction(self):
-        self.actions =  [Action( self.preparation,
-                        lambda : self.realize(self.wheeledbase, self.display),
-                            Interrupteur.typ,
-                            "INTERRUPTEUR",
-                            Interrupteur.POINTS,
-                            Interrupteur.TIME)  ]
-        return self.actions
-
-    def watch(self):
-        self.logger("SWITCH WATCHER : ", "Start thread")
-        time.sleep(7)
-        if not self.beacon_receiver.get_panel_status():
-            self.logger("SWITCH WATCHER : ", "Panel off")
-            self.actions[0].done.clear()
-
-        else:
-            self.logger("SWITCH WATCHER : ", "Panel on")
 
 
 
-class Abeille(Actionnable):
-    typ="Abeille"
-    POINTS = 50
-    TIME = 10
+class Abeille_Bornibus(Abeille):
     def __init__(self, side, geo, arduinos, display, mover, logger, data):
-        self.side=side
-        self.logger = logger
-        self.mover = mover
-        self.wheeledbase =arduinos["wheeledbase"]
-        self.display = display
-        self.beeActioner = arduinos["beeActioner"]
-        self.preparation=geo.get('Abeille'+str(self.side)+'_0')
-        self.interrupteur=geo.get('Abeille'+str(self.side)+'_1')
-        self.data = data
+        Abeille.__init__(self, side, geo, arduinos, display, mover, logger, data)
 
     def realize(self,robot, display):
         self.logger("BEE : ", "Turn toward bee")
@@ -90,6 +48,7 @@ class Abeille(Actionnable):
         self.logger("BEE : ", "Orientate to the bee")
         arrived = False
         nb_try = 0
+        time.sleep(0.05)
         while not arrived and nb_try < 2:
             nb_try += 1
             try:
@@ -128,34 +87,4 @@ class Abeille(Actionnable):
                 time.sleep(0.5)
         display.addPoints(Abeille.POINTS)
 
-        #override Actionnable
-    def getAction(self):
-            return [Action( self.preparation,
-                            lambda : self.realize(self.wheeledbase, self.display),
-                            Interrupteur.typ,
-                            "ABEILLE",
-                            Abeille.POINTS,
-                            Abeille.TIME)]
 
-class Odometrie(Actionnable):
-    typ="Odometrie"
-    def __init__(self, side, geo,id):#id = 0 (vers le bas) ou 1(vers la droite)
-        self.side=side
-        self.preparation=geo.get('Odometrie'+str(self.side)+'_{'+str(id)+'}')
-        self.mur=geo.get('Odometrie'+str(self.side)+'_{'+str(id)+',0}')
-
-    def realize(self,robot):
-        #print("Realisation")
-        theta = math.atan2(self.mur[1]-self.preparation[1],self.mur[0]-self.preparation[0])
-        AutomateTools.myTurnonthespot(robot,theta)
-        path = [ self.preparation, self.mur]
-        robot.purepursuit(path)
-            #si on patine alors on stop l'action
-        AutomateTools.myWait(robot,lambda : AutomateTools.stopThisAction)
-
-        #override Actionnable
-    def getAction(self,robot,builerCollector,waterDispenser):
-            return [Action(self.preparation,
-                    lambda : self.realize(robot),
-                    Odometrie.typ, 
-                    "ODOMETRIE") ]

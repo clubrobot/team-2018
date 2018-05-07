@@ -169,7 +169,7 @@ class RoadMap:
         vid = self.graph.vcount() - 1
         self.graph.vs[vid]['coords'] = vertex
         for target in neighbors:
-            self.graph.add_edge(vid, target, weight=self.get_vertex_distance(target, vertex))
+            self.graph.add_edge(vid, target, weight=self.get_vertex_distance(target, vertex),cuted_by=list())
         return vid
 
     def best_side(self, x, y, theta):
