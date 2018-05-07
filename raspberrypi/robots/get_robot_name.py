@@ -7,13 +7,13 @@ UNKNOWN  = -1
 
 ROBOT_ID = UNKNOWN
 try:
-    open("/opt/BORNIBUS")
+    open("/opt/BORNIBUS").close()
     ROBOT_ID = BORNIBUS
 except IOError:
     pass
 try:
     if ROBOT_ID!=BORNIBUS:
-        open("/opt/128")
+        open("/opt/128").close()
         ROBOT_ID = R128
 except IOError:
     pass
