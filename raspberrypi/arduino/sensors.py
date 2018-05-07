@@ -48,10 +48,10 @@ class Sensors(SecureSerialTalksProxy):
 			raise TimeoutError()
 
 	def activate(self):
-		self.send(_ACTIVATE_SENSORS_OPCODE, BYTE(1))
+		self.send(_ACTIVATE_SENSORS_OPCODE)
 
 	def desactivate(self):
-		self.send(_DESACTIVATE_SENSORS_OPCODE, BYTE(0))
+		self.send(_DESACTIVATE_SENSORS_OPCODE)
 
 	def get_left_switch(self):
 		output = self.execute(_GET_LEFT_SWITCH_OPCODE)
