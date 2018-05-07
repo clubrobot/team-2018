@@ -3,6 +3,7 @@
 
 from common.roadmap import RoadMap
 from common.geogebra import Geogebra
+from arduino.arm import RobotArm
 # Check for the Rapsberry Pi address
 # It looks for a file in the current directory, whose name is
 # a valid IP address
@@ -43,8 +44,7 @@ wheeledbase = WheeledBase(manager)
 beeactuator = BeeActuator(manager)
 
 
-
-    #	l = Module(m, 'display')
+arm = RobotArm(manager)
 ssd = SevenSegments(manager)
 led1 = LEDMatrix(manager, 1)
 led2 = LEDMatrix(manager, 2)
