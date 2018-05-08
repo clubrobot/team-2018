@@ -6,10 +6,10 @@
 #include "../common/SerialTalks.h"
 #include "../common/PeriodicProcess.h"
 
-#define SHAKER_HORIZONTAL_1 3
-#define SHAKER_HORIZONTAL_2 142
-#define SHAKER_VERTICAL_1 160
-#define SHAKER_VERTICAL_2 70
+#define SHAKER_HORIZONTAL_1 45
+#define SHAKER_HORIZONTAL_2 160
+#define SHAKER_VERTICAL_1 180
+#define SHAKER_VERTICAL_2 80
 
 #define PER_VERTICAL       (int)(82)
 #define PER_HORIZONTAL     (int)(64)
