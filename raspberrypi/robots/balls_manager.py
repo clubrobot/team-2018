@@ -120,9 +120,13 @@ class Shot(Actionnable):
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
         watersorter.enable_shaker_equal()
-        watersorter.close_trash()
-        watersorter.open_indoor()
-        watersorter.close_outdoor()
+
+        if self.data["current_ball_in_sorter"] is not None:
+            watersorter.open_indoor()
+            watersorter.close_trash()
+            watersorter.close_outdoor()
+            self.data.pop("current_ball_in_sorter")
+
         waterlauncher.get_nb_launched_water()
         while nb_balls < 8 and time.time() - begin_time < global_timeout:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
@@ -189,15 +193,18 @@ class Shot(Actionnable):
         nb_ball = 0
         begin_time = time.time()
         timeout_per_ball = 1
+
         CASTLE = 0
         TREATMENT = 1
 
         self.data["nb_balls_in_unloader"] = 0
         while not (time.time() - begin_time > global_timeout) and nb_ball<8:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
-            watersorter.open_indoor()
-            watersorter.close_trash()
-            watersorter.close_outdoor()
+            if self.data["current_ball_in_sorter"] is not None:
+                watersorter.open_indoor()
+                watersorter.close_trash()
+                watersorter.close_outdoor()
+                self.data.pop("current_ball_in_sorter")
 
             close_time = time.time()
             while not (time.time() - begin_time > global_timeout) and not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
@@ -213,18 +220,20 @@ class Shot(Actionnable):
             watersorter.close_indoor()
             nb_ball+=1
             # On verifie si la code couleur est bon
-            if(watersorter.get_water_color()[0] < watersorter.get_water_color()[1]) and not (time.time() - begin_time > global_timeout):
-                self.logger("SHOT : ", "Green ball")
-                if self.side==0:
-                    action = CASTLE
-                else:
-                    action = TREATMENT
-            elif not (time.time() - begin_time > global_timeout):
-                self.logger("SHOT : ", "Orange ball")
-                if self.side==0:
-                    action = TREATMENT
-                else:
-                    action = CASTLE
+            if not (time.time() - begin_time > global_timeout):
+                if watersorter.get_water_color()[0] < watersorter.get_water_color()[1]:
+                    self.logger("SHOT : ", "Green ball")
+                    if self.side==0:
+                        action = CASTLE
+                    else:
+                        action = TREATMENT
+                elif not (time.time() - begin_time > global_timeout):
+                    self.logger("SHOT : ", "Orange ball")
+                    if self.side==0:
+                        action = TREATMENT
+                    else:
+                        action = CASTLE
+                self.data["current_ball_in_sorter"] = True
 
             if not (time.time() - begin_time > global_timeout):
                 if action == CASTLE:
@@ -254,6 +263,8 @@ class Shot(Actionnable):
                         self.logger("SHOT : ", "En attente de la sortie")
                     time.sleep(0.6)
                     self.data["nb_balls_in_unloader"] += 1
+
+                self.data.pop("current_ball_in_sorter")
 
             if time.time() - begin_time > global_timeout:
                 self.logger("SHOT : ", "TIMEOUT")
