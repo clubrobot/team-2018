@@ -20,7 +20,7 @@ _SET_SPEED_OPCODE 	 = 0X17
 _GET_POS_OPCODE 	 = 0X18
 _GET_POS_THEO_OPCODE = 0X19
 _SET_ANGLES_OPCODE	 = 0X1A
-
+_128_GET_EMERGENCY_OPCODE = 0X22
 _OPEN_GRIPPER_OPCODE = 0X1B
 _CLOSE_GRIPPER_OPCODE = 0X1C
 
@@ -64,7 +64,7 @@ class RobotArm(SecureSerialTalksProxy):
     ABOVE_CROSS = (-17.5, 6,  MAX_Z/2, 180, 0)
     CUBES_POS = [CLOSER_CUBE, LEFT_CUBE, RIGHT_CUBE, MIDDLE_CUBE]
 
-    def __init__(self, manager, uuid='RobotArm'):
+    def __init__(self, manager, uuid='128'):
         SecureSerialTalksProxy.__init__(self, manager, uuid, dict())
         self.logger = None
 
@@ -160,4 +160,7 @@ class RobotArm(SecureSerialTalksProxy):
         time.sleep(2)
         self.logger("ROBOT ARM", "Put from temp to tank ended")
 
+    def get_emergency_state(self):
+        output = self.execute(_128_GET_EMERGENCY_OPCODE)
+        return output.read(INT)
 
