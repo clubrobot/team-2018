@@ -102,8 +102,8 @@ class FriendManager(TCPTalks,Thread):
                 self.connect(timeout=5)
                 self.logger("FRIEND MANAGER : ", "Connected")
                 connected = True
-            except:
-                self.logger("FRIEND MANAGER : ", "Not connected")
+            except Exception as e:
+                self.logger("FRIEND MANAGER : ", "Not connected" + str(e))
                 pass
 
 
