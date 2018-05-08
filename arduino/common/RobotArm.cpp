@@ -34,7 +34,7 @@ void RobotArm::begin()
 	//Broadcast address
 	servoax.attach(254);
 
-	servoax.setSRL(1); // Respond only to READ_DATA instructions
+	//servoax.setSRL(1); // Respond only to READ_DATA instructions
 	servoax.setLEDAlarm(32); // max torque only
 
 	servoax.setShutdownAlarm(32); // max torque only
@@ -158,7 +158,6 @@ bool RobotArm::ReachPosition(double x, double y, double z, double theta, int z_o
 		servoax.setMaxTorqueRAM(1023);
 		servoax.moveSpeed((float)t3, m_speed);
 		servoax.detach();
-		//while(!is_reached());
 
 
 		if(z_order == Z_LAST)
