@@ -25,7 +25,10 @@ class FriendManager(TCPTalks,Thread):
         self.daemon = True
         self.is_stopped = Event()
         self.is_stopped.clear()
-        self.connect(timeout=10)
+        try:
+            self.connect(timeout=1)
+        except:
+            pass
 
         # Action storages
         self.friend_action = "None"

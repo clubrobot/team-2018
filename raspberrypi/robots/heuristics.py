@@ -185,7 +185,8 @@ class Heuristics:
 
     def get_best(self):
         for friend_action in self.friend.get_friend_action_done():
-            friend_action.done.set()
+            if friend_action in self.action_names:
+                self.action_dict[friend_action].set()
 
         heuristics_values = self.compute_heuristics()
         name_best = ""

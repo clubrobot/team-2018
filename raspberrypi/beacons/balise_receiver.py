@@ -13,7 +13,6 @@ PORT_BALISE = 26657
 
 
 class BaliseReceiver(TCPTalks):
-
     def __init__(self, ip=None, port=PORT_BALISE, password=None):
         TCPTalks.__init__(self, ip=ip, port=port)
 

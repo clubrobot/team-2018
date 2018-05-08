@@ -49,7 +49,7 @@ class Action():
         self.area = aera_name
 
     def __bool__(self):
-        return self.done
+        return self.done.is_set()
 
     def set_before_action(self, action):
         self.before_action = action

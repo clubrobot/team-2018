@@ -57,7 +57,7 @@ class Mover:
     SENSORS = 8
     POSITION = 9
 
-    def __init__(self, side, friend ,roadmap, arduinos, logger, becons_receiver):
+    def __init__(self, side, roadmap, arduinos, logger, becons_receiver):
 
         # RoadMap et ses obstacles virtuel
         self.roadmap = roadmap

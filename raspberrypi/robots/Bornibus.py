@@ -163,8 +163,8 @@ class Bornibus:
         panelAct.set_manual_order(6)
         beeAct.set_manual_order(7)
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
-                                     mode=Heuristics.MANUAL)
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.mover.friend,
+                                     mode=Heuristics.AUTO)
 
         if self.side == Bornibus.GREEN:
             self.arduinos["wheeledbase"].set_position(592, 290, 0)
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
     br = BaliseReceiver("192.168.12.3")
     try:
-        br.connect()
+        br.connect(timeout=1)
     except:
         print("BALISE : Not connected")
         pass
