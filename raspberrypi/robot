@@ -20,8 +20,10 @@ from robots.R128 import *
 from arduino.bee import *
 from beacons.balise_receiver import BaliseReceiver
 from robots.beacons_manager import BeaconsManagement
-from robots.color_pattern import Pattern
 from robots.get_robot_name import *
+if ROBOT_ID == R128_ID:
+    from robots.color_pattern import Pattern
+
 DEV_MODE = True
 MATCH_MODE = False
 
