@@ -13,7 +13,11 @@ class Logger:
     def __init__(self, exec_param, file_name=None):
         self.initial_time = time()
         self.exec_param = exec_param
-        self.file = open(file_name, "w") if file_name is not None and exec_param > 0 else open("/tmp/log-{}-{}-{}.T".format(*asctime().split(" ")[1:4]),"w")
+        if exec_param > 0:
+            self.file = open(file_name, "w") if file_name is not None else open("/tmp/log-{}-{}-{}.T".format(*asctime().split(" ")[1:4]),"w")
+        else:
+            self.file = None
+
 
     def __call__(self, *args, **kwargs):
         self.write(*args, **kwargs)
