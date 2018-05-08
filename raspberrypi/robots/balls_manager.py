@@ -158,7 +158,7 @@ class Shot(Actionnable):
             waterlauncher.set_motor_pulsewidth(1000 + motor_base)
             watersorter.open_indoor()
             watersorter.close_outdoor()
-            time.sleep(0.2)
+            time.sleep(0.4)
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
@@ -241,6 +241,7 @@ class Shot(Actionnable):
                     time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1000 + motor_base)
                     display.addPoints(Shot.POINTS_PER_BALL_CASTLE)
+                    time.sleep(0.2)
 
                 else:
                     self.logger("SHOT : ", "Treatment")
