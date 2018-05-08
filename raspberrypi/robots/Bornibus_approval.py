@@ -42,6 +42,7 @@ class BornibusApproval:
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
         self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
+        self.friend = self.mover.get_friend()
         self.data = dict()
 
         # Apply cube obstacle
@@ -160,7 +161,7 @@ class BornibusApproval:
         dispMono.set_manual_order(1)
         beeAct.set_manual_order(2)
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager,
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend_manager,
                                      mode=Heuristics.MANUAL)
 
         if self.side == BornibusApproval.GREEN:
