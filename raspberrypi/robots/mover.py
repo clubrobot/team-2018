@@ -110,6 +110,9 @@ class Mover:
         self.front_safe_flag.clear()
         if ROBOT_ID == R128_ID :
             self.in_path_flag.clear()
+        self.sensors_front.desactivate()
+        self.sensors_back.desactivate()
+        self.sensors_lat.desactivate()
         self.wheeledbase.reset_parameters()
         self.interupted_timeout.clear()
         self.interupted_status.clear()
@@ -141,6 +144,8 @@ class Mover:
 
     # Button activation
     def _gowall_sensors(self, try_limit, direction):
+        self.sensors_front.activate()
+        self.sensors_back.activate()
         wall_reached = False
         nb_try = try_limit
         direction = {"forward": 1, "backward": -1}[direction]
@@ -299,6 +304,8 @@ class Mover:
     def withdraw(self, x, y, direction="forward", timeout=5, strategy=SIMPLE, last_point_aim=None):
         self.goal = (x, y)
         self.timeout = timeout
+        self.sensors_front.activate()
+        self.sensors_back.activate()
         if strategy == Mover.SIMPLE:
             self._withdraw_simple(direction)
         if strategy == Mover.HARD:
@@ -409,8 +416,9 @@ class Mover:
 
     def _turnonthespot_soft(self, try_limit):
         try_number = 0
+        self.sensors_front.activate()
+        self.sensors_back.activate()
         way = 'forward'
-        closed_to_wall = self.get_wall_status(*self.goal[:-1])  # Boolean qui représente la proximité à un cube
         closed_to_enemy = True  # self.get_enemy_status() # Boolean qui représente la proximité à un enemie
         position_reach = False
         while not position_reach and ((try_limit + 1) >= try_number or try_limit < 0):
@@ -515,7 +523,7 @@ class Mover:
 
     def goto(self, x, y):
         self.goal = (x, y)
-
+        self.sensors_front.activate()
         if ROBOT_ID == R128_ID :
             self.in_path_flag.bind(self.friend_listener.signal)
         self.front_flag.bind(self.sensors_front_listener.signal)
@@ -676,8 +684,8 @@ class Mover:
 
 
     def goto_safe(self, x, y):
-
         self.goal = (x, y)
+        self.sensors_front.activate()
         self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2], self.goal)
         self.logger("MOVER : ", path=self.path)
         self.wheeledbase.max_linvel.set(300)
