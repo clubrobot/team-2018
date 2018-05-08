@@ -29,11 +29,11 @@ void GET_MESURE(SerialTalks& inst, Deserializer& input, Serializer& output)
 }
 
 void ACTIVATE_SENSORS(SerialTalks& inst, Deserializer& input, Serializer& output){
-    activated = input.read<bool>();
+    activated = true;
 }
 
 void DESACTIVATE_SENSORS(SerialTalks& inst, Deserializer& input, Serializer& output){
-    activated = input.read<bool>();
+    activated = false;
 }
 
 
