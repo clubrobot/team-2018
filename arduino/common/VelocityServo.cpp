@@ -17,16 +17,17 @@ void VelocityServo::Velocitywrite(int setpoint){
 
 void VelocityServo::process(float timestep){
 	if(!m_arrived){
-		m_servo.write((int) (m_clock.getElapsedTime() * m_velocity * m_dir + m_startpoint));
+		int setpoint = (int) (m_clock.getElapsedTime() * m_velocity * m_dir + m_startpoint);
 	
 		if(m_dir == -1 && m_servo.read() <= m_setpoint){
 			m_arrived = true;
-			m_servo.write(m_setpoint);
+			setpoint = m_setpoint;
 		}
 		else if(m_dir == 1 && m_servo.read() >= m_setpoint){
 			m_arrived = true;
-			m_servo.write(m_setpoint);
+			setpoint = m_setpoint;
 		}
+		m_servo.write(setpoint);
 	}
 }
 

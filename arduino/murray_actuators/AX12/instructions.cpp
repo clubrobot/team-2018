@@ -6,11 +6,12 @@
 #include "PIN.h"
 
 extern RobotArm arm;
+extern Servo beeActivator;
 
 void BEGIN(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
 	arm.attach(2,1,3,SERVO1);
-    
+
 	arm.begin();
 
 }
@@ -73,7 +74,7 @@ void SET_ANGLES(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
 	// float x = input.read<float>();
 	// float y = input.read<float>();
-	// float z = input.read<float>();	
+	// float z = input.read<float>();
 
 	// // 	// send pos to AX12 servos
 	// servoax.attach(1);
@@ -94,4 +95,24 @@ void OPEN_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output)
 void CLOSE_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
 	arm.close_gripper();
+}
+
+void GET_EMERGENCY_STATE(SerialTalks &inst, Deserializer &input, Serializer &output){
+	output.write<int>(digitalRead(INTER2));
+}
+
+void WRITE_BEEACTIVATOR(SerialTalks& inst, Deserializer& input, Serializer& output){
+	int val = input.read<int>();
+    if (val >= 0)
+    {
+        if (!beeActivator.attached())
+        {
+            beeActivator.attach(SERVO1);
+        }
+        beeActivator.write(val);
+    }
+    else if (val < 0)
+    {
+        beeActivator.detach();
+    }
 }

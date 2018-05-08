@@ -13,6 +13,7 @@
 #include <SPI.h>
 #include "DW1000Ranging.h"
 #include "DW1000.h"
+#include "../common/dataSync.h"
 
 #include "SSD1306.h"
 #include <Wire.h>
@@ -20,53 +21,78 @@
 #include "../../common/SerialTalks.h"
 #include "instructions.h"
 
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <BLE2902.h>
+#include "../common/OLED_display.h"
 
 
-SSD1306 display(0x3C, PIN_SDA, PIN_SCL);
+OLEDdisplay display(0x3C, PIN_SDA, PIN_SCL);
 
 byte currentBeaconNumber = 1;
 boolean calibrationRunning = false;
+DataSync data;
+
+// BLE variables
+BLECharacteristic *pCharacteristic;
+boolean deviceConnected = false;
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    //  Serial.println("connected");
+    deviceConnected = true;
+    display.log("panneau connecté");
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+    //  Serial.println("disconnected");
+    deviceConnected = false;
+    display.log("panneau déconnecté");
+  }
+};
+
+void loopCore0(void *pvParameters) // loop on core 0
+{
+  for (;;)
+  {
+    display.update();
+    talks.execute();
+    delay(10);
+  }
+}
 
 void newRange()
 {
-
   DW1000Ranging.setRangeFilterValue(5);
-  float distance = DW1000Ranging.getDistantDevice()->getRange()*1000;
-  float projection = distance * distance - ((Z_HEIGHT[currentBeaconNumber] - Z_TAG) * (Z_HEIGHT[currentBeaconNumber] - Z_TAG));
-  if(projection > 0)
-    distance = round(sqrt(projection)/10); // projection dans le plan des tags
-  else 
-    distance = 0;
 
-  display.clear();
-  display.setFont(ArialMT_Plain_16);
-  String toDisplay = "";
-  toDisplay += (int)distance;
-  toDisplay += "cm";
-  display.drawString(64, 0, toDisplay);
- 
+  String toDisplay;
+
   if(calibrationRunning==true){
-    display.setFont(ArialMT_Plain_16);
-    toDisplay = "timeOut";
+    display.log("timeOut");
   } else {
-    /*int antennaDelay = DW1000.getAntennaDelay();
-    toDisplay = antennaDelay;*/
-    display.setFont(ArialMT_Plain_16);
-    float x = DW1000Ranging.getPosX() / 10;
-    float y = DW1000Ranging.getPosY() / 10;
+    // get master tag coordinates
+    float x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[0]) / 10;
+    float y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[0]) / 10;
     toDisplay = "(";
     toDisplay += (int)x;
     toDisplay += ", ";
     toDisplay += (int)y;
-    toDisplay += ")";
+    toDisplay += ")\n";
+    // get slave tag coordinates
+    x = DW1000Ranging.getPosX(TAG_SHORT_ADDRESS[1]) / 10;
+    y = DW1000Ranging.getPosY(TAG_SHORT_ADDRESS[1]) / 10;
+    toDisplay += "(";
+    toDisplay += (int)x;
+    toDisplay += ", ";
+    toDisplay += (int)y;
+    toDisplay += ")\n";
   }
-  
-  display.drawString(64, 20, toDisplay);
-  uint8_t c = DW1000Ranging.getColor();
-  toDisplay = c;
-  toDisplay += c==0?" : green":" : orange";
-  display.drawString(64,40,toDisplay);
-  display.display();
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
   digitalWrite(PIN_LED_OK, HIGH);
   digitalWrite(PIN_LED_FAIL, LOW);
 }
@@ -108,30 +134,48 @@ void calibration(int realDistance, int mesure){
     }
   }
   
-  display.clear();
-  display.setFont(ArialMT_Plain_16);
   String toDisplay = "target: ";
   toDisplay += realDistance;
   toDisplay += "mm\nmesure: ";
   toDisplay += mesure;
   toDisplay += "mm\ndelay: ";
   toDisplay += antennaDelay;
-  display.drawString(64, 0, toDisplay);
-  display.display();
+  display.displayMsg(Text(toDisplay, 6, 64, 0));
 }
 
 void newBlink(DW1000Device *device)
 {
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber();
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
 
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
+
+  digitalWrite(PIN_LED_OK, HIGH);
+  digitalWrite(PIN_LED_FAIL, LOW);
 }
 
 void inactiveDevice(DW1000Device *device)
 {
-  display.clear();
-  display.drawString(64, 0, "INACTIVE");
-  display.display();
-  digitalWrite(PIN_LED_OK, LOW);
-  digitalWrite(PIN_LED_FAIL, HIGH);
+  int networkNumber = DW1000Ranging.getNetworkDevicesNumber()-1;
+  int tagNumber = DW1000Ranging.getTagDevicesNumber();
+
+  String toDisplay = "ANC : ";
+  toDisplay += networkNumber;
+  toDisplay += "\nTAG : ";
+  toDisplay += tagNumber;
+
+  display.displayMsg(Text(toDisplay, 3, 64, 0));
+
+  if (tagNumber + networkNumber == 0)
+  {
+    digitalWrite(PIN_LED_OK, LOW);
+    digitalWrite(PIN_LED_FAIL, HIGH);
+  }
 }
 
 void setup() {
@@ -144,6 +188,7 @@ void setup() {
   talks.bind(CALIBRATION_ROUTINE_OPCODE, CALIBRATION_ROUTINE);
   talks.bind(UPDATE_COLOR_OPCODE, UPDATE_COLOR);
   talks.bind(GET_COORDINATE_OPCODE,GET_COORDINATE);
+  talks.bind(GET_PANEL_STATUS_OPCODE, GET_PANEL_STATUS);
 
   /*if (!EEPROM.begin(EEPROM_SIZE))   // Already done in serialtalks lib
   {
@@ -161,7 +206,7 @@ void setup() {
   DW1000Ranging.initCommunication(PIN_UWB_RST, PIN_SPICSN, PIN_IRQ, PIN_SPICLK, PIN_SPIMISO, PIN_SPIMOSI); //Reset, CS, IRQ pin
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachBlinkDevice(newBlink);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+  DW1000Ranging.attachInactiveAncDevice(inactiveDevice);  // TODO : rename func
   DW1000Ranging.attachAutoCalibration(calibration);
 
   unsigned int replyTime;
@@ -199,27 +244,57 @@ void setup() {
 
   display.init();
   display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
   display.setTextAlignment(TEXT_ALIGN_CENTER );
+
+  xTaskCreatePinnedToCore(
+      loopCore0,   /* Function to implement the task */
+      "loopCore0", /* Name of the task */
+      10000,       /* Stack size in words */
+      NULL,        /* Task input parameter */
+      0,           /* Priority of the task */
+      NULL,        /* Task handle. */
+      0);          /* Core where the task should run */
 
   pinMode(PIN_LED_FAIL,OUTPUT);
   pinMode(PIN_LED_OK,OUTPUT);
   digitalWrite(PIN_LED_OK,HIGH);
   digitalWrite(PIN_LED_FAIL,HIGH);
 
-  String toDisplay = "SYNCHRONISATION\n(anchor : ";
-  toDisplay += DW1000Ranging.getCurrentShortAddress()[0]; //currentBeaconNumber;
-  toDisplay += ")\n";
-  toDisplay += antennaDelay;
-  display.drawString(64, 64/4, toDisplay);
-  display.display();
+  display.displayMsg(Text("SYNC", 3, 64, 0));
 
-  display.setFont(ArialMT_Plain_24);
+  data.color = GREEN;
+
+  // Start BLE Server only if this is the supervisor anchor
+  if (ANCHOR_SHORT_ADDRESS[currentBeaconNumber] == BEACON_BLE_ADDRESS)
+  {
+    DW1000Ranging.setDataSync(&data);
+    DW1000Ranging.setDataSyncSize(sizeof(data));
+    display.log(data.color==GREEN?"green":"orange");
+
+    BLEDevice::init("srv");
+    BLEServer *pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_READ |
+            BLECharacteristic::PROPERTY_WRITE |
+            BLECharacteristic::PROPERTY_NOTIFY);
+    pCharacteristic->setValue("insa rennes");
+    pService->start();
+    BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising->addServiceUUID(pService->getUUID());
+    pAdvertising->start();
+
+  } else {
+    String s = "ANCHOR\n";
+    s += currentBeaconNumber;
+    display.displayMsg(Text(s, 4, 64, 0));
+  }
 }
 
 void loop() {
   DW1000Ranging.loop();
-  talks.execute();
 }
 
 

@@ -11,8 +11,13 @@
 
 #define USE_SHIFTREG 1
 
+#define BEE_CLOSED 170
+
+
 //#include "../../common/StepByStepMotor.h"
 SoftwareSerial SoftSerial(RX_AX12,TX_AX12);
+
+Servo beeActivator;
 
 ShiftRegister shift;
 
@@ -45,7 +50,16 @@ void setup()
 
     talks.bind(OPEN_GRIPPER_OPCODE,OPEN_GRIPPER);
     talks.bind(CLOSE_GRIPPER_OPCODE,CLOSE_GRIPPER);
+		talks.bind(GET_EMERGENCY_STATE_OPCODE, GET_EMERGENCY_STATE);
+		talks.bind(WRITE_BEEACTIVATOR_OPCODE, WRITE_BEEACTIVATOR);
+
     /***************************************************/
+
+		pinMode(INTER2, INPUT_PULLUP);
+		pinMode(SERVO1, OUTPUT);
+
+		beeActivator.attach(SERVO1);
+		beeActivator.write(BEE_CLOSED);
 
     //initialise ShiftRegister
     shift.attach(LATCHPIN,CLOCKPIN,DATAPIN);
@@ -53,6 +67,13 @@ void setup()
     motor.attach(STEP_PAP, DIR_PAP, ENABLE_PAP, RST_PAP, SLEEP_PAP);
     
     ShiftRegAX12::SerialBegin(9600, RX_AX12, TX_AX12, AX12_DATA_CONTROL);
+
+
+    //arm.set_angles(150.0, 150.0, 150.0);
+
+    arm.attach(2,1,3,SERVO1);
+
+    arm.begin();
 
 }
 
@@ -62,3 +83,4 @@ void loop()
     motor.update();
 
 }
+

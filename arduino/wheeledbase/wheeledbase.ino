@@ -61,7 +61,9 @@ void setup()
 	talks.bind(SET_PARAMETER_VALUE_OPCODE, SET_PARAMETER_VALUE);
 	talks.bind(GET_PARAMETER_VALUE_OPCODE, GET_PARAMETER_VALUE);
 	talks.bind(GET_VELOCITIES_WANTED_OPCODE, GET_VELOCITIES_WANTED);
+	talks.bind(GOTO_DELTA_OPCODE,GOTO_DELTA);
 	talks.bind(SERIALTALKS_DISCONNECT_OPCODE, DISABLE);
+	talks.bind(RESET_PARAMETERS_OPCODE, RESET_PARAMETERS);
 
 	// DC motors wheels
 	driver.attach(DRIVER_RESET, DRIVER_FAULT);
@@ -94,12 +96,12 @@ void setup()
 	velocityControl.setPID(linVelPID, angVelPID);
 	velocityControl.disable();
 
-	const float maxLinVel = min(leftWheel.getMaxVelocity(), rightWheel.getMaxVelocity());
-	const float maxAngVel = min(leftWheel.getMaxVelocity(), rightWheel.getMaxVelocity()) * 2 / WHEELS_AXLE_TRACK;
+	//const float maxLinVel = min(leftWheel.getMaxVelocity(), rightWheel.getMaxVelocity());
+	//const float maxAngVel = min(leftWheel.getMaxVelocity(), rightWheel.getMaxVelocity()) * 2 / WHEELS_AXLE_TRACK;
 	linVelPID.load(LINVELPID_ADDRESS);
 	angVelPID.load(ANGVELPID_ADDRESS);
-	linVelPID.setOutputLimits(-maxLinVel, maxLinVel);
-	angVelPID.setOutputLimits(-maxAngVel, maxAngVel);
+	//linVelPID.setOutputLimits(-maxLinVel, maxLinVel);
+	//angVelPID.setOutputLimits(-maxAngVel, maxAngVel);
 
 #if ENABLE_VELOCITYCONTROLLER_LOGS
 	controllerLogs.setController(velocityControl);

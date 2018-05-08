@@ -269,6 +269,7 @@ class Geogebra():
         elements = self.root.findall('./construction/element[@label]')
         all_labels = [element.get('label') for element in elements]
         labels = [label for label in all_labels if re.match(pattern, label)]
+        labels = sorted(labels)
         return [self.get(label) for label in labels]
 
     def _check_label(self, label):
