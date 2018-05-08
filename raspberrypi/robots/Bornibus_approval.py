@@ -161,7 +161,7 @@ class BornibusApproval:
         dispMono.set_manual_order(1)
         beeAct.set_manual_order(2)
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend_manager,
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
 
         if self.side == BornibusApproval.GREEN:
