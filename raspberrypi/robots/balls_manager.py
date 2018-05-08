@@ -44,6 +44,7 @@ class Dispenser(Actionnable):
         robot.max_linvel.set(500)
         robot.max_angvel.set(6)
         self.watersorter.enable_shaker_diff()
+        time.sleep(0.2)
         init_pos = (0,0)
         try:
             robot.wait()
@@ -120,6 +121,7 @@ class Shot(Actionnable):
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
         watersorter.enable_shaker_equal()
+        time.sleep(0.2)
 
         if watersorter.get_water_color()[0] > 100 or watersorter.get_water_color()[1] > 100:
             self.data["current_ball_in_sorter"] = True
@@ -197,6 +199,7 @@ class Shot(Actionnable):
        
         time.sleep(1)
         watersorter.enable_shaker_equal()
+        time.sleep(0.2)
         watersorter.close_indoor()
         watersorter.close_trash_unloader()
         watersorter.close_outdoor()
