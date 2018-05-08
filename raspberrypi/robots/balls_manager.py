@@ -130,7 +130,6 @@ class Shot(Actionnable):
                 watersorter.open_indoor()
                 watersorter.close_trash()
                 watersorter.close_outdoor()
-                self.data.pop("current_ball_in_sorter")
 
             if not (time.time() - begin_time > global_timeout):
                 self.logger("SHOT : ", "Waiting ball in sorter")
@@ -213,7 +212,6 @@ class Shot(Actionnable):
                 watersorter.open_indoor()
                 watersorter.close_trash()
                 watersorter.close_outdoor()
-                self.data.pop("current_ball_in_sorter")
 
             if not (time.time() - begin_time > global_timeout):
                 close_time = time.time()
