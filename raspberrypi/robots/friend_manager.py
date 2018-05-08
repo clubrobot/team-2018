@@ -12,7 +12,7 @@ FM_SET_ACTION          = 0x14
 class FriendManager(TCPTalks,Thread):
     def __init__(self, wheeledbase, mover, timestep, logger):
         if ROBOT_ID == BORNIBUS_ID:
-            TCPTalks.__init__(self,FRIEND_PORT)
+            TCPTalks.__init__(self,port=FRIEND_PORT)
         if ROBOT_ID == R128_ID:
             TCPTalks.__init__(self,"192.168.12.1",FRIEND_PORT)
 
