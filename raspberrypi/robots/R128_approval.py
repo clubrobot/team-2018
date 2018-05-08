@@ -75,7 +75,7 @@ class R128Approval:
         else:
             self.arduinos["wheeledbase"].set_position(510, 3000-270, 0)
 
-        self.roadmap.cut_edges(((0, 700), (1500, 700)))
+        self.roadmap.cut_edges(((0, 700), (1000, 1000)))
 
     def run(self):
         self.logger.reset_time()
