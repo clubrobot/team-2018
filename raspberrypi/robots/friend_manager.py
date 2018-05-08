@@ -25,10 +25,7 @@ class FriendManager(TCPTalks,Thread):
         self.daemon = True
         self.is_stopped = Event()
         self.is_stopped.clear()
-        try:
-            self.connect(timeout=1)
-        except:
-            pass
+        Thread(target=self.try_connect, daemon=True).start()
 
         # Action storages
         self.friend_action = "None"
@@ -44,7 +41,6 @@ class FriendManager(TCPTalks,Thread):
         self.timestep = timestep
         self.mover = mover
         self.logger = logger
-
 
 
     def _get_position(self):
@@ -98,6 +94,17 @@ class FriendManager(TCPTalks,Thread):
             except:
                 pass
             self.position_lock.release()
+
+    def try_connect(self):
+        connected = False
+        while not connected:
+            try:
+                self.connect(timeout=5)
+                self.logger("FRIEND MANAGER : ", "Connected")
+                connected = True
+            except:
+                self.logger("FRIEND MANAGER : ", "Not connected")
+                pass
 
 
 

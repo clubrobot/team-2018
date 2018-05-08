@@ -103,10 +103,11 @@ class FriendManager(TCPTalks,Thread):
 if __name__ == '__main__':
     logger = Logger(Logger.SHOW)
     f = FriendManager(0.5, logger)
+    input("Launch fake friend")
+    sleep(10)
+    f.launch_action("ABEILLE")
     sleep(10)
     f.launch_action("INTERRUPTEUR")
-    sleep(10)
-    f.launch_action("ODOMETRY")
 
 
 
