@@ -70,9 +70,9 @@ class R128Approval:
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
         if self.side == R128Approval.GREEN:
-            wheeledbase.set_position(510, 270, 0)
+            self.arduinos["wheeledbase"].set_position(510, 270, 0)
         else:
-            wheeledbase.set_position(510, 3000-270, 0)
+            self.arduinos["wheeledbase"].set_position(510, 3000-270, 0)
 
         self.roadmap.cut_edges(((0, 700), (1500, 700)))
 

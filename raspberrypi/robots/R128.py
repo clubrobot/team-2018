@@ -59,7 +59,7 @@ class R128:
         self.action_list = []
         self.cross = []
         self.cross = Cross(self.side, 1, self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
-        self.crossAct = self.cross.getAction()[3]
+        self.crossAct = self.cross.getAction()[0]
 
         self.beeAct = self.bee.getAction()[0]
         self.panelAct = self.panel.getAction()[0]
@@ -79,9 +79,9 @@ class R128:
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
         if self.side == R128.GREEN:
-            wheeledbase.set_position(510, 270, 0)
+            self.arduinos["wheeledbase"].set_position(510, 270, 0)
         else:
-            wheeledbase.set_position(510, 3000-270, 0)
+            self.arduinos["wheeledbase"].set_position(510, 3000-270, 0)
 
     def run(self):
         self.logger.reset_time()
