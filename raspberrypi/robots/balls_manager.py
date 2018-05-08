@@ -125,7 +125,7 @@ class Shot(Actionnable):
         while nb_balls < 8 and time.time() - begin_time < global_timeout:
             self.logger("SHOT : ", "Ball N°", nb_balls+1)
 
-            if self.data["current_ball_in_sorter"] is None:
+            if self.data.get("current_ball_in_sorter") is None:
                 self.logger("SHOT : ", "Already ball in sorter", nb_balls + 1)
                 watersorter.open_indoor()
                 watersorter.close_trash()
@@ -209,7 +209,7 @@ class Shot(Actionnable):
         self.data["nb_balls_in_unloader"] = 0
         while not (time.time() - begin_time > global_timeout) and nb_ball<8:
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
-            if self.data["current_ball_in_sorter"] is None:
+            if self.data.get("current_ball_in_sorter") is None:
                 watersorter.open_indoor()
                 watersorter.close_trash()
                 watersorter.close_outdoor()
