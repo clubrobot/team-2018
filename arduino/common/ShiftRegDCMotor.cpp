@@ -7,13 +7,13 @@
 #define FORWARD  0
 #define BACKWARD 1
 
-extern ShiftRegister reg;
+extern ShiftRegister shift;
 
-void ShiftRegDCMotor::attach(int EN, int PWM, int DIRPOS)
+void ShiftRegDCMotor::attach(int EN, int PWM, int DIR)
 {
 	m_EN  = EN;
 	m_PWM = PWM;
-	m_DIRPOS = DIRPOS;
+	m_DIR = DIR;
 
 	pinMode(m_EN, OUTPUT);
 	pinMode(m_PWM, OUTPUT);
@@ -28,15 +28,11 @@ void ShiftRegDCMotor::update()
 		if (PWM > 255 * m_maxPWM) PWM = 255 * m_maxPWM;
 		digitalWrite(m_EN, HIGH);
 		analogWrite(m_PWM, PWM);
-
-		if(m_velocity * m_constant * m_wheelRadius > 0)
-			reg.SetLow(m_DIRPOS);
-		else 
-			reg.SetHigh(m_DIRPOS);
+		shift.write(m_DIR, (m_velocity * m_constant * m_wheelRadius > 0) ? FORWARD : BACKWARD);
 	}
 	else
 	{
-		digitalWrite(m_EN, LOW);
+		digitalWrite(m_EN, HIGH);
 	}
 }
 
@@ -67,12 +63,12 @@ void ShiftRegDCMotorsDriver::attach(int RESET, int FAULT)
 
 void ShiftRegDCMotorsDriver::reset()
 {
-	reg.SetLow(m_RESET);
+	shift.write(m_RESET, LOW);
 	delayMicroseconds(10); // One may adjust this value.
-	reg.SetHigh(m_RESET);
+	shift.write(m_RESET, HIGH);
 }
 
 bool ShiftRegDCMotorsDriver::isFaulty()
 {
-	return (digitalRead(m_FAULT) == LOW);
+	return -1;
 }

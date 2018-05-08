@@ -1,10 +1,11 @@
-#ifndef __DCMOTOR_H__
-#define __DCMOTOR_H__
+#ifndef __SHIFTREGDCMOTOR_H__
+#define __SHIFTREGDCMOTOR_H__
 
 #include "NonCopyable.h"
 #include "DifferentialController.h"
 
 #include <math.h>
+
 
 
 class ShiftRegDCMotor : private NonCopyable, public AbstractMotor
@@ -13,7 +14,7 @@ public:
 
 	ShiftRegDCMotor() : m_enabled(false), m_velocity(0), m_wheelRadius(1 / (2 * M_PI)), m_constant(1), m_maxPWM(1){}
 
-	void attach(int EN, int PWM, int DIRPOS);
+	void attach(int EN, int PWM, int DIR);
 
 	void setVelocity(float velocity){m_velocity = velocity; update();}
 
@@ -47,7 +48,7 @@ protected:
 
 	int	m_EN;
 	int	m_PWM;
-	int	m_DIRPOS;
+	int	m_DIR;
 };
 
 class ShiftRegDCMotorsDriver
@@ -66,4 +67,4 @@ private:
 	int m_FAULT;
 };
 
-#endif // __DCMOTOR_H__
+#endif // __SHIFTREGDCMOTOR_H__

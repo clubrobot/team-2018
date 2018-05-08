@@ -2,6 +2,7 @@
 #include <EEPROM.h>
 
 #include "DCMotor.h"
+#include "ShiftRegister.h"
 
 #define FORWARD  0
 #define BACKWARD 1
