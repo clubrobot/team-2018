@@ -29,7 +29,7 @@ StepByStepMotor motor;
 ShiftRegAX12 servoax;
 
 //            X |  Y  |  Z  | Th | SPEED
-RobotArm arm(15.0, 15.0, 10.0, 0.0, 100);
+RobotArm arm(-10.0, 10.0, 10.0, 180.0, 500);
 
 Servo beeActivator;
 
@@ -94,7 +94,7 @@ void setup()
 void loop()
 {
 	talks.execute();
-    motor.update();
+    //motor.update();
 
     if(open_manager)
     {

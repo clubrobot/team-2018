@@ -64,7 +64,7 @@ class RobotArm(SecureSerialTalksProxy):
     ABOVE_CROSS = (-17.5, 6,  MAX_Z/2, 180, 0)
     CUBES_POS = [CLOSER_CUBE, LEFT_CUBE, RIGHT_CUBE, MIDDLE_CUBE]
 
-    def __init__(self, manager, uuid='RobotArm'):
+    def __init__(self, manager, uuid='128'):
         SecureSerialTalksProxy.__init__(self, manager, uuid, dict())
         self.logger = None
 
