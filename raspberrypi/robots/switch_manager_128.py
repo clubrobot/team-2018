@@ -26,7 +26,7 @@ class Interrupteur_128(Interrupteur):
             return
         display.addPoints(Interrupteur.POINTS)
         self.logger("SWITCH : ", "Go back to preparation point")
-        self.mover.withdraw(*self.preparation,direction="forward")
+        self.mover.withdraw(*self.preparation,direction="backward")
         self.actions[0].set_reliability(max(self.actions[0].reliability - 0.2, 0))
         self.watcher = Thread(target=self.watch, daemon=True)
         self.watcher.start()
