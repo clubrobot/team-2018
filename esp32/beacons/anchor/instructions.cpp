@@ -67,3 +67,11 @@ void GET_COORDINATE(SerialTalks &talks, Deserializer &input, Serializer &output)
 void GET_PANEL_STATUS(SerialTalks &talks, Deserializer &input, Serializer &output){
     output.write<bool>(deviceConnected);
 }
+
+void CHANGE_CHANNEL(SerialTalks &talks, Deserializer &input, Serializer &output)
+{
+    if (data.channel > LONGDATA_RANGE_LOWPOWER)
+        data.channel = (Channel)((uint16_t)data.channel -1);
+    else
+        data.channel = LONGDATA_RANGE_ACCURACY;
+}

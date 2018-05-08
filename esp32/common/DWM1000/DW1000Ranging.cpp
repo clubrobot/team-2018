@@ -85,7 +85,6 @@ float DW1000RangingClass::_pos_x[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 float DW1000RangingClass::_pos_y[MAX_TAG_DEVICES] = {-1000, -1000, -1000};
 
 // others
-uint8_t DW1000RangingClass::_color = 0;
 uint8_t DW1000RangingClass::_dataSyncSize = 0;
 void *DW1000RangingClass::_dataSync = NULL;
 
@@ -114,6 +113,7 @@ void (* DW1000RangingClass::_handleInactiveAncDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleInactiveTagDevice)(DW1000Device*) = 0;
 void (* DW1000RangingClass::_handleCalibration)(int,int) = 0;
 void (* DW1000RangingClass::_handleDataSync)() = 0;
+void (* DW1000RangingClass::_handleNewChannel)(uint16_t) = 0;
 
 /* ###########################################################################
  * #### Debug ################################################################
@@ -696,7 +696,17 @@ void DW1000RangingClass::loop() {
 			
 			//then we proceed to range protocole
 			if(_type == ANCHOR) {
-				if(messageType != _expectedMsgId) {
+				if(messageType == CHANGE_CHANNEL_MODE){
+					log("CHANGE_CHANNEL_MODE");
+					uint16_t channel;
+					memcpy(&channel, data + SHORT_MAC_LEN + 1, 2);
+					String s = "change channel to channel ";
+					s+= channel;
+					log(s);
+					if(_handleNewChannel != 0)
+						(*_handleNewChannel)(channel);
+					return;
+				}else if(messageType != _expectedMsgId) {
 					// unexpected message, start over again (except if already POLL)
 
 					String s = "IGNORED Unexppected msg : ";
@@ -828,12 +838,23 @@ void DW1000RangingClass::loop() {
 			}
 			else if(_type == TAG) {
 				// get message and parse
-				if(messageType != _expectedMsgId) {
-					
+				if (messageType == CHANGE_CHANNEL_MODE)
+				{
+					log("CHANGE_CHANNEL_MODE");
+					uint16_t channel;
+					memcpy(&channel, data + SHORT_MAC_LEN + 1, 2);
+					String s = "change channel to channel ";
+					s += channel;
+					log(s);
+					if (_handleNewChannel != 0)
+						(*_handleNewChannel)(channel);
+					return;
+				}
+				else if (messageType != _expectedMsgId)
+				{
+
 					//not needed ?
-					if(messageType == CHANGE_COLOR){
-						memcpy(&_color,  data + 1 + SHORT_MAC_LEN, 1);
-					} else if(!_isEnabled) {
+					 if(!_isEnabled) {
 						String s = "IGNORED Unexppected msg : ";
 						s+=messageType;
 						s+=" expected : ";
@@ -1468,36 +1489,6 @@ void DW1000RangingClass::setPosY(float &y, uint8_t index)
 	_pos_y[index] = y;
 }
 
-void DW1000RangingClass::transmitTrilaterationReport()	// TODO : not used
-{
-
-	transmitInit();
-	byte shortBroadcast[2] = {0xFF, 0xFF};
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
-	data[SHORT_MAC_LEN] = TRILATERATION_REPORT;
-	//memcpy(data + SHORT_MAC_LEN + 1, &_pos_x, 4);
-	//memcpy(data + SHORT_MAC_LEN + 5, &_pos_y, 4);
-
-	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
-	transmit(data);
-}
-
-void DW1000RangingClass::transmitColor(uint8_t color)
-{
-	_color = color;
-	DW1000Device *myDistantDevice = getDistantDevice();
-	transmitInit();
-	_globalMac.generateShortMACFrame(data, _currentShortAddress, myDistantDevice->getByteShortAddress());
-	data[SHORT_MAC_LEN] = CHANGE_COLOR;
-	memcpy(data + 1 + SHORT_MAC_LEN, &color, 1);
-	copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
-	transmit(data, DW1000Time(_replyDelayTimeUS, DW1000Time::MICROSECONDS));
-}
-
-uint8_t DW1000RangingClass::getColor(){
-	return _color;
-}
-
 // dataSync
 void DW1000RangingClass::setDataSyncSize(uint8_t dataSize)
 {
@@ -1508,4 +1499,16 @@ void DW1000RangingClass::setDataSyncSize(uint8_t dataSize)
 void DW1000RangingClass::setDataSync(void *data)
 {
 	_dataSync = data;
+}
+
+void DW1000RangingClass::transmitChangeChannel(uint16_t channel)
+{
+	log("transmitChangeChannel");
+	transmitInit();
+	byte shortBroadcast[2] = {0xFF, 0xFF};
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
+	data[SHORT_MAC_LEN] = CHANGE_CHANNEL_MODE;
+	memcpy(data + SHORT_MAC_LEN + 1,&channel,2);
+	copyShortAddress(_lastSentToShortAddress, shortBroadcast);
+	transmit(data);
 }

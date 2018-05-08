@@ -39,11 +39,9 @@
 #define RANGE_FAILED 			255
 #define BLINK 					4
 #define RANGING_INIT 			5
-#define TRILATERATION_REPORT 	6
-#define CHANGE_COLOR 			7
 #define TAG_SYNC				8
-#define TAG_SYNC_ACK			9
 #define TAG_SYNC_END			10
+#define CHANGE_CHANNEL_MODE		11
 
 #define LEN_DATA 120
 
@@ -121,6 +119,7 @@ public:
 	static void attachInactiveTagDevice(void (*handleInactiveTagDevice)(DW1000Device *)) { _handleInactiveTagDevice = handleInactiveTagDevice; };
 	static void attachAutoCalibration(void (*handleCalibration)(int, int)){_handleCalibration = handleCalibration; };
 	static void attachDataSync(void (*handleDataSync)()) { _handleDataSync = handleDataSync; };
+	static void attachNewChannel(void (*handleNewChannel)(uint16_t)){_handleNewChannel = handleNewChannel; };
 
 	// Auto calibration
 	static void startAutoCalibration(int realDistance, unsigned long timeOut);
@@ -133,11 +132,8 @@ public:
 	static float getPosY();									// get y coordinate of the first tag connected
 	static void setPosX(float &x, uint8_t index);   
 	static void setPosY(float &y, uint8_t index);   
-	static void transmitTrilaterationReport();
 
 	// Others
-	static void transmitColor(uint8_t color);
-	static uint8_t getColor();
 
 	static DW1000Device* getDistantDevice();
 	static DW1000Device* searchDistantDevice(byte shortAddress[]);
@@ -148,6 +144,9 @@ public:
 	// dataSync
 	static void setDataSyncSize(uint8_t dataSize);
 	static void setDataSync(void *data);
+
+	// changing channel
+	static void transmitChangeChannel(uint16_t channel);
 
   private:
 	//other devices in the network
@@ -180,6 +179,7 @@ public:
 	static void (* _handleInactiveTagDevice)(DW1000Device *);
 	static void (* _handleCalibration)(int,int);	// real distance (INT), mesure (INT)
 	static void (* _handleDataSync)();
+	static void (*_handleNewChannel)(uint16_t);
 
 	//sketch type (tag or anchor)
 	static int16_t          _type; //0 for tag and 1 for anchor
@@ -224,7 +224,6 @@ public:
 	static float _pos_x[MAX_TAG_DEVICES];
 	static float _pos_y[MAX_TAG_DEVICES];
 	// others
-	static uint8_t _color;	// 0 = green, 1 = orange
 	static uint8_t _dataSyncSize;
 	static void *_dataSync;
 

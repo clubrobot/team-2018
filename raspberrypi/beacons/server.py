@@ -8,6 +8,7 @@ import sys
 from common.tcptalks import TCPTalksServer
 from beacons.panel import *
 from beacons.anchor import *
+from common.gpiodevices import *
 
 PORT_BALISE = 26657
 GET_POSITION_OPCODE = 0x14
@@ -15,7 +16,6 @@ SET_COLOR_OPCODE = 0x15
 GET_PANEL_STATUS_OPCODE = 0x17
 BIG_ROBOT = 0
 LITTLE_ROBOT = 1
-
 
 class Server(TCPTalksServer):
     def __init__(self):
@@ -25,6 +25,7 @@ class Server(TCPTalksServer):
         self.bind(GET_PANEL_STATUS_OPCODE, self.get_panel_status)
         self.beacon = Anchor()
         self.beacon.connect()
+        Switch(5, self.changeChannel)
 
     def run(self):
         while True:
@@ -55,3 +56,9 @@ class Server(TCPTalksServer):
 
     def get_panel_status(self):
         return bool(self.beacon.is_panel_on())
+
+    def changeChannel(self):
+        try:
+            self.beacon.change_channel()
+        except:
+            pass
