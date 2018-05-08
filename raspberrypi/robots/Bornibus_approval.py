@@ -193,6 +193,8 @@ class BornibusApproval:
             except PositionUnreachable:
                 self.logger("MAIN : ", "Unreachable action")
                 act.temp_disable(5)
+            act = self.heuristics.get_best()
+            self.mover.reset()
 
 if __name__ == '__main__':
     from robots.setup_bornibus import *
