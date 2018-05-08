@@ -6,13 +6,14 @@ from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
 from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
+import time
 from robots.get_robot_name import *
 from robots.friend_manager import FriendManager
 #if ROBOT_ID == R128_ID:
 #    from robots.color_pattern import Pattern
 
 
-class R128:
+class R128Approval:
     cube ="cube"
     dispenser = "disp"
     shot = "shot"
@@ -57,31 +58,24 @@ class R128:
         self.odometry = Odometry(self.side, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
         self.odoAct  =self.odometry.getAction()[0]
         self.action_list = []
-        self.cross = []
-        self.cross = Cross(self.side, 1, self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
-        self.crossAct = self.cross.getAction()[0]
 
         self.beeAct = self.bee.getAction()[0]
         self.panelAct = self.panel.getAction()[0]
 
         self.action_list = [
-            self.beeAct,
             self.panelAct,
-            self.odoAct,
-            self.crossAct,
         ]
 
-        self.odoAct.set_manual_order(1)
-        #self.beeAct.set_manual_order(3)
-        #self.panelAct.set_manual_order(2)
-        self.crossAct.set_manual_order(2)
+        self.panelAct.set_manual_order(1)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
-        if self.side == R128.GREEN:
+        if self.side == R128Approval.GREEN:
             self.arduinos["wheeledbase"].set_position(510, 270, 0)
         else:
             self.arduinos["wheeledbase"].set_position(510, 3000-270, 0)
+
+        self.roadmap.cut_edges(((0, 700), (1000, 1000)))
 
     def run(self):
         self.logger.reset_time()
@@ -89,13 +83,13 @@ class R128:
 
         act = self.heuristics.get_best()
         self.arduinos["robot_arm"].begin()
-        time.sleep(2)
+        time.sleep(20)
         print(act)
         while act is not None:
             try:
                 act.before_action()
                 self.logger("MAIN : ", "Let's go to the next action : {}".format(act.name))
-                self.mover.goto(*act.actionPoint)
+                self.mover.goto_safe(*act.actionPoint)
                 self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
                 act()
                 act.done.set()
@@ -122,10 +116,7 @@ if __name__ == '__main__':
    #     pass
 
     bm = BeaconsManagement(br, "area.ggb")
-    if ROBOT_ID == R128:
-        p = Pattern()
-    else:
-        p = None
-    auto = R128(0, rm, geo, wheeledbase, ssd, led1, led2, beeactuator, arm, s_front, s_lat, s_back, br, bm, p)
+
+    auto = R128Approval(0, rm, geo, wheeledbase, ssd, led1, led2, beeactuator, arm, s_front, s_lat, s_back, br, bm, p)
     auto.set_side(0)
     auto.run()
