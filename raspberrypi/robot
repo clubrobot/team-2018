@@ -58,6 +58,7 @@ def start(args):
         automate = Bornibus(0, rm, geo, b, l, d, ssd, led1, led2, a, s_front, s_lat, s_back,  br, bm)
         button_gesture = ButtonGestureMatch(button_card, l, ssd, b, m, automate.set_side)
         button_gesture.run()
+        m.start_match()
         button_card.disconnect()
         try:
             automate.run()
