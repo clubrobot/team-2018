@@ -57,18 +57,12 @@ class R128Approval:
         self.odometry = Odometry(self.side, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
         self.odoAct  =self.odometry.getAction()[0]
         self.action_list = []
-        self.cross = []
-        self.cross = Cross(self.side, 1, self.roadmap, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
-        self.crossAct = self.cross.getAction()[3]
 
         self.beeAct = self.bee.getAction()[0]
         self.panelAct = self.panel.getAction()[0]
 
         self.action_list = [
-            self.beeAct,
             self.panelAct,
-            self.odoAct,
-            self.crossAct,
         ]
 
         self.panelAct.set_manual_order(1)
