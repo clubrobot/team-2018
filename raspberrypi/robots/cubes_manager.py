@@ -187,3 +187,13 @@ class Cross(Actionnable):
                            Cross.TIME)
         return actions
 
+
+"""
+class Dropper(Actionnable):
+    typ = "Dropper"
+    SPOT = 0
+    def __init__(self, side, geo, arduinos, mover, logger, data):
+        self.side = side
+        self.geo = geo
+        self.wheeledbase
+"""

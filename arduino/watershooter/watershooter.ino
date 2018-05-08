@@ -16,13 +16,10 @@ Servo trash;
 Servo trashUnloader;
 BallsShaker shaker;
 Servo beeActivator;
-<<<<<<< HEAD
-=======
 
 int ballCount = 0;
 bool lastState = HIGH;
 unsigned long timeDebouncer = 0;
->>>>>>> 0ebc8a222df4f9d85c589cce3a542eee6517ecd3
 
 Adafruit_TCS34725 waterSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
