@@ -53,8 +53,8 @@ CROSS_LIST = [CROSS1, CROSS2, CROSS3, CROSS4, CROSS5, CROSS6]
 
 
 class RobotArm(SerialTalks):	
-	def __init__(self, uuid='ttyUSB0'):
-		SerialTalks.__init__(self, "/dev/{}".format(uuid))
+	def __init__(self, uuid='128'):
+		SerialTalks.__init__(self, "/dev/arduino/{}".format(uuid))
 		r_x = 0
 		r_y = 0
 		r_t = 0

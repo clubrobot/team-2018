@@ -51,7 +51,7 @@ void setup()
     shift.attach(LATCHPIN,CLOCKPIN,DATAPIN);
 
     motor.attach(STEP_PAP, DIR_PAP, ENABLE_PAP, RST_PAP, SLEEP_PAP);
-
+    
     ShiftRegAX12::SerialBegin(9600, RX_AX12, TX_AX12, AX12_DATA_CONTROL);
 
 }
@@ -59,5 +59,6 @@ void setup()
 void loop()
 {
 	talks.execute();
+    motor.update();
 
 }

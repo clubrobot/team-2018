@@ -1,8 +1,9 @@
 #include "instructions.h"
+#include "../../common/ShiftRegDCMotor.h"
 
-extern DCMotorsDriver driver;
-extern DCMotor motor_1;
-extern DCMotor motor_2;
+extern ShiftRegDCMotorsDriver driver;
+extern ShiftRegDCMotor motor_1;
+extern ShiftRegDCMotor motor_2;
 
 void RESET_DRIVER(SerialTalks& talks, Deserializer& input, Serializer& output)
 {

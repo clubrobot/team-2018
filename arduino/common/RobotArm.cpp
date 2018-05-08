@@ -97,7 +97,7 @@ bool RobotArm::solve_coords(double x, double y)
 
 bool RobotArm::is_reached()
 {
-	bool ret1,ret2,ret3;
+	bool ret1,ret2;
 	double A1,A2;
 
 	A1 = get_A1();
@@ -158,13 +158,11 @@ bool RobotArm::ReachPosition(double x, double y, double z, double theta, int z_o
 		servoax.setMaxTorqueRAM(1023);
 		servoax.moveSpeed((float)t3, m_speed);
 		servoax.detach();
-		while(!is_reached());
+		//while(!is_reached());
 
 
 		if(z_order == Z_LAST)
 			motor.set_position(m_z);
-
-		//TODO : add pap Z axis
 
 		return true;
 	}

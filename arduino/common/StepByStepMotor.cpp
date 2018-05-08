@@ -21,6 +21,7 @@ void StepByStepMotor::attach(int step, int dir, int enable, int rst, int sleep)
 
 	pinMode(m_step, OUTPUT);
 
+	m_state = WATING_STATE;
 }
 
 void StepByStepMotor::begin()
@@ -34,13 +35,14 @@ void StepByStepMotor::begin()
 	m_last_pos = 0;
 
 	m_en = true;
+	
+	m_p = 1;
 }
 
 void StepByStepMotor::step()
 {
-	//digitalWrite(m_step, LOW);
 	PORTB &= ~(_BV(5));
-    delayMicroseconds(5);
+    delayMicroseconds(15);
     PORTB |= _BV(5);            
 
     if(m_speed < 31)
@@ -51,45 +53,71 @@ void StepByStepMotor::step()
   	else
     	delayMicroseconds(1000000 / m_speed - 110);
 }
-
-void StepByStepMotor::update()
+void StepByStepMotor::set_position(double position)
 {
-	long abssteps, pAcc, pDec, p, steps;
+	long abssteps, steps;
 
-	m_current_pos = m_pos;
+	m_current_pos = position;
 
 	steps = (m_current_pos - m_last_pos) * P_MM;
 
 	abssteps = (steps>0 ? steps : -steps);
 
-	pAcc = abssteps / (1.0 + ACC/DECC);
-	pDec = abssteps - pAcc;
+	m_pAcc = abssteps / (1.0 + ACC/DECC);
+	m_pDec = abssteps - m_pAcc;
 
 	if(steps > 0)
 		shift.write(m_dir,FORWARD);
 	else
 		shift.write(m_dir,BACKWARD);
 
-	for(p=1; p<=pAcc; p++)
-  	{
-	    m_speed = sqrt((2*p-1)*ACC);
-	    if(m_speed > PLAT)
-	    	m_speed = PLAT;
+	m_state = ACC_STATE;
+}
 
-		step();
+void StepByStepMotor::update()
+{
 
-	    
-  	}
-	for(p = pDec; p > 0 ; p--)
+	switch(m_state)
 	{
-		m_speed = sqrt(2*p*DECC);
-		if(m_speed > PLAT)
-			m_speed = PLAT;
-		
-		step();
-	}
+		case ACC_STATE :
+			if(m_p <= m_pAcc)
+			{
+				m_speed = sqrt((2*m_p-1)*ACC);
+		   		if(m_speed > PLAT)
+		    		m_speed = PLAT;
 
-	m_last_pos = m_pos;
+				step();
+				m_p++;
+			}
+			else
+			{
+				m_state = DEC_STATE;
+				m_p = m_pDec;
+			}
+			break;
+
+		case DEC_STATE :
+			if(m_p > 0)
+			{
+				m_speed = sqrt(2*m_p*DECC);
+		   		if(m_speed > PLAT)
+		    		m_speed = PLAT;
+
+				step();
+				m_p--;
+			}
+			else
+			{
+				m_state = WATING_STATE;
+				m_p = 0;
+				m_last_pos = m_pos;
+			}
+			break;
+
+		case WATING_STATE :
+			break;
+
+	}
 }
 
 void StepByStepMotor::enable()

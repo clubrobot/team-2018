@@ -10,7 +10,8 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/SerialTalks.cpp \
 	$(COMMON)/CRC16.cpp \
 	$(COMMON)/ShiftRegister.cpp \
-	$(COMMON)/StepByStepMotor.cpp
+	$(COMMON)/StepByStepMotor.cpp \
+	$(COMMON)/PeriodicProcess.cpp
 
 # Sketch libraries
 ARDUINO_LIBS = EEPROM Servo

@@ -1,6 +1,7 @@
 #ifndef __STEPBYSTEPMOTOR_H__
 #define __STEPBYSTEPMOTOR_H__
 
+
 #define STEP_BY_REV (200*16)
 
 #define P_MM 80L
@@ -22,7 +23,7 @@ class StepByStepMotor
 
 		void update();
 
-		void set_position(double position){m_pos = position; update();}
+		void set_position(double position);
 
 		void set_speed(unsigned long speed){m_speed = speed;}
 
@@ -41,8 +42,20 @@ class StepByStepMotor
 		int m_rst;
 		int m_enable;
 
+		long m_pAcc;
+		long m_pDec;
+
 		float m_current_pos;
 		float m_last_pos;
+
+		long m_p;
+
+		enum 
+		{
+			ACC_STATE,
+			DEC_STATE,
+			WATING_STATE,
+		}m_state;
 
 		float m_pos;
 		unsigned long m_speed;

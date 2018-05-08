@@ -15,6 +15,8 @@ LOCAL_CPP_SRCS = \
 	$(COMMON)/ShiftRegAX12.cpp \
 	$(COMMON)/SoftwareSerial.cpp \
 	$(COMMON)/StepByStepMotor.cpp \
+	$(COMMON)/PeriodicProcess.cpp \
+	$(COMMON)/Clock.cpp \
 	$(COMMON)/RobotArm.cpp
 
 

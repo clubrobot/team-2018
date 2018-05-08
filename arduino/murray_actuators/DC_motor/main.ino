@@ -2,15 +2,14 @@
 
 #include "PIN.h"
 #include "instructions.h"
-#include "../../common/DCMotor.h"
+#include "../../common/ShiftRegDCMotor.h"
 #include "../../common/SerialTalks.h"
 #include "../../common/ShiftRegister.h"
 #define USE_SHIFTREG 1
 
 
-DCMotorsDriver driver;
-DCMotor motor_1;
-DCMotor motor_2;
+ShiftRegDCMotorsDriver driver;
+ShiftRegDCMotor motor_1;
 
 ShiftRegister shift;
 
@@ -39,7 +38,10 @@ void setup()
 	driver.reset();
 
   	motor_1.attach(EN_MOTOR_1, PWM_MOTOR_1, SELECT_MOTOR1);
-  	motor_2.attach(EN_MOTOR_2, PWM_MOTOR_2, SELECT_MOTOR2);
+    motor_1.setConstant(1/11.1);
+  	//motor_2.attach(EN_MOTOR_2, PWM_MOTOR_2, SELECT_MOTOR2);
+    //motor_1.enable();
+    motor_1.setVelocity(10);
 }
 
 void loop()
