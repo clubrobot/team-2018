@@ -186,7 +186,7 @@ class BornibusApproval:
             try:
                 act.before_action()
                 self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
-                self.mover.goto(*act.actionPoint)
+                self.mover.goto_safe(*act.actionPoint)
                 self.logger("MAIN ; ", "Arrived on action point ! Go execute it =)")
                 act()
                 act.done.set()

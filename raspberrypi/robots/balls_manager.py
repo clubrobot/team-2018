@@ -62,7 +62,7 @@ class Dispenser(Actionnable):
         self.logger("DISPENSER : ", "Trying to go backward ")
         pos = robot.get_position()[:-1]
         self.mover.withdraw(*self.preparationPoint, direction="backward", timeout=5, strategy=Mover.HARD,
-                            last_point_aim=self.preparationPoint)
+                            last_point_aim=self.targetPoint)
         self.watersorter.disable_shaker()
         robot.stop()
         self.display.happy(2)

@@ -40,11 +40,15 @@ class Sensors(SecureSerialTalksProxy):
 
 	def wait(self,threshold,timeout=2):
 		init_time = time.time()
-		while (self.get_mesure()[0]<threshold or self.get_mesure()[1]<threshold ) \
+		left, right = self.get_mesure()
+
+		while (left<threshold or right<threshold ) \
 			and time.time()-init_time<timeout:
-			print(self.get_mesure())
 			time.sleep(0.2)
-		if  not (self.get_mesure()[0]>threshold and self.get_mesure()[1]>threshold ):
+			left, right = self.get_mesure()
+			print(left, right)
+
+		if  not (left>threshold and right>threshold ):
 			raise TimeoutError()
 
 	def activate(self):
