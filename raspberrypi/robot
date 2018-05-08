@@ -147,7 +147,7 @@ def start_approval(args):
         led1 = LEDMatrix(m, 1)
         led2 = LEDMatrix(m, 2)
         geo = Geogebra('{}/robots/128.ggb'.format(sys.path[0]))
-        patern = Pattern()
+        #patern = Pattern()
         rm = RoadMap.load(geo)
         br = BaliseReceiver("192.168.12.3")
         try:
