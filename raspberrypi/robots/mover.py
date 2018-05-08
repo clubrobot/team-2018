@@ -34,7 +34,7 @@ SENSORS_RANGE = 200
 ENEMY_THRESHOLD = 200
 
 # GOTO
-TIMEOUT_GOAL = 5
+TIMEOUT_GOAL = 7
 
 
 # <> ERROR <>
@@ -567,6 +567,7 @@ class Mover:
             self.wheeledbase.set_velocities(0, 0)
             try:
                 self.sensors_front.wait(250, timeout=TIMEOUT_GOAL)
+                self.wheeledbase.purepursuit(self.path)
             except TimeoutError:
                 self.goto_interrupt.set()
 
