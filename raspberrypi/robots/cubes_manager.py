@@ -50,7 +50,7 @@ class Cross(Actionnable):
         self.arm = arduinos["robot_arm"]
         self.catchPoint = [None]*4
         self.preparationPoint = [None]*4
-        for cube in Cross.CUBES_ID:
+        for cube in range(4):
             self.catchPoint[cube] = self.geo.get("Croix"+ str(self.numberCross) + "_{"+ str(cube) + "1}")
             self.preparationPoint[cube] = self.geo.get("Croix"+ str(self.numberCross) + "_{"+ str(cube) + "0}")
 
@@ -100,10 +100,9 @@ class Cross(Actionnable):
             self.logger("CUBES : ", "Turn on the spot, theta : ", theta)
             self.mover.turnonthespot(theta, 3, Mover.AIM)
             time.sleep(1)
-            current_position = self.wheeledbase.get_position()
             self.logger("CUBES : ", "Go to catch position")
             try:
-                self.wheeledbase.goto(*self.catchPoint[cube_to_reach])
+                self.wheeledbase.goto(*(self.catchPoint[cube_to_reach]))
             except RuntimeError:
                 return
             self.wheeledbase.wait()
