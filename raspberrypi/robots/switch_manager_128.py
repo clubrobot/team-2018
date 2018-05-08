@@ -19,9 +19,9 @@ class Interrupteur_128(Interrupteur):
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0]) + math.pi
         try:
             self.logger("SWITCH : ", "Turn toward switch")
-            self.mover.turnonthespot(theta, try_limit=3, stategy=Mover.AIM)
+            self.mover.turnonthespot(theta+math.pi, try_limit=3, stategy=Mover.AIM)
             self.logger("SWITCH : ", "Activate switch")
-            self.mover.gowall(try_limit=5, strategy=Mover.POSITION, direction="backward", position=self.interrupteur)
+            self.mover.gowall(try_limit=5, strategy=Mover.POSITION, direction="forward", position=self.interrupteur)
         except PositionUnreachable:
             return
         display.addPoints(Interrupteur.POINTS)
