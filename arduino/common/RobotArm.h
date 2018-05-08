@@ -14,7 +14,7 @@
 /********ARM OFFSETS*******/
 #define ARM1_OFFSET 60
 #define ARM2_OFFSET 30
-#define ARM3_OFFSET 5
+#define ARM3_OFFSET 25
 
 /*******GRIPPER POS *******/
 #define GRIPPER_OPEN 50

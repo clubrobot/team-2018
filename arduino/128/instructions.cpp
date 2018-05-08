@@ -12,6 +12,7 @@ extern RobotArm arm;
 extern Servo beeActivator;
 extern ShiftRegDCMotor cuber_manager;
 extern Clock clock;
+extern ShiftRegAX12 servoax;
 
 
 #define CUBE_MANAGER_TIME 1.5
@@ -96,19 +97,19 @@ void GET_POSITION_THEO(SerialTalks &inst, Deserializer &input, Serializer &outpu
 
 void SET_ANGLES(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
-	// float x = input.read<float>();
-	// float y = input.read<float>();
-	// float z = input.read<float>();	
+	float x = input.read<float>();
+	float y = input.read<float>();
+	float z = input.read<float>();	
 
-	// // 	// send pos to AX12 servos
-	// servoax.attach(1);
-	// servoax.moveSpeed((float)x,50);
+	// 	// send pos to AX12 servos
+	servoax.attach(1);
+	servoax.moveSpeed((float)x,50);
 
-	// servoax.attach(2);
-	// servoax.moveSpeed((float)y, 50);
+	servoax.attach(2);
+	servoax.moveSpeed((float)y, 50);
 
-	// servoax.attach(3);
-	// servoax.moveSpeed((float)z, 50);
+	servoax.attach(3);
+	servoax.moveSpeed((float)z, 50);
 }
 
 void OPEN_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output)
