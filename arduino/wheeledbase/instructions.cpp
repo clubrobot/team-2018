@@ -510,7 +510,7 @@ void GET_PARAMETER_VALUE(SerialTalks& talks, Deserializer& input, Serializer& ou
 
 void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& output)
 {
-	robot = input.read<byte>();
+	byte robot = input.read<byte>();
 	if(robot == BORNIBUS)
 	{
 		purePursuit.setLookAhead(200);
