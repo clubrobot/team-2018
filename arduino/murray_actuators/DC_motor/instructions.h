@@ -2,7 +2,7 @@
 #define __INSTRUCTIONS_H__
 
 #include "../../common/SerialTalks.h"
-#include "../../common/ShiftRegDCMotor.h"
+#include "../../common/DCMotor.h"
 #include "../../common/ShiftRegister.h"
 
 #define _RESET_DRIVER_OPCODE   	0X11

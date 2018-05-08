@@ -1,9 +1,7 @@
 #ifndef __INSTRUCTIONS_H__
 #define __INSTRUCTIONS_H__
 
-#include "../../common/SerialTalks.h"
-
-
+#include "../common/SerialTalks.h"
 
 #define BEGIN_OPCODE 0X11
 #define SET_POS_OPCODE 0X12
@@ -22,8 +20,13 @@
 
 #define OPEN_GRIPPER_OPCODE 0X1B
 #define CLOSE_GRIPPER_OPCODE 0X1C
-#define GET_EMERGENCY_STATE_OPCODE 0x1D
-#define WRITE_BEEACTIVATOR_OPCODE 0x1E
+
+#define WRITE_BEEACTIVATOR_OPCODE 0X27
+
+#define OPEN_CUBE_MANAGER_OPCODE 0X20
+#define CLOSE_CUBE_MANAGER_OPCODE 0X21
+
+#define GET_EMERGENCY_STATE_OPCODE 0X22
 
 void BEGIN(SerialTalks &inst, Deserializer &input, Serializer &output);
 
@@ -49,8 +52,13 @@ void OPEN_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 void CLOSE_GRIPPER(SerialTalks &inst, Deserializer &input, Serializer &output);
 
+void WRITE_BEEACTIVATOR(SerialTalks &inst, Deserializer &input, Serializer &output);
+
 void GET_EMERGENCY_STATE(SerialTalks &inst, Deserializer &input, Serializer &output);
 
-void WRITE_BEE_ACTIVATOR(SerialTalks &inst, Deserializer &input, Serializer &output);
+void OPEN_CUBE_MANAGER(SerialTalks &inst, Deserializer &input, Serializer &output);
+
+void CLOSE_CUBE_MANAGER(SerialTalks &inst, Deserializer &input, Serializer &output);
+
 
 #endif //__INSTRUCTIONS_H__

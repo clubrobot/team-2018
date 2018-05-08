@@ -1,4 +1,5 @@
 #include "instructions.h"
+#include "../../common/ShiftRegDCMotor.h"
 
 extern ShiftRegDCMotorsDriver driver;
 extern ShiftRegDCMotor motor_1;

@@ -44,11 +44,11 @@ void setup()
 	pinMode(SERVO6, OUTPUT);
 
 	servo_1.attach(SERVO1);
-	servo_1.attach(SERVO2);
-	servo_1.attach(SERVO3);
-	servo_1.attach(SERVO4);
-	servo_1.attach(SERVO5);
-	servo_1.attach(SERVO6);
+	servo_2.attach(SERVO2);
+	servo_3.attach(SERVO3);
+	servo_4.attach(SERVO4);
+	servo_5.attach(SERVO5);
+	servo_6.attach(SERVO6);
 }
 
 void loop()

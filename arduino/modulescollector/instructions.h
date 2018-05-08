@@ -2,6 +2,7 @@
 #define __INSTRUCTIONS_H__
 
 #include "../common/SerialTalks.h"
+#include "../common/RobotArm.h"
 
 
 

@@ -1,5 +1,5 @@
-#ifndef __AX12_H
-#define __AX12_H
+#ifndef __SHIFTREGAX12_H
+#define __SHIFTREGAX12_H
 
 	/// EEPROM AREA  ///
 #define AX_MODEL_NUMBER_L           0
@@ -117,7 +117,7 @@
 #include <Arduino.h>
 #include "../common/ShiftRegister.h"
 
-class DynamixelClass {
+class ShiftDynamixelClass {
 private:
 	unsigned char DTx;              //		Default Serial Port 0 -> Rx  &  1 -> Tx
 	unsigned char DRx;
@@ -191,10 +191,10 @@ public:
 	int ledStatus(unsigned char ID, bool Status);
 };
 
-extern DynamixelClass Dynamixel;
+extern ShiftDynamixelClass ShiftDynamixel;
 
 
-class AX12 {
+class ShiftRegAX12 {
 private: 
 	unsigned char m_id;
 	bool m_endlessMode;
