@@ -83,7 +83,7 @@ class R128Approval:
 
         act = self.heuristics.get_best()
         self.arduinos["robot_arm"].begin()
-        time.sleep(10)
+        time.sleep(20)
         print(act)
         while act is not None:
             try:
