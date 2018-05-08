@@ -6,6 +6,7 @@ from common.logger               import Logger
 from robots.beacons_manager      import BeaconsManagement
 from beacons.balise_receiver     import BaliseReceiver
 from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
+import time
 from robots.get_robot_name import *
 from robots.friend_manager import FriendManager
 #if ROBOT_ID == R128_ID:
@@ -115,10 +116,7 @@ if __name__ == '__main__':
    #     pass
 
     bm = BeaconsManagement(br, "area.ggb")
-    if ROBOT_ID == R128Approval:
-        p = Pattern()
-    else:
-        p = None
+
     auto = R128Approval(0, rm, geo, wheeledbase, ssd, led1, led2, beeactuator, arm, s_front, s_lat, s_back, br, bm, p)
     auto.set_side(0)
     auto.run()
