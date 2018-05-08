@@ -14,6 +14,7 @@ CALIBRATION_ROUTINE_OPCODE 	= 0x12
 UPDATE_COLOR_OPCODE 		= 0x13
 GET_POSITION_OPCODE 		= 0x14
 GET_PANEL_STATUS_OPCODE 	= 0x17
+CHANGE_CHANNEL_OPCODE       = 0x18
 
 
 class Anchor(SerialTalks):
@@ -47,5 +48,9 @@ class Anchor(SerialTalks):
 		output = self.execute(GET_PANEL_STATUS_OPCODE)
 		ret = output.read(BYTE)
 		return ret
+
+	def change_channel(self):
+		self.send(CHANGE_CHANNEL_OPCODE)
+		
 
 
