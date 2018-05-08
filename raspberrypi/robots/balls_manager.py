@@ -66,7 +66,6 @@ class Dispenser(Actionnable):
         self.watersorter.disable_shaker()
         robot.stop()
         self.display.happy(2)
-        self.waterlauncher.set_motor_pulsewidth(1080)
         
 
         
