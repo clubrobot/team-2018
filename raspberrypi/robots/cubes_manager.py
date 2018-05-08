@@ -39,6 +39,8 @@ class Cross(Actionnable):
 
     CUBES_ID = {ORANGE, BLACK, BLUE, GREEN, YELLOW}
 
+    IMPOSSIBLE_CUBES = [[2], [], [3], [2], [], [3]]
+
     def __init__(self, side, numberCross, rm, geo, arduinos, mover, logger, data):
         self.side = side
         self.rm = rm
@@ -85,10 +87,14 @@ class Cross(Actionnable):
         time.sleep(5)
         opposite_cube = None
         for cube in Cross.CUBES_ID:
-            if not cube in self.pattern:
+            if not cube in self.pattern and not cube in Cross.IMPOSSIBLE_CUBES[self.numberCross]:
                 opposite_cube = cube
 
-        cube_to_reach = self.get_opposite_cube(opposite_cube)
+        if opposite_cube is not None:
+            cube_to_reach = self.get_opposite_cube(opposite_cube)
+
+        else:
+            cube_to_reach = Cross.ORANGE
 
         theta = math.atan2(self.catchPoint[cube_to_reach][1] - self.preparationPoint[cube_to_reach][1],
                            self.catchPoint[cube_to_reach][0] - self.preparationPoint[cube_to_reach][0])
