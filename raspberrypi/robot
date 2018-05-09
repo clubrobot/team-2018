@@ -138,6 +138,7 @@ def start_approval(args):
     else:
         button_card = ButtonCard(m)
         ssd = SevenSegments(m)
+        ssd.set_message("LAUNCH")
         b= WheeledBase(m)
         d = WaterSorter(m)
         a = BeeActuator(m)

@@ -577,7 +577,7 @@ class Mover:
     def front_obstacle(self):
         # RoadMap.LEFT
         # RoadMap.RIGHT
-        ((a,_),(b,_)) = self.sensors_front.get_mesure()
+        a,b  = self.sensors_front.get_mesure()
         if a>350 and b>350:
             return
         print("LOG ", )
