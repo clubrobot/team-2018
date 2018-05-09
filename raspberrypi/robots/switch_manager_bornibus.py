@@ -55,7 +55,8 @@ class Abeille_Bornibus(Abeille):
                 robot.angpos_threshold.set(0.05)
                 robot.purepursuit([self.preparation, self.interrupteur], direction="backward", lookahead=50,
                                   finalangle=math.pi/2+(self.side*2-1)*math.pi/4, lookaheadbis=400)
-                robot.wait()
+                robot.wait(timeout=5, command= lambda : robot.purepursuit([self.preparation, self.interrupteur], direction="backward", lookahead=50,
+                                  finalangle=math.pi/2+(self.side*2-1)*math.pi/4, lookaheadbis=400))
                 arrived = True
             except RuntimeError:
                 self.logger("BEE : ", "Can't orientate")

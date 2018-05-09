@@ -188,9 +188,15 @@ class WheeledBase(SecureSerialTalksProxy):
         output = self.execute(GET_VELOCITIES_WANTED_OPCODE,BYTE(int(real_output)))
         return output.read(FLOAT, FLOAT)
 
-    def wait(self, timestep=0.1, **kwargs):
+    def wait(self, timestep=0.1, timeout=200, command=None, **kwargs):
+        init_time = time.time()
         while not self.isarrived(**kwargs):
             time.sleep(timestep)
+            if (time.time()-init_time>timeout) and (not command is None):
+                print("RESCUE wheeledbase !")
+                command()
+                time.sleep(timestep)
+
 
     def goto_delta(self, x, y):
         self.send(GOTO_DELTA_OPCODE, FLOAT(x) + FLOAT(y))
