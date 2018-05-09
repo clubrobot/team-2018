@@ -103,10 +103,10 @@ class Shot(Actionnable):
         self.data = data
         
         
-    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=23):
+    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=21):
         nb_balls = 0
         begin_time = time.time()
-        motor_base = 83
+        motor_base = 81
         timeout_per_ball_in = 1
         timeout_per_ball_out = 2
         currentPosXY=wheeledbase.get_position()[:2]
@@ -158,7 +158,8 @@ class Shot(Actionnable):
                     time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1000+motor_base)
                     if time.time() - close_time > timeout_per_ball_out:
-                        break
+                        watersorter.close_trash()
+                        close_time = time.time()
                          
                 self.data.pop("current_ball_in_sorter")
 
@@ -184,7 +185,7 @@ class Shot(Actionnable):
         watersorter.open_indoor()
             
     def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=25):
-        motor_base = 110
+        motor_base = 107
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         currentPosXY=wheeledbase.get_position()[:2]
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
