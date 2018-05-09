@@ -6,6 +6,7 @@ import math
 
 from common.serialtalks import BYTE, INT, LONG, FLOAT, SerialTalks
 from common.components import SecureSerialTalksProxy
+from common.serialutils import Deserializer
 
 
 _BEGIN_OPCODE 		 = 0X11
@@ -64,8 +65,14 @@ class RobotArm(SecureSerialTalksProxy):
     ABOVE_CROSS = (-17.5, 6,  MAX_Z/2, 180, 0)
     CUBES_POS = [CLOSER_CUBE, LEFT_CUBE, RIGHT_CUBE, MIDDLE_CUBE]
 
+    _DEFAULT = {
+        _128_GET_EMERGENCY_OPCODE : Deserializer(BYTE(0)),
+        _GET_POS_OPCODE: Deserializer(BYTE(0)+BYTE(0)+BYTE(0)),
+        _GET_POS_THEO_OPCODE: Deserializer(BYTE(0)+BYTE(0)+BYTE(0))
+    }
+
     def __init__(self, manager, uuid='128'):
-        SecureSerialTalksProxy.__init__(self, manager, uuid, dict())
+        SecureSerialTalksProxy.__init__(self, manager, uuid, RobotArm._DEFAULT)
         self.logger = None
 
     def set_logger(self, logger):
