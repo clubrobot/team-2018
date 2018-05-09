@@ -555,11 +555,6 @@ class Mover:
                     self.wheeledbase.set_velocities(copysign(150, vel), 0)
                     time.sleep(1.2)
                     self.wheeledbase.purepursuit(self.path)
-
-
-                    sleep(1)
-                    # self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2],self.goal)
-                    self.wheeledbase.purepursuit(self.path)
                     self.interupted_lock.release()
                 except TimeoutError:
                     self.isarrived = False
