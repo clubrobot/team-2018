@@ -67,7 +67,7 @@ class Mover:
         # Launch Friend Manager
         self.friend = FriendManager(arduinos["wheeledbase"], self, 0.4, logger)
         self.friend.start()
-        if ROBOT_ID == R128_ID:
+        if True:
             self.friend_obstacle = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
             self.friend_obstacle.set_position(-1000,-1000)
             self.friend_listener = PositionListener(lambda: self.friend.get_friend_position(), 0.5)
