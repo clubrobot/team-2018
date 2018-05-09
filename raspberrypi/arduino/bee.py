@@ -17,7 +17,7 @@ class BeeActuator(SecureSerialTalksProxy):
         SecureSerialTalksProxy.__init__(self,parent, uuid, dict())
         if ROBOT_ID==BORNIBUS_ID:
             self.closed_position = 0
-            self.open_position = 80
+            self.open_position = 65
         else:
             self.closed_position = 40
             self.open_position = 140
