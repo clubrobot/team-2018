@@ -52,7 +52,7 @@ CROSS6 = [(540  , 2208 , 0),(598  , 2150 , -90),(540  , 2092 , 180),(482  , 2150
 CROSS_LIST = [CROSS1, CROSS2, CROSS3, CROSS4, CROSS5, CROSS6]
 
 
-class RobotArm(SerialTalks):	
+class RobotArm(SerialTalks):
 	def __init__(self, uuid='128'):
 		SerialTalks.__init__(self, "/dev/arduino/{}".format(uuid))
 		r_x = 0
@@ -70,15 +70,15 @@ class RobotArm(SerialTalks):
 	def set_pos(self, x, y ,z ,theta, z_o):
 		self.send(_SET_POS_OPCODE, FLOAT(x), FLOAT(y), FLOAT(z), FLOAT(theta),INT(z_o))
 
-	def put_in_tank():
+	def put_in_tank(self):
 		output = self.execute(_SET_POS_OPCODE, FLOAT(10), FLOAT(10), FLOAT(10), FLOAT(90))
 		ret = output.read(INT);
 		return ret
 
-	def process_cubes(num_cubes, cross_num, order_list):
+	def process_cubes(self, num_cubes, cross_num, order_list):
 		for i in range(0,num_cubes):
 			x, y, th = CROSS_LIST[cross_num][order_list[i]]
-			set_pos(x,y)
+			self.set_pos(x,y)
 
 	def set_x(self,x):
 		output = self.execute(_SET_X_OPCODE, FLOAT(x))
@@ -127,4 +127,4 @@ class RobotArm(SerialTalks):
 		self.send(_OPEN_GRIPPER_OPCODE)
 
 	def close_gripper(self):
-		self.send(_CLOSE_GRIPPER_OPCODE)	
+		self.send(_CLOSE_GRIPPER_OPCODE)
