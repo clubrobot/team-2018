@@ -525,12 +525,12 @@ void RESET_PARAMETERS(SerialTalks& talks, Deserializer& input, Serializer& outpu
 	else
 	{
 		purePursuit.setLookAhead(300);
-		positionControl.setVelLimits(800, 9);
+		positionControl.setVelLimits(500, 6);
 
 		leftWheel.setMaxPWM(1);
 		rightWheel.setMaxPWM(1);
 
-		linVelPID.setOutputLimits(-1100, 1100);
+		linVelPID.setOutputLimits(-1000, 1000);
 		angVelPID.setOutputLimits(-18,18);
 	}
 }
