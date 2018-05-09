@@ -84,95 +84,127 @@ class Cross(Actionnable):
             return Cross.BLUE
 
     def realize(self):
-        time.sleep(5)
-        opposite_cube = None
-        for cube in Cross.CUBES_ID:
-            if not cube in self.pattern and not cube in Cross.IMPOSSIBLE_CUBES[self.numberCross]:
-                opposite_cube = cube
+        #time.sleep(5)
+        #opposite_cube = None
+        #for cube in Cross.CUBES_ID:
+        #    if not cube in self.pattern and not cube in Cross.IMPOSSIBLE_CUBES[self.numberCross]:
+        #        opposite_cube = cube
+#
+        #if opposite_cube is not None:
+        #    cube_to_reach = self.get_opposite_cube(opposite_cube)
+#
+        #else:
+        #    cube_to_reach = Cross.ORANGE
+#
+        #theta = math.atan2(self.catchPoint[cube_to_reach][1] - self.preparationPoint[cube_to_reach][1],
+        #                   self.catchPoint[cube_to_reach][0] - self.preparationPoint[cube_to_reach][0])
+        #self.logger("CUBES : ", "Go to cross", self.numberCross, "cube_to_reach n°", cube_to_reach)
+        #self.logger("CUBES", "Preparation Point : ", self.preparationPoint[cube_to_reach])
+        #self.logger("CUBES", "Catch Point : ", self.catchPoint[cube_to_reach])
+        #try:
+        #    time.sleep(1)
+        #    self.logger("CUBES : ", "Turn on the spot, theta : ", theta)
+        #    self.mover.turnonthespot(theta, 3, Moveself.arm.AIM)
+        #    time.sleep(1)
+        #    self.logger("CUBES : ", "Go to catch position")
+        #    try:
+        #        self.wheeledbase.goto(*(self.catchPoint[cube_to_reach]))
+        #    except RuntimeError:
+        #        return
+        #    self.wheeledbase.wait()
+        #    time.sleep(1)
+        #except RuntimeError:
+        #    pass
+#
+        #cube_positions = self.get_relative_position(cube_to_reach)
+#
+        #stack_height = 0
+        #if Cross.YELLOW not in self.pattern:
+        #    for current_cube in self.pattern:
+        #        self.self.arm.put_in_tank(cube_positions[current_cube], stack_height)
+        #        stack_height += 1
+#
+        #    self.self.arm.put_in_tank(cube_positions[Cross.YELLOW], stack_height)
+#
+        #else:
+        #    remaining_cubes = Cross.CUBES_ID
+        #    for pattern_cube in self.pattern:
+        #        remaining_cubes.remove(pattern_cube)
+        #    remaining_cubes.remove(opposite_cube)
+        #    remaining_cube = remaining_cubes[0]
+#
+        #    if not (self.pattern.index(Cross.YELLOW) == 1):
+        #        if self.pattern.index(Cross.YELLOW) == 0:
+        #            self.pattern.reverse()
+        #        self.self.arm.put_in_tank(cube_positions[remaining_cube], stack_height)
+        #        stack_height += 1
+#
+        #        for current_cube in self.pattern:
+        #            self.self.arm.put_in_tank(cube_positions[current_cube], stack_height)
+        #            stack_height += 1
+        #    else:
+        #        self.self.arm.put_in_temp(cube_positions[remaining_cube])
+        #        for current_cube in self.pattern:
+        #            self.self.arm.put_in_tank(cube_positions[current_cube], stack_height)
+        #            stack_height += 1
+        #        self.self.arm.put_from_temp_to_tank(stack_height)
 
-        if opposite_cube is not None:
-            cube_to_reach = self.get_opposite_cube(opposite_cube)
+        catch = (self.catchPoint[1][0], self.catchPoint[1][0] - 20)
 
-        else:
-            cube_to_reach = Cross.ORANGE
+        self.wheeledbase.goto(*catch)
 
-        theta = math.atan2(self.catchPoint[cube_to_reach][1] - self.preparationPoint[cube_to_reach][1],
-                           self.catchPoint[cube_to_reach][0] - self.preparationPoint[cube_to_reach][0])
-        self.logger("CUBES : ", "Go to cross", self.numberCross, "cube_to_reach n°", cube_to_reach)
-        self.logger("CUBES", "Preparation Point : ", self.preparationPoint[cube_to_reach])
-        self.logger("CUBES", "Catch Point : ", self.catchPoint[cube_to_reach])
         try:
-            time.sleep(1)
-            self.logger("CUBES : ", "Turn on the spot, theta : ", theta)
-            self.mover.turnonthespot(theta, 3, Mover.AIM)
-            time.sleep(1)
-            self.logger("CUBES : ", "Go to catch position")
-            try:
-                self.wheeledbase.goto(*(self.catchPoint[cube_to_reach]))
-            except RuntimeError:
-                return
-            self.wheeledbase.wait()
-            time.sleep(1)
-        except RuntimeError:
+            self.mover.turnonthespot(0, 3, Mover.AIM)
+        except:
             pass
 
-        cube_positions = self.get_relative_position(cube_to_reach)
+        self.wheeledbase.wait()
 
-        stack_height = 0
-        if Cross.YELLOW not in self.pattern:
-            for current_cube in self.pattern:
-                self.arm.put_in_tank(cube_positions[current_cube], stack_height)
-                stack_height += 1
+        self.arm.set_pos(-26.5, 3, 10, 270, 1)
+        time.sleep(1)
+        self.arm.open_gripper()
 
-            self.arm.put_in_tank(cube_positions[Cross.YELLOW], stack_height)
+        time.sleep(3)
 
-        else:
-            remaining_cubes = Cross.CUBES_ID
-            for pattern_cube in self.pattern:
-                remaining_cubes.remove(pattern_cube)
-            remaining_cubes.remove(opposite_cube)
-            remaining_cube = remaining_cubes[0]
+        # descente
+        self.arm.set_z(0)
+        time.sleep(2)
+        self.arm.close_gripper()
+        time.sleep(2)
+        # remonte
+        self.arm.set_z(10)
 
-            if not (self.pattern.index(Cross.YELLOW) == 1):
-                if self.pattern.index(Cross.YELLOW) == 0:
-                    self.pattern.reverse()
-                self.arm.put_in_tank(cube_positions[remaining_cube], stack_height)
-                stack_height += 1
+        time.sleep(1)
 
-                for current_cube in self.pattern:
-                    self.arm.put_in_tank(cube_positions[current_cube], stack_height)
-                    stack_height += 1
-            else:
-                self.arm.put_in_temp(cube_positions[remaining_cube])
-                for current_cube in self.pattern:
-                    self.arm.put_in_tank(cube_positions[current_cube], stack_height)
-                    stack_height += 1
-                self.arm.put_from_temp_to_tank(stack_height)
+        self.arm.set_theta(-20)
 
+        time.sleep(1)
 
+        self.arm.set_speed(100)
 
-       #cube_ = 0
-       #for cube_pos in RobotArm.CUBES:
-       #    self.logger("CUBES : ", "Catch cube n°", cube_)
-       #    self.arm.set_pos(*cube_pos)
-       #    time.sleep(2)
-       #    self.arm.close_gripper()
-       #    time.sleep(1)
-       #    self.arm.set_z(RobotArm.MAX_Z-5)
-       #    time.sleep(1)
-       #    self.arm.set_z(RobotArm.MAX_Z)
-       #    self.logger("CUBES : ", "Drop off the cube")
-       #    self.arm.set_pos(*RobotArm.TANK)
-       #    time.sleep(2)
-       #    self.arm.set_z(cube_*5+RobotArm.MIN_Z)
-       #    time.sleep(2)
-       #    cube_ +=1
-       #    self.arm.open_gripper()
-       #    time.sleep(1)
-       #    self.arm.set_pos(*RobotArm.TANK)
-       #    time.sleep(2)
+        # rentre correctement dans le compacteur
+        self.arm.set_pos(0, 12, 10, 2, 1)
+        time.sleep(3)
+        self.arm.set_pos(8, 16, 10, 2, 1)
+        time.sleep(1)
+        self.arm.set_pos(11, 17.9, 10, 2, 1)
+        time.sleep(1)
+        self.arm.set_pos(13, 18.9, 10, 2, 1)
 
-        self.arm.begin()
+        # descend
+        time.sleep(3)
+        self.arm.set_z(2)
+        time.sleep(3)
+        self.arm.open_gripper()
+        time.sleep(3)
+        self.arm.set_z(10)
+
+        # sort du compacteur
+        self.arm.set_speed(500)
+        time.sleep(3)
+
+        self.arm.set_pos(8, 16, 10, 2, 1)
+
         time.sleep(2)
 
 
