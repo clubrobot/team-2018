@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from common.tcptalks import TCPTalks
+from threading import Thread
 
 BIG_ROBOT = 0
 LITTLE_ROBOT = 1
@@ -33,3 +34,15 @@ class BaliseReceiver(TCPTalks):
         except:
             return True
         return result
+
+    def launch(self):
+        Thread(target=self.try_connect, daemon=True).start()
+
+    def try_connect(self):
+        connected = False
+        while not connected:
+            try:
+                self.connect(timeout=5)
+                connected = True
+            except Exception as e:
+                pass
