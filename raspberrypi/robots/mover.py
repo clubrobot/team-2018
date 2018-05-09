@@ -229,10 +229,10 @@ class Mover:
         direction = {"forward": 1, "backward": -1}[direction]
         while not wall_reached:
             try:
-                self.wheeledbase.set_velocities(250 * direction, 0)
                 while not self.wheeledbase.isarrived():
-                    time.sleep(0.2)
+                    time.sleep(0.1)
                     self.wheeledbase.set_velocities(250 * direction, 0)
+                    time.sleep(0.1)
             except RuntimeError:
                 if not nb_try > 0:
                     break
@@ -588,7 +588,7 @@ class Mover:
         self.interupted_status.set()
         x, y, theta = self.wheeledbase.get_position()
         self.logger("MOVER : ", "Objet on the goal", hypot(y - self.goal[1], x - self.goal[0]))
-        if hypot(y - self.goal[1], x - self.goal[0]) < 300:
+        if 100 <hypot(y - self.goal[1], x - self.goal[0]) < 300:
             # Obstacle on the goal !
             self.wheeledbase.set_velocities(0, 0)
             try:
@@ -600,6 +600,11 @@ class Mover:
             self.interupted_status.clear()
             self.interupted_lock.release()
 
+            return
+
+        if 100<hypot(y - self.goal[1], x - self.goal[0]):
+            self.interupted_status.clear()
+            self.interupted_lock.release()
             return
 
         lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted(True)
