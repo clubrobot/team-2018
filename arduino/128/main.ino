@@ -15,7 +15,7 @@
 #include "instructions.h"
 
 #define USE_SHIFTREG 1
-#define BEE_CLOSED 170
+#define BEE_CLOSED 40
 
 ShiftRegDCMotorsDriver driver;
 ShiftRegDCMotor cuber_manager;

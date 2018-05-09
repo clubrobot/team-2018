@@ -555,11 +555,6 @@ class Mover:
                     self.wheeledbase.set_velocities(copysign(150, vel), 0)
                     time.sleep(1.2)
                     self.wheeledbase.purepursuit(self.path)
-
-
-                    sleep(1)
-                    # self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2],self.goal)
-                    self.wheeledbase.purepursuit(self.path)
                     self.interupted_lock.release()
                 except TimeoutError:
                     self.isarrived = False
@@ -577,7 +572,7 @@ class Mover:
     def front_obstacle(self):
         # RoadMap.LEFT
         # RoadMap.RIGHT
-        ((a,_),(b,_)) = self.sensors_front.get_mesure()
+        a,b  = self.sensors_front.get_mesure()
         if a>350 and b>350:
             return
         print("LOG ", )
