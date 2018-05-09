@@ -58,24 +58,25 @@ class ButtonGestureMatch():
         Thread(target=self._red).start()
 
     def _red(self):
-        self.lock_stat.acquire()
-        if (self.status == ButtonGestureMatch.WAITING_ODOMETRY):
-            self.side = None
-            self.status = ButtonGestureMatch.WAITING_TEAM
-            self.buttons.on(_GREEN_COLOR)
-            self.buttons.on(_ORANGE_COLOR)
-            self.buttons.off(_RED_COLOR)
-            self.buttons.off(_BLUE_COLOR)
-            self.display.set_message("Select")
-        if (self.status == ButtonGestureMatch.WAITING_MATCH):
-            self.status = ButtonGestureMatch.WAITING_TIRRET
-            self.display.set_message("TIRRET")
-
-        if self.status == ButtonGestureMatch.WAITING_TIRRET:
-            self.status = ButtonGestureMatch.WAITING_ODOMETRY
-            self.display.set_message("ODOMETRIE")
-
-        self.lock_stat.release()
+        pass
+        # self.lock_stat.acquire()
+        # if (self.status == ButtonGestureMatch.WAITING_ODOMETRY):
+        #     self.side = None
+        #     self.status = ButtonGestureMatch.WAITING_TEAM
+        #     self.buttons.on(_GREEN_COLOR)
+        #     self.buttons.on(_ORANGE_COLOR)
+        #     self.buttons.off(_RED_COLOR)
+        #     self.buttons.off(_BLUE_COLOR)
+        #     self.display.set_message("Select")
+        # if (self.status == ButtonGestureMatch.WAITING_MATCH):
+        #     self.status = ButtonGestureMatch.WAITING_TIRRET
+        #     self.display.set_message("TIRRET")
+#
+        # if self.status == ButtonGestureMatch.WAITING_TIRRET:
+        #     self.status = ButtonGestureMatch.WAITING_ODOMETRY
+        #     self.display.set_message("ODOMETRIE")
+#
+        # self.lock_stat.release()
 
     def button_blue(self):
         Thread(target=self._blue).start()
