@@ -153,18 +153,18 @@ class Bornibus:
         treatmentAct.set_impossible_combination(lambda: not longShot)
         dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
 
-        # dispMono.set_manual_order(1)
-        # shortShot.set_manual_order(2)
-        # dispMulti.set_manual_order(3)
+        dispMono.set_manual_order(1)
+        shortShot.set_manual_order(2)
+        dispMulti.set_manual_order(3)
         # longShot2.set_manual_order(4)
-        # longShot0.set_manual_order(4)
+        longShot0.set_manual_order(4)
         # longShot1.set_manual_order(4)
         # treatmentAct.set_manual_order(5)
-        panelAct.set_manual_order(6)
-        beeAct.set_manual_order(7)
+        #panelAct.set_manual_order(6)
+        #beeAct.set_manual_order(7)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.mover.friend,
-                                     mode=Heuristics.AUTO)
+                                     mode=Heuristics.MANUAL)
 
         if self.side == Bornibus.GREEN:
             self.arduinos["wheeledbase"].set_position(592, 290, 0)
