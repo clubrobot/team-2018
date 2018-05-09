@@ -231,7 +231,8 @@ class Mover:
             try:
                 self.wheeledbase.set_velocities(250 * direction, 0)
                 while not self.wheeledbase.isarrived():
-                    time.sleep(0.1)
+                    time.sleep(0.2)
+                    self.wheeledbase.set_velocities(250 * direction, 0)
             except RuntimeError:
                 if not nb_try > 0:
                     break
