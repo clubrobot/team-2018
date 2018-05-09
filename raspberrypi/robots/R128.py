@@ -85,6 +85,7 @@ class R128:
             self.arduinos["wheeledbase"].set_position(510, 3000-270, 0)
 
     def run(self):
+        self.displayManager.start()
         self.logger.reset_time()
         self.mover.reset()
 
