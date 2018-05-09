@@ -52,7 +52,7 @@ def start(args):
         rm = RoadMap.load(geo)
         br = BaliseReceiver("192.168.12.3")
         try:
-            br.connect()
+            br.launch()
         except:
             print("Balise Receiver not connected ! ")
 
@@ -83,7 +83,7 @@ def start(args):
         rm = RoadMap.load(geo)
         br = BaliseReceiver("192.168.12.3")
         try:
-            br.connect()
+            br.launch()
         except:
             print("Balise Receiver not connected ! ")
 
