@@ -67,7 +67,7 @@ class Mover:
         # Launch Friend Manager
         self.friend = FriendManager(arduinos["wheeledbase"], self, 0.4, logger)
         self.friend.start()
-        if True:
+        if False:
             self.friend_obstacle = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
             self.friend_obstacle.set_position(-1000,-1000)
             self.friend_listener = PositionListener(lambda: self.friend.get_friend_position(), 0.5)
@@ -87,7 +87,7 @@ class Mover:
         self.front_flag = Flag(self.front_obstacle)
         self.withdraw_flag = Flag(self._withdraw_interrup)
         self.front_safe_flag = Flag(self.front_obstacle_safe)
-        if ROBOT_ID == R128_ID :
+        if True:
             self.in_path_flag = Flag(self.on_path_obstacle)
 
 
@@ -526,7 +526,7 @@ class Mover:
     def goto(self, x, y):
         self.goal = (x, y)
         self.sensors_front.activate()
-        if ROBOT_ID == R128_ID :
+        if False :
             self.in_path_flag.bind(self.friend_listener.signal)
         self.front_flag.bind(self.sensors_front_listener.signal)
 
