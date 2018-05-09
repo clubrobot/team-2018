@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from common.tcptalks import TCPTalks
+from common.tcptalks import *
 from threading import Thread
 
 BIG_ROBOT = 0
@@ -25,9 +25,6 @@ class BaliseReceiver(TCPTalks):
             return (-1000, -1000)
         return output
 
-    def set_color(self, color):
-        self.send(SET_COLOR_OPCODE, color)
-
     def get_panel_status(self):
         try:
             result =  self.execute(GET_PANEL_STATUS_OPCODE)
@@ -37,6 +34,14 @@ class BaliseReceiver(TCPTalks):
 
     def launch(self):
         Thread(target=self.try_connect, daemon=True).start()
+
+    def set_color(self, color):
+        Thread(target=self._set_color(color), daemon=True).start()
+
+    def _set_color(self, color):
+        while not self.is_connected:
+            time.sleep(1)
+        self.send(SET_COLOR_OPCODE, color)
 
     def try_connect(self):
         connected = False
