@@ -53,7 +53,7 @@ class Bornibus:
     def set_side(self,side):
         self.side = side
         self.action_list = [list(), list()]
-
+        self.beacons_receiver.set_color(side)
         # Generate Dispenser
         self.d1 = Dispenser(1, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                             self.data)

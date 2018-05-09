@@ -28,12 +28,12 @@ class WaterLauncher(SecureSerialTalksProxy):
 		SecureSerialTalksProxy.__init__(self, parent, uuid, WaterLauncher._DEFAULT)
 
 	def get_emergency_state(self):
-		output = self.execute(_GET_EMERGENCY_STATE_OPCODE);
-		return output.read(INT);
+		output = self.execute(_GET_EMERGENCY_STATE_OPCODE)
+		return output.read(INT)
 
 	def get_nb_launched_water(self):
-		output = self.execute(_GET_LAUNCHED_WATER_OPCODE);
-		return output.read(INT);
+		output = self.execute(_GET_LAUNCHED_WATER_OPCODE)
+		return output.read(INT)
 
 	def set_motor_velocity(self, velocity):
 		output = self.execute(_SET_MOTOR_VELOCITY_OPCODE,INT(velocity))
@@ -65,12 +65,12 @@ class WaterLauncher(SecureSerialTalksProxy):
 
 	def setupPulsewidthESC(self):
 		print("Please activate emergency stop")
-		print("Press enter when ready");
+		print("Press enter when ready")
 		input()
-		self.force_pulsewidth(2000);
+		self.force_pulsewidth(2000)
 		print("Please disable emergency stop and wait for 123 melody, 2 short beep")
 		print("Press enter directly after the last 2 beep")
 		input()
-		self.force_pulsewidth(1000);
+		self.force_pulsewidth(1000)
 		print("Wait for 3 beep for battery cell count and a long final beep")
 		print("End of ESC setup and motor ready to go !")

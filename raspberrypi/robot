@@ -52,7 +52,7 @@ def start(args):
         rm = RoadMap.load(geo)
         br = BaliseReceiver("192.168.12.3")
         try:
-            br.connect()
+            br.launch()
         except:
             print("Balise Receiver not connected ! ")
 
@@ -71,7 +71,6 @@ def start(args):
         button_card = ButtonCard(m)
         ssd = SevenSegments(m)
         b= WheeledBase(m)
-        l = WaterLauncher(m)
         a = BeeActuator(m)
         s_lat   = Sensors(m, "sensorsLat")
         s_front = Sensors(m, "sensorsAv")
@@ -84,13 +83,13 @@ def start(args):
         rm = RoadMap.load(geo)
         br = BaliseReceiver("192.168.12.3")
         try:
-            br.connect()
+            br.launch()
         except:
             print("Balise Receiver not connected ! ")
 
         bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
-        automate = R128(0, rm, geo, b, ssd, led1, led2, a, arm, s_front, s_lat, s_back,  br, bm, p)
-        button_gesture = ButtonGestureMatch(button_card, l, ssd, b, m, automate.set_side)
+        automate = R128(0, rm, geo, b, ssd, led1, led2, a, arm, s_front, s_lat, s_back,  br, bm, patern)
+        button_gesture = ButtonGestureMatch(button_card, arm, ssd, b, m, automate.set_side)
         button_gesture.run()
         m.start_match()
         button_card.disconnect()
@@ -139,9 +138,9 @@ def start_approval(args):
     else:
         button_card = ButtonCard(m)
         ssd = SevenSegments(m)
+        ssd.set_message("LAUNCH")
         b= WheeledBase(m)
         d = WaterSorter(m)
-        l = WaterLauncher(m)
         a = BeeActuator(m)
         s_lat   = Sensors(m, "sensorsLat")
         s_front = Sensors(m, "sensorsAv")
@@ -160,7 +159,7 @@ def start_approval(args):
 
         bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
         automate = R128Approval(0, rm, geo, b, ssd, led1, led2, a, arm, s_front, s_lat, s_back,  br, bm, patern)
-        button_gesture = ButtonGestureMatch(button_card, l, ssd, b, m, automate.set_side)
+        button_gesture = ButtonGestureMatch(button_card, arm, ssd, b, m, automate.set_side)
         button_gesture.run()
         m.start_match()
         button_card.disconnect()

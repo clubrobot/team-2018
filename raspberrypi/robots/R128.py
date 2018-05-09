@@ -8,8 +8,9 @@ from beacons.balise_receiver     import BaliseReceiver
 from robots.switch_manager_128       import Interrupteur_128, Abeille_128, Odometry
 from robots.get_robot_name import *
 from robots.friend_manager import FriendManager
-#if ROBOT_ID == R128_ID:
-#    from robots.color_pattern import Pattern
+import time
+if ROBOT_ID == R128_ID:
+    from robots.color_pattern import Pattern
 
 
 class R128:
@@ -71,10 +72,10 @@ class R128:
             self.crossAct,
         ]
 
-        self.odoAct.set_manual_order(1)
+        #self.odoAct.set_manual_order(1)
         #self.beeAct.set_manual_order(3)
-        #self.panelAct.set_manual_order(2)
-        self.crossAct.set_manual_order(2)
+        self.panelAct.set_manual_order(2)
+        #self.crossAct.set_manual_order(2)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
@@ -84,6 +85,7 @@ class R128:
             self.arduinos["wheeledbase"].set_position(510, 3000-270, 0)
 
     def run(self):
+        self.displayManager.start()
         self.logger.reset_time()
         self.mover.reset()
 

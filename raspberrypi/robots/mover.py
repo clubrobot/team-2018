@@ -177,7 +177,7 @@ class Mover:
                                 self.wheeledbase.left_wheel_maxPWM.set(0.5)
                                 self.wheeledbase.right_wheel_maxPWM.set(0.5)
                                 self.wheeledbase.turnonthespot(self.goal[-1])
-                                self.wheeledbase.wait()
+                                self.wheeledbase.wait(timeout=4,command= lambda : self.wheeledbase.turnonthespot(self.goal[-1]))
                                 self.wheeledbase.left_wheel_maxPWM.set(1)
                                 self.wheeledbase.right_wheel_maxPWM.set(1)
                                 break
@@ -188,12 +188,13 @@ class Mover:
                                 sleep(0.2)
                                 self.wheeledbase.stop()
                         # Go backward
-                        if ang < 0:
-                            self.wheeledbase.goto_delta(-50 * direction, 0)
-                        else:
-                            self.wheeledbase.goto_delta(-40 * direction, 0)
                         try:
-                            self.wheeledbase.wait()
+                            if ang < 0:
+                                self.wheeledbase.goto_delta(-50 * direction, 0)
+                                self.wheeledbase.wait()
+                            else:
+                                self.wheeledbase.goto_delta(-40 * direction, 0)
+                                self.wheeledbase.wait()
                         except RuntimeError:
                             pass
 
@@ -202,7 +203,7 @@ class Mover:
                         sleep(0.8)
                         try:
                             self.wheeledbase.turnonthespot(self.goal[-1])
-                            self.wheeledbase.wait()
+                            self.wheeledbase.wait(timeout=3, command = lambda :self.wheeledbase.turnonthespot(self.goal[-1]))
                         except RuntimeError:
                             pass
                     else:
@@ -217,7 +218,7 @@ class Mover:
                         while True:
                             try:
                                 self.wheeledbase.turnonthespot(self.goal[-1])
-                                self.wheeledbase.wait()
+                                self.wheeledbase.wait(timeout=3, command=lambda :self.wheeledbase.turnonthespot(self.goal[-1]))
                                 break
                             except RuntimeError:
                                 pass
@@ -254,7 +255,7 @@ class Mover:
                                 self.wheeledbase.left_wheel_maxPWM.set(0.5)
                                 self.wheeledbase.right_wheel_maxPWM.set(0.5)
                                 self.wheeledbase.turnonthespot(self.goal[-1])
-                                self.wheeledbase.wait()
+                                self.wheeledbase.wait(timeout=3, command = lambda : self.wheeledbase.turnonthespot(self.goal[-1]))
                                 self.wheeledbase.left_wheel_maxPWM.set(1)
                                 self.wheeledbase.right_wheel_maxPWM.set(1)
                                 break
@@ -280,7 +281,7 @@ class Mover:
                         sleep(0.8)
                         try:
                             self.wheeledbase.turnonthespot(self.goal[-1])
-                            self.wheeledbase.wait()
+                            self.wheeledbase.wait(timeout=3, command = lambda : self.wheeledbase.turnonthespot(self.goal[-1]))
                         except RuntimeError:
                             pass
                     else:
@@ -296,7 +297,7 @@ class Mover:
                         while True:
                             try:
                                 self.wheeledbase.turnonthespot(self.goal[-1])
-                                self.wheeledbase.wait()
+                                self.wheeledbase.wait(timeout=4, command = lambda  : self.wheeledbase.turnonthespot(self.goal[-1]))
                                 break
                             except RuntimeError:
                                 pass
@@ -501,7 +502,7 @@ class Mover:
             try:
                 self.logger("MOVER : ", "Turn on the spot start")
                 self.wheeledbase.turnonthespot(self.goal[2], direction=way)
-                self.wheeledbase.wait()
+                self.wheeledbase.wait(timeout= 3, command = lambda: self.wheeledbase.turnonthespot(self.goal[2], direction=way))
                 self.isarrived = True
                 self.logger("MOVER : ", "Turn on the spot reached")
             except RuntimeError:
@@ -534,7 +535,7 @@ class Mover:
         self.wheeledbase.purepursuit(self.path)
         self.isarrived = False
         x, y, _ = self.wheeledbase.get_position()
-        while hypot(x-self.goal[0],y-self.goal[1])>50:
+        while hypot(x-self.goal[0],y-self.goal[1])>100:
             while not self.isarrived or self.interupted_status.is_set():
                 try:
                     if(self.goto_interrupt.is_set()):
@@ -555,11 +556,6 @@ class Mover:
                     self.wheeledbase.set_velocities(copysign(150, vel), 0)
                     time.sleep(1.2)
                     self.wheeledbase.purepursuit(self.path)
-
-
-                    sleep(1)
-                    # self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2],self.goal)
-                    self.wheeledbase.purepursuit(self.path)
                     self.interupted_lock.release()
                 except TimeoutError:
                     self.isarrived = False
@@ -577,7 +573,7 @@ class Mover:
     def front_obstacle(self):
         # RoadMap.LEFT
         # RoadMap.RIGHT
-        ((a,_),(b,_)) = self.sensors_front.get_mesure()
+        a,b  = self.sensors_front.get_mesure()
         if a>350 and b>350:
             return
         print("LOG ", )
