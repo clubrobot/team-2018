@@ -630,7 +630,10 @@ class Mover:
         obs.set_position(x_obs, y_obs, theta)
         old_path = self.path
         try:
-            self.path = self.roadmap.get_shortest_path((x, y), self.goal)
+            try:
+                self.path = self.roadmap.get_shortest_path((x, y), self.goal)
+            except ValueError:
+                self.path = old_path
             print(self.path)
             aim_theta= atan2(self.path[1][1]-self.path[0][1], self.path[1][0]-self.path[0][0])
             arrived = False
