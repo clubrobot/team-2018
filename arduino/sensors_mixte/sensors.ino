@@ -23,6 +23,8 @@ void setup() {
     talks.begin(Serial);
     talks.bind(GET_MESURE_OPCODE, GET_MESURE);
     talks.bind(GET_NORMAL_OPCODE,GET_NORMAL);
+    talks.bind(ACTIVATE_SENSORS_OPCODE, ACTIVATE_SENSORS);
+    talks.bind(DESACTIVATE_SENSORS_OPCODE, DESACTIVATE_SENSORS);
     talks.bind(GET_LEFT_SWITCH_OPCODE,GET_LEFT_SWITCH);
     talks.bind(GET_RIGHT_SWITCH_OPCODE,GET_RIGHT_SWITCH);
     SensorAv.attach(TRIGGPIN7, ECHOPIN2);

@@ -19,6 +19,8 @@ void setup() {
     talks.begin(Serial);
     talks.bind(GET_MESURE_OPCODE, GET_MESURE);
     talks.bind(GET_NORMAL_OPCODE,GET_NORMAL);
+    talks.bind(ACTIVATE_SENSORS_OPCODE, ACTIVATE_SENSORS);
+    talks.bind(DESACTIVATE_SENSORS_OPCODE, DESACTIVATE_SENSORS);
     SensorAv.attach(TRIGGPIN7, ECHOPIN2);
     SensorAr.attach(TRIGGPIN8, ECHOPIN3);
     SensorAv.trig();
