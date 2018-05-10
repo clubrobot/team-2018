@@ -40,8 +40,7 @@ class Bornibus:
         self.roadmap  = roadmap
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
-        self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
-        self.friend = self.mover.get_friend()
+        self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br),
         self.data = dict()
         self.beacons_receiver = br
         self.beacons_manager = bm
@@ -108,56 +107,11 @@ class Bornibus:
             treatmentAct,
         ]
 
-        dispMono.set_reliability(0.6)
-        dispMulti.set_reliability(0.6)
-        shortShot.set_reliability(0.8)
-        longShot0.set_reliability(0.8)
-        longShot1.set_reliability(0.8)
-        longShot2.set_reliability(0.8)
-
-        treatmentAct.set_impossible_combination(lambda: not (longShot0 or longShot1 or longShot2))
-        longShot0.set_predecessors([dispMulti])
-        longShot1.set_predecessors([dispMulti])
-        longShot2.set_predecessors([dispMulti])
-        shortShot.set_predecessors([dispMono])
-        longShot0.set_impossible_combination(lambda: longShot1 or longShot2)
-        longShot1.set_impossible_combination(lambda: longShot0 or longShot2)
-        longShot2.set_impossible_combination(lambda: longShot1 or longShot0)
-
-        if self.beacons_manager is not None and self.beacons_receiver is not None:
-            self.beacons_manager.create_area(treatmentAct.name, "auxTreatment{}_*".format(self.side))
-            self.beacons_manager.create_area(dispMulti.name,
-                                             "auxDispenser{}_*".format(2 if self.side == Bornibus.GREEN else 3))
-            self.beacons_manager.create_area(panelAct.name, "auxSwitch{}_*".format(self.side))
-            self.beacons_manager.create_area(longShot0.name, "auxLongShot{}0_*".format(self.side))
-            self.beacons_manager.create_area(longShot1.name, "auxLongShot{}1_*".format(self.side))
-            self.beacons_manager.create_area(longShot2.name, "auxLongShot{}2_*".format(self.side))
-            self.beacons_manager.create_area(shortShot.name, "auxShortShot{}_*".format(self.side))
-            self.beacons_manager.create_area(beeAct.name, "auxBee{}_*".format(self.side))
-
-        treatmentAct.link_area(treatmentAct.name)
-        dispMulti.link_area(dispMulti.name)
-        panelAct.link_area(panelAct.name)
-        longShot0.link_area(longShot0.name)
-        longShot1.link_area(longShot1.name)
-        longShot2.link_area(longShot2.name)
-        shortShot.link_area(shortShot.name)
-        beeAct.link_area(beeAct.name)
-
-        self.beacons_manager.start()
-
-        def longShot():
-            return not (longShot0 or longShot1 or longShot2)
-
-        dispMulti.set_impossible_combination(lambda: dispMono and not shortShot)
-        treatmentAct.set_impossible_combination(lambda: not longShot)
-        dispMono.set_impossible_combination(lambda: dispMulti and (not longShot or not treatmentAct))
-
         beeAct.set_manual_order(1)
         dispMono.set_manual_order(2)
         shortShot.set_manual_order(3)
         dispMulti.set_manual_order(4)
-        # longShot2.set_manual_order(4)
+        #longShot2.set_manual_order(4)
         # longShot0.set_manual_order(5)
         longShot1.set_manual_order(5)
         treatmentAct.set_manual_order(6)

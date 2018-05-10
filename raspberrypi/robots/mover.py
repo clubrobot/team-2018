@@ -62,16 +62,6 @@ class Mover:
         # RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
         self.logger = logger
-        self.becons_receiver = becons_receiver
-
-        # Launch Friend Manager
-        self.friend = FriendManager(arduinos["wheeledbase"], self, 0.4, logger)
-        self.friend.start()
-        if False:
-            self.friend_obstacle = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
-            self.friend_obstacle.set_position(-1000,-1000)
-            self.friend_listener = PositionListener(lambda: self.friend.get_friend_position(), 0.5)
-
         # Arduino et autre
         self.wheeledbase = arduinos["wheeledbase"]
         self.sensors_front = arduinos["sensors_front"]
@@ -87,8 +77,6 @@ class Mover:
         self.front_flag = Flag(self.front_obstacle)
         self.withdraw_flag = Flag(self._withdraw_interrup)
         self.front_safe_flag = Flag(self.front_obstacle_safe)
-        if True:
-            self.in_path_flag = Flag(self.on_path_obstacle)
 
 
         self.path = list()
@@ -108,8 +96,6 @@ class Mover:
         self.front_flag.clear()
         self.withdraw_flag.clear()
         self.front_safe_flag.clear()
-        if ROBOT_ID == R128_ID :
-            self.in_path_flag.clear()
         self.sensors_front.desactivate()
         self.sensors_back.desactivate()
         self.sensors_lat.desactivate()
@@ -130,7 +116,7 @@ class Mover:
     def get_wall_status(x, y):
         return x < WALL_RANGE or (2000 - x) < WALL_RANGE or y < WALL_RANGE or (3000 - y) < WALL_RANGE
 
-    def gowall(self, try_limit=3, strategy=SENSORS, direction="forward", position=None):
+    def gowall(self, try_limit=2, strategy=SENSORS, direction="forward", position=None):
         #  /\ Determination de la proximité avec un enemies et initialisation des variables /\
         # closed_to_enemy = self.get_enemy_status()
         self.goal = self.wheeledbase.get_position()
@@ -491,11 +477,8 @@ class Mover:
             raise PositionUnreachable()
 
     def _turnonthespot_aim(self, try_limit):
-
         try_number = 0
         way = 'forward'
-        closed_to_wall = self.get_wall_status(*self.goal[:-1])  # Boolean qui représente la proximité à un cube
-        closed_to_enemy = self.get_enemy_status(*self.goal[:-1])  # Boolean qui représente la proximité à un enemie
         self.wheeledbase.left_wheel_maxPWM.set(0.4)
         self.wheeledbase.right_wheel_maxPWM.set(0.4)
         constant_pwm = 0.4
@@ -526,20 +509,16 @@ class Mover:
     def goto(self, x, y):
         self.goal = (x, y)
         self.sensors_front.activate()
-        if False :
-            self.in_path_flag.bind(self.friend_listener.signal)
-        self.front_flag.bind(self.sensors_front_listener.signal)
-
 
         self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2], self.goal)
         self.logger("MOVER : ", path=self.path)
         self.wheeledbase.purepursuit(self.path)
         self.isarrived = False
         x, y, _ = self.wheeledbase.get_position()
-        while hypot(x-self.goal[0],y-self.goal[1])>100:
+        while hypot(x-self.goal[0], y-self.goal[1]) > 100:
             while not self.isarrived or self.interupted_status.is_set():
                 try:
-                    if(self.goto_interrupt.is_set()):
+                    if self.goto_interrupt.is_set():
                         break
 
                     self.isarrived = self.wheeledbase.isarrived()
@@ -558,18 +537,16 @@ class Mover:
                     time.sleep(1.2)
                     self.wheeledbase.purepursuit(self.path)
                     self.interupted_lock.release()
+
                 except TimeoutError:
                     self.isarrived = False
 
             x, y, _ = self.wheeledbase.get_position()
 
         # self.on_path_flag.clear()
-        if (self.goto_interrupt.is_set()):
+        if self.goto_interrupt.is_set():
             self.reset()
             raise PositionUnreachable()
-
-
-
 
     def front_obstacle(self):
         # RoadMap.LEFT
@@ -669,24 +646,6 @@ class Mover:
             if (theta_bis-theta)%pi>pi/2:
                 result.remove(point)
         return result
-
-    def on_path_obstacle(self):
-        self.friend_obstacle.set_position(*self.friend.get_friend_position())
-        if not self.interupted_lock.acquire():
-            return
-        self.interupted_status.set()
-        self.wheeledbase.set_velocities(0, 0)
-        x, y, _ = self.wheeledbase.get_position_previous(0.5)
-        x_f, y_f = self.friend.get_friend_position()
-        while hypot(y-y_f, x - x_f)<400:
-            sleep(0.2)
-            x_f, y_f = self.friend.get_friend_position()
-
-        self.wheeledbase.purepursuit(self.path)
-        self.interupted_status.clear()
-        self.interupted_lock.release()
-
-
 
     def goto_safe(self, x, y):
         self.goal = (x, y)

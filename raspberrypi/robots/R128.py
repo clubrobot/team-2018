@@ -72,7 +72,7 @@ class R128:
             self.crossAct,
         ]
 
-        # self.odoAct.set_manual_order(1)
+        #self.odoAct.set_manual_order(1)
         #self.beeAct.set_manual_order(3)
         self.panelAct.set_manual_order(1)
         # self.crossAct.set_manual_order(2)
