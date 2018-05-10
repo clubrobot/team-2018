@@ -35,16 +35,23 @@ void ACTIVATE_SENSORS(SerialTalks& inst, Deserializer& input, Serializer& output
         {
             sensorArm1.attach(SERVO1);
         }
-    sensorArm1.write(90);
-	if (!sensorArm2.attached())
+    if (!sensorArm2.attached())
         {
             sensorArm2.attach(SERVO2);
         }
-    sensorArm2.write(90);
+    sensorArm1.write(45);
+    sensorArm2.write(18);
+    
 }
 
 void DESACTIVATE_SENSORS(SerialTalks& inst, Deserializer& input, Serializer& output){
     activated = false;
-    sensorArm1.write(180);
-    sensorArm2.write(180);
+    if (!sensorArm1.attached())
+        {
+            sensorArm1.attach(SERVO1);
+        }
+    sensorArm1.write(135);
+    delay(500);
+    sensorArm1.detach();
+    sensorArm2.detach();
 }
