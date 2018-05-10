@@ -218,7 +218,6 @@ class Shot(Actionnable):
 
         self.data["nb_balls_in_unloader"] = 0
         while not (time.time() - begin_time > global_timeout) and nb_ball<8:
-            watersorter.enable_shaker_equal()
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
             if self.data.get("current_ball_in_sorter") is None:
                 watersorter.open_indoor()
@@ -343,7 +342,8 @@ class Shot(Actionnable):
                 )
         def launch_motor():
             self.waterlauncher.set_motor_pulsewidth(1100)
-            time.sleep(0.2)
+            time.sleep(0.1)
+            self.waterlauncher.enable_shaker_equal()
             print("MOTOR LAUNCHING")
         act_without_sort.set_before_action(launch_motor)
         act_with_sort.set_before_action(launch_motor)
