@@ -41,7 +41,7 @@ class Abeille_Bornibus(Abeille):
     def realize(self,robot, display):
         self.logger("BEE : ", "Turn toward bee")
         try:
-            self.mover.turnonthespot(math.pi,try_limit=3,stategy=Mover.AIM)
+            self.mover.turnonthespot(0,try_limit=3,stategy=Mover.AIM)
         except PositionUnreachable:
             return
 
@@ -68,6 +68,12 @@ class Abeille_Bornibus(Abeille):
                 return
         else:
             return
+        if self.side==0:
+            self.wheeledbase.goto_delta(200,0)
+            try:
+                self.wheeledbase.wait()
+            except RuntimeError:
+                pass
         self.logger("BEE : ", "Activate arm")
         self.beeActioner.open()
         time.sleep(0.3)
