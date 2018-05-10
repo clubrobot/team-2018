@@ -52,29 +52,34 @@ class Abeille_Bornibus(Abeille):
         while not arrived and nb_try < 2:
             nb_try += 1
             try:
-                robot.angpos_threshold.set(0.05)
-                robot.purepursuit([self.preparation, self.interrupteur], direction="backward", lookahead=50,
-                                  finalangle=math.pi/2+(self.side*2-1)*math.pi/4, lookaheadbis=400)
-                robot.wait(timeout=5, command= lambda : robot.purepursuit([self.preparation, self.interrupteur], direction="backward", lookahead=50,
-                                  finalangle=math.pi/2+(self.side*2-1)*math.pi/4, lookaheadbis=400))
+                self.wheeledbase.goto(*self.interrupteur,direction="forward")
                 arrived = True
             except RuntimeError:
-                self.logger("BEE : ", "Can't orientate")
-                robot.left_wheel_maxPWM.set(0.7)
-                robot.right_wheel_maxPWM.set(0.7)
-                robot.goto_delta(-150, 0)
-                time.sleep(2)
-                robot.left_wheel_maxPWM.set(1)
-                robot.right_wheel_maxPWM.set(1)
+                self.wheeledbase.goto_delta(-150,0)
+                try:
+                    self.wheeledbase.wait()
+                except RuntimeError:
+                    pass
 
+        if arrived:
+            try:
+                self.mover.turnonthespot(-math.pi/2,2,Mover.AIM)
+            except PositionUnreachable:
+                return
+        else:
+            return
         self.logger("BEE : ", "Activate arm")
         self.beeActioner.open()
         time.sleep(0.3)
         self.logger("BEE : ", "Activa te bee")
-        robot.set_velocities(0, -(self.side*2-1)*9)
-        time.sleep(0.7)
+        self.wheeledbase.goto_delta((self.side*2-1)*300,0)
+        try:
+            self.wheeledbase.wait()
+        except RuntimeError:
+            pass
+
         self.beeActioner.close()
-        robot.stop()
+        self.wheeledbase.stop()
 
         self.logger("Go back to action point")
         arrived = False
