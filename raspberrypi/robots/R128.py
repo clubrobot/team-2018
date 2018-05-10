@@ -72,10 +72,10 @@ class R128:
             self.crossAct,
         ]
 
-        #self.odoAct.set_manual_order(1)
+        # self.odoAct.set_manual_order(1)
         #self.beeAct.set_manual_order(3)
-        self.panelAct.set_manual_order(2)
-        self.crossAct.set_manual_order(2)
+        self.panelAct.set_manual_order(1)
+        # self.crossAct.set_manual_order(2)
 
         self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
                                      mode=Heuristics.MANUAL)
@@ -90,7 +90,6 @@ class R128:
         self.mover.reset()
 
         act = self.heuristics.get_best()
-        self.arduinos["robot_arm"].begin()
         time.sleep(2)
         print(act)
         while act is not None:

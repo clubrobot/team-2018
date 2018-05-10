@@ -241,7 +241,7 @@ class Mover:
                 current_position = self.wheeledbase.get_position()
                 # TODO Change for more generic com      paraison
                 self.logger("MOVER : ", position_goal=position_goal, current_position=current_position)
-                if abs(current_position[0] - position_goal[0]) < 60:
+                if abs(current_position[0] - position_goal[0]) < 110:
                     wall_reached = True
 
                 else:
@@ -652,7 +652,7 @@ class Mover:
             time.sleep(1)
         try:
             self.wheeledbase.purepursuit(self.path)
-        except ValueError:
+        except (ValueError, IndexError):
             self.path = old_path
             self.wheeledbase.purepursuit(self.path)
             time.sleep(1)
