@@ -78,7 +78,7 @@ class Abeille_Bornibus(Abeille):
         self.beeActioner.open()
         time.sleep(0.3)
         self.logger("BEE : ", "Activa te bee")
-        self.wheeledbase.goto_delta((self.side*2-1)*300,0)
+        self.wheeledbase.goto_delta((self.side*2-1)*350,0)
         try:
             self.wheeledbase.wait()
         except RuntimeError:
