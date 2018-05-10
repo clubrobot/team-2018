@@ -14,7 +14,7 @@ class Interrupteur(Actionnable):
     typ="Interrupteur"
     POINTS = 25
     TIME = 5
-    def __init__(self,side, geo, arduinos, display, mover, logger, br, data):
+    def __init__(self,side, geo, arduinos, display, mover, logger, data):
         self.side=side
         self.mover = mover
         self.logger = logger

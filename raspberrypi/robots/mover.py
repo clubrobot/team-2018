@@ -57,7 +57,7 @@ class Mover:
     SENSORS = 8
     POSITION = 9
 
-    def __init__(self, side, roadmap, arduinos, logger, becons_receiver):
+    def __init__(self, side, roadmap, arduinos, logger):
 
         # RoadMap et ses obstacles virtuel
         self.roadmap = roadmap
@@ -89,8 +89,6 @@ class Mover:
         self.goal = (0, 0, 0)
         self.timeout = 1
 
-    def get_friend(self):
-        return self.friend
 
     def reset(self):
         self.front_flag.clear()

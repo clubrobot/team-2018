@@ -8,7 +8,7 @@ import math
 class Heuristics:
     MANUAL = 1
     AUTO = 0
-    def __init__(self, actions, arduinos, logger, beacon_management, friend, mode=AUTO):
+    def __init__(self, actions, arduinos, logger, mode=AUTO):
         self.actions = actions
         self.action_names = []
         self.action_dict = dict()

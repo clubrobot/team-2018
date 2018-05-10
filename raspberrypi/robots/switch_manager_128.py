@@ -12,8 +12,8 @@ from robots.switch_manager import Interrupteur, Abeille
 
 
 class Interrupteur_128(Interrupteur):
-    def __init__(self,side, geo, arduinos, display, mover, logger, br, data):
-        super(Interrupteur_128, self).__init__(side, geo, arduinos, display, mover, logger, br, data)
+    def __init__(self,side, geo, arduinos, display, mover, logger, data):
+        super(Interrupteur_128, self).__init__(side, geo, arduinos, display, mover, logger, data)
 
     def realize(self,robot, display):
         theta = math.atan2(self.interrupteur[1]-self.preparation[1],self.interrupteur[0]-self.preparation[0]) + math.pi

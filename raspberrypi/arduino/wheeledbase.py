@@ -161,6 +161,8 @@ class WheeledBase(SecureSerialTalksProxy):
         self.send(RESET_PUREPURSUIT_OPCODE)
         for x, y in waypoints:
             self.send(ADD_PUREPURSUIT_WAYPOINT_OPCODE, FLOAT(x), FLOAT(y))
+            time.sleep(0.001)
+
         if lookahead is not None:
             self.set_parameter_value(PUREPURSUIT_LOOKAHEAD_ID, lookahead, FLOAT)
         if lookaheadbis is not None:

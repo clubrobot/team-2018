@@ -22,7 +22,7 @@ class Bornibus:
     GREEN  = 0
     ORANGE = 1
 
-    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back, br, bm):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, waterlauncher, watersorter, display, led1, led2, beeActioner,sensors_front, sensors_lat, sensors_back):
         # Save arduinos
         self.arduinos = dict(wheeledbase=wheeledbase,
                              waterlauncher=waterlauncher,
@@ -40,10 +40,8 @@ class Bornibus:
         self.roadmap  = roadmap
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
-        self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br),
+        self.mover    = Mover(side, roadmap, self.arduinos, self.logger)
         self.data = dict()
-        self.beacons_receiver = br
-        self.beacons_manager = bm
         self.displayManager = DisplayPoints(display, led1, led2)
         self.cube_management = CubeManagement(self.roadmap, self.geogebra)
 
@@ -52,7 +50,6 @@ class Bornibus:
     def set_side(self,side):
         self.side = side
         self.action_list = [list(), list()]
-        self.beacons_receiver.set_color(side)
         # Generate Dispenser
         self.d1 = Dispenser(1, self.roadmap, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                             self.data)
@@ -65,8 +62,7 @@ class Bornibus:
         # Generate buttons
         self.bee = Abeille_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                            self.data)
-        self.panel = Interrupteur_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
-                                  self.beacons_receiver, self.data)
+        self.panel = Interrupteur_Bornibus(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger, self.data)
 
         # Generate balls manipulate
         self.treatment = Treatment(self.side, self.roadmap, self.geogebra, self.arduinos, self.displayManager,
@@ -118,8 +114,7 @@ class Bornibus:
         #panelAct.set_manual_order(6)
         #
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.mover.friend,
-                                     mode=Heuristics.MANUAL)
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, mode=Heuristics.MANUAL)
 
         if self.side == Bornibus.GREEN:
             self.arduinos["wheeledbase"].set_position(592, 290, 0)

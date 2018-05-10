@@ -19,7 +19,7 @@ class R128:
     shot = "shot"
     GREEN  = 0
     ORANGE = 1
-    def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner, robot_arm, sensors_front, sensors_lat, sensors_back, br, bm, p):
+    def __init__(self, side, roadmap, geogebra, wheeledbase, display, led1, led2, beeActioner, robot_arm, sensors_front, sensors_lat, sensors_back):
         # Save arduinos
         self.arduinos = dict(wheeledbase=wheeledbase,
                              display=display,
@@ -33,15 +33,11 @@ class R128:
 
         # Save annexes inf
         self.side     = side
-        self.pattern = p
         self.roadmap  = roadmap
         self.geogebra = geogebra
         self.logger   = Logger(Logger.SHOW)
         robot_arm.set_logger(self.logger)
-        self.mover    = Mover(side, roadmap, self.arduinos, self.logger, br)
-        self.friend = self.mover.get_friend()
-        self.beacons_receiver = br
-        self.beacons_manager = bm
+        self.mover    = Mover(side, roadmap, self.arduinos, self.logger)
         self.data = dict()
         self.displayManager = DisplayPoints(display, led1, led2)
 
@@ -53,7 +49,7 @@ class R128:
         self.bee = Abeille_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
                            self.data)
         self.panel = Interrupteur_128(self.side, self.geogebra, self.arduinos, self.displayManager, self.mover, self.logger,
-                                  self.beacons_receiver, self.data)
+                            self.data)
 
         self.odometry = Odometry(self.side, self.geogebra, self.arduinos, self.mover, self.logger, self.data)
         self.odoAct  =self.odometry.getAction()[0]
@@ -77,8 +73,7 @@ class R128:
         self.panelAct.set_manual_order(1)
         # self.crossAct.set_manual_order(2)
 
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, self.beacons_manager, self.friend,
-                                     mode=Heuristics.MANUAL)
+        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, mode=Heuristics.MANUAL)
         if self.side == R128.GREEN:
             self.arduinos["wheeledbase"].set_position(510, 270, 0)
         else:
