@@ -74,11 +74,6 @@ def start(args):
         geo = Geogebra('{}/robots/128.ggb'.format(sys.path[0]))
         patern = None#Pattern()
         rm = RoadMap.load(geo)
-        br = BaliseReceiver("192.168.12.3")
-        try:
-            br.launch()
-        except:
-            print("Balise Receiver not connected ! ")
 
         bm = BeaconsManagement(br, "{}/robots/area.ggb".format(sys.path[0]))
         automate = R128(0, rm, geo, b, ssd, led1, led2, a, arm, s_front, s_lat, s_back)
