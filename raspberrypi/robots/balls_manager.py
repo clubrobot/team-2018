@@ -103,12 +103,12 @@ class Shot(Actionnable):
         self.data = data
         
         
-    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=21):
+    def realize_without_sort(self, wheeledbase, watersorter, waterlauncher, display, global_timeout=16):
         nb_balls = 0
         begin_time = time.time()
         motor_base = 81
         timeout_per_ball_in = 1
-        timeout_per_ball_out = 2
+        timeout_per_ball_out = 1
         currentPosXY=wheeledbase.get_position()[:2]
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         theta = math.atan2(self.castlePoint[1]-currentPosXY[1],self.castlePoint[0]-currentPosXY[0])
@@ -124,18 +124,17 @@ class Shot(Actionnable):
         watersorter.enable_shaker_equal()
         time.sleep(0.2)
 
-        if watersorter.get_water_color()[0] > 100 or watersorter.get_water_color()[1] > 100:
-            self.data["current_ball_in_sorter"] = True
-
         waterlauncher.get_nb_launched_water()
         while nb_balls < 8 and time.time() - begin_time < global_timeout:
             self.logger("SHOT : ", "Ball N°", nb_balls+1)
-
-            if self.data.get("current_ball_in_sorter") is None:
-                self.logger("SHOT : ", "Already ball in sorter", nb_balls + 1)
+            if not (watersorter.get_water_color()[0] > 100 or watersorter.get_water_color()[1] > 100):
                 watersorter.open_indoor()
                 watersorter.close_trash()
-                watersorter.close_outdoor()
+                self.logger("SHOT : No ball in sorter")
+            else:
+                self.logger("Shot : already ball in sorter")
+
+            watersorter.close_outdoor()
 
             if not (time.time() - begin_time > global_timeout):
                 self.logger("SHOT : ", "Waiting ball in sorter")
@@ -145,9 +144,8 @@ class Shot(Actionnable):
                     if time.time() - open_time > timeout_per_ball_in:
                         watersorter.close_trash()
                         open_time = time.time()
-                self.data["current_ball_in_sorter"] = True
 
-            time.sleep(0.2)
+            time.sleep(0.4)
             watersorter.open_outdoor()
             watersorter.close_indoor()
 
@@ -159,9 +157,7 @@ class Shot(Actionnable):
                     waterlauncher.set_motor_pulsewidth(1000+motor_base)
                     if time.time() - close_time > timeout_per_ball_out:
                         watersorter.close_trash()
-                        close_time = time.time()
-                         
-                self.data.pop("current_ball_in_sorter")
+                        break
 
             if time.time() - begin_time < global_timeout:
                 nb_balls += 1
@@ -172,11 +168,8 @@ class Shot(Actionnable):
                 self.logger("SHOT : ", "TIMEOUT")
 
             waterlauncher.set_motor_pulsewidth(1150)
-            time.sleep(0.1)
+            time.sleep(0.2)
             waterlauncher.set_motor_pulsewidth(1000 + motor_base)
-            watersorter.open_indoor()
-            watersorter.close_outdoor()
-            time.sleep(0.4)
 
         watersorter.disable_shaker()
         wheeledbase.angpos_threshold.set(old)
@@ -184,7 +177,7 @@ class Shot(Actionnable):
         watersorter.close_outdoor()
         watersorter.open_indoor()
             
-    def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=25):
+    def realize_with_sort(self,wheeledbase, watersorter, waterlauncher, display, global_timeout=20):
         motor_base = 107
         waterlauncher.set_motor_pulsewidth(1000 + motor_base)
         currentPosXY=wheeledbase.get_position()[:2]
@@ -197,8 +190,6 @@ class Shot(Actionnable):
             return
         old = wheeledbase.angpos_threshold.get()
         wheeledbase.angpos_threshold.set(0.1)
-       
-        time.sleep(1)
         watersorter.enable_shaker_equal()
         time.sleep(0.2)
         watersorter.close_indoor()
@@ -208,35 +199,32 @@ class Shot(Actionnable):
         nb_ball = 0
         begin_time = time.time()
         timeout_per_ball_in = 1
-        timeout_per_ball_out = 2
+        timeout_per_ball_out = 1
 
         CASTLE = 0
         TREATMENT = 1
 
-        if watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100:
-            self.data["current_ball_in_sorter"] = True
-
-        self.data["nb_balls_in_unloader"] = 0
         while not (time.time() - begin_time > global_timeout) and nb_ball<8:
-            watersorter.enable_shaker_equal()
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
-            if self.data.get("current_ball_in_sorter") is None:
+            if not (watersorter.get_water_color()[0] > 100 or watersorter.get_water_color()[1] > 100):
                 watersorter.open_indoor()
                 watersorter.close_trash()
-                watersorter.close_outdoor()
+                self.logger("SHOT : No ball in sorter")
+            else:
+                self.logger("Shot : already ball in sorter")
+
+            watersorter.close_outdoor()
 
             if not (time.time() - begin_time > global_timeout):
+                self.logger("SHOT : ", "Waiting ball in sorter")
                 open_time = time.time()
-                while not (watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100):
+                while not (watersorter.get_water_color()[0] > 100 or watersorter.get_water_color()[1]>100) and not (time.time() - begin_time > global_timeout):
                     time.sleep(0.1)
-                    #print(watersorter.get_water_color())
                     if time.time() - open_time > timeout_per_ball_in:
                         watersorter.close_trash()
                         open_time = time.time()
 
-                self.data["current_ball_in_sorter"] = True
-
-            time.sleep(0.2)
+            time.sleep(0.4)
 
             #Verification de la sortie dans le canon
             waterlauncher.set_motor_pulsewidth(1000+motor_base)
@@ -266,6 +254,7 @@ class Shot(Actionnable):
                     while waterlauncher.get_nb_launched_water() < 1 and not (time.time() - begin_time > global_timeout):
                         self.logger("SHOT : ", "En attente de la sortie ")
                         if time.time() - close_time > timeout_per_ball_out:
+                            watersorter.close_trash()
                             break
                         time.sleep(0.1)
                     waterlauncher.set_motor_pulsewidth(1200)
@@ -285,8 +274,6 @@ class Shot(Actionnable):
                         self.logger("SHOT : ", "En attente de la sortie")
                     time.sleep(0.6)
                     self.data["nb_balls_in_unloader"] += 1
-
-                self.data.pop("current_ball_in_sorter")
 
             if time.time() - begin_time > global_timeout:
                 self.logger("SHOT : ", "TIMEOUT")
@@ -309,22 +296,6 @@ class Shot(Actionnable):
                 8*Shot.POINTS_PER_BALL_CASTLE,
                 Shot.TIME_UNSORTED
                 )
-        act_with_sort =Action(
-                self.shootCastlePoint, #self.shootCastlePointLong,
-                lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
-                Shot.typ,
-                "SHORTSHOOTSORT",
-                4 * Shot.POINTS_PER_BALL_CASTLE,
-                Shot.TIME_SORTED
-                )
-        act_with_sort_long0 =Action(
-                self.shootCastlePointLong0,
-                lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
-                Shot.typ,
-                "LONGSHOOTSORT0",
-                4 * Shot.POINTS_PER_BALL_CASTLE,
-                Shot.TIME_SORTED
-                )
         act_with_sort_long1 =Action(
                 self.shootCastlePointLong1,
                 lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
@@ -333,24 +304,14 @@ class Shot(Actionnable):
                 4 * Shot.POINTS_PER_BALL_CASTLE,
                 Shot.TIME_SORTED
                 )
-        act_with_sort_long2 =Action(
-                self.shootCastlePointLong2,
-                lambda  :self.realize_with_sort(self.wheeledbase,self.watersorter,self.waterlauncher, self.display) ,
-                Shot.typ,
-                "LONGSHOOTSORT2",
-                4 * Shot.POINTS_PER_BALL_CASTLE,
-                Shot.TIME_SORTED
-                )
         def launch_motor():
             self.waterlauncher.set_motor_pulsewidth(1100)
-            time.sleep(0.2)
+            time.sleep(0.1)
+            self.watersorter.enable_shaker_equal()
             print("MOTOR LAUNCHING")
         act_without_sort.set_before_action(launch_motor)
-        act_with_sort.set_before_action(launch_motor)
-        act_with_sort_long0.set_before_action(launch_motor)
         act_with_sort_long1.set_before_action(launch_motor)
-        act_with_sort_long2.set_before_action(launch_motor)
-        return [act_without_sort,act_with_sort,act_with_sort_long0,act_with_sort_long1,act_with_sort_long2]
+        return [act_without_sort,act_with_sort_long1]
 
 
 class Treatment(Actionnable):
@@ -371,7 +332,7 @@ class Treatment(Actionnable):
         self.treatmentPoint=self.geo.get('Treatment'+str(self.side))
         self.data = data
         
-    def realize(self, shotDirection,robot,waterSorter):
+    def realize(self,robot,waterSorter):
         self.logger("TREATMENT :", "Go to the drop point !")
         currentPosXY=robot.get_position()[:2]
         try:
@@ -413,16 +374,70 @@ class Treatment(Actionnable):
         self.mover.turnonthespot(0, -1, stategy=Mover.AIM)
         self.mover.withdraw(*currentPosXY, direction="backward")
 
+    def all_in_treatment(self):
+        current_pos = self.wheeledbase.get_position()[:2]
+        try:
+            self.mover.turnonthespot(math.pi, 3, stategy=Mover.AIM)
+        except PositionUnreachable:
+            raise PositionUnreachable()
+
+        self.display.angry(1)
+        try:
+            self.mover.gowall(3, direction="backward", strategy=Mover.POSITION, position=self.shootTreatmentPoint)
+        except PositionUnreachable:
+            pass
+
+        try:
+            self.wheeledbase.goto_delta(70, 0)
+            self.wheeledbase.wait()
+
+        except RuntimeError:
+            pass
+        try:
+            self.mover.turnonthespot(math.pi /2, 3, stategy=Mover.AIM)
+        except PositionUnreachable:
+            raise PositionUnreachable()
+
+        self.display.happy(2)
+
+        self.watersorter.open_trash_unloader()
+        self.watersorter.enable_shaker_equal()
+        if watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100:
+            if watersorter.get_water_color()[0] > watersorter.get_water_color()[1]:
+                self.display.addPoints(10)
+        self.watersorter.close_indoor()
+        time.sleep(0.3)
+        self.watersorter.open_trash()
+        time.sleep(0.3)
+        self.watersorter.open_outdoor()
+        time.sleep(0.3)
+        self.watersorter.close_trash()
+        time.sleep(0.3)
+        while True:
+            self.watersorter.open_indoor()
+            while watersorter.get_water_color()[0]>100 or watersorter.get_water_color()[1]>100:
+                time.sleep(0.1)
+            if watersorter.get_water_color()[0] > watersorter.get_water_color()[1]:
+                self.display.addPoints(10)
+            self.watersorter.close_indoor()
+            time.sleep(0.3)
+            self.watersorter.open_trash()
+            time.sleep(0.3)
+            self.watersorter.open_outdoor()
+            time.sleep(0.3)
+            self.watersorter.close_trash()
+            time.sleep(0.3)
+
+        
 
     #override
     def getAction(self):
         act =Action(
                 self.treatmentPoint,
-                lambda  :self.realize(self.shootTreatmentPoint,self.wheeledbase ,self.watersorter) ,
+                self.all_in_treatment,
                 Treatment.typ,
                 "TREATMENT",
                 Treatment.POINTS,
                 Treatment.TIME
             )
         return [act]
-
