@@ -24,8 +24,6 @@ class Heuristics:
 
         if mode is not Heuristics.MANUAL:
             self.heuristics_soft = [self.points, self.reliability, self.time, self.action_distance]
-            if beacon_management is not None:
-                self.heuristics_soft += [self.opponent_position]
 
             self.influences = {"points":3, "reliability":1, "time":2, "action_distance":1, "opponent_position": 4}
             self.heuristics_hard = [self.order, self.combinations, self.done]
@@ -36,9 +34,6 @@ class Heuristics:
             self.heuristics_hard = [self.done]
 
         self.wheeledbase = arduinos["wheeledbase"]
-        self.beacon_management = beacon_management
-        self.friend = friend
-
     def init_points_recursive(self, action, points):
         for pred in action.predecessors:
             pred.points += points
