@@ -279,7 +279,7 @@ bool SerialTalks::execute()
 			continue;
 		}
 	}
-	FREE_BUFFER();
+	if (length>0){ FREE_BUFFER();}
 	return ret;
 }
 
