@@ -10,7 +10,7 @@ class DisplayPoints:
         self.display = display
         self.left_eye = left_eye
         self.right_eye = right_eye
-        self.points = 0
+        self.points = 10
         self.locker = RLock()
         self.eyes_locker = RLock()
         self.left_eye.set_message("^^^^^%^",1,speed=100)
