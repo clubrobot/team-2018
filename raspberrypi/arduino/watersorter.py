@@ -33,9 +33,9 @@ OUTDOOR_DOOR_OPEN = 40
 OUTDOOR_DOOR_CLOSED = 70
 INDOOR_DOOR_CLOSED = 38
 
-TRASH_BEFORE_CLOSE = 80
-TRASH_CLOSED = 122
-TRASH_OPEN = 150
+TRASH_BEFORE_CLOSE = 70
+TRASH_CLOSED = 99
+TRASH_OPEN = 135
 
 SHAKER_HORIZONTAL_1 = 3
 SHAKER_HORIZONTAL_2  = 142
@@ -91,9 +91,11 @@ class WaterSorter(SecureSerialTalksProxy):
         return bool(indoorAngle == INDOOR_DOOR_CLOSED)
 
     def close_trash(self):
+        print("Raspberry : ", TRASH_CLOSED)
         self.send(_WRITE_TRASH_OPCODE,INT(TRASH_BEFORE_CLOSE))
         time.sleep(0.2)
-        self.send(_WRITE_TRASH_OPCODE,INT(TRASH_CLOSED))
+        output = self.execute(_WRITE_TRASH_OPCODE,INT(TRASH_CLOSED))
+        print("Arduino : ", output.read(INT))
 
     def open_trash(self):
         self.send(_WRITE_TRASH_OPCODE,INT(TRASH_OPEN))
@@ -127,6 +129,10 @@ class WaterSorter(SecureSerialTalksProxy):
 
     def get_trash_unloader(self):
         output = self.execute(_GET_TRASH_UNLOADER_OPCODE)
+        return output.read(INT)
+    
+    def get_trash(self):
+        output = self.execute(_GET_TRASH_OPCODE)
         return output.read(INT)
 
     def open_trash_unloader(self):
