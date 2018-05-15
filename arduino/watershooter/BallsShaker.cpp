@@ -54,7 +54,7 @@ void BallsShaker::shake()
         {
             shakerVertical.Velocitywrite(SHAKER_VERTICAL_1);
         }
-        if(count_clock_vertical == PER_VERTICAL){
+        if(count_clock_vertical >= PER_VERTICAL){
             shakerVertical.Velocitywrite(SHAKER_VERTICAL_2);
             count_clock_vertical = 0;
         }
@@ -74,7 +74,7 @@ void BallsShaker::shake()
             shakerVertical.Velocitywrite(SHAKER_VERTICAL_2);
         }
 
-        if(count_clock_horizontal == PER_EQUAL){
+        if(count_clock_horizontal >= PER_EQUAL){
             shakerVertical.Velocitywrite(SHAKER_VERTICAL_1);
             count_clock_horizontal = 0;
         }
