@@ -23,7 +23,6 @@ class Interrupteur(Actionnable):
         self.preparation=geo.get('Interrupteur'+str(self.side)+'_0')
         self.interrupteur=geo.get('Interrupteur'+str(self.side)+'_1')
         self.data = data
-        self.beacon_receiver = br
         self.actions = []
         self.watcher = None
 
@@ -44,13 +43,7 @@ class Interrupteur(Actionnable):
     def watch(self):
         self.logger("SWITCH WATCHER : ", "Start thread")
         time.sleep(7)
-        if not self.beacon_receiver.get_panel_status():
-            self.logger("SWITCH WATCHER : ", "Panel off")
-            self.actions[0].done.clear()
-            self.display.removePoints(Interrupteur.POINTS)
 
-        else:
-            self.logger("SWITCH WATCHER : ", "Panel on")
 
 
 
