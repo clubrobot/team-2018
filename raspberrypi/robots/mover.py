@@ -213,9 +213,9 @@ class Mover:
         direction = {"forward": 1, "backward": -1}[direction]
         while not wall_reached:
             try:
+                self.wheeledbase.set_velocities(250 * direction, 0)
+                time.sleep(0.1)
                 while not self.wheeledbase.isarrived():
-                    time.sleep(0.1)
-                    self.wheeledbase.set_velocities(250 * direction, 0)
                     time.sleep(0.1)
             except RuntimeError:
                 if not nb_try > 0:
@@ -507,7 +507,7 @@ class Mover:
     def goto(self, x, y):
         self.goal = (x, y)
         self.sensors_front.activate()
-
+        self.front_flag.bind(self.sensors_front_listener.signal)
         self.path = self.roadmap.get_shortest_path(self.wheeledbase.get_position()[:2], self.goal)
         self.logger("MOVER : ", path=self.path)
         self.wheeledbase.purepursuit(self.path)
@@ -542,8 +542,9 @@ class Mover:
             x, y, _ = self.wheeledbase.get_position()
 
         # self.on_path_flag.clear()
+        self.reset()
         if self.goto_interrupt.is_set():
-            self.reset()
+
             raise PositionUnreachable()
 
     def front_obstacle(self):
@@ -577,19 +578,12 @@ class Mover:
 
             return
 
-        if 100<hypot(y - self.goal[1], x - self.goal[0]):
+        if 100>hypot(y - self.goal[1], x - self.goal[0]):
             self.interupted_status.clear()
             self.interupted_lock.release()
             return
 
-        lin_wanted, ang_wanted = self.wheeledbase.get_velocities_wanted(True)
-        if abs(ang_wanted) > 7:
-            self.wheeledbase.set_velocities(copysign(150, -lin_wanted), copysign(1, ang_wanted))
-            time.sleep(1)  # 0.5
-            self.wheeledbase.set_velocities(copysign(150, lin_wanted), 0)
-            time.sleep(1.2)
-            self.wheeledbase.purepursuit(self.path)
-
+        print("stop")
         self.wheeledbase.stop()
 
 
@@ -605,10 +599,9 @@ class Mover:
         obs.set_position(x_obs, y_obs, theta)
         old_path = self.path
         try:
-            try:
-                self.path = self.roadmap.get_shortest_path((x, y), self.goal)
-            except ValueError:
-                self.path = old_path
+            self.path = self.roadmap.get_shortest_path((x, y), self.goal)
+
+
             print(self.path)
             aim_theta= atan2(self.path[1][1]-self.path[0][1], self.path[1][0]-self.path[0][0])
             arrived = False
