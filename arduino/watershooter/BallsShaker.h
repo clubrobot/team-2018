@@ -7,7 +7,7 @@
 #include "../common/PeriodicProcess.h"
 
 #define SHAKER_HORIZONTAL_1 10
-#define SHAKER_HORIZONTAL_2 65
+#define SHAKER_HORIZONTAL_2 70
 #define SHAKER_VERTICAL_1 180
 #define SHAKER_VERTICAL_2 120
 
