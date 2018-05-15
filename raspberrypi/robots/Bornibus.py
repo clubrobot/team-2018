@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 import time
-
+import math
 
 from robots.cubes_manager           import CubeManagement
 from robots.balls_manager           import Dispenser, Treatment, Shot
@@ -78,9 +78,9 @@ class Bornibus:
         d3Act = self.d3.getAction()[0]
         d4Act = self.d4.getAction()[0]
         shortShot = self.shot.getAction()[0]
-        longShot0 = self.shot.getAction()[2]
-        longShot1 = self.shot.getAction()[3]
-        longShot2 = self.shot.getAction()[4]
+        #longShot0 = self.shot.getAction()[2]
+        longShot1 = self.shot.getAction()[1]
+        #longShot2 = self.shot.getAction()[4]
         treatmentAct = self.treatment.getAction()[0]
 
         if self.side == Bornibus.GREEN:
@@ -93,48 +93,32 @@ class Bornibus:
 
         self.action_list = [
             beeAct,
-            panelAct,
             dispMono,
             shortShot,
             dispMulti,
-            longShot0,
             longShot1,
-            longShot2,
             treatmentAct,
+            #panelAct,
         ]
 
-        beeAct.set_manual_order(1)
-        dispMono.set_manual_order(2)
-        shortShot.set_manual_order(3)
-        dispMulti.set_manual_order(4)
-        #longShot2.set_manual_order(4)
-        # longShot0.set_manual_order(5)
-        longShot1.set_manual_order(5)
-        treatmentAct.set_manual_order(6)
-        #panelAct.set_manual_order(6)
-        #
-
-        self.heuristics = Heuristics(self.action_list, self.arduinos, self.logger, mode=Heuristics.MANUAL)
 
         if self.side == Bornibus.GREEN:
-            self.arduinos["wheeledbase"].set_position(592, 290, 0)
+            self.arduinos["wheeledbase"].set_position(650-112.5, 57.5, math.pi/2)
         else:
-            self.arduinos["wheeledbase"].set_position(592, 3000-290, 0)
+            self.arduinos["wheeledbase"].set_position(650-112.5, 3000-57.5, -math.pi/2)
 
     def run(self):
         self.displayManager.start()
         self.logger.reset_time()
         self.mover.reset()
-        self.arduinos["watersorter"].set_shaker_velocity(400)
+        self.arduinos["watersorter"].set_shaker_velocity(600)
         self.arduinos["beeActioner"].close()
-        self.arduinos["watersorter"].close_trash_unloader()
+        self.arduinos["watersorter"].write_trash_unloader(40)
         self.arduinos["watersorter"].close_trash()
 
         self.data["nb_balls_in_unloader"] = 0
 
-        act = self.heuristics.get_best()
-        print(act)
-        while act is not None:
+        for act in self.action_list:
             try:
                 act.before_action()
                 self.logger("MAIN : ", "Let's go to the next action : {}".format(act.typ))
@@ -145,7 +129,6 @@ class Bornibus:
             except PositionUnreachable:
                 self.logger("MAIN : ", "Unreachable action")
                 act.temp_disable(5)
-            act = self.heuristics.get_best()
             self.mover.reset()
 
 
@@ -166,6 +149,6 @@ if __name__ == '__main__':
 
     bm = BeaconsManagement(br, "area.ggb")
 
-    auto = Bornibus(0, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back, br, bm)
+    auto = Bornibus(0, rm, geo, wheeledbase, waterlauncher, watersorter, ssd, led1, led2, beeactuator, s_front, s_lat, s_back)
     auto.set_side(0)
     auto.run()
